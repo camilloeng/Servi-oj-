@@ -1023,5 +1023,42 @@
   }
 </style>
 
+
+<script type="module">
+import { observarPedidos, demonstrarInteresse, observarLogin, buscarUsuario } from './firebase.js';
+
+observarLogin(async user => {
+  if (!user) { window.location.href = 'login.html'; return; }
+  const dados = await buscarUsuario(user.uid);
+  if (dados?.nome) {
+    document.querySelector('.nav-nome') && (document.querySelector('.nav-nome').textContent = dados.nome.split(' ')[0]);
+  }
+});
+
+// Override registrar interesse
+window.registrarInteresse = async function(btn) {
+  const pedidoCard = btn.closest('.pedido-card');
+  const pedidoId = pedidoCard?.dataset.pedidoId;
+  if (!pedidoId) {
+    // Demo mode
+    btn.className = 'interesse-btn enviado';
+    btn.textContent = '✅ Interesse enviado';
+    btn.onclick = null;
+    document.getElementById('overlayConfirmInteresse').classList.add('vis');
+    return;
+  }
+  try {
+    await demonstrarInteresse(pedidoId);
+    btn.className = 'interesse-btn enviado';
+    btn.textContent = '✅ Interesse enviado';
+    btn.onclick = null;
+    document.getElementById('overlayConfirmInteresse').classList.add('vis');
+  } catch(e) {
+    console.error(e);
+    alert('Erro ao registrar interesse. Tente novamente.');
+  }
+}
+</script>
+
 </body>
 </html>

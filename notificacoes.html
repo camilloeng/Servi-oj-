@@ -651,5 +651,19 @@
   }
 </style>
 
+
+<script type="module">
+import { observarNotificacoes, observarLogin, marcarNotificacaoLida } from './firebase.js';
+
+observarLogin(user => {
+  if (!user) { window.location.href = 'login.html'; return; }
+  observarNotificacoes(notifs => {
+    const naoLidas = notifs.filter(n => !n.lida).length;
+    document.getElementById('countBadge') && (document.getElementById('countBadge').textContent = naoLidas);
+    document.getElementById('subCount') && (document.getElementById('subCount').textContent = `${notifs.length} notificações · ${naoLidas} não lidas`);
+  });
+});
+</script>
+
 </body>
 </html>

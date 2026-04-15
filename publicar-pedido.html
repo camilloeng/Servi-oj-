@@ -927,5 +927,40 @@
   }
 </style>
 
+
+<script type="module">
+import { publicarPedido, observarLogin } from './firebase.js';
+
+observarLogin(user => {
+  if (!user) window.location.href = 'login.html';
+});
+
+// Override publicar function
+window.publicar = async function() {
+  const titulo = document.getElementById('tituloInput')?.value.trim();
+  const desc = document.getElementById('descInput')?.value.trim();
+  const cat = document.querySelector('.cat-pill.sel')?.textContent.trim();
+  const valorTipo = document.querySelector('.valor-btn.sel')?.textContent.includes('aberto') ? 'aberto' : 'aproximado';
+  const valor = document.getElementById('valorInput')?.value || null;
+  const urgencia = document.querySelector('.urg-btn.sel')?.textContent.trim();
+  const endereco = document.querySelector('input[placeholder*="São Paulo"]')?.value.trim();
+
+  if (!titulo || !desc) { alert('Preencha o título e a descrição do pedido!'); return; }
+  if (!cat) { alert('Selecione uma categoria!'); return; }
+
+  try {
+    const id = await publicarPedido({
+      titulo, descricao: desc, categoria: cat,
+      valorTipo, valor: valor ? parseFloat(valor) : null,
+      urgencia, endereco
+    });
+    document.getElementById('modalOverlay').classList.add('vis');
+  } catch(e) {
+    console.error(e);
+    alert('Erro ao publicar pedido. Você está logado?');
+  }
+}
+</script>
+
 </body>
 </html>

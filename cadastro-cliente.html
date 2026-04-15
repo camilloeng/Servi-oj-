@@ -677,5 +677,54 @@
   }
 </script>
 
+
+<script type="module">
+import { cadastrarUsuario } from './firebase.js';
+
+// Botão finalizar cadastro
+document.querySelector('.btn-cadastrar').addEventListener('click', async () => {
+  const nome = document.querySelector('input[placeholder="Ex: Maria Silva"]').value.trim();
+  const email = document.querySelector('input[type="email"]').value.trim();
+  const tel = document.querySelector('input[type="tel"]').value.trim();
+  const senha = document.getElementById('senhaInput').value;
+  const rua = document.getElementById('rua').value.trim();
+  const bairro = document.getElementById('bairro').value.trim();
+  const cidade = document.getElementById('cidade').value.trim();
+  const estado = document.getElementById('estado').value;
+  const num = document.querySelectorAll('input[type="text"]')[1]?.value.trim();
+
+  if (!nome || !email || !senha || !tel) {
+    alert('Preencha nome, email, telefone e senha!'); return;
+  }
+  if (senha.length < 6) {
+    alert('A senha precisa ter pelo menos 6 caracteres!'); return;
+  }
+
+  const btn = document.querySelector('.btn-cadastrar');
+  btn.textContent = 'Criando conta...';
+  btn.style.opacity = '0.7';
+  btn.disabled = true;
+
+  try {
+    await cadastrarUsuario(email, senha, {
+      nome, telefone: tel, tipo: 'cliente',
+      endereco: { rua, numero: num, bairro, cidade, estado }
+    });
+    localStorage.setItem('sj_tipo', 'cliente');
+    localStorage.setItem('sj_nome', nome);
+    alert('✅ Conta criada com sucesso! Bem-vinda ao ServiçoJá, ' + nome + '!');
+    window.location.href = 'meus-pedidos-cliente.html';
+  } catch(e) {
+    btn.textContent = 'Criar conta grátis';
+    btn.style.opacity = '1';
+    btn.disabled = false;
+    let msg = 'Erro ao criar conta. Tente novamente.';
+    if (e.code === 'auth/email-already-in-use') msg = 'Este email já está cadastrado. Faça login.';
+    if (e.code === 'auth/weak-password') msg = 'Senha muito fraca. Use pelo menos 6 caracteres.';
+    alert(msg);
+  }
+});
+</script>
+
 </body>
 </html>
