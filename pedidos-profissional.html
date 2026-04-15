@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiçoJá — Pedidos Disponíveis</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --verde: #00C96F; --verde-escuro: #009E57;
+    --azul: #0A1628; --azul-medio: #132240; --azul-input: #0F1C35;
+    --branco: #F5F7F2; --cinza: #8A9BB5;
+    --laranja: #FF6B35; --amarelo: #FFB830;
+    --borda: rgba(255,255,255,0.09);
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--azul); color: var(--branco); min-height: 100vh; }
+  body::before {
+    content: ''; position: fixed; top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,201,111,0.09) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 28px; border-bottom: 1px solid var(--borda);
+  }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; text-decoration: none; color: var(--branco); }
+  .logo span { color: var(--verde); }
+  .nav-right { display: flex; align-items: center; gap: 14px; }
+  .nav-badge {
+    background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3);
+    color: var(--laranja); font-size: 0.75rem; font-weight: 700;
+    padding: 4px 10px; border-radius: 100px;
+  }
+  .avatar-wrap { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, rgba(0,201,111,0.3), rgba(0,201,111,0.1));
+    border: 2px solid rgba(0,201,111,0.3);
+    display: flex; align-items: center; justify-content: center; font-size: 1rem;
+  }
+  .avatar-name { font-size: 0.85rem; font-weight: 600; }
+  .avatar-role { font-size: 0.72rem; color: var(--cinza); }
+
+  /* LAYOUT */
+  .layout {
+    position: relative; z-index: 5;
+    display: grid; grid-template-columns: 300px 1fr;
+    min-height: calc(100vh - 65px);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    border-right: 1px solid var(--borda);
+    padding: 24px 20px;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+
+  .sidebar-title {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 1rem; margin-bottom: 2px;
+  }
+  .sidebar-sub { color: var(--cinza); font-size: 0.78rem; }
+
+  /* RAIO */
+  .raio-card {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 16px; padding: 16px;
+  }
+  .raio-label {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 0.78rem; color: var(--cinza);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+  }
+  .raio-valor {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 1.6rem; color: var(--verde); margin-bottom: 8px;
+  }
+  .raio-valor span { font-size: 0.9rem; font-weight: 600; color: var(--cinza); }
+
+  input[type=range] {
+    width: 100%; -webkit-appearance: none; appearance: none;
+    height: 4px; border-radius: 2px;
+    background: linear-gradient(to right, var(--verde) 0%, var(--verde) 40%, rgba(255,255,255,0.1) 40%);
+    outline: none; cursor: pointer; margin-bottom: 8px;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--verde); border: 3px solid var(--azul);
+    box-shadow: 0 0 0 2px var(--verde);
+    cursor: pointer; transition: transform 0.15s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+  .raio-opts { display: flex; justify-content: space-between; }
+  .raio-opt {
+    font-size: 0.7rem; color: var(--cinza); cursor: pointer;
+    padding: 3px 6px; border-radius: 6px; transition: all 0.2s;
+  }
+  .raio-opt:hover { color: var(--verde); }
+  .raio-opt.sel { color: var(--verde); font-weight: 700; }
+
+  /* LOCALIZAÇÃO */
+  .loc-card {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 16px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .loc-icon { font-size: 1.2rem; flex-shrink: 0; }
+  .loc-info { flex: 1; }
+  .loc-info strong { font-size: 0.85rem; font-weight: 600; display: block; }
+  .loc-info span { font-size: 0.72rem; color: var(--cinza); }
+  .loc-btn {
+    background: none; border: 1px solid var(--borda); border-radius: 8px;
+    color: var(--cinza); font-size: 0.72rem; padding: 4px 8px;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .loc-btn:hover { border-color: var(--verde); color: var(--verde); }
+
+  /* FILTROS */
+  .filtros-title {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 0.78rem; color: var(--cinza);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  .filtro-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 12px; border-radius: 10px; cursor: pointer;
+    transition: all 0.2s; font-size: 0.85rem; font-weight: 500;
+    color: var(--cinza); margin-bottom: 4px;
+  }
+  .filtro-item:hover { background: rgba(255,255,255,0.04); color: var(--branco); }
+  .filtro-item.ativo { background: rgba(0,201,111,0.1); color: var(--verde); font-weight: 600; }
+  .filtro-count {
+    background: rgba(255,255,255,0.08); border-radius: 100px;
+    padding: 2px 8px; font-size: 0.7rem; font-weight: 700;
+  }
+  .filtro-item.ativo .filtro-count { background: rgba(0,201,111,0.2); color: var(--verde); }
+
+  /* STATS SIDEBAR */
+  .stats-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-mini {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 12px; padding: 12px; text-align: center;
+  }
+  .stat-mini .num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--verde); }
+  .stat-mini .lbl { font-size: 0.68rem; color: var(--cinza); margin-top: 2px; }
+
+  /* CONTEÚDO PRINCIPAL */
+  .main {
+    padding: 24px 28px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+
+  .main-header {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+  .main-header h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; }
+  .main-header p { color: var(--cinza); font-size: 0.82rem; margin-top: 2px; }
+
+  .sort-select {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 10px; color: var(--branco);
+    font-family: 'DM Sans', sans-serif; font-size: 0.82rem;
+    padding: 8px 28px 8px 12px; outline: none; cursor: pointer;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A9BB5' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+  }
+  select option { background: var(--azul-medio); }
+
+  /* CARDS DE PEDIDO */
+  .pedido-card {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 18px; padding: 22px 24px;
+    transition: all 0.25s; cursor: pointer;
+    animation: fadeUp 0.4s ease both;
+    position: relative; overflow: hidden;
+  }
+  .pedido-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: transparent; transition: background 0.25s;
+  }
+  .pedido-card:hover { border-color: rgba(0,201,111,0.2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+  .pedido-card:hover::before { background: var(--verde); }
+  .pedido-card.urgente::before { background: var(--laranja); }
+  .pedido-card.urgente { border-color: rgba(255,107,53,0.15); }
+
+  .pedido-top {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px;
+  }
+  .pedido-cat {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 100px;
+    background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.2); color: var(--verde);
+  }
+  .pedido-cat.urgente { background: rgba(255,107,53,0.1); border-color: rgba(255,107,53,0.25); color: var(--laranja); }
+
+  .pedido-titulo { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 6px; line-height: 1.3; }
+  .pedido-desc { color: var(--cinza); font-size: 0.82rem; line-height: 1.6; margin-bottom: 14px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+
+  .pedido-meta {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 14px;
+  }
+  .meta-item { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--cinza); }
+  .meta-item strong { color: var(--branco); }
+
+  .pedido-bottom {
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid var(--borda); padding-top: 14px; margin-top: 14px; gap: 12px;
+  }
+
+  .pedido-fotos { display: flex; align-items: center; gap: 6px; }
+  .foto-mini {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--azul-input); border: 1px solid var(--borda);
+    display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
+  }
+  .foto-count { font-size: 0.72rem; color: var(--cinza); }
+
+  .interesse-btn {
+    background: var(--verde); border: none; border-radius: 10px;
+    padding: 10px 20px; color: var(--azul);
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .interesse-btn:hover { background: var(--verde-escuro); transform: scale(1.03); }
+  .interesse-btn.enviado {
+    background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.3);
+    color: var(--verde); cursor: default; transform: none;
+  }
+
+  /* MODAL PERFIL */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(10,22,40,0.92);
+    z-index: 50; display: flex; align-items: center; justify-content: center;
+    padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .overlay.vis { opacity: 1; pointer-events: all; }
+
+  .modal-perfil {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 24px; width: 100%; max-width: 520px; max-height: 90vh;
+    overflow-y: auto; transform: translateY(20px); transition: transform 0.3s;
+  }
+  .overlay.vis .modal-perfil { transform: translateY(0); }
+
+  .modal-perfil-header {
+    padding: 28px 28px 0; position: relative;
+  }
+  .modal-close {
+    position: absolute; top: 20px; right: 20px;
+    background: rgba(255,255,255,0.06); border: none; border-radius: 50%;
+    width: 32px; height: 32px; color: var(--cinza); font-size: 1rem;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.12); color: var(--branco); }
+
+  .prof-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+  .prof-avatar {
+    width: 72px; height: 72px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, rgba(0,201,111,0.3), rgba(0,78,200,0.2));
+    border: 3px solid rgba(0,201,111,0.3);
+    display: flex; align-items: center; justify-content: center; font-size: 2rem;
+  }
+  .prof-nome { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 3px; }
+  .prof-cats { color: var(--cinza); font-size: 0.8rem; margin-bottom: 6px; }
+  .prof-stars { display: flex; align-items: center; gap: 4px; }
+  .stars { color: var(--amarelo); font-size: 0.9rem; letter-spacing: 1px; }
+  .rating-num { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.88rem; }
+  .rating-count { font-size: 0.75rem; color: var(--cinza); }
+
+  .prof-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.25);
+    color: var(--verde); font-size: 0.72rem; font-weight: 700;
+    padding: 4px 10px; border-radius: 100px; margin-bottom: 14px;
+  }
+
+  .modal-section { padding: 18px 28px; border-top: 1px solid var(--borda); }
+  .modal-sec-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.82rem; color: var(--cinza); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+
+  .prof-sobre { font-size: 0.85rem; color: var(--cinza); line-height: 1.7; }
+
+  .fotos-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+  .foto-trabalho {
+    aspect-ratio: 1; border-radius: 10px; background: var(--azul-input);
+    border: 1px solid var(--borda); display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem;
+  }
+
+  .reviews { display: flex; flex-direction: column; gap: 12px; }
+  .review-item {
+    background: var(--azul-input); border: 1px solid var(--borda);
+    border-radius: 12px; padding: 14px;
+  }
+  .review-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .review-nome { font-weight: 600; font-size: 0.82rem; }
+  .review-stars { color: var(--amarelo); font-size: 0.78rem; }
+  .review-text { font-size: 0.8rem; color: var(--cinza); line-height: 1.5; }
+  .review-data { font-size: 0.68rem; color: rgba(138,155,181,0.5); margin-top: 4px; }
+
+  .modal-footer { padding: 20px 28px; border-top: 1px solid var(--borda); display: flex; gap: 10px; }
+  .btn-recusar {
+    flex: 1; background: transparent; border: 1.5px solid var(--borda);
+    border-radius: 12px; padding: 13px; color: var(--cinza);
+    font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.88rem;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-recusar:hover { border-color: rgba(255,92,92,0.4); color: #FF5C5C; }
+  .btn-aceitar {
+    flex: 2; background: var(--verde); border: none;
+    border-radius: 12px; padding: 13px; color: var(--azul);
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.92rem;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-aceitar:hover { background: var(--verde-escuro); }
+
+  /* MODAL ORÇAMENTO */
+  .modal-orcamento {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 24px; width: 100%; max-width: 460px;
+    transform: translateY(20px); transition: transform 0.3s;
+    padding: 32px 28px;
+  }
+  .overlay.vis .modal-orcamento { transform: translateY(0); }
+
+  .orc-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; margin-bottom: 4px; }
+  .orc-sub { color: var(--cinza); font-size: 0.82rem; margin-bottom: 22px; line-height: 1.5; }
+
+  .orc-field { margin-bottom: 14px; }
+  .orc-label { font-size: 0.78rem; font-weight: 600; color: var(--cinza); margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+  .orc-opcional { font-size: 0.68rem; background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--cinza); }
+
+  .orc-input {
+    width: 100%; background: var(--azul-input); border: 1.5px solid var(--borda);
+    border-radius: 12px; color: var(--branco); font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem; padding: 12px 14px; outline: none; transition: border-color 0.2s;
+  }
+  .orc-input:focus { border-color: rgba(0,201,111,0.45); }
+  .orc-input::placeholder { color: rgba(138,155,181,0.45); }
+  textarea.orc-input { resize: vertical; min-height: 90px; line-height: 1.6; }
+  .orc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .orc-prefix { position: relative; }
+  .orc-prefix span { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--cinza); font-size: 0.85rem; pointer-events: none; }
+  .orc-prefix input { padding-left: 36px; }
+
+  .orc-aviso {
+    display: flex; align-items: flex-start; gap: 8px;
+    background: rgba(0,201,111,0.06); border: 1px solid rgba(0,201,111,0.15);
+    border-radius: 10px; padding: 10px 12px; margin-bottom: 18px;
+    font-size: 0.75rem; color: var(--cinza); line-height: 1.5;
+  }
+
+  .orc-btns { display: flex; gap: 10px; }
+  .btn-cancelar {
+    flex: 1; background: transparent; border: 1.5px solid var(--borda);
+    border-radius: 12px; padding: 13px; color: var(--cinza);
+    font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-cancelar:hover { border-color: rgba(255,255,255,0.25); color: var(--branco); }
+  .btn-enviar-orc {
+    flex: 2; background: var(--verde); border: none; border-radius: 12px; padding: 13px;
+    color: var(--azul); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.92rem;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-enviar-orc:hover { background: var(--verde-escuro); }
+
+  /* MODAL SUCESSO */
+  .modal-sucesso {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 24px; width: 100%; max-width: 400px;
+    text-align: center; padding: 40px 32px;
+    transform: translateY(20px); transition: transform 0.3s;
+  }
+  .overlay.vis .modal-sucesso { transform: translateY(0); }
+  .suc-icon { font-size: 3.5rem; margin-bottom: 16px; }
+  .suc-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; margin-bottom: 8px; }
+  .suc-sub { color: var(--cinza); font-size: 0.85rem; line-height: 1.6; margin-bottom: 24px; }
+  .btn-suc { width: 100%; background: var(--verde); border: none; border-radius: 12px; padding: 14px; color: var(--azul); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
+  .btn-suc:hover { background: var(--verde-escuro); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 768px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { border-right: none; border-bottom: 1px solid var(--borda); }
+    .main { padding: 20px 16px; }
+    nav { padding: 16px 18px; }
+    .avatar-name, .avatar-role { display: none; }
+  }
+</style>
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#00C96F">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ServiçoJá">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo">Serviço<span>Já</span></a>
+  <div class="nav-right">
+    <div class="nav-badge">⚡ 12 novos pedidos</div>
+    <div class="avatar-wrap">
+      <div class="avatar">👷</div>
+      <div>
+        <div class="avatar-name">João Ferreira</div>
+        <div class="avatar-role">Eletricista · SP</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div>
+      <div class="sidebar-title">Pedidos disponíveis</div>
+      <div class="sidebar-sub">Filtre por distância e categoria</div>
+    </div>
+
+    <!-- LOCALIZAÇÃO -->
+    <div class="loc-card">
+      <div class="loc-icon">📍</div>
+      <div class="loc-info">
+        <strong>Vila Mariana, SP</strong>
+        <span>Localização atual</span>
+      </div>
+      <button class="loc-btn">Atualizar</button>
+    </div>
+
+    <!-- RAIO -->
+    <div class="raio-card">
+      <div class="raio-label">📡 Raio de busca</div>
+      <div class="raio-valor" id="raioValor">10 <span>km</span></div>
+      <input type="range" min="1" max="50" value="10" id="raioSlider" oninput="atualizarRaio(this.value)">
+      <div class="raio-opts">
+        <span class="raio-opt" onclick="setRaio(5)">5km</span>
+        <span class="raio-opt sel" onclick="setRaio(10)">10km</span>
+        <span class="raio-opt" onclick="setRaio(20)">20km</span>
+        <span class="raio-opt" onclick="setRaio(50)">50km</span>
+      </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div>
+      <div class="filtros-title">Minhas categorias</div>
+      <div class="filtro-item ativo" onclick="selFiltro(this)">
+        <span>⚡ Todos os pedidos</span>
+        <span class="filtro-count">24</span>
+      </div>
+      <div class="filtro-item" onclick="selFiltro(this)">
+        <span>⚡ Elétrica</span>
+        <span class="filtro-count">18</span>
+      </div>
+      <div class="filtro-item" onclick="selFiltro(this)">
+        <span>🔌 Instalações</span>
+        <span class="filtro-count">6</span>
+      </div>
+    </div>
+
+    <!-- URGÊNCIA -->
+    <div>
+      <div class="filtros-title">Urgência</div>
+      <div class="filtro-item ativo" onclick="selFiltro(this)">
+        <span>🔄 Todos</span>
+        <span class="filtro-count">24</span>
+      </div>
+      <div class="filtro-item" onclick="selFiltro(this)">
+        <span>🔥 Urgentes</span>
+        <span class="filtro-count">5</span>
+      </div>
+      <div class="filtro-item" onclick="selFiltro(this)">
+        <span>📅 Esta semana</span>
+        <span class="filtro-count">14</span>
+      </div>
+      <div class="filtro-item" onclick="selFiltro(this)">
+        <span>🗓️ Sem pressa</span>
+        <span class="filtro-count">5</span>
+      </div>
+    </div>
+
+    <!-- MINI STATS -->
+    <div class="stats-mini">
+      <div class="stat-mini"><div class="num">8</div><div class="lbl">Interesses enviados</div></div>
+      <div class="stat-mini"><div class="num">3</div><div class="lbl">Aceitos pelo cliente</div></div>
+      <div class="stat-mini"><div class="num">4.9★</div><div class="lbl">Sua avaliação</div></div>
+      <div class="stat-mini"><div class="num">R$2.4k</div><div class="lbl">Este mês</div></div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <div class="main-header">
+      <div>
+        <h2>24 pedidos encontrados</h2>
+        <p>Dentro de 10km · São Paulo, SP · Categoria: Elétrica</p>
+      </div>
+      <select class="sort-select">
+        <option>Mais recentes</option>
+        <option>Mais próximos</option>
+        <option>Maior valor</option>
+        <option>Mais urgentes</option>
+      </select>
+    </div>
+
+    <!-- PEDIDO 1 - URGENTE -->
+    <div class="pedido-card urgente" style="animation-delay:0s">
+      <div class="pedido-top">
+        <div>
+          <div class="pedido-cat urgente">🔥 Urgente · ⚡ Elétrica</div>
+        </div>
+        <div style="font-size:0.75rem;color:var(--cinza);white-space:nowrap">há 15 min</div>
+      </div>
+      <div class="pedido-titulo">Disjuntor caiu e não volta — preciso urgente</div>
+      <div class="pedido-desc">O disjuntor geral da casa caiu e não consigo religar. Tentei resetar mas volta a desligar. Tenho uma criança pequena em casa e preciso resolver hoje.</div>
+      <div class="pedido-meta">
+        <div class="meta-item">📍 <strong>2,3 km</strong> · Moema</div>
+        <div class="meta-item">💰 <strong>Em aberto</strong></div>
+        <div class="meta-item">👁️ <strong>7</strong> viram</div>
+        <div class="meta-item" style="color:var(--verde)">✅ <strong>2</strong> aceitos pelo cliente</div>
+        <div class="meta-item" style="color:var(--amarelo)">💳 Taxa: <strong>R$ 35,00</strong></div>
+      </div>
+      <div class="pedido-bottom">
+        <div class="pedido-fotos">
+          <div class="foto-mini">🖼️</div>
+          <div class="foto-mini">🖼️</div>
+          <span class="foto-count">2 fotos</span>
+        </div>
+        <button class="interesse-btn" onclick="registrarInteresse(this)">👋 Tenho interesse</button>
+      </div>
+    </div>
+
+    <!-- PEDIDO 2 -->
+    <div class="pedido-card" style="animation-delay:0.05s">
+      <div class="pedido-top">
+        <div><div class="pedido-cat">⚡ Elétrica</div></div>
+        <div style="font-size:0.75rem;color:var(--cinza);white-space:nowrap">há 1h</div>
+      </div>
+      <div class="pedido-titulo">Instalação de 4 tomadas novas no escritório</div>
+      <div class="pedido-desc">Reforma do escritório em andamento. Preciso instalar 4 tomadas duplas com aterramento no padrão NBR 14136. A fiação já foi passada pelo pedreiro.</div>
+      <div class="pedido-meta">
+        <div class="meta-item">📍 <strong>4,1 km</strong> · Brooklin</div>
+        <div class="meta-item">💰 <strong>R$ 400</strong> aprox.</div>
+        <div class="meta-item">👁️ <strong>12</strong> viram</div>
+        <div class="meta-item" style="color:var(--verde)">✅ <strong>1</strong> aceito pelo cliente</div>
+        <div class="meta-item" style="color:var(--amarelo)">💳 Taxa: <strong>R$ 25,00</strong></div>
+      </div>
+      <div class="pedido-bottom">
+        <div class="pedido-fotos">
+          <div class="foto-mini">📄</div>
+          <span class="foto-count">1 projeto PDF</span>
+        </div>
+        <button class="interesse-btn" onclick="registrarInteresse(this)">👋 Tenho interesse</button>
+      </div>
+    </div>
+
+    <!-- PEDIDO 3 -->
+    <div class="pedido-card" style="animation-delay:0.1s">
+      <div class="pedido-top">
+        <div><div class="pedido-cat">⚡ Elétrica</div></div>
+        <div style="font-size:0.75rem;color:var(--cinza);white-space:nowrap">há 3h</div>
+      </div>
+      <div class="pedido-titulo">Instalação de ar-condicionado split 12.000 BTUs</div>
+      <div class="pedido-desc">Comprei um ar-condicionado split LG 12.000 BTUs e preciso de instalação completa: suporte, tubulação, elétrica e configuração. Apartamento no 8º andar.</div>
+      <div class="pedido-meta">
+        <div class="meta-item">📍 <strong>5,8 km</strong> · Ibirapuera</div>
+        <div class="meta-item">💰 <strong>R$ 300</strong> aprox.</div>
+        <div class="meta-item">👁️ <strong>21</strong> viram</div>
+        <div class="meta-item" style="color:var(--verde)">✅ <strong>3</strong> aceitos pelo cliente</div>
+        <div class="meta-item" style="color:var(--amarelo)">💳 Taxa: <strong>R$ 30,00</strong></div>
+      </div>
+      <div class="pedido-bottom">
+        <div class="pedido-fotos">
+          <div class="foto-mini">🖼️</div>
+          <div class="foto-mini">🎬</div>
+          <span class="foto-count">1 foto · 1 vídeo</span>
+        </div>
+        <button class="interesse-btn enviado">✅ Interesse enviado</button>
+      </div>
+    </div>
+
+    <!-- PEDIDO 4 -->
+    <div class="pedido-card" style="animation-delay:0.15s">
+      <div class="pedido-top">
+        <div><div class="pedido-cat">⚡ Elétrica</div></div>
+        <div style="font-size:0.75rem;color:var(--cinza);white-space:nowrap">há 5h</div>
+      </div>
+      <div class="pedido-titulo">Quadro de distribuição antigo — troca completa</div>
+      <div class="pedido-desc">Quadro elétrico de 1985, fios antigos e sem DR. Quero trocar tudo por quadro novo com disjuntores modernos e DR. Casa de 3 quartos, aproximadamente 120m².</div>
+      <div class="pedido-meta">
+        <div class="meta-item">📍 <strong>7,2 km</strong> · Santo André</div>
+        <div class="meta-item">💰 <strong>Em aberto</strong></div>
+        <div class="meta-item">👁️ <strong>9</strong> viram</div>
+        <div class="meta-item" style="color:var(--cinza)">✅ <strong>0</strong> aceitos ainda</div>
+        <div class="meta-item" style="color:var(--amarelo)">💳 Taxa: <strong>R$ 50,00</strong></div>
+      </div>
+      <div class="pedido-bottom">
+        <div class="pedido-fotos">
+          <div class="foto-mini">🖼️</div>
+          <div class="foto-mini">🖼️</div>
+          <div class="foto-mini">🖼️</div>
+          <span class="foto-count">3 fotos</span>
+        </div>
+        <button class="interesse-btn" onclick="registrarInteresse(this)">👋 Tenho interesse</button>
+      </div>
+    </div>
+
+    <!-- PEDIDO 5 -->
+    <div class="pedido-card" style="animation-delay:0.2s">
+      <div class="pedido-top">
+        <div><div class="pedido-cat">⚡ Elétrica</div></div>
+        <div style="font-size:0.75rem;color:var(--cinza);white-space:nowrap">há 8h</div>
+      </div>
+      <div class="pedido-titulo">Ponto de luz na garagem e tomada 220V</div>
+      <div class="pedido-desc">Preciso instalar um ponto de luz com sensor de presença na garagem e uma tomada 220V para carregar carro elétrico. Garagem coberta com 30m².</div>
+      <div class="pedido-meta">
+        <div class="meta-item">📍 <strong>9,4 km</strong> · ABC</div>
+        <div class="meta-item">💰 <strong>R$ 500</strong> aprox.</div>
+        <div class="meta-item">👁️ <strong>4</strong> viram</div>
+        <div class="meta-item" style="color:var(--cinza)">✅ <strong>0</strong> aceitos ainda</div>
+        <div class="meta-item" style="color:var(--amarelo)">💳 Taxa: <strong>R$ 20,00</strong></div>
+      </div>
+      <div class="pedido-bottom">
+        <div class="pedido-fotos">
+          <span class="foto-count" style="color:var(--cinza)">Sem anexos</span>
+        </div>
+        <button class="interesse-btn" onclick="registrarInteresse(this)">👋 Tenho interesse</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL: CONFIRMAÇÃO DE INTERESSE -->
+<div class="overlay" id="overlayConfirmInteresse">
+  <div style="background:var(--azul-medio);border:1px solid rgba(0,201,111,0.25);border-radius:22px;width:100%;max-width:380px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s">
+    <div style="font-size:3rem;margin-bottom:12px">👋</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:8px">Interesse registrado!</div>
+    <div style="color:var(--cinza);font-size:0.83rem;line-height:1.6;margin-bottom:8px">O cliente foi notificado do seu interesse. Se ele aceitar ver seu orçamento, você será avisado por notificação e poderá enviar a proposta.</div>
+    <div style="background:rgba(255,184,48,0.08);border:1px solid rgba(255,184,48,0.2);border-radius:10px;padding:10px 14px;font-size:0.75rem;color:var(--amarelo);margin-bottom:20px;text-align:left">
+      💳 <strong>Lembre-se:</strong> a taxa só é cobrada se o cliente aceitar ver seu orçamento. Se não aceitar, você não paga nada.
+    </div>
+    <button onclick="fecharOverlay('overlayConfirmInteresse')" style="width:100%;background:var(--verde);border:none;border-radius:12px;padding:13px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer">Entendido!</button>
+  </div>
+</div>
+
+<!-- MODAL: PERFIL DO PROFISSIONAL (visto pelo cliente) -->
+<div class="overlay" id="overlayPerfil">
+  <div class="modal-perfil">
+    <div class="modal-perfil-header">
+      <button class="modal-close" onclick="fecharOverlay('overlayPerfil')">✕</button>
+      <div class="prof-header">
+        <div class="prof-avatar">👷</div>
+        <div>
+          <div class="prof-nome">João Ferreira</div>
+          <div class="prof-cats">⚡ Eletricista · 🔌 Instalações</div>
+          <div class="prof-stars">
+            <span class="stars">★★★★★</span>
+            <span class="rating-num">4.9</span>
+            <span class="rating-count">(47 avaliações)</span>
+          </div>
+        </div>
+      </div>
+      <div class="prof-badge">✅ Aprovado pela IA ServiçoJá · 98% no teste</div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-sec-title">Sobre o profissional</div>
+      <div class="prof-sobre">Eletricista com 12 anos de experiência em instalações residenciais e comerciais. Especializado em quadros elétricos, instalações de ar-condicionado e projetos de reforma. Trabalho com nota fiscal e garantia de 1 ano em todos os serviços.</div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-sec-title">Fotos de trabalhos realizados</div>
+      <div class="fotos-grid">
+        <div class="foto-trabalho">🔌</div>
+        <div class="foto-trabalho">⚡</div>
+        <div class="foto-trabalho">🏠</div>
+        <div class="foto-trabalho">🔧</div>
+        <div class="foto-trabalho">💡</div>
+        <div class="foto-trabalho">🛠️</div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-sec-title">Avaliações de clientes</div>
+      <div class="reviews">
+        <div class="review-item">
+          <div class="review-top">
+            <span class="review-nome">Carlos M.</span>
+            <span class="review-stars">★★★★★</span>
+          </div>
+          <div class="review-text">Excelente profissional! Chegou no horário, trabalho impecável e muito cuidadoso com a limpeza. Recomendo muito.</div>
+          <div class="review-data">há 2 semanas</div>
+        </div>
+        <div class="review-item">
+          <div class="review-top">
+            <span class="review-nome">Ana P.</span>
+            <span class="review-stars">★★★★★</span>
+          </div>
+          <div class="review-text">Instalou 6 tomadas novas e trocou o quadro elétrico. Serviço rápido, limpo e com garantia. Ótimo custo-benefício.</div>
+          <div class="review-data">há 1 mês</div>
+        </div>
+        <div class="review-item">
+          <div class="review-top">
+            <span class="review-nome">Roberto S.</span>
+            <span class="review-stars">★★★★☆</span>
+          </div>
+          <div class="review-text">Bom trabalho na instalação do ar-condicionado. Pequeno atraso no início mas avisou com antecedência. Serviço feito corretamente.</div>
+          <div class="review-data">há 2 meses</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-recusar" onclick="fecharOverlay('overlayPerfil')">✕ Recusar</button>
+      <button class="btn-aceitar" onclick="abrirOrcamento()">✅ Aceitar e ver orçamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ENVIAR ORÇAMENTO -->
+<div class="overlay" id="overlayOrcamento">
+  <div class="modal-orcamento">
+    <div class="orc-title">Enviar orçamento</div>
+    <div class="orc-sub">Preencha os detalhes da sua proposta. Todos os campos são opcionais — envie o que fizer sentido para o serviço.</div>
+
+    <div class="orc-aviso">
+      💡 Agora que o cliente aceitou seu perfil, você pode enviar um orçamento prévio. Após combinar pessoalmente, vocês podem ajustar os detalhes.
+    </div>
+
+    <div class="orc-row">
+      <div class="orc-field">
+        <div class="orc-label">💰 Valor estimado <span class="orc-opcional">opcional</span></div>
+        <div class="orc-prefix">
+          <span>R$</span>
+          <input type="number" class="orc-input" placeholder="0,00">
+        </div>
+      </div>
+      <div class="orc-field">
+        <div class="orc-label">📅 Data de início <span class="orc-opcional">opcional</span></div>
+        <input type="date" class="orc-input">
+      </div>
+    </div>
+
+    <div class="orc-field">
+      <div class="orc-label">🏁 Data de conclusão <span class="orc-opcional">opcional</span></div>
+      <input type="date" class="orc-input">
+    </div>
+
+    <div class="orc-field">
+      <div class="orc-label">💬 Mensagem <span class="orc-opcional">opcional</span></div>
+      <textarea class="orc-input" placeholder="Ex: Olá! Analisei seu pedido e posso atender. Precisarei de cerca de 2 horas para o serviço. Trabalho com garantia de 1 ano..."></textarea>
+    </div>
+
+    <div class="orc-btns">
+      <button class="btn-cancelar" onclick="fecharOverlay('overlayOrcamento')">Cancelar</button>
+      <button class="btn-enviar-orc" onclick="enviarOrcamento()">📤 Enviar orçamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: SUCESSO -->
+<div class="overlay" id="overlaySucesso">
+  <div class="modal-sucesso">
+    <div class="suc-icon">🎉</div>
+    <div class="suc-title">Orçamento enviado!</div>
+    <div class="suc-sub">Seu orçamento foi enviado para o cliente. Você receberá uma notificação quando ele responder. As informações completas de contato serão liberadas após a confirmação.</div>
+    <button class="btn-suc" onclick="fecharOverlay('overlaySucesso')">Voltar aos pedidos</button>
+  </div>
+</div>
+
+<script>
+  // RAIO
+  function atualizarRaio(val) {
+    document.getElementById('raioValor').innerHTML = `${val} <span>km</span>`;
+    const slider = document.getElementById('raioSlider');
+    const pct = ((val - 1) / 49) * 100;
+    slider.style.background = `linear-gradient(to right, var(--verde) 0%, var(--verde) ${pct}%, rgba(255,255,255,0.1) ${pct}%)`;
+    document.querySelectorAll('.raio-opt').forEach(o => o.classList.remove('sel'));
+  }
+  function setRaio(val) {
+    document.getElementById('raioSlider').value = val;
+    atualizarRaio(val);
+    document.querySelectorAll('.raio-opt').forEach(o => {
+      o.classList.toggle('sel', parseInt(o.textContent) === val);
+    });
+  }
+
+  // FILTROS
+  function selFiltro(el) {
+    el.parentElement.querySelectorAll('.filtro-item').forEach(f => f.classList.remove('ativo'));
+    el.classList.add('ativo');
+  }
+
+  // MODAIS
+  function registrarInteresse(btn) {
+    btn.className = 'interesse-btn enviado';
+    btn.textContent = '✅ Interesse enviado';
+    btn.onclick = null;
+    // Mostra modal de confirmação
+    document.getElementById('overlayConfirmInteresse').classList.add('vis');
+  }
+
+  function fecharOverlay(id) {
+    document.getElementById(id).classList.remove('vis');
+  }
+
+  // Fechar clicando fora
+  document.querySelectorAll('.overlay').forEach(ov => {
+    ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('vis'); });
+  });
+</script>
+
+<!-- BOTÃO FLUTUANTE DE SUGESTÃO -->
+<div id="sugestaoBtn" onclick="abrirSugestao()" style="
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  background:#132240;border:1px solid rgba(0,201,111,0.3);
+  border-radius:100px;padding:10px 16px;
+  display:flex;align-items:center;gap:7px;
+  cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.35);
+  transition:all 0.2s;font-family:'DM Sans',sans-serif;
+  animation:fadeUpBtn 0.5s 0.8s ease both;opacity:0;
+">
+  <span style="font-size:1rem">💡</span>
+  <span style="font-size:0.75rem;font-weight:600;color:#00C96F">Sugerir melhoria</span>
+</div>
+
+<!-- MODAL SUGESTÃO -->
+<div id="overlaySugestao" style="
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:1000;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
+">
+  <div id="modalSugestao" style="
+    background:#132240;border:1px solid rgba(255,255,255,0.09);
+    border-radius:22px;width:100%;max-width:440px;padding:28px;
+    transform:translateY(20px);transition:transform 0.3s;
+  ">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:2px">💡 Sugerir melhoria</div>
+        <div style="font-size:0.75rem;color:#8A9BB5">Sua opinião nos ajuda a melhorar o ServiçoJá</div>
+      </div>
+      <button onclick="fecharSugestao()" style="background:rgba(255,255,255,0.06);border:none;border-radius:50%;width:30px;height:30px;color:#8A9BB5;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s">✕</button>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Você é:</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="selTipoSug(this,'cliente')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👤 Cliente</button>
+        <button onclick="selTipoSug(this,'profissional')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👷 Profissional</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Categoria:</div>
+      <select id="sugCategoria" style="width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;font-size:0.83rem;padding:10px 12px;outline:none;cursor:pointer;-webkit-appearance:none">
+        <option value="">Selecione uma categoria</option>
+        <option>🎨 Design e visual</option>
+        <option>⚡ Funcionalidade</option>
+        <option>🐛 Reportar problema</option>
+        <option>💬 Comunicação e chat</option>
+        <option>💳 Pagamentos e taxas</option>
+        <option>🤖 Teste de IA</option>
+        <option>📋 Pedidos e orçamentos</option>
+        <option>💡 Nova funcionalidade</option>
+        <option>🔒 Segurança e privacidade</option>
+        <option>🌟 Outro</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom:18px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Sua sugestão:</div>
+      <textarea id="sugTexto" placeholder="Descreva sua ideia ou problema. Seja específico — isso nos ajuda a implementar mais rápido!" style="
+        width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);
+        border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;
+        font-size:0.83rem;padding:12px 14px;outline:none;resize:vertical;
+        min-height:100px;line-height:1.6;transition:border-color 0.2s;
+      " oninput="this.style.borderColor='rgba(0,201,111,0.4)'"></textarea>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button onclick="fecharSugestao()" style="flex:1;background:transparent;border:1.5px solid rgba(255,255,255,0.09);border-radius:12px;padding:12px;color:#8A9BB5;font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.2s">Cancelar</button>
+      <button onclick="enviarSugestao()" style="flex:2;background:#00C96F;border:none;border-radius:12px;padding:12px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all 0.2s">💡 Enviar sugestão</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUCESSO SUGESTÃO -->
+<div id="overlaySugSucesso" style="
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:1001;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
+">
+  <div style="background:#132240;border:1px solid rgba(0,201,111,0.25);border-radius:22px;width:100%;max-width:360px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s" id="modalSugSuc">
+    <div style="font-size:3rem;margin-bottom:12px">🙏</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:8px">Sugestão enviada!</div>
+    <div style="color:#8A9BB5;font-size:0.82rem;line-height:1.6;margin-bottom:22px">Obrigado pelo seu feedback! Nossa equipe lê todas as sugestões. As melhores ideias são implementadas em novas versões do app. 🚀</div>
+    <button onclick="fecharSugSucesso()" style="width:100%;background:#00C96F;border:none;border-radius:12px;padding:13px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer">Fechar</button>
+  </div>
+</div>
+
+<style>
+  @keyframes fadeUpBtn { from { opacity:0;transform:translateY(12px); } to { opacity:1;transform:translateY(0); } }
+  #sugestaoBtn:hover { background:#1a2d4a; transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+  .sug-tipo-btn.sel { background:rgba(0,201,111,0.12) !important; border-color:rgba(0,201,111,0.4) !important; color:#00C96F !important; }
+</style>
+
+<script>
+  var sugTipoAtual = '';
+  function abrirSugestao() {
+    document.getElementById('overlaySugestao').style.opacity='1';
+    document.getElementById('overlaySugestao').style.pointerEvents='all';
+    document.getElementById('modalSugestao').style.transform='translateY(0)';
+  }
+  function fecharSugestao() {
+    document.getElementById('overlaySugestao').style.opacity='0';
+    document.getElementById('overlaySugestao').style.pointerEvents='none';
+    document.getElementById('modalSugestao').style.transform='translateY(20px)';
+  }
+  function selTipoSug(btn, tipo) {
+    sugTipoAtual = tipo;
+    document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+  }
+  function enviarSugestao() {
+    var texto = document.getElementById('sugTexto').value.trim();
+    var cat = document.getElementById('sugCategoria').value;
+    if (!texto) { document.getElementById('sugTexto').style.borderColor='rgba(255,92,92,0.5)'; return; }
+    fecharSugestao();
+    setTimeout(function() {
+      document.getElementById('overlaySugSucesso').style.opacity='1';
+      document.getElementById('overlaySugSucesso').style.pointerEvents='all';
+      document.getElementById('modalSugSuc').style.transform='translateY(0)';
+      document.getElementById('sugTexto').value='';
+      document.getElementById('sugCategoria').value='';
+      sugTipoAtual='';
+      document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
+    }, 200);
+  }
+  function fecharSugSucesso() {
+    document.getElementById('overlaySugSucesso').style.opacity='0';
+    document.getElementById('overlaySugSucesso').style.pointerEvents='none';
+    document.getElementById('modalSugSuc').style.transform='translateY(20px)';
+  }
+  document.getElementById('overlaySugestao').addEventListener('click', function(e) { if(e.target===this) fecharSugestao(); });
+  document.getElementById('overlaySugSucesso').addEventListener('click', function(e) { if(e.target===this) fecharSugSucesso(); });
+</script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(e => {});
+  }
+</script>
+
+<!-- BARRA DE NAVEGAÇÃO MOBILE -->
+<nav class="bottom-nav" id="bottomNav">
+  <a href="meus-pedidos-cliente.html" class="bn-item" id="bn-pedidos">
+    <span class="bn-icon">📋</span>
+    <span class="bn-label">Pedidos</span>
+  </a>
+  <a href="publicar-pedido.html" class="bn-item bn-center" id="bn-publicar">
+    <span class="bn-icon-center">＋</span>
+  </a>
+  <a href="notificacoes.html" class="bn-item" id="bn-notif">
+    <span class="bn-icon">🔔</span>
+    <span class="bn-label">Alertas</span>
+    <span class="bn-badge">3</span>
+  </a>
+</nav>
+
+<style>
+  body { padding-bottom: 70px; }
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: #132240; border-top: 1px solid rgba(255,255,255,0.09);
+    display: flex; align-items: center; justify-content: space-around;
+    padding: 8px 16px 12px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .bn-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    text-decoration: none; color: #8A9BB5; font-size: 0.62rem; font-weight: 600;
+    min-width: 50px; transition: color 0.2s; position: relative;
+  }
+  .bn-item.ativo { color: #00C96F; }
+  .bn-icon { font-size: 1.2rem; }
+  .bn-label { font-family: 'DM Sans', sans-serif; }
+  .bn-center {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: #00C96F; color: #0A1628 !important;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: -14px; box-shadow: 0 4px 16px rgba(0,201,111,0.4);
+    font-size: 0; min-width: 0;
+  }
+  .bn-icon-center { font-size: 1.8rem; color: #0A1628; font-weight: 300; line-height: 1; }
+  .bn-badge {
+    position: absolute; top: -2px; right: 2px;
+    background: #FF6B35; color: white; font-size: 0.55rem; font-weight: 800;
+    width: 14px; height: 14px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 1.5px solid #132240;
+  }
+</style>
+
+</body>
+</html>

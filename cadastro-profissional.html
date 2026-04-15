@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiçoJá — Cadastro do Profissional</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --verde: #00C96F;
+    --verde-escuro: #009E57;
+    --azul: #0A1628;
+    --azul-medio: #132240;
+    --azul-input: #0F1C35;
+    --branco: #F5F7F2;
+    --cinza: #8A9BB5;
+    --laranja: #FF6B35;
+    --erro: #FF5C5C;
+    --borda: rgba(255,255,255,0.09);
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--azul); color: var(--branco); min-height: 100vh; }
+  body::before {
+    content: ''; position: fixed; top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,201,111,0.10) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  nav {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 32px; border-bottom: 1px solid var(--borda);
+  }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; text-decoration: none; color: var(--branco); }
+  .logo span { color: var(--verde); }
+  .nav-login { color: var(--cinza); font-size: 0.9rem; }
+  .nav-login a { color: var(--verde); text-decoration: none; font-weight: 600; }
+
+  /* STEPS TOP */
+  .steps-bar {
+    position: relative; z-index: 5;
+    max-width: 700px; margin: 32px auto 0; padding: 0 20px;
+    display: flex; align-items: center;
+  }
+  .step-item {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    flex: 1; cursor: pointer;
+  }
+  .step-circle {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 2px solid var(--borda);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem;
+    color: var(--cinza); background: var(--azul-medio);
+    transition: all 0.3s; position: relative; z-index: 2;
+  }
+  .step-item.active .step-circle { border-color: var(--verde); color: var(--verde); box-shadow: 0 0 0 4px rgba(0,201,111,0.12); }
+  .step-item.done .step-circle { background: var(--verde); border-color: var(--verde); color: var(--azul); }
+  .step-label { font-size: 0.72rem; color: var(--cinza); text-align: center; white-space: nowrap; }
+  .step-item.active .step-label { color: var(--verde); font-weight: 600; }
+  .step-item.done .step-label { color: var(--verde); opacity: 0.6; }
+  .step-line { flex: 1; height: 2px; background: var(--borda); margin: 0 4px; margin-bottom: 20px; transition: background 0.3s; }
+  .step-line.done { background: var(--verde); opacity: 0.4; }
+
+  /* CARD */
+  .page { position: relative; z-index: 5; padding: 32px 20px 60px; display: flex; justify-content: center; }
+  .card {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 24px; padding: 36px 40px;
+    width: 100%; max-width: 620px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  /* PAINEL */
+  .painel { display: none; }
+  .painel.ativo { display: block; animation: fadeUp 0.4s ease both; }
+
+  .card-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; margin-bottom: 4px; letter-spacing: -0.5px; }
+  .card-sub { color: var(--cinza); font-size: 0.88rem; margin-bottom: 24px; line-height: 1.5; }
+
+  .section-label {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.72rem;
+    text-transform: uppercase; letter-spacing: 0.08em; color: var(--cinza);
+    margin: 22px 0 12px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--borda); }
+  .section-label:first-child { margin-top: 0; }
+
+  .field { margin-bottom: 12px; }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--cinza); margin-bottom: 5px; }
+  label .req { color: var(--verde); margin-left: 2px; }
+
+  .input-wrap { position: relative; display: flex; align-items: center; }
+  .input-icon { position: absolute; left: 13px; color: var(--cinza); font-size: 0.9rem; pointer-events: none; }
+
+  input, select, textarea {
+    width: 100%; background: var(--azul-input); border: 1.5px solid var(--borda);
+    border-radius: 12px; color: var(--branco);
+    font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+    padding: 12px 12px 12px 38px; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  textarea { padding-left: 14px; resize: vertical; min-height: 90px; }
+  select { cursor: pointer; -webkit-appearance: none; padding-right: 32px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A9BB5' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+  }
+  select option { background: var(--azul-medio); }
+  input:focus, select:focus, textarea:focus { border-color: rgba(0,201,111,0.45); box-shadow: 0 0 0 3px rgba(0,201,111,0.08); }
+  input::placeholder, textarea::placeholder { color: rgba(138,155,181,0.45); }
+  .no-icon { padding-left: 14px !important; }
+
+  .hint { font-size: 0.72rem; color: var(--cinza); margin-top: 4px; }
+
+  .senha-toggle { position: absolute; right: 12px; background: none; border: none; color: var(--cinza); cursor: pointer; font-size: 0.85rem; }
+
+  /* FOTO PERFIL */
+  .foto-upload {
+    display: flex; align-items: center; gap: 16px; margin-bottom: 20px;
+  }
+  .foto-circle {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--azul-input); border: 2px dashed rgba(0,201,111,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; cursor: pointer; flex-shrink: 0;
+    transition: border-color 0.2s;
+  }
+  .foto-circle:hover { border-color: var(--verde); }
+  .foto-info p { font-size: 0.85rem; font-weight: 600; margin-bottom: 2px; }
+  .foto-info span { font-size: 0.75rem; color: var(--cinza); }
+  .btn-foto {
+    margin-top: 6px; background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.25);
+    color: var(--verde); border-radius: 8px; padding: 6px 14px;
+    font-size: 0.78rem; font-weight: 600; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-foto:hover { background: rgba(0,201,111,0.2); }
+
+  /* CATEGORIAS */
+  .cats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; }
+  .cat-item {
+    background: var(--azul-input); border: 1.5px solid var(--borda);
+    border-radius: 12px; padding: 12px 10px; cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+    transition: all 0.2s; font-size: 0.82rem; font-weight: 500;
+  }
+  .cat-item:hover { border-color: rgba(0,201,111,0.3); }
+  .cat-item.sel { background: rgba(0,201,111,0.12); border-color: rgba(0,201,111,0.4); color: var(--verde); }
+  .cat-item .cat-check {
+    width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--cinza);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.6rem;
+  }
+  .cat-item.sel .cat-check { background: var(--verde); border-color: var(--verde); color: var(--azul); }
+
+  /* FOTOS PORTFÓLIO */
+  .portfolio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; }
+  .foto-slot {
+    aspect-ratio: 1; border-radius: 12px;
+    background: var(--azul-input); border: 2px dashed rgba(255,255,255,0.1);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; cursor: pointer; transition: all 0.2s; font-size: 1.4rem;
+  }
+  .foto-slot span { font-size: 0.7rem; color: var(--cinza); }
+  .foto-slot:hover { border-color: rgba(0,201,111,0.35); }
+
+  /* DOCUMENTO */
+  .doc-toggle { display: flex; gap: 8px; margin-bottom: 12px; }
+  .doc-btn {
+    flex: 1; padding: 10px; border-radius: 10px;
+    border: 1.5px solid var(--borda); background: var(--azul-input);
+    color: var(--cinza); font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .doc-btn.sel { background: rgba(0,201,111,0.12); border-color: rgba(0,201,111,0.4); color: var(--verde); }
+
+  /* NAVEGAÇÃO */
+  .nav-btns { display: flex; gap: 10px; margin-top: 24px; }
+  .btn-voltar {
+    flex: 1; background: transparent; border: 1.5px solid var(--borda);
+    border-radius: 14px; padding: 14px; color: var(--branco);
+    font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.9rem;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-voltar:hover { border-color: rgba(255,255,255,0.3); }
+  .btn-avancar {
+    flex: 2; background: var(--verde); border: none;
+    border-radius: 14px; padding: 14px; color: var(--azul);
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-avancar:hover { background: var(--verde-escuro); transform: scale(1.01); }
+
+  /* TESTE IA */
+  .ia-intro {
+    text-align: center; padding: 8px 0 20px;
+  }
+  .ia-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,107,53,0.12); border: 1px solid rgba(255,107,53,0.25);
+    color: var(--laranja); font-size: 0.78rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 6px 14px; border-radius: 100px; margin-bottom: 16px;
+  }
+  .ia-info {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 20px 0;
+  }
+  .ia-info-item {
+    background: var(--azul-input); border: 1px solid var(--borda);
+    border-radius: 12px; padding: 14px; text-align: center;
+  }
+  .ia-info-item .num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; color: var(--verde); }
+  .ia-info-item .desc { font-size: 0.72rem; color: var(--cinza); margin-top: 2px; }
+
+  .tentativas {
+    display: flex; gap: 6px; justify-content: center; margin: 12px 0 20px;
+  }
+  .tent {
+    width: 32px; height: 8px; border-radius: 4px;
+    background: rgba(0,201,111,0.2); border: 1px solid rgba(0,201,111,0.25);
+  }
+  .tent.usada { background: var(--erro); border-color: var(--erro); opacity: 0.5; }
+  .tent.atual { background: var(--verde); border-color: var(--verde); }
+
+  /* QUIZ */
+  .quiz-wrap { display: none; }
+  .quiz-wrap.ativo { display: block; animation: fadeUp 0.4s ease both; }
+
+  .quiz-progress {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  }
+  .quiz-prog-bar { flex: 1; height: 6px; background: var(--azul-input); border-radius: 3px; overflow: hidden; }
+  .quiz-prog-fill { height: 100%; background: var(--verde); border-radius: 3px; transition: width 0.4s; }
+  .quiz-num { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.8rem; color: var(--cinza); white-space: nowrap; }
+
+  .quiz-pergunta {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 1rem; line-height: 1.5; margin-bottom: 20px;
+    min-height: 60px;
+  }
+
+  .quiz-opcoes { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+  .quiz-op {
+    background: var(--azul-input); border: 1.5px solid var(--borda);
+    border-radius: 12px; padding: 14px 16px;
+    cursor: pointer; font-size: 0.88rem; line-height: 1.4;
+    display: flex; align-items: center; gap: 10px;
+    transition: all 0.2s;
+  }
+  .quiz-op:hover { border-color: rgba(0,201,111,0.35); }
+  .quiz-op.sel { background: rgba(0,201,111,0.12); border-color: rgba(0,201,111,0.45); color: var(--verde); }
+  .quiz-op.certa { background: rgba(0,201,111,0.15); border-color: var(--verde); color: var(--verde); }
+  .quiz-op.errada { background: rgba(255,92,92,0.1); border-color: var(--erro); color: var(--erro); }
+  .op-letra {
+    width: 26px; height: 26px; border-radius: 7px; border: 1.5px solid currentColor;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.75rem; flex-shrink: 0;
+  }
+
+  .btn-proxima {
+    width: 100%; background: var(--verde); border: none; border-radius: 12px;
+    padding: 14px; color: var(--azul);
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem;
+    cursor: pointer; transition: all 0.2s; display: none;
+  }
+  .btn-proxima.vis { display: block; }
+  .btn-proxima:hover { background: var(--verde-escuro); }
+
+  /* RESULTADO */
+  .resultado { display: none; text-align: center; padding: 20px 0; }
+  .resultado.vis { display: block; animation: fadeUp 0.5s ease both; }
+  .res-icon { font-size: 3.5rem; margin-bottom: 16px; }
+  .res-titulo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem; margin-bottom: 8px; }
+  .res-sub { color: var(--cinza); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6; }
+  .res-score {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--azul-input); border: 1px solid var(--borda);
+    border-radius: 12px; padding: 12px 24px; margin-bottom: 24px;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem;
+  }
+  .res-score.aprovado { border-color: rgba(0,201,111,0.4); color: var(--verde); background: rgba(0,201,111,0.08); }
+  .res-score.reprovado { border-color: rgba(255,92,92,0.4); color: var(--erro); background: rgba(255,92,92,0.08); }
+
+  .tentativas-restantes {
+    display: flex; align-items: center; gap: 6px; justify-content: center;
+    font-size: 0.82rem; color: var(--cinza); margin-bottom: 20px;
+  }
+
+  .btn-repetir {
+    width: 100%; background: transparent; border: 1.5px solid var(--borda);
+    border-radius: 14px; padding: 14px; color: var(--branco);
+    font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.9rem;
+    cursor: pointer; transition: all 0.2s; margin-bottom: 10px;
+  }
+  .btn-repetir:hover { border-color: rgba(255,255,255,0.3); }
+  .btn-finalizar {
+    width: 100%; background: var(--verde); border: none;
+    border-radius: 14px; padding: 14px; color: var(--azul);
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-finalizar:hover { background: var(--verde-escuro); }
+
+  /* LOADING */
+  .loading-ia {
+    text-align: center; padding: 40px 20px; display: none;
+  }
+  .loading-ia.vis { display: block; animation: fadeUp 0.3s ease both; }
+  .spinner {
+    width: 48px; height: 48px; border: 3px solid var(--borda);
+    border-top-color: var(--verde); border-radius: 50%;
+    animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+  }
+  .loading-ia p { color: var(--cinza); font-size: 0.88rem; }
+  .loading-ia strong { color: var(--branco); display: block; font-family: 'Syne', sans-serif; font-size: 1rem; margin-bottom: 4px; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 560px) {
+    .card { padding: 24px 18px; }
+    .row-2 { grid-template-columns: 1fr; }
+    .cats-grid { grid-template-columns: repeat(2,1fr); }
+    nav { padding: 18px 20px; }
+    .ia-info { grid-template-columns: repeat(3,1fr); }
+  }
+</style>
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#00C96F">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ServiçoJá">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo">Serviço<span>Já</span></a>
+  <span class="nav-login">Já tem conta? <a href="#">Entrar</a></span>
+</nav>
+
+<!-- STEPS -->
+<div class="steps-bar" id="stepsBar">
+  <div class="step-item active" id="si1">
+    <div class="step-circle">1</div>
+    <div class="step-label">Dados pessoais</div>
+  </div>
+  <div class="step-line" id="sl1"></div>
+  <div class="step-item" id="si2">
+    <div class="step-circle">2</div>
+    <div class="step-label">Endereço</div>
+  </div>
+  <div class="step-line" id="sl2"></div>
+  <div class="step-item" id="si3">
+    <div class="step-circle">3</div>
+    <div class="step-label">Serviços & Portfólio</div>
+  </div>
+  <div class="step-line" id="sl3"></div>
+  <div class="step-item" id="si4">
+    <div class="step-circle">4</div>
+    <div class="step-label">Teste IA</div>
+  </div>
+</div>
+
+<div class="page">
+<div class="card">
+
+  <!-- ETAPA 1: DADOS PESSOAIS -->
+  <div class="painel ativo" id="p1">
+    <h1 class="card-title">Dados pessoais</h1>
+    <p class="card-sub">Suas informações ficam protegidas e só aparecem ao cliente após ele aceitar sua proposta.</p>
+
+    <div class="foto-upload">
+      <div class="foto-circle">📷</div>
+      <div class="foto-info">
+        <p>Foto de perfil</p>
+        <span>Essa foto aparece no seu perfil público</span><br>
+        <button class="btn-foto">Escolher foto</button>
+      </div>
+    </div>
+
+    <div class="section-label">Informações básicas</div>
+
+    <div class="field">
+      <label>Nome completo <span class="req">*</span></label>
+      <div class="input-wrap"><span class="input-icon">👤</span><input type="text" placeholder="Ex: João Ferreira"></div>
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>E-mail <span class="req">*</span></label>
+        <div class="input-wrap"><span class="input-icon">✉️</span><input type="email" placeholder="seu@email.com"></div>
+      </div>
+      <div class="field">
+        <label>WhatsApp / Telefone <span class="req">*</span></label>
+        <div class="input-wrap"><span class="input-icon">📱</span><input type="tel" placeholder="(11) 99999-9999"></div>
+      </div>
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>Senha <span class="req">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="senhaProf" placeholder="Mínimo 8 caracteres">
+          <button class="senha-toggle" onclick="toggleSenha()" type="button">👁️</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Confirmar senha <span class="req">*</span></label>
+        <div class="input-wrap"><span class="input-icon">🔒</span><input type="password" placeholder="Repita a senha"></div>
+      </div>
+    </div>
+
+    <div class="section-label">Documento (privado)</div>
+
+    <div class="doc-toggle">
+      <button class="doc-btn sel" onclick="selDoc('cpf',this)">CPF — Pessoa Física</button>
+      <button class="doc-btn" onclick="selDoc('cnpj',this)">CNPJ — Empresa</button>
+    </div>
+    <div class="field">
+      <div class="input-wrap"><span class="input-icon">🪪</span><input type="text" id="docInput" placeholder="000.000.000-00" maxlength="18"></div>
+      <p class="hint">Usado apenas para verificação de identidade. Não é exibido publicamente.</p>
+    </div>
+
+    <div class="field">
+      <label>Sobre você <span class="req">*</span></label>
+      <textarea class="no-icon" placeholder="Conte um pouco sobre sua experiência, anos de atuação e diferenciais..."></textarea>
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn-avancar" style="flex:1" onclick="irPara(2)">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 2: ENDEREÇO -->
+  <div class="painel" id="p2">
+    <h1 class="card-title">Seu endereço</h1>
+    <p class="card-sub">Usado para mostrar profissionais próximos ao cliente. Endereço completo só aparece após proposta aceita.</p>
+
+    <div class="section-label">Localização</div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>CEP <span class="req">*</span></label>
+        <div class="input-wrap"><span class="input-icon">📮</span><input type="text" placeholder="00000-000" maxlength="9" oninput="buscarCEP2(this.value)"></div>
+        <p class="hint">Preenche automaticamente</p>
+      </div>
+      <div class="field">
+        <label>Número <span class="req">*</span></label>
+        <div class="input-wrap"><span class="input-icon">#</span><input type="text" placeholder="Ex: 142"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Rua / Logradouro <span class="req">*</span></label>
+      <div class="input-wrap"><span class="input-icon">🏠</span><input type="text" id="rua2" placeholder="Preenchido pelo CEP"></div>
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>Bairro <span class="req">*</span></label>
+        <div class="input-wrap"><span class="input-icon">🗺️</span><input type="text" id="bairro2" placeholder="Preenchido pelo CEP"></div>
+      </div>
+      <div class="field">
+        <label>Complemento</label>
+        <div class="input-wrap"><span class="input-icon">🏢</span><input type="text" placeholder="Apto, sala..."></div>
+      </div>
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>Cidade <span class="req">*</span></label>
+        <div class="input-wrap"><span class="input-icon">🏙️</span><input type="text" id="cidade2" placeholder="Preenchido pelo CEP"></div>
+      </div>
+      <div class="field">
+        <label>Estado <span class="req">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">📍</span>
+          <select id="estado2" style="padding-left:38px">
+            <option value="">Selecione</option>
+            <option value="SP" selected>São Paulo</option>
+            <option value="MG">Minas Gerais</option>
+            <option value="RJ">Rio de Janeiro</option>
+            <option value="RS">Rio Grande do Sul</option>
+            <option value="PR">Paraná</option>
+            <option value="BA">Bahia</option>
+            <option value="SC">Santa Catarina</option>
+            <option value="GO">Goiás</option>
+            <option value="PE">Pernambuco</option>
+            <option value="CE">Ceará</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Raio de atendimento <span class="req">*</span></label>
+      <div class="input-wrap">
+        <span class="input-icon">📡</span>
+        <select class="no-icon" style="padding-left:38px">
+          <option>Até 5 km</option>
+          <option selected>Até 10 km</option>
+          <option>Até 20 km</option>
+          <option>Até 50 km</option>
+          <option>Toda a cidade</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn-voltar" onclick="irPara(1)">← Voltar</button>
+      <button class="btn-avancar" onclick="irPara(3)">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 3: SERVIÇOS & PORTFÓLIO -->
+  <div class="painel" id="p3">
+    <h1 class="card-title">Serviços & Portfólio</h1>
+    <p class="card-sub">Selecione o que você faz e mostre seus trabalhos. Para cada serviço selecionado haverá um teste de qualificação por IA.</p>
+
+    <div class="section-label">Categorias de serviço</div>
+    <p class="hint" style="margin-bottom:10px">Selecione todos os serviços que você oferece</p>
+
+    <div class="cats-grid">
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>⚡ Elétrica</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>🔧 Encanamento</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>🎨 Pintura</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>🪚 Marcenaria</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>❄️ Ar-condicionado</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>🧹 Limpeza</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>🏗️ Reforma</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>🔩 Serralheria</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>🛋️ Montagem</div>
+    </div>
+
+    <div class="section-label" style="margin-top:22px">Fotos do portfólio</div>
+    <p class="hint" style="margin-bottom:8px">Adicione até 9 fotos de trabalhos realizados. Isso aumenta muito suas chances de ser contratado!</p>
+    <div style="background:rgba(255,92,92,0.07);border:1px solid rgba(255,92,92,0.2);border-radius:10px;padding:10px 14px;font-size:0.74rem;color:rgba(255,92,92,0.85);margin-bottom:10px;display:flex;align-items:flex-start;gap:7px;line-height:1.5">
+      <span style="flex-shrink:0">🚫</span>
+      <span><strong>Conteúdo proibido:</strong> fotos de nudez, conteúdo sexual, imagens violentas ou ofensivas são automaticamente bloqueadas e resultam em <strong>banimento imediato</strong> da plataforma. Envie apenas fotos de serviços realizados.</span>
+    </div>
+
+    <div class="portfolio-grid">
+      <div class="foto-slot">➕<span>Adicionar</span></div>
+      <div class="foto-slot">➕<span>Adicionar</span></div>
+      <div class="foto-slot">➕<span>Adicionar</span></div>
+      <div class="foto-slot">➕<span>Adicionar</span></div>
+      <div class="foto-slot">➕<span>Adicionar</span></div>
+      <div class="foto-slot">➕<span>Adicionar</span></div>
+      <div class="foto-slot">➕<span>Adicionar</span></div>
+      <div class="foto-slot">➕<span>Adicionar</span></div>
+      <div class="foto-slot">➕<span>Adicionar</span></div>
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn-voltar" onclick="irPara(2)">← Voltar</button>
+      <button class="btn-avancar" onclick="iniciarTesteIA()">Iniciar Teste IA →</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 4: TESTE IA -->
+  <div class="painel" id="p4">
+
+    <!-- INTRO DO TESTE -->
+    <div id="iaIntro">
+      <div class="ia-intro">
+        <div class="ia-badge">🤖 Avaliação por Inteligência Artificial</div>
+        <h1 class="card-title" style="text-align:center">Teste de qualificação</h1>
+        <p class="card-sub" style="text-align:center">A IA vai gerar 20 perguntas técnicas sobre os serviços que você selecionou. Você precisa acertar pelo menos 90% para ser aprovado.</p>
+      </div>
+
+      <div class="ia-info">
+        <div class="ia-info-item"><div class="num">20</div><div class="desc">Perguntas</div></div>
+        <div class="ia-info-item"><div class="num">90%</div><div class="desc">Para aprovar</div></div>
+        <div class="ia-info-item"><div class="num">4x</div><div class="desc">Tentativas/dia</div></div>
+      </div>
+
+      <p style="font-size:0.82rem; color:var(--cinza); text-align:center; margin-bottom:8px">Tentativas de hoje:</p>
+      <div class="tentativas">
+        <div class="tent atual"></div>
+        <div class="tent"></div>
+        <div class="tent"></div>
+        <div class="tent"></div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn-voltar" onclick="irPara(3)">← Voltar</button>
+        <button class="btn-avancar" onclick="comecarQuiz()">Começar teste →</button>
+      </div>
+    </div>
+
+    <!-- LOADING IA -->
+    <div class="loading-ia" id="loadingIA">
+      <div class="spinner"></div>
+      <strong>IA gerando suas perguntas...</strong>
+      <p>Preparando 20 questões técnicas personalizadas para você</p>
+    </div>
+
+    <!-- QUIZ -->
+    <div class="quiz-wrap" id="quizWrap">
+      <div class="quiz-progress">
+        <div class="quiz-prog-bar"><div class="quiz-prog-fill" id="progFill" style="width:5%"></div></div>
+        <div class="quiz-num" id="progNum">1 / 20</div>
+      </div>
+      <div class="quiz-pergunta" id="pergunta"></div>
+      <div class="quiz-opcoes" id="opcoes"></div>
+      <button class="btn-proxima" id="btnProxima" onclick="proximaPergunta()">Próxima →</button>
+    </div>
+
+    <!-- RESULTADO -->
+    <div class="resultado" id="resultado">
+      <div class="res-icon" id="resIcon"></div>
+      <div class="res-titulo" id="resTitulo"></div>
+      <div class="res-sub" id="resSub"></div>
+      <div class="res-score" id="resScore"></div>
+      <div class="tentativas-restantes" id="tentRestantes"></div>
+      <button class="btn-repetir" id="btnRepetir" onclick="repetirTeste()">🔄 Repetir teste</button>
+      <button class="btn-finalizar" id="btnFinalizar" style="display:none">✅ Finalizar cadastro</button>
+    </div>
+
+  </div>
+
+</div>
+</div>
+
+<script>
+// ── NAVEGAÇÃO ──────────────────────────────────────
+let stepAtual = 1;
+function irPara(n) {
+  document.getElementById('p' + stepAtual).classList.remove('ativo');
+  document.getElementById('p' + n).classList.add('ativo');
+  // steps
+  for (let i = 1; i <= 4; i++) {
+    const si = document.getElementById('si' + i);
+    si.classList.remove('active','done');
+    if (i < n) si.classList.add('done');
+    if (i === n) si.classList.add('active');
+    if (i < 4) {
+      const sl = document.getElementById('sl' + i);
+      sl.classList.toggle('done', i < n);
+    }
+  }
+  stepAtual = n;
+  window.scrollTo(0,0);
+}
+
+// ── DOC TOGGLE ────────────────────────────────────
+function selDoc(tipo, el) {
+  document.querySelectorAll('.doc-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('docInput').placeholder = tipo === 'cpf' ? '000.000.000-00' : '00.000.000/0000-00';
+}
+
+// ── SENHA ─────────────────────────────────────────
+function toggleSenha() {
+  const i = document.getElementById('senhaProf');
+  i.type = i.type === 'password' ? 'text' : 'password';
+}
+
+// ── CATEGORIAS ────────────────────────────────────
+function toggleCat(el) {
+  el.classList.toggle('sel');
+  el.querySelector('.cat-check').textContent = el.classList.contains('sel') ? '✓' : '';
+}
+
+// ── CEP ───────────────────────────────────────────
+async function buscarCEP2(val) {
+  const cep = val.replace(/\D/g,'');
+  if (cep.length !== 8) return;
+  try {
+    const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const d = await r.json();
+    if (!d.erro) {
+      document.getElementById('rua2').value = d.logradouro || '';
+      document.getElementById('bairro2').value = d.bairro || '';
+      document.getElementById('cidade2').value = d.localidade || '';
+      const s = document.getElementById('estado2');
+      for (let o of s.options) if (o.value === d.uf) { s.value = d.uf; break; }
+    }
+  } catch(e) {}
+}
+
+// ── TESTE IA ──────────────────────────────────────
+let perguntas = [];
+let atual = 0;
+let acertos = 0;
+let opcaoSel = null;
+let tentativas = 1;
+const MAX_TENT = 4;
+
+const PERGUNTAS_DEMO = [
+  { p: "Qual a tensão padrão das tomadas residenciais no Brasil segundo a NBR 14136?", ops: ["110V ou 127V apenas","220V apenas","127V ou 220V dependendo da região","380V trifásico"], c: 2 },
+  { p: "Em instalações elétricas residenciais, qual é a bitola mínima de fio para circuitos de iluminação?", ops: ["0,5 mm²","1,5 mm²","2,5 mm²","4,0 mm²"], c: 1 },
+  { p: "O que significa o código IP65 em equipamentos elétricos?", ops: ["Resistente a poeira e jatos d'água","Apenas resistente a poeira","Submersível até 1 metro","Resistente a explosões"], c: 0 },
+  { p: "Qual dispositivo protege contra correntes de fuga para a terra?", ops: ["Disjuntor","Fusível","DR (Diferencial-Residual)","Transformador"], c: 2 },
+  { p: "Para instalar um ar-condicionado split de 12.000 BTUs, qual bitola de fio é indicada?", ops: ["1,5 mm²","2,5 mm²","4,0 mm²","6,0 mm²"], c: 1 },
+  { p: "O que é aterramento elétrico e qual sua principal função?", ops: ["Aumentar a tensão","Proteger contra choques elétricos e surtos","Reduzir o consumo de energia","Melhorar a qualidade do sinal"], c: 1 },
+  { p: "Qual a cor do fio neutro segundo a norma NBR 5410?", ops: ["Verde","Vermelho","Azul claro","Preto"], c: 2 },
+  { p: "Em um quadro de distribuição residencial, o que significa 'DPS'?", ops: ["Dispositivo de Proteção Secundária","Dispositivo de Proteção contra Surtos","Disjuntor Principal Simples","Derivação de Proteção do Sistema"], c: 1 },
+  { p: "Quantos pontos de tomada são obrigatórios por cômodo segundo a NBR 5410?", ops: ["1 tomada a cada 5 metros de parede","1 tomada a cada 4 metros ou fração","2 tomadas por cômodo mínimo","Apenas 1 tomada por cômodo"], c: 1 },
+  { p: "O que é um circuito dedicado em instalações elétricas?", ops: ["Circuito com proteção extra","Circuito exclusivo para um único equipamento","Circuito de 3 fases","Circuito sem aterramento"], c: 1 },
+  { p: "Qual equipamento mede a resistência de isolamento de um cabo elétrico?", ops: ["Multímetro","Alicate amperímetro","Megôhmetro","Osciloscópio"], c: 2 },
+  { p: "Para instalação de chuveiro elétrico de 6.800W em 220V, qual disjuntor usar?", ops: ["20A","25A","32A","40A"], c: 2 },
+  { p: "O que é o fator de potência em uma instalação elétrica?", ops: ["Relação entre potência ativa e aparente","Tensão dividida pela corrente","Resistência do circuito","Frequência da rede"], c: 0 },
+  { p: "Qual a profundidade mínima para instalação de eletrodutos embutidos em alvenaria?", ops: ["1 cm","2 cm","3 cm","5 cm"], c: 1 },
+  { p: "O que significa SPDA em instalações elétricas prediais?", ops: ["Sistema de Proteção Dinâmica Automática","Sistema de Proteção contra Descargas Atmosféricas","Suporte Principal de Distribuição Aérea","Sistema de Proteção Diferencial Avançada"], c: 1 },
+  { p: "Qual o prazo médio de vida útil de uma instalação elétrica residencial sem manutenção?", ops: ["5 a 10 anos","10 a 15 anos","20 a 30 anos","50 anos ou mais"], c: 2 },
+  { p: "Em instalações com conduítes, qual o percentual máximo de ocupação recomendado?", ops: ["30%","40%","50%","60%"], c: 2 },
+  { p: "O que é carga instalada em um projeto elétrico?", ops: ["Potência máxima que o gerador suporta","Soma das potências de todos os equipamentos previstos","Corrente de curto-circuito","Tensão de pico do sistema"], c: 1 },
+  { p: "Qual norma brasileira rege as instalações elétricas de baixa tensão?", ops: ["NBR 5410","NBR 14136","NBR 6118","NBR 9050"], c: 0 },
+  { p: "Para uma tomada de uso geral (TUG), qual a corrente nominal mínima exigida?", ops: ["6A","10A","15A","20A"], c: 1 },
+];
+
+function iniciarTesteIA() {
+  const cats = document.querySelectorAll('.cat-item.sel');
+  if (cats.length === 0) { alert('Selecione pelo menos um serviço antes de continuar!'); return; }
+  irPara(4);
+}
+
+async function comecarQuiz() {
+  document.getElementById('iaIntro').style.display = 'none';
+  document.getElementById('loadingIA').classList.add('vis');
+
+  // Simula carregamento da IA
+  await new Promise(r => setTimeout(r, 2200));
+
+  document.getElementById('loadingIA').classList.remove('vis');
+  perguntas = [...PERGUNTAS_DEMO].sort(() => Math.random() - 0.5);
+  atual = 0; acertos = 0; opcaoSel = null;
+  document.getElementById('quizWrap').classList.add('ativo');
+  renderPergunta();
+}
+
+function renderPergunta() {
+  const q = perguntas[atual];
+  document.getElementById('progFill').style.width = ((atual + 1) / 20 * 100) + '%';
+  document.getElementById('progNum').textContent = (atual + 1) + ' / 20';
+  document.getElementById('pergunta').textContent = q.p;
+  const letras = ['A','B','C','D'];
+  document.getElementById('opcoes').innerHTML = q.ops.map((op, i) =>
+    `<div class="quiz-op" onclick="selOp(this,${i})" data-i="${i}">
+      <div class="op-letra">${letras[i]}</div>${op}
+    </div>`
+  ).join('');
+  document.getElementById('btnProxima').classList.remove('vis');
+  opcaoSel = null;
+}
+
+function selOp(el, idx) {
+  if (opcaoSel !== null) return;
+  opcaoSel = idx;
+  const q = perguntas[atual];
+  document.querySelectorAll('.quiz-op').forEach((op, i) => {
+    if (i === q.c) op.classList.add('certa');
+    else if (i === idx && idx !== q.c) op.classList.add('errada');
+  });
+  if (idx === q.c) acertos++;
+  document.getElementById('btnProxima').classList.add('vis');
+}
+
+function proximaPergunta() {
+  atual++;
+  if (atual >= 20) { mostrarResultado(); return; }
+  renderPergunta();
+}
+
+function mostrarResultado() {
+  document.getElementById('quizWrap').classList.remove('ativo');
+  const pct = Math.round((acertos / 20) * 100);
+  const aprovado = pct >= 90;
+  tentativas++;
+  const restam = MAX_TENT - tentativas + 1;
+
+  const res = document.getElementById('resultado');
+  res.classList.add('vis');
+  document.getElementById('resIcon').textContent = aprovado ? '🎉' : '😔';
+  document.getElementById('resTitulo').textContent = aprovado ? 'Parabéns! Você foi aprovado!' : 'Não foi desta vez...';
+  document.getElementById('resSub').textContent = aprovado
+    ? 'Seu cadastro foi aprovado com sucesso! Agora você pode receber pedidos de clientes na plataforma.'
+    : `Você precisa de 90% (18 acertos) para ser aprovado. Estude mais e tente novamente!`;
+
+  const sc = document.getElementById('resScore');
+  sc.textContent = `${acertos}/20 acertos — ${pct}%`;
+  sc.className = 'res-score ' + (aprovado ? 'aprovado' : 'reprovado');
+
+  const tr = document.getElementById('tentRestantes');
+  if (!aprovado) {
+    tr.textContent = restam > 0 ? `🔄 Você ainda tem ${restam} tentativa(s) hoje` : '⛔ Limite diário atingido. Volte amanhã!';
+  }
+
+  document.getElementById('btnRepetir').style.display = aprovado || restam <= 0 ? 'none' : 'block';
+  document.getElementById('btnFinalizar').style.display = aprovado ? 'block' : 'none';
+}
+
+function repetirTeste() {
+  document.getElementById('resultado').classList.remove('vis');
+  document.getElementById('quizWrap').classList.remove('ativo');
+  document.getElementById('iaIntro').style.display = 'block';
+  // atualiza barra de tentativas
+  const tents = document.querySelectorAll('.tent');
+  tents.forEach((t, i) => {
+    t.className = 'tent';
+    if (i < tentativas - 1) t.classList.add('usada');
+    else if (i === tentativas - 1) t.classList.add('atual');
+  });
+}
+</script>
+
+<!-- BOTÃO FLUTUANTE DE SUGESTÃO -->
+<div id="sugestaoBtn" onclick="abrirSugestao()" style="
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  background:#132240;border:1px solid rgba(0,201,111,0.3);
+  border-radius:100px;padding:10px 16px;
+  display:flex;align-items:center;gap:7px;
+  cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.35);
+  transition:all 0.2s;font-family:'DM Sans',sans-serif;
+  animation:fadeUpBtn 0.5s 0.8s ease both;opacity:0;
+">
+  <span style="font-size:1rem">💡</span>
+  <span style="font-size:0.75rem;font-weight:600;color:#00C96F">Sugerir melhoria</span>
+</div>
+
+<!-- MODAL SUGESTÃO -->
+<div id="overlaySugestao" style="
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:1000;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
+">
+  <div id="modalSugestao" style="
+    background:#132240;border:1px solid rgba(255,255,255,0.09);
+    border-radius:22px;width:100%;max-width:440px;padding:28px;
+    transform:translateY(20px);transition:transform 0.3s;
+  ">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:2px">💡 Sugerir melhoria</div>
+        <div style="font-size:0.75rem;color:#8A9BB5">Sua opinião nos ajuda a melhorar o ServiçoJá</div>
+      </div>
+      <button onclick="fecharSugestao()" style="background:rgba(255,255,255,0.06);border:none;border-radius:50%;width:30px;height:30px;color:#8A9BB5;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s">✕</button>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Você é:</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="selTipoSug(this,'cliente')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👤 Cliente</button>
+        <button onclick="selTipoSug(this,'profissional')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👷 Profissional</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Categoria:</div>
+      <select id="sugCategoria" style="width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;font-size:0.83rem;padding:10px 12px;outline:none;cursor:pointer;-webkit-appearance:none">
+        <option value="">Selecione uma categoria</option>
+        <option>🎨 Design e visual</option>
+        <option>⚡ Funcionalidade</option>
+        <option>🐛 Reportar problema</option>
+        <option>💬 Comunicação e chat</option>
+        <option>💳 Pagamentos e taxas</option>
+        <option>🤖 Teste de IA</option>
+        <option>📋 Pedidos e orçamentos</option>
+        <option>💡 Nova funcionalidade</option>
+        <option>🔒 Segurança e privacidade</option>
+        <option>🌟 Outro</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom:18px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Sua sugestão:</div>
+      <textarea id="sugTexto" placeholder="Descreva sua ideia ou problema. Seja específico — isso nos ajuda a implementar mais rápido!" style="
+        width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);
+        border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;
+        font-size:0.83rem;padding:12px 14px;outline:none;resize:vertical;
+        min-height:100px;line-height:1.6;transition:border-color 0.2s;
+      " oninput="this.style.borderColor='rgba(0,201,111,0.4)'"></textarea>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button onclick="fecharSugestao()" style="flex:1;background:transparent;border:1.5px solid rgba(255,255,255,0.09);border-radius:12px;padding:12px;color:#8A9BB5;font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.2s">Cancelar</button>
+      <button onclick="enviarSugestao()" style="flex:2;background:#00C96F;border:none;border-radius:12px;padding:12px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all 0.2s">💡 Enviar sugestão</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUCESSO SUGESTÃO -->
+<div id="overlaySugSucesso" style="
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:1001;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
+">
+  <div style="background:#132240;border:1px solid rgba(0,201,111,0.25);border-radius:22px;width:100%;max-width:360px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s" id="modalSugSuc">
+    <div style="font-size:3rem;margin-bottom:12px">🙏</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:8px">Sugestão enviada!</div>
+    <div style="color:#8A9BB5;font-size:0.82rem;line-height:1.6;margin-bottom:22px">Obrigado pelo seu feedback! Nossa equipe lê todas as sugestões. As melhores ideias são implementadas em novas versões do app. 🚀</div>
+    <button onclick="fecharSugSucesso()" style="width:100%;background:#00C96F;border:none;border-radius:12px;padding:13px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer">Fechar</button>
+  </div>
+</div>
+
+<style>
+  @keyframes fadeUpBtn { from { opacity:0;transform:translateY(12px); } to { opacity:1;transform:translateY(0); } }
+  #sugestaoBtn:hover { background:#1a2d4a; transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+  .sug-tipo-btn.sel { background:rgba(0,201,111,0.12) !important; border-color:rgba(0,201,111,0.4) !important; color:#00C96F !important; }
+</style>
+
+<script>
+  var sugTipoAtual = '';
+  function abrirSugestao() {
+    document.getElementById('overlaySugestao').style.opacity='1';
+    document.getElementById('overlaySugestao').style.pointerEvents='all';
+    document.getElementById('modalSugestao').style.transform='translateY(0)';
+  }
+  function fecharSugestao() {
+    document.getElementById('overlaySugestao').style.opacity='0';
+    document.getElementById('overlaySugestao').style.pointerEvents='none';
+    document.getElementById('modalSugestao').style.transform='translateY(20px)';
+  }
+  function selTipoSug(btn, tipo) {
+    sugTipoAtual = tipo;
+    document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+  }
+  function enviarSugestao() {
+    var texto = document.getElementById('sugTexto').value.trim();
+    var cat = document.getElementById('sugCategoria').value;
+    if (!texto) { document.getElementById('sugTexto').style.borderColor='rgba(255,92,92,0.5)'; return; }
+    fecharSugestao();
+    setTimeout(function() {
+      document.getElementById('overlaySugSucesso').style.opacity='1';
+      document.getElementById('overlaySugSucesso').style.pointerEvents='all';
+      document.getElementById('modalSugSuc').style.transform='translateY(0)';
+      document.getElementById('sugTexto').value='';
+      document.getElementById('sugCategoria').value='';
+      sugTipoAtual='';
+      document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
+    }, 200);
+  }
+  function fecharSugSucesso() {
+    document.getElementById('overlaySugSucesso').style.opacity='0';
+    document.getElementById('overlaySugSucesso').style.pointerEvents='none';
+    document.getElementById('modalSugSuc').style.transform='translateY(20px)';
+  }
+  document.getElementById('overlaySugestao').addEventListener('click', function(e) { if(e.target===this) fecharSugestao(); });
+  document.getElementById('overlaySugSucesso').addEventListener('click', function(e) { if(e.target===this) fecharSugSucesso(); });
+</script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(e => {});
+  }
+</script>
+
+</body>
+</html>

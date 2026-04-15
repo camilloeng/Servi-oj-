@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiçoJá — Meus Pedidos</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --verde: #00C96F; --verde-escuro: #009E57;
+    --azul: #0A1628; --azul-medio: #132240; --azul-input: #0F1C35;
+    --branco: #F5F7F2; --cinza: #8A9BB5;
+    --laranja: #FF6B35; --amarelo: #FFB830;
+    --erro: #FF5C5C; --borda: rgba(255,255,255,0.09);
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--azul); color: var(--branco); min-height: 100vh; }
+  body::before {
+    content: ''; position: fixed; top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,201,111,0.09) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 28px; border-bottom: 1px solid var(--borda);
+  }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; text-decoration: none; color: var(--branco); }
+  .logo span { color: var(--verde); }
+  .nav-right { display: flex; align-items: center; gap: 14px; }
+  .notif-btn {
+    position: relative; background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 10px; width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 1rem; transition: border-color 0.2s;
+  }
+  .notif-btn:hover { border-color: rgba(0,201,111,0.3); }
+  .notif-dot {
+    position: absolute; top: 6px; right: 6px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--laranja); border: 2px solid var(--azul);
+  }
+  .avatar-wrap { display: flex; align-items: center; gap: 8px; }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, rgba(0,201,111,0.3), rgba(0,78,200,0.2));
+    border: 2px solid rgba(0,201,111,0.3);
+    display: flex; align-items: center; justify-content: center; font-size: 1rem;
+  }
+  .avatar-name { font-size: 0.85rem; font-weight: 600; }
+  .avatar-sub { font-size: 0.72rem; color: var(--cinza); }
+  .btn-novo {
+    background: var(--verde); border: none; border-radius: 10px;
+    padding: 9px 18px; color: var(--azul);
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.82rem;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-novo:hover { background: var(--verde-escuro); }
+
+  /* LAYOUT */
+  .page {
+    position: relative; z-index: 5;
+    max-width: 1100px; margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+
+  /* HEADER */
+  .page-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px; margin-bottom: 28px;
+  }
+  .page-header h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem; letter-spacing: -0.5px; margin-bottom: 4px; }
+  .page-header p { color: var(--cinza); font-size: 0.88rem; }
+
+  /* STATS */
+  .stats-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 16px; padding: 18px 20px;
+    animation: fadeUp 0.4s ease both;
+  }
+  .stat-card:nth-child(2) { animation-delay: 0.05s; }
+  .stat-card:nth-child(3) { animation-delay: 0.1s; }
+  .stat-card:nth-child(4) { animation-delay: 0.15s; }
+  .stat-icon { font-size: 1.4rem; margin-bottom: 8px; }
+  .stat-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem; margin-bottom: 2px; }
+  .stat-num.verde { color: var(--verde); }
+  .stat-num.laranja { color: var(--laranja); }
+  .stat-num.amarelo { color: var(--amarelo); }
+  .stat-lbl { font-size: 0.75rem; color: var(--cinza); }
+
+  /* ABAS */
+  .tabs {
+    display: flex; gap: 4px; margin-bottom: 20px;
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 12px; padding: 4px; width: fit-content;
+  }
+  .tab {
+    padding: 8px 18px; border-radius: 9px; cursor: pointer;
+    font-size: 0.82rem; font-weight: 600; color: var(--cinza);
+    transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+  }
+  .tab:hover { color: var(--branco); }
+  .tab.ativo { background: var(--azul); color: var(--branco); }
+  .tab-badge {
+    background: rgba(255,107,53,0.2); color: var(--laranja);
+    font-size: 0.68rem; font-weight: 700; padding: 1px 6px; border-radius: 100px;
+  }
+  .tab.ativo .tab-badge { background: rgba(0,201,111,0.2); color: var(--verde); }
+
+  /* PEDIDO CARD */
+  .pedido-wrap { margin-bottom: 16px; animation: fadeUp 0.4s ease both; }
+  .pedido-wrap:nth-child(2) { animation-delay: 0.05s; }
+  .pedido-wrap:nth-child(3) { animation-delay: 0.1s; }
+
+  .pedido-card {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 18px; overflow: hidden;
+  }
+
+  .pedido-header {
+    padding: 20px 24px; display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 12px; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .pedido-header:hover { background: rgba(255,255,255,0.02); }
+
+  .pedido-status {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 100px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .status-aberto { background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.25); color: var(--verde); }
+  .status-andamento { background: rgba(255,184,48,0.1); border: 1px solid rgba(255,184,48,0.25); color: var(--amarelo); }
+  .status-concluido { background: rgba(138,155,181,0.1); border: 1px solid rgba(138,155,181,0.2); color: var(--cinza); }
+
+  .pedido-titulo { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin: 6px 0 4px; line-height: 1.3; }
+  .pedido-meta-row { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .pmeta { font-size: 0.78rem; color: var(--cinza); display: flex; align-items: center; gap: 4px; }
+  .pmeta strong { color: var(--branco); }
+
+  .pedido-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .act-btn {
+    background: none; border: 1px solid var(--borda); border-radius: 8px;
+    color: var(--cinza); font-size: 0.75rem; padding: 6px 10px;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .act-btn:hover { border-color: rgba(255,255,255,0.25); color: var(--branco); }
+  .act-btn.danger:hover { border-color: rgba(255,92,92,0.4); color: var(--erro); }
+  .expand-icon { color: var(--cinza); font-size: 0.8rem; transition: transform 0.3s; }
+  .expand-icon.open { transform: rotate(180deg); }
+
+  /* PROFISSIONAIS INTERESSADOS */
+  .interessados {
+    border-top: 1px solid var(--borda);
+    padding: 0 24px 20px;
+    display: none;
+  }
+  .interessados.open { display: block; animation: fadeUp 0.3s ease both; }
+
+  .int-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 0 12px;
+  }
+  .int-titulo { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.88rem; }
+  .int-count {
+    background: rgba(255,107,53,0.12); border: 1px solid rgba(255,107,53,0.25);
+    color: var(--laranja); font-size: 0.72rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 100px;
+  }
+  .int-count.zero { background: rgba(138,155,181,0.1); border-color: rgba(138,155,181,0.2); color: var(--cinza); }
+
+  .prof-lista { display: flex; flex-direction: column; gap: 10px; }
+
+  .prof-item {
+    background: var(--azul-input); border: 1px solid var(--borda);
+    border-radius: 14px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 14px;
+    transition: border-color 0.2s;
+  }
+  .prof-item:hover { border-color: rgba(0,201,111,0.2); }
+  .prof-item.aceito { border-color: rgba(0,201,111,0.25); background: rgba(0,201,111,0.04); }
+  .prof-item.recusado { opacity: 0.45; }
+
+  .prof-av {
+    width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, rgba(0,201,111,0.25), rgba(0,78,200,0.15));
+    border: 2px solid rgba(0,201,111,0.2);
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+  }
+
+  .prof-info { flex: 1; min-width: 0; }
+  .prof-nome { font-weight: 700; font-size: 0.9rem; margin-bottom: 2px; }
+  .prof-rating { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+  .stars-sm { color: var(--amarelo); font-size: 0.75rem; }
+  .rating-sm { font-size: 0.75rem; color: var(--cinza); }
+  .prof-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .prof-tag {
+    font-size: 0.68rem; padding: 2px 7px; border-radius: 100px;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--borda);
+    color: var(--cinza);
+  }
+
+  .prof-btns { display: flex; gap: 6px; flex-shrink: 0; }
+  .btn-ver-perfil {
+    background: none; border: 1px solid var(--borda); border-radius: 8px;
+    color: var(--cinza); font-size: 0.75rem; padding: 7px 10px;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .btn-ver-perfil:hover { border-color: rgba(255,255,255,0.25); color: var(--branco); }
+  .btn-aceitar-prof {
+    background: var(--verde); border: none; border-radius: 8px;
+    color: var(--azul); font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 0.75rem; padding: 7px 12px;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .btn-aceitar-prof:hover { background: var(--verde-escuro); }
+  .btn-recusar-prof {
+    background: none; border: 1px solid rgba(255,92,92,0.2); border-radius: 8px;
+    color: var(--erro); font-size: 0.75rem; padding: 7px 10px;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .btn-recusar-prof:hover { background: rgba(255,92,92,0.08); }
+  .status-tag {
+    font-size: 0.72rem; font-weight: 700; padding: 5px 10px; border-radius: 8px;
+  }
+  .status-aceito-tag { background: rgba(0,201,111,0.12); color: var(--verde); border: 1px solid rgba(0,201,111,0.25); }
+  .status-recusado-tag { background: rgba(255,92,92,0.08); color: var(--erro); border: 1px solid rgba(255,92,92,0.2); }
+
+  /* VAZIO */
+  .vazio { text-align: center; padding: 28px 20px; }
+  .vazio-icon { font-size: 2rem; opacity: 0.3; margin-bottom: 8px; }
+  .vazio p { color: var(--cinza); font-size: 0.82rem; }
+
+  /* MODAL PERFIL */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(10,22,40,0.92);
+    z-index: 50; display: flex; align-items: center; justify-content: center;
+    padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .overlay.vis { opacity: 1; pointer-events: all; }
+
+  .modal-box {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 24px; width: 100%; max-width: 500px; max-height: 90vh;
+    overflow-y: auto; transform: translateY(20px); transition: transform 0.3s;
+  }
+  .overlay.vis .modal-box { transform: translateY(0); }
+
+  .modal-head {
+    padding: 26px 28px 0; position: relative;
+  }
+  .modal-close {
+    position: absolute; top: 18px; right: 18px;
+    background: rgba(255,255,255,0.06); border: none; border-radius: 50%;
+    width: 30px; height: 30px; color: var(--cinza); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: all 0.2s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.12); color: var(--branco); }
+
+  .mprof-header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .mprof-av {
+    width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, rgba(0,201,111,0.3), rgba(0,78,200,0.2));
+    border: 3px solid rgba(0,201,111,0.3);
+    display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+  }
+  .mprof-nome { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.15rem; margin-bottom: 2px; }
+  .mprof-cat { color: var(--cinza); font-size: 0.78rem; margin-bottom: 4px; }
+  .mprof-stars { display: flex; align-items: center; gap: 4px; }
+  .mprof-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.25);
+    color: var(--verde); font-size: 0.7rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 100px; margin-bottom: 16px;
+  }
+
+  .msec { padding: 16px 28px; border-top: 1px solid var(--borda); }
+  .msec-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.78rem; color: var(--cinza); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+
+  .msobre { font-size: 0.83rem; color: var(--cinza); line-height: 1.7; }
+
+  .fotos-g { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+  .foto-t { aspect-ratio: 1; border-radius: 10px; background: var(--azul-input); border: 1px solid var(--borda); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+
+  .revs { display: flex; flex-direction: column; gap: 10px; }
+  .rev { background: var(--azul-input); border: 1px solid var(--borda); border-radius: 12px; padding: 12px; }
+  .rev-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+  .rev-nome { font-weight: 600; font-size: 0.8rem; }
+  .rev-stars { color: var(--amarelo); font-size: 0.75rem; }
+  .rev-txt { font-size: 0.78rem; color: var(--cinza); line-height: 1.5; }
+
+  .modal-foot {
+    padding: 18px 28px; border-top: 1px solid var(--borda); display: flex; gap: 10px;
+  }
+  .mf-recusar {
+    flex: 1; background: transparent; border: 1.5px solid var(--borda);
+    border-radius: 12px; padding: 12px; color: var(--cinza);
+    font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+  }
+  .mf-recusar:hover { border-color: rgba(255,92,92,0.4); color: var(--erro); }
+  .mf-aceitar {
+    flex: 2; background: var(--verde); border: none; border-radius: 12px; padding: 12px;
+    color: var(--azul); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+  }
+  .mf-aceitar:hover { background: var(--verde-escuro); }
+
+  /* MODAL AVALIAR */
+  .modal-avaliar {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 24px; width: 100%; max-width: 420px;
+    padding: 32px 28px; transform: translateY(20px); transition: transform 0.3s;
+  }
+  .overlay.vis .modal-avaliar { transform: translateY(0); }
+  .aval-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; margin-bottom: 4px; }
+  .aval-sub { color: var(--cinza); font-size: 0.83rem; margin-bottom: 22px; }
+
+  .estrelas-input { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; }
+  .estrela {
+    font-size: 2rem; cursor: pointer; transition: transform 0.15s;
+    filter: grayscale(1) opacity(0.3);
+  }
+  .estrela:hover, .estrela.sel { filter: none; transform: scale(1.15); }
+
+  .aval-field { margin-bottom: 14px; }
+  .aval-label { font-size: 0.78rem; font-weight: 600; color: var(--cinza); margin-bottom: 5px; display: block; }
+  .aval-textarea {
+    width: 100%; background: var(--azul-input); border: 1.5px solid var(--borda);
+    border-radius: 12px; color: var(--branco); font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; padding: 12px 14px; outline: none; resize: vertical; min-height: 90px; line-height: 1.6;
+    transition: border-color 0.2s;
+  }
+  .aval-textarea:focus { border-color: rgba(0,201,111,0.45); }
+  .aval-textarea::placeholder { color: rgba(138,155,181,0.45); }
+
+  .aval-btns { display: flex; gap: 10px; margin-top: 6px; }
+  .btn-aval-cancel {
+    flex: 1; background: transparent; border: 1.5px solid var(--borda);
+    border-radius: 12px; padding: 12px; color: var(--cinza);
+    font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-aval-cancel:hover { border-color: rgba(255,255,255,0.25); color: var(--branco); }
+  .btn-aval-enviar {
+    flex: 2; background: var(--amarelo); border: none; border-radius: 12px; padding: 12px;
+    color: var(--azul); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-aval-enviar:hover { background: #e6a420; }
+
+  /* MODAL EDITAR */
+  .modal-editar {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 24px; width: 100%; max-width: 460px;
+    padding: 32px 28px; transform: translateY(20px); transition: transform 0.3s;
+  }
+  .overlay.vis .modal-editar { transform: translateY(0); }
+  .edit-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 4px; }
+  .edit-sub { color: var(--cinza); font-size: 0.82rem; margin-bottom: 20px; }
+  .edit-field { margin-bottom: 14px; }
+  .edit-label { font-size: 0.78rem; font-weight: 600; color: var(--cinza); margin-bottom: 5px; display: block; }
+  .edit-input, .edit-textarea {
+    width: 100%; background: var(--azul-input); border: 1.5px solid var(--borda);
+    border-radius: 12px; color: var(--branco); font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; padding: 12px 14px; outline: none; transition: border-color 0.2s;
+  }
+  .edit-textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+  .edit-input:focus, .edit-textarea:focus { border-color: rgba(0,201,111,0.45); }
+  .edit-btns { display: flex; gap: 10px; margin-top: 6px; }
+  .btn-salvar {
+    flex: 2; background: var(--verde); border: none; border-radius: 12px; padding: 12px;
+    color: var(--azul); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-salvar:hover { background: var(--verde-escuro); }
+  .btn-edit-cancel {
+    flex: 1; background: transparent; border: 1.5px solid var(--borda);
+    border-radius: 12px; padding: 12px; color: var(--cinza);
+    font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-edit-cancel:hover { border-color: rgba(255,255,255,0.2); color: var(--branco); }
+
+  /* MODAL SUCESSO */
+  .modal-suc {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 24px; width: 100%; max-width: 380px;
+    text-align: center; padding: 36px 28px;
+    transform: translateY(20px); transition: transform 0.3s;
+  }
+  .overlay.vis .modal-suc { transform: translateY(0); }
+  .suc-icon { font-size: 3.2rem; margin-bottom: 14px; }
+  .suc-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; margin-bottom: 8px; }
+  .suc-sub { color: var(--cinza); font-size: 0.83rem; line-height: 1.6; margin-bottom: 22px; }
+  .btn-suc { width: 100%; background: var(--verde); border: none; border-radius: 12px; padding: 13px; color: var(--azul); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.92rem; cursor: pointer; transition: all 0.2s; }
+  .btn-suc:hover { background: var(--verde-escuro); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 640px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .page { padding: 20px 16px 40px; }
+    nav { padding: 16px 18px; }
+    .avatar-name, .avatar-sub { display: none; }
+    .pedido-actions { flex-direction: column; gap: 4px; }
+    .prof-btns { flex-direction: column; }
+  }
+</style>
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#00C96F">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ServiçoJá">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo">Serviço<span>Já</span></a>
+  <div class="nav-right">
+    <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+    <div class="avatar-wrap">
+      <div class="avatar">👤</div>
+      <div>
+        <div class="avatar-name">Maria Silva</div>
+        <div class="avatar-sub">Cliente</div>
+      </div>
+    </div>
+    <button class="btn-novo" onclick="alert('Ir para publicar pedido')">+ Novo pedido</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <h1>Meus pedidos</h1>
+      <p>Acompanhe seus pedidos e veja os profissionais interessados</p>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">📋</div>
+      <div class="stat-num verde">3</div>
+      <div class="stat-lbl">Pedidos ativos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">👷</div>
+      <div class="stat-num laranja">7</div>
+      <div class="stat-lbl">Aguardando resposta</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-num" style="color:var(--cinza)">5</div>
+      <div class="stat-lbl">Serviços concluídos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⭐</div>
+      <div class="stat-num amarelo">4.8</div>
+      <div class="stat-lbl">Sua reputação</div>
+    </div>
+  </div>
+
+  <!-- ABAS -->
+  <div class="tabs">
+    <div class="tab ativo" onclick="selTab(this)">📋 Todos <span class="tab-badge">8</span></div>
+    <div class="tab" onclick="selTab(this)">🟢 Abertos</div>
+    <div class="tab" onclick="selTab(this)">🔄 Em andamento</div>
+    <div class="tab" onclick="selTab(this)">✅ Concluídos</div>
+  </div>
+
+  <!-- PEDIDO 1: ABERTO COM INTERESSADOS -->
+  <div class="pedido-wrap">
+    <div class="pedido-card">
+      <div class="pedido-header" onclick="togglePedido(this)">
+        <div style="flex:1">
+          <div class="pedido-status status-aberto">🟢 Aberto</div>
+          <div class="pedido-titulo">Disjuntor caiu e não volta — preciso urgente</div>
+          <div class="pedido-meta-row">
+            <div class="pmeta">📅 <span>Postado hoje às 09:14</span></div>
+            <div class="pmeta">👷 <strong>3 profissionais</strong> interessados</div>
+            <div class="pmeta">📍 <span>Moema, SP</span></div>
+            <div class="pmeta">💰 <span>Em aberto</span></div>
+          </div>
+        </div>
+        <div class="pedido-actions">
+          <button class="act-btn" onclick="event.stopPropagation(); abrirEditar()">✏️ Editar</button>
+          <button class="act-btn danger" onclick="event.stopPropagation(); cancelarPedido(this)">🗑️ Cancelar</button>
+          <span class="expand-icon" id="exp1">▼</span>
+        </div>
+      </div>
+
+      <div class="interessados" id="int1">
+        <div class="int-header">
+          <span class="int-titulo">Profissionais interessados</span>
+          <span class="int-count">3 aguardando resposta</span>
+        </div>
+        <div class="prof-lista">
+
+          <div class="prof-item" id="pi1">
+            <div class="prof-av">👷</div>
+            <div class="prof-info">
+              <div class="prof-nome">João Ferreira</div>
+              <div class="prof-rating">
+                <span class="stars-sm">★★★★★</span>
+                <span class="rating-sm">4.9 · 47 avaliações</span>
+              </div>
+              <div class="prof-tags">
+                <span class="prof-tag">⚡ Eletricista</span>
+                <span class="prof-tag">✅ Aprovado IA</span>
+                <span class="prof-tag">📍 2,3 km</span>
+              </div>
+            </div>
+            <div class="prof-btns">
+              <button class="btn-ver-perfil" onclick="abrirPerfil('pi1')">Ver perfil</button>
+              <button class="btn-aceitar-prof" onclick="aceitarProf('pi1', this)">✅ Aceitar</button>
+              <button class="btn-recusar-prof" onclick="recusarProf('pi1', this)">✕</button>
+            </div>
+          </div>
+
+          <div class="prof-item" id="pi2">
+            <div class="prof-av">👷</div>
+            <div class="prof-info">
+              <div class="prof-nome">Carlos Mendes</div>
+              <div class="prof-rating">
+                <span class="stars-sm">★★★★☆</span>
+                <span class="rating-sm">4.6 · 23 avaliações</span>
+              </div>
+              <div class="prof-tags">
+                <span class="prof-tag">⚡ Eletricista</span>
+                <span class="prof-tag">✅ Aprovado IA</span>
+                <span class="prof-tag">📍 3,8 km</span>
+              </div>
+            </div>
+            <div class="prof-btns">
+              <button class="btn-ver-perfil" onclick="abrirPerfil('pi2')">Ver perfil</button>
+              <button class="btn-aceitar-prof" onclick="aceitarProf('pi2', this)">✅ Aceitar</button>
+              <button class="btn-recusar-prof" onclick="recusarProf('pi2', this)">✕</button>
+            </div>
+          </div>
+
+          <div class="prof-item" id="pi3">
+            <div class="prof-av">👷</div>
+            <div class="prof-info">
+              <div class="prof-nome">Roberto Santos</div>
+              <div class="prof-rating">
+                <span class="stars-sm">★★★★★</span>
+                <span class="rating-sm">4.8 · 31 avaliações</span>
+              </div>
+              <div class="prof-tags">
+                <span class="prof-tag">⚡ Eletricista</span>
+                <span class="prof-tag">✅ Aprovado IA</span>
+                <span class="prof-tag">📍 5,1 km</span>
+              </div>
+            </div>
+            <div class="prof-btns">
+              <button class="btn-ver-perfil" onclick="abrirPerfil('pi3')">Ver perfil</button>
+              <button class="btn-aceitar-prof" onclick="aceitarProf('pi3', this)">✅ Aceitar</button>
+              <button class="btn-recusar-prof" onclick="recusarProf('pi3', this)">✕</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PEDIDO 2: EM ANDAMENTO -->
+  <div class="pedido-wrap">
+    <div class="pedido-card">
+      <div class="pedido-header" onclick="togglePedido(this)">
+        <div style="flex:1">
+          <div class="pedido-status status-andamento">🔄 Em andamento</div>
+          <div class="pedido-titulo">Instalação de 4 tomadas novas no escritório</div>
+          <div class="pedido-meta-row">
+            <div class="pmeta">📅 <span>Postado há 2 dias</span></div>
+            <div class="pmeta">👷 <strong>João Ferreira</strong> contratado</div>
+            <div class="pmeta">📍 <span>Brooklin, SP</span></div>
+            <div class="pmeta">💰 <strong>R$ 380</strong> combinado</div>
+          </div>
+        </div>
+        <div class="pedido-actions">
+          <button class="act-btn verde" onclick="event.stopPropagation(); abrirAvaliar()" style="border-color:rgba(0,201,111,0.3);color:var(--verde)">⭐ Avaliar</button>
+          <span class="expand-icon" id="exp2">▼</span>
+        </div>
+      </div>
+
+      <div class="interessados" id="int2">
+        <div class="int-header">
+          <span class="int-titulo">Profissional contratado</span>
+          <span class="int-count zero">Em andamento</span>
+        </div>
+        <div class="prof-lista">
+          <div class="prof-item aceito">
+            <div class="prof-av">👷</div>
+            <div class="prof-info">
+              <div class="prof-nome">João Ferreira</div>
+              <div class="prof-rating">
+                <span class="stars-sm">★★★★★</span>
+                <span class="rating-sm">4.9 · 47 avaliações</span>
+              </div>
+              <div class="prof-tags">
+                <span class="prof-tag">📅 Início: 12/04</span>
+                <span class="prof-tag">🏁 Fim: 12/04</span>
+                <span class="prof-tag">💰 R$ 380</span>
+              </div>
+            </div>
+            <div class="prof-btns">
+              <span class="status-tag status-aceito-tag">✅ Aceito</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PEDIDO 3: CONCLUÍDO -->
+  <div class="pedido-wrap">
+    <div class="pedido-card" style="opacity:0.75">
+      <div class="pedido-header" onclick="togglePedido(this)">
+        <div style="flex:1">
+          <div class="pedido-status status-concluido">✅ Concluído</div>
+          <div class="pedido-titulo">Troca de chuveiro elétrico — banheiro suite</div>
+          <div class="pedido-meta-row">
+            <div class="pmeta">📅 <span>Concluído em 08/04</span></div>
+            <div class="pmeta">👷 <strong>Carlos Mendes</strong></div>
+            <div class="pmeta">💰 <strong>R$ 120</strong> pago</div>
+            <div class="pmeta">⭐ <strong style="color:var(--amarelo)">Você avaliou: 5★</strong></div>
+          </div>
+        </div>
+        <div class="pedido-actions">
+          <span class="expand-icon" id="exp3">▼</span>
+        </div>
+      </div>
+
+      <div class="interessados" id="int3">
+        <div class="int-header">
+          <span class="int-titulo">Detalhes do serviço</span>
+          <span class="int-count zero">Concluído</span>
+        </div>
+        <div class="prof-lista">
+          <div class="prof-item aceito">
+            <div class="prof-av">👷</div>
+            <div class="prof-info">
+              <div class="prof-nome">Carlos Mendes</div>
+              <div class="prof-rating">
+                <span class="stars-sm">★★★★☆</span>
+                <span class="rating-sm">4.6 · 23 avaliações</span>
+              </div>
+              <div class="prof-tags">
+                <span class="prof-tag">📅 Realizado: 08/04</span>
+                <span class="prof-tag">💰 R$ 120</span>
+                <span class="prof-tag">⭐ Sua nota: 5★</span>
+              </div>
+            </div>
+            <div class="prof-btns">
+              <span class="status-tag status-aceito-tag">✅ Concluído</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- OVERLAY: PERFIL DO PROFISSIONAL -->
+<div class="overlay" id="overlayPerfil">
+  <div class="modal-box">
+    <div class="modal-head">
+      <button class="modal-close" onclick="fecharOverlay('overlayPerfil')">✕</button>
+      <div class="mprof-header">
+        <div class="mprof-av">👷</div>
+        <div>
+          <div class="mprof-nome" id="mpNome">João Ferreira</div>
+          <div class="mprof-cat">⚡ Eletricista · 🔌 Instalações</div>
+          <div class="mprof-stars">
+            <span class="stars-sm" style="font-size:0.9rem">★★★★★</span>
+            <span style="font-size:0.78rem;margin-left:4px">4.9 · 47 avaliações</span>
+          </div>
+        </div>
+      </div>
+      <div class="mprof-badge">✅ Aprovado pela IA ServiçoJá · 98% no teste</div>
+    </div>
+
+    <div class="msec">
+      <div class="msec-title">Sobre o profissional</div>
+      <div class="msobre">Eletricista com 12 anos de experiência em instalações residenciais e comerciais. Trabalho com nota fiscal e garantia de 1 ano em todos os serviços realizados.</div>
+    </div>
+
+    <div class="msec">
+      <div class="msec-title">Fotos de trabalhos</div>
+      <div class="fotos-g">
+        <div class="foto-t">🔌</div><div class="foto-t">⚡</div><div class="foto-t">🏠</div>
+        <div class="foto-t">🔧</div><div class="foto-t">💡</div><div class="foto-t">🛠️</div>
+      </div>
+    </div>
+
+    <div class="msec">
+      <div class="msec-title">Avaliações</div>
+      <div class="revs">
+        <div class="rev">
+          <div class="rev-top"><span class="rev-nome">Carlos M.</span><span class="rev-stars">★★★★★</span></div>
+          <div class="rev-txt">Excelente profissional! Chegou no horário, trabalho impecável. Recomendo muito.</div>
+        </div>
+        <div class="rev">
+          <div class="rev-top"><span class="rev-nome">Ana P.</span><span class="rev-stars">★★★★★</span></div>
+          <div class="rev-txt">Instalou 6 tomadas e trocou o quadro elétrico. Serviço rápido, limpo e com garantia.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-foot" id="mpFooter">
+      <button class="mf-recusar" id="mpBtnRecusar">✕ Recusar</button>
+      <button class="mf-aceitar" id="mpBtnAceitar">✅ Aceitar profissional</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY: AVALIAR -->
+<div class="overlay" id="overlayAvaliar">
+  <div class="modal-avaliar">
+    <div class="aval-title">Avaliar profissional</div>
+    <div class="aval-sub">Como foi o serviço do João Ferreira? Sua avaliação ajuda outros clientes.</div>
+
+    <div class="estrelas-input" id="estrelasInput">
+      <span class="estrela" onclick="selEstrela(1)">★</span>
+      <span class="estrela" onclick="selEstrela(2)">★</span>
+      <span class="estrela" onclick="selEstrela(3)">★</span>
+      <span class="estrela" onclick="selEstrela(4)">★</span>
+      <span class="estrela" onclick="selEstrela(5)">★</span>
+    </div>
+
+    <div class="aval-field">
+      <label class="aval-label">Comentário <span style="font-weight:400;color:rgba(138,155,181,0.6)">(opcional)</span></label>
+      <textarea class="aval-textarea" placeholder="Conte como foi o atendimento, pontualidade, qualidade do serviço..."></textarea>
+    </div>
+
+    <div class="aval-btns">
+      <button class="btn-aval-cancel" onclick="fecharOverlay('overlayAvaliar')">Cancelar</button>
+      <button class="btn-aval-enviar" onclick="enviarAvaliacao()">⭐ Enviar avaliação</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY: EDITAR -->
+<div class="overlay" id="overlayEditar">
+  <div class="modal-editar">
+    <div class="edit-title">Editar pedido</div>
+    <div class="edit-sub">Altere as informações do seu pedido. Profissionais verão a versão atualizada.</div>
+    <div class="edit-field">
+      <label class="edit-label">Título</label>
+      <input class="edit-input" type="text" value="Disjuntor caiu e não volta — preciso urgente">
+    </div>
+    <div class="edit-field">
+      <label class="edit-label">Descrição</label>
+      <textarea class="edit-textarea">O disjuntor geral da casa caiu e não consigo religar. Tentei resetar mas volta a desligar. Tenho uma criança pequena em casa e preciso resolver hoje.</textarea>
+    </div>
+    <div class="edit-field">
+      <label class="edit-label">Valor aproximado</label>
+      <input class="edit-input" type="text" placeholder="Deixar em aberto ou informar valor">
+    </div>
+    <div class="edit-btns">
+      <button class="btn-edit-cancel" onclick="fecharOverlay('overlayEditar')">Cancelar</button>
+      <button class="btn-salvar" onclick="salvarEdicao()">💾 Salvar alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY: SUCESSO -->
+<div class="overlay" id="overlaySucesso">
+  <div class="modal-suc">
+    <div class="suc-icon" id="sucIcon">🎉</div>
+    <div class="suc-title" id="sucTitle">Profissional aceito!</div>
+    <div class="suc-sub" id="sucSub">Você aceitou ver o orçamento. O profissional será notificado e poderá enviar a proposta com valor, datas e mensagem.</div>
+    <button class="btn-suc" onclick="fecharOverlay('overlaySucesso')">Entendido</button>
+  </div>
+</div>
+
+<script>
+  // TOGGLE PEDIDO
+  function togglePedido(header) {
+    const card = header.parentElement;
+    const intDiv = card.querySelector('.interessados');
+    const expIcon = header.querySelector('.expand-icon');
+    const isOpen = intDiv.classList.contains('open');
+    intDiv.classList.toggle('open', !isOpen);
+    expIcon.classList.toggle('open', !isOpen);
+  }
+
+  // ABAS
+  function selTab(el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('ativo'));
+    el.classList.add('ativo');
+  }
+
+  // ABRIR PERFIL
+  let profAtual = null;
+  function abrirPerfil(profId) {
+    profAtual = profId;
+    const nomes = { pi1: 'João Ferreira', pi2: 'Carlos Mendes', pi3: 'Roberto Santos' };
+    document.getElementById('mpNome').textContent = nomes[profId] || 'Profissional';
+    document.getElementById('overlayPerfil').classList.add('vis');
+    document.getElementById('mpBtnAceitar').onclick = () => { fecharOverlay('overlayPerfil'); aceitarProf(profId, null); };
+    document.getElementById('mpBtnRecusar').onclick = () => { fecharOverlay('overlayPerfil'); recusarProf(profId, null); };
+  }
+
+  // ACEITAR PROFISSIONAL
+  function aceitarProf(profId, btn) {
+    const item = document.getElementById(profId);
+    if (!item) return;
+    item.classList.add('aceito');
+    const btns = item.querySelector('.prof-btns');
+    btns.innerHTML = `<span class="status-tag status-aceito-tag">✅ Aceito</span>`;
+    mostrarSucesso('🎉', 'Profissional aceito!', 'Ótimo! O profissional foi notificado e poderá enviar o orçamento com valor, datas e mensagem para você.');
+  }
+
+  // RECUSAR PROFISSIONAL
+  function recusarProf(profId, btn) {
+    const item = document.getElementById(profId);
+    if (!item) return;
+    item.classList.add('recusado');
+    const btns = item.querySelector('.prof-btns');
+    btns.innerHTML = `<span class="status-tag status-recusado-tag">✕ Recusado</span>`;
+  }
+
+  // AVALIAR
+  let notaSel = 0;
+  function abrirAvaliar() { document.getElementById('overlayAvaliar').classList.add('vis'); }
+  function selEstrela(n) {
+    notaSel = n;
+    document.querySelectorAll('.estrela').forEach((e, i) => {
+      e.classList.toggle('sel', i < n);
+    });
+  }
+  function enviarAvaliacao() {
+    fecharOverlay('overlayAvaliar');
+    mostrarSucesso('⭐', 'Avaliação enviada!', `Obrigado pelo feedback! Sua avaliação ajuda a manter a qualidade dos profissionais na plataforma.`);
+  }
+
+  // EDITAR
+  function abrirEditar() { document.getElementById('overlayEditar').classList.add('vis'); }
+  function salvarEdicao() {
+    fecharOverlay('overlayEditar');
+    mostrarSucesso('💾', 'Pedido atualizado!', 'As alterações foram salvas. Os profissionais interessados verão a versão atualizada do seu pedido.');
+  }
+
+  // CANCELAR
+  function cancelarPedido(btn) {
+    if (confirm('Tem certeza que deseja cancelar este pedido?')) {
+      const card = btn.closest('.pedido-wrap');
+      card.style.transition = 'opacity 0.4s, transform 0.4s';
+      card.style.opacity = '0';
+      card.style.transform = 'translateX(-10px)';
+      setTimeout(() => card.remove(), 400);
+    }
+  }
+
+  // SUCESSO GENÉRICO
+  function mostrarSucesso(icon, title, sub) {
+    document.getElementById('sucIcon').textContent = icon;
+    document.getElementById('sucTitle').textContent = title;
+    document.getElementById('sucSub').textContent = sub;
+    document.getElementById('overlaySucesso').classList.add('vis');
+  }
+
+  // FECHAR OVERLAY
+  function fecharOverlay(id) { document.getElementById(id).classList.remove('vis'); }
+  document.querySelectorAll('.overlay').forEach(ov => {
+    ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('vis'); });
+  });
+</script>
+
+<!-- BOTÃO FLUTUANTE DE SUGESTÃO -->
+<div id="sugestaoBtn" onclick="abrirSugestao()" style="
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  background:#132240;border:1px solid rgba(0,201,111,0.3);
+  border-radius:100px;padding:10px 16px;
+  display:flex;align-items:center;gap:7px;
+  cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.35);
+  transition:all 0.2s;font-family:'DM Sans',sans-serif;
+  animation:fadeUpBtn 0.5s 0.8s ease both;opacity:0;
+">
+  <span style="font-size:1rem">💡</span>
+  <span style="font-size:0.75rem;font-weight:600;color:#00C96F">Sugerir melhoria</span>
+</div>
+
+<!-- MODAL SUGESTÃO -->
+<div id="overlaySugestao" style="
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:1000;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
+">
+  <div id="modalSugestao" style="
+    background:#132240;border:1px solid rgba(255,255,255,0.09);
+    border-radius:22px;width:100%;max-width:440px;padding:28px;
+    transform:translateY(20px);transition:transform 0.3s;
+  ">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:2px">💡 Sugerir melhoria</div>
+        <div style="font-size:0.75rem;color:#8A9BB5">Sua opinião nos ajuda a melhorar o ServiçoJá</div>
+      </div>
+      <button onclick="fecharSugestao()" style="background:rgba(255,255,255,0.06);border:none;border-radius:50%;width:30px;height:30px;color:#8A9BB5;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s">✕</button>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Você é:</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="selTipoSug(this,'cliente')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👤 Cliente</button>
+        <button onclick="selTipoSug(this,'profissional')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👷 Profissional</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Categoria:</div>
+      <select id="sugCategoria" style="width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;font-size:0.83rem;padding:10px 12px;outline:none;cursor:pointer;-webkit-appearance:none">
+        <option value="">Selecione uma categoria</option>
+        <option>🎨 Design e visual</option>
+        <option>⚡ Funcionalidade</option>
+        <option>🐛 Reportar problema</option>
+        <option>💬 Comunicação e chat</option>
+        <option>💳 Pagamentos e taxas</option>
+        <option>🤖 Teste de IA</option>
+        <option>📋 Pedidos e orçamentos</option>
+        <option>💡 Nova funcionalidade</option>
+        <option>🔒 Segurança e privacidade</option>
+        <option>🌟 Outro</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom:18px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Sua sugestão:</div>
+      <textarea id="sugTexto" placeholder="Descreva sua ideia ou problema. Seja específico — isso nos ajuda a implementar mais rápido!" style="
+        width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);
+        border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;
+        font-size:0.83rem;padding:12px 14px;outline:none;resize:vertical;
+        min-height:100px;line-height:1.6;transition:border-color 0.2s;
+      " oninput="this.style.borderColor='rgba(0,201,111,0.4)'"></textarea>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button onclick="fecharSugestao()" style="flex:1;background:transparent;border:1.5px solid rgba(255,255,255,0.09);border-radius:12px;padding:12px;color:#8A9BB5;font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.2s">Cancelar</button>
+      <button onclick="enviarSugestao()" style="flex:2;background:#00C96F;border:none;border-radius:12px;padding:12px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all 0.2s">💡 Enviar sugestão</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUCESSO SUGESTÃO -->
+<div id="overlaySugSucesso" style="
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:1001;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
+">
+  <div style="background:#132240;border:1px solid rgba(0,201,111,0.25);border-radius:22px;width:100%;max-width:360px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s" id="modalSugSuc">
+    <div style="font-size:3rem;margin-bottom:12px">🙏</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:8px">Sugestão enviada!</div>
+    <div style="color:#8A9BB5;font-size:0.82rem;line-height:1.6;margin-bottom:22px">Obrigado pelo seu feedback! Nossa equipe lê todas as sugestões. As melhores ideias são implementadas em novas versões do app. 🚀</div>
+    <button onclick="fecharSugSucesso()" style="width:100%;background:#00C96F;border:none;border-radius:12px;padding:13px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer">Fechar</button>
+  </div>
+</div>
+
+<style>
+  @keyframes fadeUpBtn { from { opacity:0;transform:translateY(12px); } to { opacity:1;transform:translateY(0); } }
+  #sugestaoBtn:hover { background:#1a2d4a; transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+  .sug-tipo-btn.sel { background:rgba(0,201,111,0.12) !important; border-color:rgba(0,201,111,0.4) !important; color:#00C96F !important; }
+</style>
+
+<script>
+  var sugTipoAtual = '';
+  function abrirSugestao() {
+    document.getElementById('overlaySugestao').style.opacity='1';
+    document.getElementById('overlaySugestao').style.pointerEvents='all';
+    document.getElementById('modalSugestao').style.transform='translateY(0)';
+  }
+  function fecharSugestao() {
+    document.getElementById('overlaySugestao').style.opacity='0';
+    document.getElementById('overlaySugestao').style.pointerEvents='none';
+    document.getElementById('modalSugestao').style.transform='translateY(20px)';
+  }
+  function selTipoSug(btn, tipo) {
+    sugTipoAtual = tipo;
+    document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+  }
+  function enviarSugestao() {
+    var texto = document.getElementById('sugTexto').value.trim();
+    var cat = document.getElementById('sugCategoria').value;
+    if (!texto) { document.getElementById('sugTexto').style.borderColor='rgba(255,92,92,0.5)'; return; }
+    fecharSugestao();
+    setTimeout(function() {
+      document.getElementById('overlaySugSucesso').style.opacity='1';
+      document.getElementById('overlaySugSucesso').style.pointerEvents='all';
+      document.getElementById('modalSugSuc').style.transform='translateY(0)';
+      document.getElementById('sugTexto').value='';
+      document.getElementById('sugCategoria').value='';
+      sugTipoAtual='';
+      document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
+    }, 200);
+  }
+  function fecharSugSucesso() {
+    document.getElementById('overlaySugSucesso').style.opacity='0';
+    document.getElementById('overlaySugSucesso').style.pointerEvents='none';
+    document.getElementById('modalSugSuc').style.transform='translateY(20px)';
+  }
+  document.getElementById('overlaySugestao').addEventListener('click', function(e) { if(e.target===this) fecharSugestao(); });
+  document.getElementById('overlaySugSucesso').addEventListener('click', function(e) { if(e.target===this) fecharSugSucesso(); });
+</script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(e => {});
+  }
+</script>
+
+<!-- BARRA DE NAVEGAÇÃO MOBILE -->
+<nav class="bottom-nav" id="bottomNav">
+  <a href="meus-pedidos-cliente.html" class="bn-item" id="bn-pedidos">
+    <span class="bn-icon">📋</span>
+    <span class="bn-label">Pedidos</span>
+  </a>
+  <a href="publicar-pedido.html" class="bn-item bn-center" id="bn-publicar">
+    <span class="bn-icon-center">＋</span>
+  </a>
+  <a href="notificacoes.html" class="bn-item" id="bn-notif">
+    <span class="bn-icon">🔔</span>
+    <span class="bn-label">Alertas</span>
+    <span class="bn-badge">3</span>
+  </a>
+</nav>
+
+<style>
+  body { padding-bottom: 70px; }
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: #132240; border-top: 1px solid rgba(255,255,255,0.09);
+    display: flex; align-items: center; justify-content: space-around;
+    padding: 8px 16px 12px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .bn-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    text-decoration: none; color: #8A9BB5; font-size: 0.62rem; font-weight: 600;
+    min-width: 50px; transition: color 0.2s; position: relative;
+  }
+  .bn-item.ativo { color: #00C96F; }
+  .bn-icon { font-size: 1.2rem; }
+  .bn-label { font-family: 'DM Sans', sans-serif; }
+  .bn-center {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: #00C96F; color: #0A1628 !important;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: -14px; box-shadow: 0 4px 16px rgba(0,201,111,0.4);
+    font-size: 0; min-width: 0;
+  }
+  .bn-icon-center { font-size: 1.8rem; color: #0A1628; font-weight: 300; line-height: 1; }
+  .bn-badge {
+    position: absolute; top: -2px; right: 2px;
+    background: #FF6B35; color: white; font-size: 0.55rem; font-weight: 800;
+    width: 14px; height: 14px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 1.5px solid #132240;
+  }
+</style>
+
+</body>
+</html>

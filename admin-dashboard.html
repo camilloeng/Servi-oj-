@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiçoJá — Painel Administrativo</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --verde: #00C96F; --verde-escuro: #009E57;
+    --azul: #0A1628; --azul-medio: #132240; --azul-input: #0F1C35;
+    --branco: #F5F7F2; --cinza: #8A9BB5;
+    --laranja: #FF6B35; --amarelo: #FFB830;
+    --erro: #FF5C5C; --roxo: #7C3AED;
+    --borda: rgba(255,255,255,0.09);
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--azul); color: var(--branco); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* NAV ADMIN */
+  nav {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px; border-bottom: 1px solid var(--borda);
+    background: var(--azul-medio);
+  }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; text-decoration: none; color: var(--branco); }
+  .logo span { color: var(--verde); }
+  .admin-badge {
+    background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3);
+    color: #a78bfa; font-size: 0.7rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(124,58,237,0.2); border: 2px solid rgba(124,58,237,0.3);
+    display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
+  }
+  .nav-name { font-size: 0.82rem; font-weight: 600; }
+  .nav-role { font-size: 0.7rem; color: var(--cinza); }
+
+  /* LAYOUT */
+  .admin-layout { display: flex; flex: 1; }
+
+  /* SIDEBAR */
+  .admin-sidebar {
+    width: 220px; flex-shrink: 0;
+    border-right: 1px solid var(--borda);
+    padding: 20px 12px;
+    background: var(--azul-medio);
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .sb-section { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.65rem; color: rgba(138,155,181,0.5); text-transform: uppercase; letter-spacing: 0.1em; padding: 12px 10px 4px; }
+  .sb-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 9px 12px; border-radius: 10px; cursor: pointer;
+    font-size: 0.83rem; font-weight: 500; color: var(--cinza);
+    transition: all 0.2s; position: relative;
+  }
+  .sb-item:hover { background: rgba(255,255,255,0.04); color: var(--branco); }
+  .sb-item.ativo { background: rgba(0,201,111,0.1); color: var(--verde); font-weight: 600; }
+  .sb-badge {
+    margin-left: auto; font-size: 0.65rem; font-weight: 700;
+    padding: 1px 6px; border-radius: 100px;
+    background: rgba(255,92,92,0.2); color: var(--erro);
+  }
+  .sb-badge.verde { background: rgba(0,201,111,0.15); color: var(--verde); }
+
+  /* MAIN */
+  .admin-main { flex: 1; padding: 24px 28px; overflow-y: auto; }
+
+  /* PAINEL */
+  .painel { display: none; }
+  .painel.ativo { display: block; animation: fadeUp 0.35s ease both; }
+
+  /* HEADER PAINEL */
+  .p-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 22px; }
+  .p-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; letter-spacing: -0.5px; margin-bottom: 3px; }
+  .p-sub { color: var(--cinza); font-size: 0.82rem; }
+  .p-actions { display: flex; gap: 8px; }
+  .btn-sm {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 8px; padding: 8px 14px; color: var(--cinza);
+    font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-sm:hover { border-color: rgba(255,255,255,0.2); color: var(--branco); }
+  .btn-sm.verde { background: rgba(0,201,111,0.1); border-color: rgba(0,201,111,0.3); color: var(--verde); }
+
+  /* STATS GRID */
+  .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+  .stats-grid.cols3 { grid-template-columns: repeat(3,1fr); }
+  .stat-card {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 14px; padding: 16px 18px; position: relative; overflow: hidden;
+  }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .stat-card.verde-c::before { background: var(--verde); }
+  .stat-card.laranja-c::before { background: var(--laranja); }
+  .stat-card.amarelo-c::before { background: var(--amarelo); }
+  .stat-card.erro-c::before { background: var(--erro); }
+  .stat-card.roxo-c::before { background: var(--roxo); }
+  .sc-icon { font-size: 1.2rem; margin-bottom: 8px; }
+  .sc-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.7rem; margin-bottom: 2px; }
+  .sc-num.verde { color: var(--verde); }
+  .sc-num.laranja { color: var(--laranja); }
+  .sc-num.amarelo { color: var(--amarelo); }
+  .sc-num.erro { color: var(--erro); }
+  .sc-num.roxo { color: var(--roxo); }
+  .sc-lbl { font-size: 0.72rem; color: var(--cinza); }
+  .sc-delta { font-size: 0.68rem; margin-top: 4px; }
+  .sc-delta.up { color: var(--verde); }
+  .sc-delta.down { color: var(--erro); }
+
+  /* INADIMPLENTES DESTAQUE */
+  .inadimplentes-box {
+    background: rgba(255,92,92,0.06); border: 1.5px solid rgba(255,92,92,0.2);
+    border-radius: 16px; padding: 16px 20px; margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+  .ib-left { display: flex; align-items: center; gap: 12px; }
+  .ib-icon { font-size: 1.8rem; }
+  .ib-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; color: var(--erro); margin-bottom: 2px; }
+  .ib-sub { font-size: 0.78rem; color: var(--cinza); }
+  .ib-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem; color: var(--erro); text-align: right; }
+  .ib-val-lbl { font-size: 0.7rem; color: var(--cinza); text-align: right; }
+  .btn-notificar {
+    background: rgba(255,92,92,0.15); border: 1px solid rgba(255,92,92,0.3);
+    color: var(--erro); border-radius: 8px; padding: 8px 14px;
+    font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-notificar:hover { background: rgba(255,92,92,0.25); }
+
+  /* TABELA */
+  .table-card {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 14px; overflow: hidden; margin-bottom: 16px;
+  }
+  .table-head {
+    padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--borda);
+  }
+  .th-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.88rem; }
+  .th-sub { font-size: 0.72rem; color: var(--cinza); margin-top: 1px; }
+
+  .search-input {
+    background: var(--azul-input); border: 1px solid var(--borda);
+    border-radius: 8px; padding: 7px 12px 7px 30px; color: var(--branco);
+    font-family: 'DM Sans', sans-serif; font-size: 0.78rem; outline: none;
+    width: 180px; transition: border-color 0.2s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238A9BB5' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: 9px center;
+  }
+  .search-input:focus { border-color: rgba(0,201,111,0.35); }
+  .search-input::placeholder { color: rgba(138,155,181,0.5); }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 10px 16px; text-align: left; font-size: 0.7rem; font-weight: 700; color: var(--cinza); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--borda); background: rgba(255,255,255,0.02); }
+  tbody td { padding: 12px 16px; font-size: 0.82rem; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.68rem; font-weight: 700; padding: 3px 8px; border-radius: 100px;
+  }
+  .badge-verde { background: rgba(0,201,111,0.12); border: 1px solid rgba(0,201,111,0.25); color: var(--verde); }
+  .badge-laranja { background: rgba(255,107,53,0.12); border: 1px solid rgba(255,107,53,0.25); color: var(--laranja); }
+  .badge-erro { background: rgba(255,92,92,0.1); border: 1px solid rgba(255,92,92,0.2); color: var(--erro); }
+  .badge-cinza { background: rgba(138,155,181,0.1); border: 1px solid rgba(138,155,181,0.2); color: var(--cinza); }
+  .badge-amarelo { background: rgba(255,184,48,0.1); border: 1px solid rgba(255,184,48,0.25); color: var(--amarelo); }
+  .badge-roxo { background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.25); color: #a78bfa; }
+
+  .td-name { font-weight: 600; margin-bottom: 1px; }
+  .td-sub { font-size: 0.72rem; color: var(--cinza); }
+
+  .action-btns { display: flex; gap: 5px; }
+  .ab {
+    background: none; border: 1px solid var(--borda); border-radius: 6px;
+    color: var(--cinza); font-size: 0.7rem; padding: 4px 8px;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .ab:hover { border-color: rgba(255,255,255,0.2); color: var(--branco); }
+  .ab.danger:hover { border-color: rgba(255,92,92,0.4); color: var(--erro); }
+  .ab.success:hover { border-color: rgba(0,201,111,0.4); color: var(--verde); }
+
+  /* GRÁFICO FAKE */
+  .chart-wrap {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 14px; padding: 18px 20px; margin-bottom: 16px;
+  }
+  .chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .chart-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.88rem; }
+  .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 100px; }
+  .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .chart-bar {
+    width: 100%; border-radius: 4px 4px 0 0;
+    background: rgba(0,201,111,0.3); transition: background 0.2s;
+    position: relative;
+  }
+  .chart-bar:hover { background: var(--verde); }
+  .chart-lbl { font-size: 0.62rem; color: var(--cinza); }
+
+  /* TERMOS */
+  .termos-wrap { max-width: 760px; }
+  .termos-card {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 18px; overflow: hidden; margin-bottom: 16px;
+  }
+  .termos-header {
+    padding: 20px 24px; border-bottom: 1px solid var(--borda);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .termos-icon { font-size: 1.5rem; }
+  .termos-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; }
+  .termos-sub { font-size: 0.75rem; color: var(--cinza); margin-top: 2px; }
+  .termos-body { padding: 20px 24px; }
+  .clausula { margin-bottom: 20px; }
+  .clausula-num {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.78rem;
+    color: var(--verde); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;
+  }
+  .clausula-titulo { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.92rem; margin-bottom: 6px; }
+  .clausula-texto { font-size: 0.82rem; color: var(--cinza); line-height: 1.75; }
+  .clausula-texto strong { color: var(--branco); }
+  .clausula-ref {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(0,201,111,0.08); border: 1px solid rgba(0,201,111,0.2);
+    color: var(--verde); font-size: 0.68rem; font-weight: 700;
+    padding: 2px 8px; border-radius: 100px; margin-top: 6px;
+  }
+
+  /* TERMOS ACEITE (final do cadastro) */
+  .aceite-preview {
+    background: var(--azul-input); border: 1.5px solid var(--borda);
+    border-radius: 16px; padding: 20px 24px; margin-bottom: 16px;
+  }
+  .aceite-scroll {
+    max-height: 180px; overflow-y: auto; margin-bottom: 14px;
+    font-size: 0.8rem; color: var(--cinza); line-height: 1.7;
+    padding-right: 8px;
+  }
+  .aceite-scroll::-webkit-scrollbar { width: 4px; }
+  .aceite-scroll::-webkit-scrollbar-track { background: transparent; }
+  .aceite-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+  .aceite-checks { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .aceite-check {
+    display: flex; align-items: flex-start; gap: 10px; font-size: 0.8rem; color: var(--cinza); line-height: 1.5; cursor: pointer;
+  }
+  .check-box {
+    width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--borda);
+    background: var(--azul-input); flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+  }
+  .check-box.sel { background: var(--verde); border-color: var(--verde); }
+  .check-box.sel::after { content: '✓'; font-size: 0.65rem; color: var(--azul); font-weight: 700; }
+  .btn-finalizar {
+    width: 100%; background: var(--verde); border: none; border-radius: 12px;
+    padding: 14px; color: var(--azul); font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s;
+    opacity: 0.4;
+  }
+  .btn-finalizar.ativo { opacity: 1; }
+  .btn-finalizar.ativo:hover { background: var(--verde-escuro); }
+
+  /* CONFIGS */
+  .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  .config-card {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 14px; padding: 18px 20px;
+  }
+  .config-label { font-size: 0.75rem; font-weight: 700; color: var(--cinza); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .config-input {
+    width: 100%; background: var(--azul-input); border: 1.5px solid var(--borda);
+    border-radius: 10px; color: var(--branco); font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem; padding: 10px 12px; outline: none; transition: border-color 0.2s;
+  }
+  .config-input:focus { border-color: rgba(0,201,111,0.4); }
+  .config-toggle { display: flex; align-items: center; justify-content: space-between; }
+  .toggle {
+    width: 40px; height: 22px; border-radius: 11px; background: rgba(255,255,255,0.1);
+    cursor: pointer; position: relative; transition: background 0.2s;
+  }
+  .toggle.on { background: var(--verde); }
+  .toggle::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 16px; height: 16px; border-radius: 50%; background: white; transition: left 0.2s;
+  }
+  .toggle.on::after { left: 21px; }
+  .config-desc { font-size: 0.78rem; color: var(--cinza); line-height: 1.5; }
+  .btn-salvar-config {
+    background: var(--verde); border: none; border-radius: 10px;
+    padding: 10px 20px; color: var(--azul); font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; margin-top: 10px;
+  }
+  .btn-salvar-config:hover { background: var(--verde-escuro); }
+
+  
+  /* MODAL NOTIF */
+  .overlay { position:fixed;inset:0;background:rgba(10,22,40,0.92);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s; }
+  .overlay.vis { opacity:1;pointer-events:all; }
+  .overlay.vis > div { transform:translateY(0) !important; }
+  .modal-notif {
+    background:var(--azul-medio);border:1px solid var(--borda);border-radius:22px;
+    width:100%;max-width:520px;max-height:88vh;overflow-y:auto;
+    padding:28px;position:relative;transform:translateY(20px);transition:transform 0.3s;
+  }
+  .modal-close-notif {
+    position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.06);border:none;
+    border-radius:50%;width:28px;height:28px;color:var(--cinza);cursor:pointer;font-size:0.85rem;
+    display:flex;align-items:center;justify-content:center;transition:all 0.2s;
+  }
+  .modal-close-notif:hover { background:rgba(255,255,255,0.12);color:var(--branco); }
+  .mn-title { font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:4px;padding-right:30px; }
+  .mn-sub { color:var(--cinza);font-size:0.8rem;line-height:1.5;margin-bottom:16px; }
+  .mn-tabs { display:flex;gap:4px;background:var(--azul-input);border-radius:10px;padding:3px;margin-bottom:14px; }
+  .mn-tab { flex:1;padding:7px;border-radius:8px;cursor:pointer;font-size:0.75rem;font-weight:600;color:var(--cinza);text-align:center;transition:all 0.2s; }
+  .mn-tab:hover { color:var(--branco); }
+  .mn-tab.ativo { background:var(--azul-medio);color:var(--branco); }
+  .mn-painel { display:none; }
+  .mn-painel.ativo { display:block;animation:fadeUp 0.3s ease both; }
+  .mn-preview-label { font-size:0.7rem;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px; }
+  .mn-msg {
+    background:var(--azul-input);border:1px solid var(--borda);border-radius:12px;
+    padding:14px 16px;font-size:0.82rem;color:var(--cinza);line-height:1.8;margin-bottom:12px;
+  }
+  .mn-msg strong { color:var(--branco); }
+  .mn-char-count { font-size:0.7rem;color:rgba(138,155,181,0.5);text-align:right; }
+  .mn-footer { display:flex;gap:10px;margin-top:16px;border-top:1px solid var(--borda);padding-top:14px; }
+  .mn-btn-cancel { flex:1;background:transparent;border:1.5px solid var(--borda);border-radius:12px;padding:11px;color:var(--cinza);font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.2s; }
+  .mn-btn-cancel:hover { border-color:rgba(255,255,255,0.2);color:var(--branco); }
+  .mn-btn-enviar { flex:2;background:var(--verde);border:none;border-radius:12px;padding:11px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all 0.2s; }
+  .mn-btn-enviar:hover { background:var(--verde-escuro); }
+  .parcela-op { background:var(--azul-input);border:1px solid var(--borda);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px; }
+  .parcela-num { font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--verde);width:28px;flex-shrink:0; }
+  .parcela-info { flex:1; }
+  .parcela-val { font-weight:700;font-size:0.88rem;margin-bottom:1px; }
+  .parcela-desc { font-size:0.72rem;color:var(--cinza); }
+  .parcela-badge { font-size:0.68rem;font-weight:700;padding:3px 8px;border-radius:100px;flex-shrink:0; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 900px) {
+    .admin-sidebar { display: none; }
+    .stats-grid { grid-template-columns: repeat(2,1fr); }
+    .config-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#00C96F">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ServiçoJá">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body>
+
+<nav>
+  <div style="display:flex;align-items:center;gap:10px">
+    <a href="#" class="logo">Serviço<span>Já</span></a>
+    <div class="admin-badge">Admin</div>
+  </div>
+  <div class="nav-right">
+    <div style="text-align:right">
+      <div class="nav-name">Administrador</div>
+      <div class="nav-role">Acesso total</div>
+    </div>
+    <div class="nav-avatar">👑</div>
+  </div>
+</nav>
+
+<div class="admin-layout">
+
+  <!-- SIDEBAR -->
+  <div class="admin-sidebar">
+    <div class="sb-section">Visão geral</div>
+    <div class="sb-item ativo" onclick="irPainel('dashboard',this)">📊 Dashboard</div>
+    <div class="sb-item" onclick="irPainel('financeiro',this)">💰 Financeiro <span class="sb-badge">8</span></div>
+
+    <div class="sb-section">Usuários</div>
+    <div class="sb-item" onclick="irPainel('profissionais',this)">👷 Profissionais</div>
+    <div class="sb-item" onclick="irPainel('clientes',this)">👥 Clientes</div>
+
+    <div class="sb-section">Plataforma</div>
+    <div class="sb-item" onclick="irPainel('pedidos',this)">📋 Pedidos</div>
+    <div class="sb-item" onclick="irPainel('termos',this)">📜 Termos de Uso</div>
+    <div class="sb-item" onclick="irPainel('configs',this)">⚙️ Configurações</div>
+    <div class="sb-item" onclick="irPainel('sugestoes',this)">💡 Sugestões <span class="sb-badge verde">14</span></div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="admin-main">
+
+    <!-- ====== DASHBOARD ====== -->
+    <div class="painel ativo" id="dashboard">
+      <div class="p-header">
+        <div>
+          <div class="p-title">Dashboard</div>
+          <div class="p-sub">Visão geral da plataforma em tempo real · Atualizado agora</div>
+        </div>
+        <div class="p-actions">
+          <button class="btn-sm">📥 Exportar</button>
+          <button class="btn-sm verde">🔄 Atualizar</button>
+        </div>
+      </div>
+
+      <!-- FATURAMENTO DESTAQUE -->
+      <div class="inadimplentes-box" style="background:rgba(0,201,111,0.06);border-color:rgba(0,201,111,0.2)">
+        <div class="ib-left">
+          <div class="ib-icon">💰</div>
+          <div>
+            <div class="ib-title" style="color:var(--verde)">Faturamento de abril · 2026</div>
+            <div class="ib-sub">Taxas recebidas dos profissionais este mês · ↑ 18% vs mês anterior</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div>
+            <div class="ib-val" style="color:var(--verde)">R$ 4.280,00</div>
+            <div class="ib-val-lbl">Total recebido</div>
+          </div>
+          <button class="btn-notificar" style="background:rgba(0,201,111,0.12);border-color:rgba(0,201,111,0.3);color:var(--verde)" onclick="alert('Relatório exportado!')">📥 Exportar</button>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card erro-c" style="cursor:default">
+          <div class="sc-icon">⚠️</div>
+          <div class="sc-num erro">8</div>
+          <div class="sc-lbl">Inadimplentes bloqueados</div>
+          <div class="sc-delta down">↑ 3 desde ontem · R$ 640 em atraso</div>
+          <button class="btn-notificar" style="margin-top:10px;font-size:0.72rem;padding:6px 10px;cursor:pointer" onclick="abrirModalNotif()">📨 Notificar todos</button>
+        </div>
+        <div class="stat-card laranja-c">
+          <div class="sc-icon">👷</div>
+          <div class="sc-num laranja">247</div>
+          <div class="sc-lbl">Profissionais ativos</div>
+          <div class="sc-delta up">↑ 12 novos esta semana</div>
+        </div>
+        <div class="stat-card amarelo-c">
+          <div class="sc-icon">👥</div>
+          <div class="sc-num amarelo">1.842</div>
+          <div class="sc-lbl">Clientes cadastrados</div>
+          <div class="sc-delta up">↑ 34 novos esta semana</div>
+        </div>
+        <div class="stat-card roxo-c">
+          <div class="sc-icon">⏳</div>
+          <div class="sc-num roxo" style="font-size:1.2rem">R$ 890</div>
+          <div class="sc-lbl">Aguardando pagamento</div>
+          <div class="sc-delta up">Faturas em aberto</div>
+        </div>
+      </div>
+
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card verde-c">
+          <div class="sc-icon">💼</div>
+          <div class="sc-num verde">R$ 487k</div>
+          <div class="sc-lbl">Receita gerada p/ profissionais</div>
+          <div class="sc-delta up">↑ Total histórico da plataforma</div>
+        </div>
+        <div class="stat-card verde-c">
+          <div class="sc-icon">📋</div>
+          <div class="sc-num verde">186</div>
+          <div class="sc-lbl">Pedidos este mês</div>
+          <div class="sc-delta up">↑ 22% vs mês anterior</div>
+        </div>
+        <div class="stat-card roxo-c">
+          <div class="sc-icon">🤖</div>
+          <div class="sc-num roxo">94%</div>
+          <div class="sc-lbl">Taxa de aprovação no teste IA</div>
+          <div class="sc-delta up">↑ 2% esta semana</div>
+        </div>
+        <div class="stat-card amarelo-c">
+          <div class="sc-icon">⭐</div>
+          <div class="sc-num amarelo">4.8</div>
+          <div class="sc-lbl">Avaliação média da plataforma</div>
+          <div class="sc-delta up">Estável</div>
+        </div>
+      </div>
+
+      <!-- GRÁFICO -->
+      <div class="chart-wrap">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Faturamento mensal</div>
+            <div style="font-size:0.72rem;color:var(--cinza);margin-top:2px">Taxas cobradas dos profissionais · 2026</div>
+          </div>
+          <select style="background:var(--azul-input);border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.75rem;padding:5px 10px;outline:none">
+            <option>2026</option><option>2025</option>
+          </select>
+        </div>
+        <div class="chart-bars" id="chartBars"></div>
+      </div>
+
+      <!-- ATIVIDADE RECENTE -->
+      <div class="table-card">
+        <div class="table-head">
+          <div><div class="th-title">Atividade recente</div><div class="th-sub">Últimas ações na plataforma</div></div>
+        </div>
+        <table>
+          <thead><tr><th>Evento</th><th>Usuário</th><th>Detalhe</th><th>Horário</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge badge-verde">✅ Pagamento</span></td><td>João Ferreira</td><td>Fatura R$ 110,00 paga</td><td style="color:var(--cinza);font-size:0.75rem">há 5 min</td></tr>
+            <tr><td><span class="badge badge-laranja">👷 Cadastro</span></td><td>Marcos Lima</td><td>Novo profissional · Elétrica</td><td style="color:var(--cinza);font-size:0.75rem">há 12 min</td></tr>
+            <tr><td><span class="badge badge-erro">🔒 Bloqueio</span></td><td>Pedro Alves</td><td>Fatura vencida — bloqueado</td><td style="color:var(--cinza);font-size:0.75rem">há 18 min</td></tr>
+            <tr><td><span class="badge badge-amarelo">📋 Pedido</span></td><td>Maria Silva</td><td>Novo pedido · Encanamento</td><td style="color:var(--cinza);font-size:0.75rem">há 25 min</td></tr>
+            <tr><td><span class="badge badge-roxo">🤖 Teste IA</span></td><td>Carlos Souza</td><td>Aprovado · 95% · Pintura</td><td style="color:var(--cinza);font-size:0.75rem">há 41 min</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ====== FINANCEIRO ====== -->
+    <div class="painel" id="financeiro">
+      <div class="p-header">
+        <div><div class="p-title">Financeiro</div><div class="p-sub">Faturas, pagamentos e inadimplência</div></div>
+        <div class="p-actions"><button class="btn-sm verde">📥 Exportar CSV</button></div>
+      </div>
+
+      <div class="inadimplentes-box">
+        <div class="ib-left"><div class="ib-icon">⚠️</div>
+          <div><div class="ib-title">8 faturas em atraso</div><div class="ib-sub">Profissionais com acesso bloqueado automaticamente</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div><div class="ib-val">R$ 640,00</div><div class="ib-val-lbl">Total inadimplente</div></div>
+          <button class="btn-notificar" onclick="alert('Notificações enviadas!')">📨 Notificar todos</button>
+        </div>
+      </div>
+
+      <div class="stats-grid cols3" style="margin-bottom:20px">
+        <div class="stat-card verde-c"><div class="sc-icon">✅</div><div class="sc-num verde">R$ 4.280</div><div class="sc-lbl">Recebido este mês</div></div>
+        <div class="stat-card amarelo-c"><div class="sc-icon">⏳</div><div class="sc-num amarelo">R$ 890</div><div class="sc-lbl">Aguardando pagamento</div></div>
+        <div class="stat-card erro-c"><div class="sc-icon">🔒</div><div class="sc-num erro">R$ 640</div><div class="sc-lbl">Em atraso</div></div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-head">
+          <div><div class="th-title">Todas as faturas</div><div class="th-sub">Período atual</div></div>
+          <input class="search-input" placeholder="Buscar profissional...">
+        </div>
+        <table>
+          <thead><tr><th>Profissional</th><th>Período</th><th>Serviços</th><th>Valor</th><th>Vencimento</th><th>Status</th><th>Ação</th></tr></thead>
+          <tbody>
+            <tr><td><div class="td-name">João Ferreira</div><div class="td-sub">⚡ Eletricista</div></td><td style="font-size:0.75rem;color:var(--cinza)">01/04–14/04</td><td>3</td><td style="font-weight:700;color:var(--verde)">R$ 110</td><td style="font-size:0.75rem">17/04/26</td><td><span class="badge badge-verde">✅ Pago</span></td><td><div class="action-btns"><button class="ab">👁️ Ver</button></div></td></tr>
+            <tr><td><div class="td-name">Pedro Alves</div><div class="td-sub">🔧 Encanador</div></td><td style="font-size:0.75rem;color:var(--cinza)">01/04–14/04</td><td>2</td><td style="font-weight:700;color:var(--erro)">R$ 70</td><td style="font-size:0.75rem;color:var(--erro)">11/04/26</td><td><span class="badge badge-erro">🔒 Vencido</span></td><td><div class="action-btns"><button class="ab">👁️ Ver</button><button class="ab" onclick="alert('SMS e email enviados!')">📨 Cobrar</button></div></td></tr>
+            <tr><td><div class="td-name">Carlos Souza</div><div class="td-sub">🎨 Pintor</div></td><td style="font-size:0.75rem;color:var(--cinza)">01/04–14/04</td><td>4</td><td style="font-weight:700;color:var(--amarelo)">R$ 140</td><td style="font-size:0.75rem">17/04/26</td><td><span class="badge badge-amarelo">⏳ Pendente</span></td><td><div class="action-btns"><button class="ab">👁️ Ver</button><button class="ab" onclick="alert('Lembrete enviado!')">🔔 Lembrar</button></div></td></tr>
+            <tr><td><div class="td-name">Ana Rodrigues</div><div class="td-sub">🧹 Limpeza</div></td><td style="font-size:0.75rem;color:var(--cinza)">01/04–14/04</td><td>5</td><td style="font-weight:700;color:var(--verde)">R$ 150</td><td style="font-size:0.75rem">17/04/26</td><td><span class="badge badge-verde">✅ Pago</span></td><td><div class="action-btns"><button class="ab">👁️ Ver</button></div></td></tr>
+            <tr><td><div class="td-name">Roberto Lima</div><div class="td-sub">🪚 Marceneiro</div></td><td style="font-size:0.75rem;color:var(--cinza)">01/04–14/04</td><td>1</td><td style="font-weight:700;color:var(--erro)">R$ 50</td><td style="font-size:0.75rem;color:var(--erro)">10/04/26</td><td><span class="badge badge-erro">🔒 Vencido</span></td><td><div class="action-btns"><button class="ab">👁️ Ver</button><button class="ab" onclick="alert('Cobrado!')">📨 Cobrar</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ====== PROFISSIONAIS ====== -->
+    <div class="painel" id="profissionais">
+      <div class="p-header">
+        <div><div class="p-title">Profissionais</div><div class="p-sub">Gerencie todos os prestadores de serviço</div></div>
+        <div class="p-actions"><input class="search-input" placeholder="Buscar..."></div>
+      </div>
+      <div class="table-card">
+        <div class="table-head"><div><div class="th-title">247 profissionais cadastrados</div></div></div>
+        <table>
+          <thead><tr><th>Profissional</th><th>Categoria</th><th>Teste IA</th><th>Pedidos</th><th>Avaliação</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody>
+            <tr><td><div class="td-name">João Ferreira</div><div class="td-sub"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b5dfdad4daf5d0d8d4dcd99bd6dad8">[email&#160;protected]</a> · (11) 99999-1111</div></td><td>⚡ Elétrica</td><td><span class="badge badge-verde">98% ✅</span></td><td>47</td><td>⭐ 4.9</td><td><span class="badge badge-verde">Ativo</span></td><td><div class="action-btns"><button class="ab">👁️</button><button class="ab danger" onclick="bloquear(this)">🔒 Bloquear</button></div></td></tr>
+            <tr><td><div class="td-name">Pedro Alves</div><div class="td-sub"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8bfbeeeff9e4cbeee6eae2e7a5e8e4e6">[email&#160;protected]</a> · (11) 98888-2222</div></td><td>🔧 Encanamento</td><td><span class="badge badge-verde">92% ✅</span></td><td>23</td><td>⭐ 4.6</td><td><span class="badge badge-erro">Bloqueado</span></td><td><div class="action-btns"><button class="ab">👁️</button><button class="ab success" onclick="desbloquear(this)">🔓 Desbloquear</button></div></td></tr>
+            <tr><td><div class="td-name">Carlos Souza</div><div class="td-sub"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="472426352b283407222a262e2b6924282a">[email&#160;protected]</a> · (11) 97777-3333</div></td><td>🎨 Pintura</td><td><span class="badge badge-verde">95% ✅</span></td><td>31</td><td>⭐ 4.8</td><td><span class="badge badge-verde">Ativo</span></td><td><div class="action-btns"><button class="ab">👁️</button><button class="ab danger" onclick="bloquear(this)">🔒 Bloquear</button></div></td></tr>
+            <tr><td><div class="td-name">Marcos Lima</div><div class="td-sub"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="afc2ceddccc0dcefcac2cec6c381ccc0c2">[email&#160;protected]</a> · (11) 96666-4444</div></td><td>❄️ Ar-condicionado</td><td><span class="badge badge-amarelo">Em teste</span></td><td>0</td><td>—</td><td><span class="badge badge-amarelo">Pendente</span></td><td><div class="action-btns"><button class="ab">👁️</button><button class="ab danger" onclick="bloquear(this)">🔒 Bloquear</button></div></td></tr>
+            <tr><td><div class="td-name">Ana Rodrigues</div><div class="td-sub"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5637383716333b373f3a7835393b">[email&#160;protected]</a> · (11) 95555-5555</div></td><td>🧹 Limpeza</td><td><span class="badge badge-verde">90% ✅</span></td><td>58</td><td>⭐ 4.7</td><td><span class="badge badge-verde">Ativo</span></td><td><div class="action-btns"><button class="ab">👁️</button><button class="ab danger" onclick="bloquear(this)">🔒 Bloquear</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ====== CLIENTES ====== -->
+    <div class="painel" id="clientes">
+      <div class="p-header">
+        <div><div class="p-title">Clientes</div><div class="p-sub">Gerencie todas as contas de clientes</div></div>
+        <div class="p-actions"><input class="search-input" placeholder="Buscar..."></div>
+      </div>
+      <div class="table-card">
+        <div class="table-head"><div><div class="th-title">1.842 clientes cadastrados</div></div></div>
+        <table>
+          <thead><tr><th>Cliente</th><th>Cidade</th><th>Pedidos</th><th>Cadastro</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody>
+            <tr><td><div class="td-name">Maria Silva</div><div class="td-sub"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="deb3bfacb7bf9ebbb3bfb7b2f0bdb1b3">[email&#160;protected]</a> · (11) 94444-1111</div></td><td>Moema, SP</td><td>8</td><td style="font-size:0.75rem;color:var(--cinza)">01/03/26</td><td><span class="badge badge-verde">Ativo</span></td><td><div class="action-btns"><button class="ab">👁️</button><button class="ab danger" onclick="bloquear(this)">🔒 Bloquear</button></div></td></tr>
+            <tr><td><div class="td-name">Carlos Oliveira</div><div class="td-sub"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2f4c4e5d43405c01406f4a424e4643014c4042">[email&#160;protected]</a> · (11) 93333-2222</div></td><td>Brooklin, SP</td><td>3</td><td style="font-size:0.75rem;color:var(--cinza)">15/03/26</td><td><span class="badge badge-verde">Ativo</span></td><td><div class="action-btns"><button class="ab">👁️</button><button class="ab danger" onclick="bloquear(this)">🔒 Bloquear</button></div></td></tr>
+            <tr><td><div class="td-name">Ana Beatriz</div><div class="td-sub"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c8a9a6a9e6aa88ada5a9a1a4e6aba7a5">[email&#160;protected]</a> · (11) 92222-3333</div></td><td>Ibirapuera, SP</td><td>5</td><td style="font-size:0.75rem;color:var(--cinza)">20/03/26</td><td><span class="badge badge-erro">Bloqueado</span></td><td><div class="action-btns"><button class="ab">👁️</button><button class="ab success" onclick="desbloquear(this)">🔓 Desbloquear</button></div></td></tr>
+            <tr><td><div class="td-name">Roberto Santos</div><div class="td-sub"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d6a4b9b4b3a4a2b996b3bbb7bfbaf8b5b9bb">[email&#160;protected]</a> · (11) 91111-4444</div></td><td>Vila Mariana, SP</td><td>1</td><td style="font-size:0.75rem;color:var(--cinza)">10/04/26</td><td><span class="badge badge-verde">Ativo</span></td><td><div class="action-btns"><button class="ab">👁️</button><button class="ab danger" onclick="bloquear(this)">🔒 Bloquear</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ====== PEDIDOS ====== -->
+    <div class="painel" id="pedidos">
+      <div class="p-header">
+        <div><div class="p-title">Pedidos</div><div class="p-sub">Todos os pedidos publicados na plataforma</div></div>
+        <div class="p-actions"><input class="search-input" placeholder="Buscar pedido..."></div>
+      </div>
+      <div class="table-card">
+        <div class="table-head"><div><div class="th-title">186 pedidos este mês</div></div></div>
+        <table>
+          <thead><tr><th>Pedido</th><th>Cliente</th><th>Categoria</th><th>Valor</th><th>Interessados</th><th>Status</th><th>Ação</th></tr></thead>
+          <tbody>
+            <tr><td><div class="td-name">Disjuntor caiu — urgente</div><div class="td-sub">há 2h · Moema, SP</div></td><td>Maria Silva</td><td>⚡ Elétrica</td><td style="color:var(--cinza);font-size:0.78rem">Em aberto</td><td>3</td><td><span class="badge badge-verde">🟢 Aberto</span></td><td><div class="action-btns"><button class="ab">👁️</button><button class="ab danger" onclick="alert('Pedido removido')">🗑️</button></div></td></tr>
+            <tr><td><div class="td-name">4 tomadas no escritório</div><div class="td-sub">há 1 dia · Brooklin, SP</div></td><td>Carlos Oliveira</td><td>⚡ Elétrica</td><td style="color:var(--verde);font-weight:600">R$ 400</td><td>7</td><td><span class="badge badge-amarelo">🔄 Andamento</span></td><td><div class="action-btns"><button class="ab">👁️</button><button class="ab danger" onclick="alert('Pedido removido')">🗑️</button></div></td></tr>
+            <tr><td><div class="td-name">Limpeza pós-obra</div><div class="td-sub">há 3 dias · Vila Mariana, SP</div></td><td>Roberto Santos</td><td>🧹 Limpeza</td><td style="color:var(--verde);font-weight:600">R$ 250</td><td>12</td><td><span class="badge badge-cinza">✅ Concluído</span></td><td><div class="action-btns"><button class="ab">👁️</button></div></td></tr>
+            <tr><td><div class="td-name">Pintura sala e quartos</div><div class="td-sub">há 5 dias · Ibirapuera, SP</div></td><td>Ana Beatriz</td><td>🎨 Pintura</td><td style="color:var(--cinza);font-size:0.78rem">Em aberto</td><td>5</td><td><span class="badge badge-verde">🟢 Aberto</span></td><td><div class="action-btns"><button class="ab">👁️</button><button class="ab danger" onclick="alert('Pedido removido')">🗑️</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ====== TERMOS ====== -->
+    <div class="painel" id="termos">
+      <div class="p-header">
+        <div><div class="p-title">Termos de Uso</div><div class="p-sub">Exibidos no final do cadastro para clientes e profissionais</div></div>
+      </div>
+      <div class="termos-wrap">
+
+        <div class="termos-card">
+          <div class="termos-header">
+            <div class="termos-icon">📜</div>
+            <div>
+              <div class="termos-title">Termos de Uso e Isenção de Responsabilidade</div>
+              <div class="termos-sub">ServiçoJá Tecnologia Ltda. · Versão 1.0 · Abril de 2026</div>
+            </div>
+          </div>
+          <div class="termos-body">
+
+            <div class="clausula">
+              <div class="clausula-num">Cláusula 1</div>
+              <div class="clausula-titulo">Natureza da Plataforma</div>
+              <div class="clausula-texto">
+                O ServiçoJá é uma <strong>plataforma digital de intermediação</strong> que conecta clientes a prestadores de serviços autônomos. O aplicativo <strong>não é fornecedor</strong> dos serviços contratados, não participa da execução dos trabalhos e não mantém vínculo empregatício ou societário com qualquer profissional cadastrado.
+              </div>
+              <div class="clausula-ref">📌 Art. 2º e Art. 3º — CDC (Lei 8.078/90)</div>
+            </div>
+
+            <div class="clausula">
+              <div class="clausula-num">Cláusula 2</div>
+              <div class="clausula-titulo">Isenção de Responsabilidade pelo Serviço Prestado</div>
+              <div class="clausula-texto">
+                O ServiçoJá <strong>não se responsabiliza</strong> por danos materiais, morais, físicos ou de qualquer natureza decorrentes dos serviços prestados pelos profissionais cadastrados. A responsabilidade pela qualidade, segurança e execução do serviço é <strong>exclusiva do prestador contratado</strong>. O cliente declara ciência de que contrata diretamente com o profissional, sem intermediação operacional do aplicativo.
+              </div>
+              <div class="clausula-ref">📌 Art. 14, §3°, II — CDC: excludente de responsabilidade por culpa exclusiva de terceiro</div>
+            </div>
+
+            <div class="clausula">
+              <div class="clausula-num">Cláusula 3</div>
+              <div class="clausula-titulo">Responsabilidade do Prestador de Serviço</div>
+              <div class="clausula-texto">
+                O profissional cadastrado é <strong>inteiramente responsável</strong> pelos serviços que executa, incluindo qualidade técnica, cumprimento de prazos, segurança do trabalho e reparação de eventuais danos causados ao cliente ou a terceiros. O profissional declara possuir capacidade técnica para executar os serviços selecionados e que as informações cadastradas são verdadeiras.
+              </div>
+              <div class="clausula-ref">📌 Art. 20 — CDC: responsabilidade do fornecedor de serviços</div>
+            </div>
+
+            <div class="clausula">
+              <div class="clausula-num">Cláusula 4</div>
+              <div class="clausula-titulo">Privacidade e Compartilhamento de Dados</div>
+              <div class="clausula-texto">
+                Os dados pessoais de clientes e profissionais (nome, telefone, endereço) são <strong>protegidos e confidenciais</strong>. As informações completas de contato somente serão compartilhadas entre as partes <strong>após a aceitação mútua da proposta</strong>, conforme fluxo da plataforma. O ServiçoJá trata os dados em conformidade com a <strong>Lei Geral de Proteção de Dados (LGPD — Lei 13.709/18)</strong>.
+              </div>
+              <div class="clausula-ref">📌 Art. 7° — LGPD (Lei 13.709/18) · Art. 43 — CDC</div>
+            </div>
+
+            <div class="clausula">
+              <div class="clausula-num">Cláusula 5</div>
+              <div class="clausula-titulo">Limitação de Responsabilidade do Aplicativo</div>
+              <div class="clausula-texto">
+                O ServiçoJá não garante a disponibilidade ininterrupta da plataforma, não se responsabiliza por falhas de conexão, erros de terceiros ou casos fortuitos. A plataforma <strong>não é parte</strong> em qualquer contrato firmado entre cliente e profissional, atuando exclusivamente como <strong>intermediadora tecnológica</strong>, nos termos do <strong>Marco Civil da Internet</strong>.
+              </div>
+              <div class="clausula-ref">📌 Art. 19 — Marco Civil da Internet (Lei 12.965/14)</div>
+            </div>
+
+            <div class="clausula">
+              <div class="clausula-num">Cláusula 6</div>
+              <div class="clausula-titulo">Taxas e Pagamentos (Profissionais)</div>
+              <div class="clausula-texto">
+                O profissional concorda que, ao ter seu interesse aceito por um cliente, será cobrada uma <strong>taxa de intermediação de R$20,00 a R$50,00</strong> por conexão, conforme a complexidade do serviço. As taxas são acumuladas por 15 dias e cobradas via PIX. O não pagamento no prazo resultará em <strong>bloqueio automático de acesso</strong> até a regularização.
+              </div>
+              <div class="clausula-ref">📌 Art. 52 — CDC: transparência nas condições de crédito e encargos</div>
+            </div>
+
+            <div class="clausula">
+              <div class="clausula-num">Cláusula 7</div>
+              <div class="clausula-titulo">Conduta e Vedações</div>
+              <div class="clausula-texto">
+                É vedado ao usuário: (i) fornecer informações falsas no cadastro; (ii) utilizar a plataforma para fins ilícitos; (iii) assediar, ameaçar ou prejudicar outros usuários; (iv) tentar burlar o sistema de avaliações ou testes de qualificação. O descumprimento acarretará <strong>suspensão ou exclusão definitiva da conta</strong>, sem prejuízo das sanções legais cabíveis.
+              </div>
+              <div class="clausula-ref">📌 Art. 39 — CDC: vedação de práticas abusivas</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PREVIEW DO ACEITE -->
+        <div class="termos-card">
+          <div class="termos-header">
+            <div class="termos-icon">✅</div>
+            <div>
+              <div class="termos-title">Tela de aceite — final do cadastro</div>
+              <div class="termos-sub">Como aparece para o usuário antes de finalizar o cadastro</div>
+            </div>
+          </div>
+          <div class="termos-body">
+            <div class="aceite-preview">
+              <div style="font-size:0.82rem;font-weight:600;margin-bottom:8px">Leia e aceite os termos para continuar:</div>
+              <div class="aceite-scroll">
+                Ao utilizar o ServiçoJá, você concorda que a plataforma atua exclusivamente como intermediadora tecnológica entre clientes e prestadores de serviços, não sendo responsável pela execução, qualidade ou resultados dos serviços contratados. O ServiçoJá não possui vínculo empregatício, societário ou operacional com qualquer profissional cadastrado. A responsabilidade pelos serviços prestados é exclusiva do profissional contratado, nos termos do Art. 14, §3°, II do CDC (Lei 8.078/90). Seus dados pessoais são protegidos conforme a LGPD (Lei 13.709/18) e somente compartilhados após aceitação mútua da proposta. O uso da plataforma para fins ilícitos ou abusivos resultará em suspensão imediata da conta. Ao profissional: você concorda com a cobrança das taxas de intermediação de R$20 a R$50 por conexão aceita, faturadas a cada 15 dias via PIX, com prazo de 3 dias para pagamento.
+              </div>
+              <div class="aceite-checks">
+                <div class="aceite-check" onclick="toggleCheck(this)">
+                  <div class="check-box"></div>
+                  <span>Li e aceito os <strong style="color:var(--verde)">Termos de Uso</strong> e a <strong style="color:var(--verde)">Política de Privacidade</strong> do ServiçoJá</span>
+                </div>
+                <div class="aceite-check" onclick="toggleCheck(this)">
+                  <div class="check-box"></div>
+                  <span>Declaro que as informações fornecidas são verdadeiras e assumo total responsabilidade pela veracidade dos dados cadastrados</span>
+                </div>
+                <div class="aceite-check" onclick="toggleCheck(this)" id="checkProf">
+                  <div class="check-box"></div>
+                  <span>Concordo com as <strong style="color:var(--verde)">taxas de intermediação</strong> e com o sistema de cobrança via PIX a cada 15 dias (apenas para profissionais)</span>
+                </div>
+              </div>
+              <button class="btn-finalizar" id="btnFinalizar">✅ Finalizar cadastro</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ====== CONFIGURAÇÕES ====== -->
+    <div class="painel" id="configs">
+      <div class="p-header">
+        <div><div class="p-title">Configurações</div><div class="p-sub">Ajuste as regras automáticas da plataforma</div></div>
+      </div>
+
+      <div class="config-grid">
+        <div class="config-card">
+          <div class="config-label">💰 Taxa mínima (R$)</div>
+          <input class="config-input" type="number" value="20">
+          <div class="config-desc" style="margin-top:8px">Valor mínimo cobrado por conexão aceita</div>
+        </div>
+        <div class="config-card">
+          <div class="config-label">💰 Taxa máxima (R$)</div>
+          <input class="config-input" type="number" value="50">
+          <div class="config-desc" style="margin-top:8px">Valor máximo cobrado por conexão aceita</div>
+        </div>
+        <div class="config-card">
+          <div class="config-label">📅 Ciclo de cobrança (dias)</div>
+          <input class="config-input" type="number" value="15">
+          <div class="config-desc" style="margin-top:8px">Dias para acumulação das taxas antes de cobrar</div>
+        </div>
+        <div class="config-card">
+          <div class="config-label">⏱️ Prazo para pagamento (dias)</div>
+          <input class="config-input" type="number" value="3">
+          <div class="config-desc" style="margin-top:8px">Dias após emissão da fatura para pagamento</div>
+        </div>
+        <div class="config-card">
+          <div class="config-label">🤖 Nota mínima no teste IA (%)</div>
+          <input class="config-input" type="number" value="90">
+          <div class="config-desc" style="margin-top:8px">% mínimo de acertos para aprovação do profissional</div>
+        </div>
+        <div class="config-card">
+          <div class="config-label">🔄 Tentativas por dia</div>
+          <input class="config-input" type="number" value="4">
+          <div class="config-desc" style="margin-top:8px">Máximo de tentativas no teste IA por dia</div>
+        </div>
+      </div>
+
+      <div class="config-grid">
+        <div class="config-card">
+          <div class="config-label">📨 Notificações automáticas</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px">
+            <div class="config-toggle"><span class="config-desc">Email de cobrança</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="config-toggle"><span class="config-desc">SMS de cobrança</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="config-toggle"><span class="config-desc">Bloqueio automático</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="config-toggle"><span class="config-desc">Lembrete 1 dia antes</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+        </div>
+        <div class="config-card">
+          <div class="config-label">🏙️ Cidades atendidas</div>
+          <textarea class="config-input" style="margin-top:4px;resize:vertical;min-height:110px;padding:10px 12px;line-height:1.6">São Paulo, SP
+Santo André, SP
+São Bernardo do Campo, SP
+Osasco, SP
+Guarulhos, SP</textarea>
+        </div>
+      </div>
+
+      <button class="btn-salvar-config" onclick="alert('Configurações salvas com sucesso!')">💾 Salvar todas as configurações</button>
+    </div>
+
+
+<!-- MODAL: NOTIFICAR INADIMPLENTES -->
+<div class="overlay" id="overlayNotif">
+  <div class="modal-notif">
+    <button class="modal-close-notif" onclick="fecharNotif()">✕</button>
+    <div class="mn-title">📨 Notificar inadimplentes</div>
+    <div class="mn-sub">As mensagens abaixo serão enviadas por <strong>email e SMS</strong> para todos os 8 profissionais com pagamento em atraso.</div>
+
+    <!-- TABS -->
+    <div class="mn-tabs">
+      <div class="mn-tab ativo" onclick="selMnTab(this,'mnEmail')">📧 Email</div>
+      <div class="mn-tab" onclick="selMnTab(this,'mnSms')">📱 SMS</div>
+      <div class="mn-tab" onclick="selMnTab(this,'mnCartao')">💳 Parcelamento</div>
+    </div>
+
+    <!-- EMAIL -->
+    <div class="mn-painel ativo" id="mnEmail">
+      <div class="mn-preview-label">Assunto: ServiçoJá — Sua conta está com pagamento pendente 💛</div>
+      <div class="mn-msg">
+        <p>Olá, <strong>[Nome do Profissional]</strong>! 👋</p>
+        <br>
+        <p>Tudo bem? Passamos para te avisar que identificamos um pagamento em aberto na sua conta ServiçoJá no valor de <strong>R$ [valor]</strong>, referente aos serviços aceitos nos últimos 15 dias.</p>
+        <br>
+        <p>Sabemos que às vezes o dia a dia aperta, então queremos facilitar ao máximo para você regularizar e voltar a receber novos pedidos de clientes! 😊</p>
+        <br>
+        <p>✅ <strong>Pague via PIX</strong> — rápido e sem complicação<br>
+        💳 <strong>Prefere parcelar?</strong> Agora você pode dividir em até <strong>3x no cartão de crédito</strong> sem juros!</p>
+        <br>
+        <p>👉 <strong>Clique aqui para regularizar:</strong> servicoja.com.br/pagar/[código]</p>
+        <br>
+        <p>Assim que o pagamento for confirmado, seu acesso é liberado automaticamente em minutos. Mal podemos esperar para ver você conquiando novos clientes! 🚀</p>
+        <br>
+        <p>Qualquer dúvida, estamos aqui: <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4b383e3b24393f2e0b382e393d222824212a65282426652939">[email&#160;protected]</a></strong></p>
+        <br>
+        <p>Com carinho,<br><strong>Equipe ServiçoJá</strong> 💚</p>
+      </div>
+    </div>
+
+    <!-- SMS -->
+    <div class="mn-painel" id="mnSms">
+      <div class="mn-preview-label">SMS enviado para o celular cadastrado</div>
+      <div class="mn-msg" style="font-size:0.85rem;line-height:1.8">
+        <p>💛 <strong>ServiçoJá</strong> — Oi [Nome]! Sua conta tem um pagamento pendente de <strong>R$ [valor]</strong>. Pague via PIX ou parcele em até <strong>3x no cartão</strong> e volte a receber pedidos hoje mesmo! 👷‍♂️ Acesse: servicoja.com.br/pagar/[código] — Dúvidas: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8bf8fefbe4f9ffeecbf8eef9fde2e8e4e1eaa5e8e4e6a5e9f9">[email&#160;protected]</a></p>
+      </div>
+      <div class="mn-char-count" id="smsCount">Aprox. 160 caracteres · 1 SMS por profissional</div>
+    </div>
+
+    <!-- PARCELAMENTO -->
+    <div class="mn-painel" id="mnCartao">
+      <div class="mn-preview-label">Opção de parcelamento incluída nas mensagens</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+        <div class="parcela-op">
+          <div class="parcela-num">1x</div>
+          <div class="parcela-info">
+            <div class="parcela-val">R$ 640,00</div>
+            <div class="parcela-desc">À vista — PIX ou cartão</div>
+          </div>
+          <div class="parcela-badge badge-verde">✅ Sem juros</div>
+        </div>
+        <div class="parcela-op">
+          <div class="parcela-num">2x</div>
+          <div class="parcela-info">
+            <div class="parcela-val">2x de R$ 320,00</div>
+            <div class="parcela-desc">Total: R$ 640,00</div>
+          </div>
+          <div class="parcela-badge badge-verde">✅ Sem juros</div>
+        </div>
+        <div class="parcela-op">
+          <div class="parcela-num">3x</div>
+          <div class="parcela-info">
+            <div class="parcela-val">3x de R$ 213,33</div>
+            <div class="parcela-desc">Total: R$ 640,00</div>
+          </div>
+          <div class="parcela-badge badge-verde">✅ Sem juros</div>
+        </div>
+      </div>
+      <div class="mn-msg" style="font-size:0.78rem;color:var(--cinza)">
+        💡 O link enviado na mensagem leva o profissional para uma tela onde ele escolhe entre pagar à vista via PIX ou parcelar em até 3x no cartão de crédito, sem juros.
+      </div>
+    </div>
+
+    <div class="mn-footer">
+      <button class="mn-btn-cancel" onclick="fecharNotif()">Cancelar</button>
+      <button class="mn-btn-enviar" onclick="enviarNotif()">📨 Enviar para os 8 inadimplentes</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUCESSO NOTIF -->
+<div class="overlay" id="overlaySucNotif">
+  <div style="background:var(--azul-medio);border:1px solid rgba(0,201,111,0.25);border-radius:24px;width:100%;max-width:360px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s">
+    <div style="font-size:3rem;margin-bottom:12px">✅</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:8px">Mensagens enviadas!</div>
+    <div style="color:var(--cinza);font-size:0.83rem;line-height:1.6;margin-bottom:22px">Email e SMS disparados para os <strong style="color:var(--branco)">8 profissionais</strong> inadimplentes com a opção de parcelamento em até 3x.</div>
+    <button onclick="fecharNotif2()" style="width:100%;background:var(--verde);border:none;border-radius:12px;padding:13px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer">Fechar</button>
+  </div>
+</div>
+
+
+    <!-- ====== SUGESTÕES ====== -->
+    <div class="painel" id="sugestoes">
+      <div class="p-header">
+        <div>
+          <div class="p-title">Sugestões de melhoria</div>
+          <div class="p-sub">Feedbacks enviados por clientes e profissionais pelo botão 💡 do app</div>
+        </div>
+        <div class="p-actions">
+          <button class="btn-sm verde">📥 Exportar</button>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-grid cols3" style="margin-bottom:20px">
+        <div class="stat-card verde-c">
+          <div class="sc-icon">💡</div>
+          <div class="sc-num verde">14</div>
+          <div class="sc-lbl">Novas sugestões</div>
+          <div class="sc-delta up">Esta semana</div>
+        </div>
+        <div class="stat-card amarelo-c">
+          <div class="sc-icon">🔄</div>
+          <div class="sc-num amarelo">6</div>
+          <div class="sc-lbl">Em análise</div>
+          <div class="sc-delta up">Sendo avaliadas</div>
+        </div>
+        <div class="stat-card roxo-c">
+          <div class="sc-icon">✅</div>
+          <div class="sc-num roxo">23</div>
+          <div class="sc-lbl">Implementadas</div>
+          <div class="sc-delta up">Total histórico</div>
+        </div>
+      </div>
+
+      <!-- FILTROS -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <button onclick="filtrarSug(this,'todos')" class="sug-filtro ativo" style="padding:6px 14px;border-radius:100px;border:1px solid rgba(255,255,255,0.15);background:var(--azul-medio);color:var(--branco);font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.2s">🔔 Todas (43)</button>
+        <button onclick="filtrarSug(this,'novo')" class="sug-filtro" style="padding:6px 14px;border-radius:100px;border:1px solid var(--borda);background:none;color:var(--cinza);font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.2s">🆕 Novas (14)</button>
+        <button onclick="filtrarSug(this,'analise')" class="sug-filtro" style="padding:6px 14px;border-radius:100px;border:1px solid var(--borda);background:none;color:var(--cinza);font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.2s">🔄 Em análise (6)</button>
+        <button onclick="filtrarSug(this,'implementado')" class="sug-filtro" style="padding:6px 14px;border-radius:100px;border:1px solid var(--borda);background:none;color:var(--cinza);font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.2s">✅ Implementadas (23)</button>
+        <button onclick="filtrarSug(this,'cliente')" class="sug-filtro" style="padding:6px 14px;border-radius:100px;border:1px solid var(--borda);background:none;color:var(--cinza);font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.2s">👤 Clientes</button>
+        <button onclick="filtrarSug(this,'profissional')" class="sug-filtro" style="padding:6px 14px;border-radius:100px;border:1px solid var(--borda);background:none;color:var(--cinza);font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.2s">👷 Profissionais</button>
+      </div>
+
+      <!-- LISTA -->
+      <div class="table-card">
+        <div class="table-head"><div><div class="th-title">43 sugestões recebidas</div></div><input class="search-input" placeholder="Buscar sugestão..."></div>
+        <div style="display:flex;flex-direction:column">
+
+          <!-- ITEM -->
+          <div class="sug-item" style="padding:16px 18px;border-bottom:1px solid var(--borda);display:flex;gap:12px;align-items:flex-start;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='none'">
+            <div style="width:38px;height:38px;border-radius:10px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">💡</div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+                <span style="font-weight:600;font-size:0.85rem">Adicionar filtro por preço na busca</span>
+                <span style="font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:100px;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);color:var(--laranja)">🆕 Nova</span>
+                <span style="font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:100px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.2);color:var(--verde)">⚡ Funcionalidade</span>
+              </div>
+              <div style="font-size:0.78rem;color:var(--cinza);line-height:1.5;margin-bottom:6px">"Seria ótimo poder filtrar os profissionais por faixa de preço estimada antes de publicar o pedido."</div>
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                <span style="font-size:0.68rem;color:rgba(138,155,181,0.5)">👤 Cliente · Maria S. · há 2h</span>
+                <div style="display:flex;gap:5px">
+                  <button onclick="mudarStatusSug(this,'analise')" style="padding:4px 9px;border-radius:7px;background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.25);color:var(--amarelo);font-size:0.68rem;font-weight:700;cursor:pointer;transition:all 0.2s">🔄 Analisar</button>
+                  <button onclick="mudarStatusSug(this,'implementado')" style="padding:4px 9px;border-radius:7px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.2);color:var(--verde);font-size:0.68rem;font-weight:700;cursor:pointer;transition:all 0.2s">✅ Implementar</button>
+                  <button onclick="this.closest('.sug-item').remove()" style="padding:4px 9px;border-radius:7px;background:none;border:1px solid var(--borda);color:var(--cinza);font-size:0.68rem;font-weight:700;cursor:pointer;transition:all 0.2s">🗑️</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sug-item" style="padding:16px 18px;border-bottom:1px solid var(--borda);display:flex;gap:12px;align-items:flex-start;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='none'">
+            <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,92,92,0.1);border:1px solid rgba(255,92,92,0.2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🐛</div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+                <span style="font-weight:600;font-size:0.85rem">Chat não carrega fotos no celular</span>
+                <span style="font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:100px;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);color:var(--laranja)">🆕 Nova</span>
+                <span style="font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:100px;background:rgba(255,92,92,0.1);border:1px solid rgba(255,92,92,0.2);color:var(--erro)">🐛 Problema</span>
+              </div>
+              <div style="font-size:0.78rem;color:var(--cinza);line-height:1.5;margin-bottom:6px">"Quando tento enviar foto pelo chat no iPhone, a foto não aparece para o outro lado. Só aparece um ícone quebrado."</div>
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                <span style="font-size:0.68rem;color:rgba(138,155,181,0.5)">👷 Profissional · João F. · há 5h</span>
+                <div style="display:flex;gap:5px">
+                  <button onclick="mudarStatusSug(this,'analise')" style="padding:4px 9px;border-radius:7px;background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.25);color:var(--amarelo);font-size:0.68rem;font-weight:700;cursor:pointer;transition:all 0.2s">🔄 Analisar</button>
+                  <button onclick="mudarStatusSug(this,'implementado')" style="padding:4px 9px;border-radius:7px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.2);color:var(--verde);font-size:0.68rem;font-weight:700;cursor:pointer;transition:all 0.2s">✅ Resolver</button>
+                  <button onclick="this.closest('.sug-item').remove()" style="padding:4px 9px;border-radius:7px;background:none;border:1px solid var(--borda);color:var(--cinza);font-size:0.68rem;font-weight:700;cursor:pointer;transition:all 0.2s">🗑️</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sug-item" style="padding:16px 18px;border-bottom:1px solid var(--borda);display:flex;gap:12px;align-items:flex-start;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='none'">
+            <div style="width:38px;height:38px;border-radius:10px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">⚡</div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+                <span style="font-weight:600;font-size:0.85rem">Poder agendar mais de um profissional</span>
+                <span style="font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:100px;background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.25);color:var(--amarelo)">🔄 Em análise</span>
+                <span style="font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:100px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);color:#a78bfa">💡 Nova função</span>
+              </div>
+              <div style="font-size:0.78rem;color:var(--cinza);line-height:1.5;margin-bottom:6px">"Para uma reforma maior eu precisaria de eletricista e encanador ao mesmo tempo. Seria ótimo poder gerenciar os dois no mesmo pedido."</div>
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                <span style="font-size:0.68rem;color:rgba(138,155,181,0.5)">👤 Cliente · Ana B. · há 1 dia</span>
+                <div style="display:flex;gap:5px">
+                  <button onclick="mudarStatusSug(this,'implementado')" style="padding:4px 9px;border-radius:7px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.2);color:var(--verde);font-size:0.68rem;font-weight:700;cursor:pointer;transition:all 0.2s">✅ Implementar</button>
+                  <button onclick="this.closest('.sug-item').remove()" style="padding:4px 9px;border-radius:7px;background:none;border:1px solid var(--borda);color:var(--cinza);font-size:0.68rem;font-weight:700;cursor:pointer;transition:all 0.2s">🗑️</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sug-item" style="padding:16px 18px;border-bottom:1px solid var(--borda);display:flex;gap:12px;align-items:flex-start;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='none'">
+            <div style="width:38px;height:38px;border-radius:10px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">✅</div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+                <span style="font-weight:600;font-size:0.85rem">Notificação por SMS quando receber interesse</span>
+                <span style="font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:100px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.2);color:var(--verde)">✅ Implementado</span>
+              </div>
+              <div style="font-size:0.78rem;color:var(--cinza);line-height:1.5;margin-bottom:6px">"Queria receber SMS além do email quando um profissional tiver interesse no meu pedido. Às vezes não vejo o email a tempo."</div>
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                <span style="font-size:0.68rem;color:rgba(138,155,181,0.5)">👤 Cliente · Carlos O. · há 3 dias · ✅ Implementado na v1.2</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sug-item" style="padding:16px 18px;display:flex;gap:12px;align-items:flex-start;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='none'">
+            <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">💳</div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+                <span style="font-weight:600;font-size:0.85rem">Parcelar a taxa em mais de 3x</span>
+                <span style="font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:100px;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);color:var(--laranja)">🆕 Nova</span>
+                <span style="font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:100px;background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.25);color:var(--amarelo)">💳 Pagamentos</span>
+              </div>
+              <div style="font-size:0.78rem;color:var(--cinza);line-height:1.5;margin-bottom:6px">"Quando tenho muitas taxas acumuladas, seria bom poder parcelar em 6x ou mais, não só 3x."</div>
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                <span style="font-size:0.68rem;color:rgba(138,155,181,0.5)">👷 Profissional · Roberto S. · há 4 dias</span>
+                <div style="display:flex;gap:5px">
+                  <button onclick="mudarStatusSug(this,'analise')" style="padding:4px 9px;border-radius:7px;background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.25);color:var(--amarelo);font-size:0.68rem;font-weight:700;cursor:pointer;transition:all 0.2s">🔄 Analisar</button>
+                  <button onclick="mudarStatusSug(this,'implementado')" style="padding:4px 9px;border-radius:7px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.2);color:var(--verde);font-size:0.68rem;font-weight:700;cursor:pointer;transition:all 0.2s">✅ Implementar</button>
+                  <button onclick="this.closest('.sug-item').remove()" style="padding:4px 9px;border-radius:7px;background:none;border:1px solid var(--borda);color:var(--cinza);font-size:0.68rem;font-weight:700;cursor:pointer;transition:all 0.2s">🗑️</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+
+  // MODAL NOTIF
+  function abrirModalNotif() { document.getElementById('overlayNotif').classList.add('vis'); }
+  function fecharNotif() { document.getElementById('overlayNotif').classList.remove('vis'); }
+  function fecharNotif2() { document.getElementById('overlaySucNotif').classList.remove('vis'); }
+  function selMnTab(el, id) {
+    document.querySelectorAll('.mn-tab').forEach(t => t.classList.remove('ativo'));
+    document.querySelectorAll('.mn-painel').forEach(p => p.classList.remove('ativo'));
+    el.classList.add('ativo');
+    document.getElementById(id).classList.add('ativo');
+  }
+  function enviarNotif() {
+    fecharNotif();
+    setTimeout(() => document.getElementById('overlaySucNotif').classList.add('vis'), 200);
+  }
+  document.addEventListener('click', e => {
+    ['overlayNotif','overlaySucNotif'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && e.target === el) el.classList.remove('vis');
+    });
+  });
+
+
+  function filtrarSug(btn, tipo) {
+    document.querySelectorAll('.sug-filtro').forEach(b => {
+      b.style.background='none'; b.style.borderColor='rgba(255,255,255,0.09)'; b.style.color='var(--cinza)';
+    });
+    btn.style.background='var(--azul-medio)'; btn.style.borderColor='rgba(255,255,255,0.15)'; btn.style.color='var(--branco)';
+  }
+  function mudarStatusSug(btn, status) {
+    const item = btn.closest('.sug-item');
+    const badges = item.querySelectorAll('span[style*="border-radius:100px"]');
+    const btnsDiv = btn.closest('div');
+    if (status === 'analise') {
+      btnsDiv.innerHTML = '<button onclick="mudarStatusSug(this,'implementado')" style="padding:4px 9px;border-radius:7px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.2);color:var(--verde);font-size:0.68rem;font-weight:700;cursor:pointer">✅ Implementar</button><button onclick="this.closest('.sug-item').remove()" style="padding:4px 9px;border-radius:7px;background:none;border:1px solid var(--borda);color:var(--cinza);font-size:0.68rem;font-weight:700;cursor:pointer;margin-left:4px">🗑️</button>';
+    } else if (status === 'implementado') {
+      btnsDiv.innerHTML = '<span style="font-size:0.72rem;color:var(--verde);font-weight:700">✅ Marcado como implementado!</span>';
+    }
+  }
+  // NAVEGAÇÃO
+  function irPainel(id, el) {
+    document.querySelectorAll('.painel').forEach(p => p.classList.remove('ativo'));
+    document.getElementById(id).classList.add('ativo');
+    document.querySelectorAll('.sb-item').forEach(s => s.classList.remove('ativo'));
+    if (el) el.classList.add('ativo');
+  }
+
+  // BLOQUEAR / DESBLOQUEAR
+  function bloquear(btn) {
+    const td = btn.closest('td');
+    const statusTd = btn.closest('tr').querySelector('td:nth-last-child(2)');
+    statusTd.innerHTML = '<span class="badge badge-erro">Bloqueado</span>';
+    td.innerHTML = '<div class="action-btns"><button class="ab">👁️</button><button class="ab success" onclick="desbloquear(this)">🔓 Desbloquear</button></div>';
+  }
+  function desbloquear(btn) {
+    const td = btn.closest('td');
+    const statusTd = btn

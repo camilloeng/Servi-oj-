@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ServiçoJá</title>
+
+<!-- PWA Meta Tags -->
+<meta name="theme-color" content="#00C96F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ServiçoJá">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Encontre profissionais qualificados perto de você. Eletricistas, encanadores, pintores e muito mais em São Paulo.">
+
+<!-- Open Graph (compartilhamento) -->
+<meta property="og:title" content="ServiçoJá — O profissional certo, na hora certa">
+<meta property="og:description" content="Encontre profissionais qualificados e aprovados por IA perto de você em São Paulo.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="icon.svg">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --verde: #00C96F; --azul: #0A1628; --azul-medio: #132240;
+    --branco: #F5F7F2; --cinza: #8A9BB5; --borda: rgba(255,255,255,0.09);
+  }
+  html, body { height: 100%; background: var(--azul); }
+  body {
+    font-family: 'DM Sans', sans-serif; color: var(--branco);
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-height: 100vh;
+    background: radial-gradient(ellipse at top right, rgba(0,201,111,0.1) 0%, transparent 60%),
+                radial-gradient(ellipse at bottom left, rgba(255,107,53,0.07) 0%, transparent 60%),
+                var(--azul);
+  }
+
+  .splash {
+    text-align: center; padding: 40px 24px;
+    animation: fadeIn 0.6s ease both;
+  }
+
+  .splash-logo {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 3rem; letter-spacing: -1px; margin-bottom: 8px;
+  }
+  .splash-logo span { color: var(--verde); }
+
+  .splash-tagline {
+    color: var(--cinza); font-size: 1rem; margin-bottom: 40px;
+  }
+
+  .splash-icon {
+    width: 90px; height: 90px; border-radius: 24px;
+    background: linear-gradient(135deg, #132240, #1a2d4a);
+    border: 2px solid rgba(0,201,111,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.4rem; margin: 0 auto 32px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    animation: pulse 2s infinite;
+  }
+
+  .loading-bar {
+    width: 200px; height: 3px;
+    background: rgba(255,255,255,0.08); border-radius: 2px;
+    margin: 0 auto 16px; overflow: hidden;
+  }
+  .loading-fill {
+    height: 100%; background: var(--verde); border-radius: 2px;
+    animation: load 1.5s ease forwards;
+  }
+  .loading-txt { font-size: 0.78rem; color: var(--cinza); }
+
+  /* INSTALAR BANNER */
+  .install-banner {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--azul-medio); border-top: 1px solid var(--borda);
+    padding: 16px 20px; display: none; align-items: center; gap: 14px;
+    z-index: 100; animation: slideUp 0.4s ease both;
+  }
+  .install-banner.vis { display: flex; }
+  .ib-icon { font-size: 2rem; flex-shrink: 0; }
+  .ib-text { flex: 1; }
+  .ib-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; margin-bottom: 2px; }
+  .ib-sub { font-size: 0.72rem; color: var(--cinza); }
+  .btn-instalar {
+    background: var(--verde); border: none; border-radius: 10px;
+    padding: 10px 18px; color: var(--azul);
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.82rem;
+    cursor: pointer; white-space: nowrap; transition: all 0.2s;
+  }
+  .btn-instalar:hover { background: #009E57; }
+  .btn-instalar-fechar {
+    background: none; border: none; color: var(--cinza);
+    font-size: 1.2rem; cursor: pointer; padding: 4px; flex-shrink: 0;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes load { from { width: 0; } to { width: 100%; } }
+  @keyframes pulse { 0%,100% { box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 0 rgba(0,201,111,0.3); } 50% { box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 12px rgba(0,201,111,0); } }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="splash">
+  <div class="splash-icon">🔧</div>
+  <div class="splash-logo">Serviço<span>Já</span></div>
+  <div class="splash-tagline">O profissional certo, na hora certa</div>
+  <div class="loading-bar"><div class="loading-fill"></div></div>
+  <div class="loading-txt">Carregando...</div>
+</div>
+
+<!-- BANNER DE INSTALAR -->
+<div class="install-banner" id="installBanner">
+  <div class="ib-icon">📲</div>
+  <div class="ib-text">
+    <div class="ib-title">Instalar ServiçoJá</div>
+    <div class="ib-sub">Adicione à tela inicial para acesso rápido</div>
+  </div>
+  <button class="btn-instalar" id="btnInstalar">Instalar</button>
+  <button class="btn-instalar-fechar" onclick="fecharBanner()">✕</button>
+</div>
+
+<script>
+  // Registra Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(e => console.log('SW error:', e));
+    });
+  }
+
+  // Redireciona para login após splash
+  setTimeout(() => {
+    window.location.href = 'login.html';
+  }, 2000);
+
+  // Banner de instalação (Android/Chrome)
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    setTimeout(() => document.getElementById('installBanner').classList.add('vis'), 1000);
+  });
+
+  document.getElementById('btnInstalar').addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const result = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      fecharBanner();
+    }
+  });
+
+  function fecharBanner() {
+    document.getElementById('installBanner').classList.remove('vis');
+  }
+</script>
+</body>
+</html>

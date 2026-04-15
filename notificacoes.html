@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiçoJá — Notificações</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --verde: #00C96F; --verde-escuro: #009E57;
+    --azul: #0A1628; --azul-medio: #132240; --azul-input: #0F1C35;
+    --branco: #F5F7F2; --cinza: #8A9BB5;
+    --laranja: #FF6B35; --amarelo: #FFB830;
+    --erro: #FF5C5C; --roxo: #7C3AED;
+    --borda: rgba(255,255,255,0.09);
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--azul); color: var(--branco); min-height: 100vh; }
+  body::before {
+    content: ''; position: fixed; top: -200px; right: -200px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,201,111,0.07) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  nav {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 28px; border-bottom: 1px solid var(--borda);
+    background: var(--azul-medio);
+  }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; text-decoration: none; color: var(--branco); }
+  .logo span { color: var(--verde); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-av {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, rgba(0,201,111,0.25), rgba(0,78,200,0.15));
+    border: 2px solid rgba(0,201,111,0.25);
+    display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
+  }
+  .nav-nome { font-size: 0.85rem; font-weight: 600; }
+  .nav-sub { font-size: 0.7rem; color: var(--cinza); }
+
+  .page { position: relative; z-index: 5; max-width: 760px; margin: 0 auto; padding: 32px 24px 60px; }
+
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  .ph-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.5px; margin-bottom: 3px; }
+  .ph-sub { color: var(--cinza); font-size: 0.82rem; }
+  .ph-actions { display: flex; gap: 8px; }
+  .btn-marcar-tudo { background: transparent; border: 1px solid var(--borda); border-radius: 9px; color: var(--cinza); font-size: 0.78rem; font-weight: 600; padding: 8px 14px; cursor: pointer; transition: all 0.2s; }
+  .btn-marcar-tudo:hover { border-color: rgba(0,201,111,0.3); color: var(--verde); }
+
+  .view-toggle { display: flex; gap: 4px; background: var(--azul-medio); border: 1px solid var(--borda); border-radius: 10px; padding: 3px; }
+  .vt-btn { padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600; color: var(--cinza); transition: all 0.2s; background: none; border: none; }
+  .vt-btn.ativo { background: var(--azul); color: var(--branco); }
+
+  .filtros { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+  .filtro-pill { display: flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 100px; cursor: pointer; font-size: 0.78rem; font-weight: 600; color: var(--cinza); border: 1px solid var(--borda); background: none; transition: all 0.2s; }
+  .filtro-pill:hover { color: var(--branco); border-color: rgba(255,255,255,0.2); }
+  .filtro-pill.ativo { background: var(--azul-medio); color: var(--branco); border-color: rgba(255,255,255,0.15); }
+  .fp-count { background: rgba(255,107,53,0.2); color: var(--laranja); font-size: 0.62rem; font-weight: 800; padding: 1px 5px; border-radius: 100px; }
+  .filtro-pill.ativo .fp-count { background: rgba(0,201,111,0.2); color: var(--verde); }
+
+  .grupo { margin-bottom: 24px; animation: fadeUp 0.4s ease both; }
+  .grupo:nth-child(2) { animation-delay: 0.05s; }
+  .grupo:nth-child(3) { animation-delay: 0.1s; }
+  .grupo-label { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.72rem; color: var(--cinza); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .grupo-label::after { content: ''; flex: 1; height: 1px; background: var(--borda); }
+
+  .notif-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px 16px; border-radius: 14px; margin-bottom: 6px;
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    transition: all 0.2s; cursor: pointer; position: relative; overflow: hidden;
+  }
+  .notif-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; border-radius: 0 2px 2px 0; }
+  .notif-item.nao-lida::after { content: ''; position: absolute; top: 16px; right: 14px; width: 7px; height: 7px; border-radius: 50%; background: var(--verde); }
+  .notif-item:hover { border-color: rgba(255,255,255,0.12); transform: translateX(2px); }
+
+  .notif-item.tipo-aceite::before { background: var(--verde); }
+  .notif-item.tipo-interesse::before { background: var(--laranja); }
+  .notif-item.tipo-msg::before { background: #7C3AED; }
+  .notif-item.tipo-fatura::before { background: var(--amarelo); }
+  .notif-item.tipo-avaliacao::before { background: var(--amarelo); }
+  .notif-item.tipo-sistema::before { background: var(--cinza); }
+
+  .notif-icon-wrap { width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+  .ic-verde { background: rgba(0,201,111,0.12); border: 1px solid rgba(0,201,111,0.2); }
+  .ic-laranja { background: rgba(255,107,53,0.12); border: 1px solid rgba(255,107,53,0.2); }
+  .ic-roxo { background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.2); }
+  .ic-amarelo { background: rgba(255,184,48,0.12); border: 1px solid rgba(255,184,48,0.2); }
+  .ic-cinza { background: rgba(138,155,181,0.1); border: 1px solid rgba(138,155,181,0.15); }
+
+  .notif-body { flex: 1; min-width: 0; }
+  .notif-titulo { font-weight: 600; font-size: 0.88rem; margin-bottom: 3px; padding-right: 20px; }
+  .notif-item.nao-lida .notif-titulo { color: var(--branco); }
+  .notif-item:not(.nao-lida) .notif-titulo { color: rgba(245,247,242,0.75); }
+  .notif-desc { font-size: 0.78rem; color: var(--cinza); line-height: 1.55; margin-bottom: 6px; }
+  .notif-item:not(.nao-lida) .notif-desc { color: rgba(138,155,181,0.65); }
+
+  .notif-meta { display: flex; align-items: center; gap: 10px; }
+  .notif-hora { font-size: 0.68rem; color: rgba(138,155,181,0.5); }
+  .notif-tag { font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 100px; }
+  .nt-verde { background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.2); color: var(--verde); }
+  .nt-laranja { background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2); color: var(--laranja); }
+  .nt-amarelo { background: rgba(255,184,48,0.1); border: 1px solid rgba(255,184,48,0.2); color: var(--amarelo); }
+  .nt-roxo { background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.2); color: #a78bfa; }
+  .nt-cinza { background: rgba(138,155,181,0.08); border: 1px solid rgba(138,155,181,0.15); color: var(--cinza); }
+
+  .notif-actions { display: flex; gap: 6px; margin-top: 8px; }
+  .na-btn { padding: 5px 12px; border-radius: 8px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.2s; border: none; font-family: 'DM Sans', sans-serif; }
+  .na-verde { background: var(--verde); color: var(--azul); }
+  .na-verde:hover { background: var(--verde-escuro); }
+  .na-outline { background: transparent; border: 1px solid var(--borda) !important; color: var(--cinza); }
+  .na-outline:hover { border-color: rgba(255,255,255,0.2) !important; color: var(--branco); }
+  .na-amarelo { background: rgba(255,184,48,0.15); color: var(--amarelo); border: 1px solid rgba(255,184,48,0.3) !important; }
+  .na-amarelo:hover { background: rgba(255,184,48,0.25); }
+
+  .notifs-vazio { text-align: center; padding: 60px 20px; display: none; }
+  .notifs-vazio.vis { display: block; animation: fadeUp 0.4s ease both; }
+  .nv-icon { font-size: 3rem; opacity: 0.25; margin-bottom: 12px; }
+  .nv-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
+  .nv-sub { color: var(--cinza); font-size: 0.82rem; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#00C96F">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ServiçoJá">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo">Serviço<span>Já</span></a>
+  <div class="nav-right">
+    <div class="nav-av" id="navAv">👤</div>
+    <div>
+      <div class="nav-nome" id="navNome">Maria Silva</div>
+      <div class="nav-sub" id="navSub">Cliente</div>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <div class="ph-title">Notificações</div>
+      <div class="ph-sub" id="subCount">12 notificações · 5 não lidas</div>
+    </div>
+    <div class="ph-actions">
+      <div class="view-toggle">
+        <button class="vt-btn ativo" onclick="filtrarVista('cliente',this)">👤 Cliente</button>
+        <button class="vt-btn" onclick="filtrarVista('profissional',this)">👷 Profissional</button>
+      </div>
+      <button class="btn-marcar-tudo" onclick="marcarTudo()">✓ Marcar todas lidas</button>
+    </div>
+  </div>
+
+  <div class="filtros">
+    <button class="filtro-pill ativo" onclick="selFiltro(this,'todos')">🔔 Todas <span class="fp-count" id="countBadge">5</span></button>
+    <button class="filtro-pill" onclick="selFiltro(this,'aceite')">✅ Aceites</button>
+    <button class="filtro-pill" onclick="selFiltro(this,'interesse')">👋 Interesses</button>
+    <button class="filtro-pill" onclick="selFiltro(this,'msg')">💬 Mensagens</button>
+    <button class="filtro-pill" onclick="selFiltro(this,'fatura')">💳 Faturas</button>
+    <button class="filtro-pill" onclick="selFiltro(this,'avaliacao')">⭐ Avaliações</button>
+  </div>
+
+  <!-- HOJE -->
+  <div class="grupo" id="grupo-hoje">
+    <div class="grupo-label">Hoje</div>
+
+    <div class="notif-item nao-lida tipo-interesse" data-tipo="interesse" data-vista="cliente" onclick="marcarLida(this)">
+      <div class="notif-icon-wrap ic-laranja">👷</div>
+      <div class="notif-body">
+        <div class="notif-titulo">João Ferreira tem interesse no seu pedido</div>
+        <div class="notif-desc">O eletricista João Ferreira (⭐ 4.9 · Aprovado IA) demonstrou interesse em <strong>"Disjuntor caiu — preciso urgente"</strong>. Veja o perfil e decida se aceita.</div>
+        <div class="notif-meta"><span class="notif-hora">há 15 min</span><span class="notif-tag nt-laranja">👋 Interesse</span></div>
+        <div class="notif-actions">
+          <button class="na-btn na-verde" onclick="event.stopPropagation();verPerfil(this)">👤 Ver perfil</button>
+          <button class="na-btn na-amarelo" onclick="event.stopPropagation();aceitarProf(this)" style="display:none">✅ Aceitar</button>
+          <button class="na-btn na-outline" onclick="event.stopPropagation();recusarProf(this)">✕ Recusar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="notif-item nao-lida tipo-msg" data-tipo="msg" data-vista="cliente" onclick="marcarLida(this)">
+      <div class="notif-icon-wrap ic-roxo">💬</div>
+      <div class="notif-body">
+        <div class="notif-titulo">Nova mensagem de João Ferreira</div>
+        <div class="notif-desc">João enviou: <em>"Olá, Maria! Posso ir amanhã às 9h, pode ser? 😊"</em></div>
+        <div class="notif-meta"><span class="notif-hora">há 32 min</span><span class="notif-tag nt-roxo">💬 Mensagem</span></div>
+        <div class="notif-actions">
+          <button class="na-btn na-verde" onclick="event.stopPropagation()">💬 Responder</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="notif-item nao-lida tipo-interesse" data-tipo="interesse" data-vista="cliente" onclick="marcarLida(this)">
+      <div class="notif-icon-wrap ic-laranja">👷</div>
+      <div class="notif-body">
+        <div class="notif-titulo">Carlos Mendes também tem interesse</div>
+        <div class="notif-desc">O eletricista Carlos Mendes (⭐ 4.6 · Aprovado IA) demonstrou interesse em <strong>"Disjuntor caiu — preciso urgente"</strong>.</div>
+        <div class="notif-meta"><span class="notif-hora">há 48 min</span><span class="notif-tag nt-laranja">👋 Interesse</span></div>
+        <div class="notif-actions">
+          <button class="na-btn na-verde" onclick="event.stopPropagation();verPerfil(this)">👤 Ver perfil</button>
+          <button class="na-btn na-amarelo" onclick="event.stopPropagation();aceitarProf(this)" style="display:none">✅ Aceitar</button>
+          <button class="na-btn na-outline" onclick="event.stopPropagation();recusarProf(this)">✕ Recusar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFISSIONAL -->
+    <div class="notif-item nao-lida tipo-aceite" data-tipo="aceite" data-vista="profissional" style="display:none" onclick="marcarLida(this)">
+      <div class="notif-icon-wrap ic-verde">✅</div>
+      <div class="notif-body">
+        <div class="notif-titulo">Maria Silva aceitou seu interesse!</div>
+        <div class="notif-desc">A cliente aceitou ver seu orçamento para <strong>"Disjuntor caiu — preciso urgente"</strong>. Agora você pode enviar sua proposta com valor, datas e mensagem.</div>
+        <div class="notif-meta"><span class="notif-hora">há 20 min</span><span class="notif-tag nt-verde">✅ Aceite</span></div>
+        <div class="notif-actions">
+          <button class="na-btn na-verde" onclick="event.stopPropagation()">📤 Enviar orçamento</button>
+          <button class="na-btn na-outline" onclick="event.stopPropagation()">💬 Abrir chat</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="notif-item nao-lida tipo-msg" data-tipo="msg" data-vista="profissional" style="display:none" onclick="marcarLida(this)">
+      <div class="notif-icon-wrap ic-roxo">💬</div>
+      <div class="notif-body">
+        <div class="notif-titulo">Nova mensagem de Maria Silva</div>
+        <div class="notif-desc">Maria enviou: <em>"Oi João! Amanhã às 9h fica ótimo. Apartamento 72, 7° andar. Portaria avisada!"</em></div>
+        <div class="notif-meta"><span class="notif-hora">há 35 min</span><span class="notif-tag nt-roxo">💬 Mensagem</span></div>
+        <div class="notif-actions">
+          <button class="na-btn na-verde" onclick="event.stopPropagation()">💬 Responder</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="notif-item nao-lida tipo-fatura" data-tipo="fatura" data-vista="profissional" style="display:none" onclick="marcarLida(this)">
+      <div class="notif-icon-wrap ic-amarelo">💳</div>
+      <div class="notif-body">
+        <div class="notif-titulo">Sua fatura foi gerada — R$ 110,00</div>
+        <div class="notif-desc">A fatura do período <strong>01/04 a 14/04</strong> está disponível. Você tem <strong>3 dias</strong> para pagar via PIX ou parcelar em até 3x no cartão. Após o vencimento o acesso é bloqueado.</div>
+        <div class="notif-meta"><span class="notif-hora">há 2h</span><span class="notif-tag nt-amarelo">💳 Fatura</span></div>
+        <div class="notif-actions">
+          <button class="na-btn na-amarelo" onclick="event.stopPropagation()">💳 Pagar agora</button>
+          <button class="na-btn na-outline" onclick="event.stopPropagation()">👁️ Ver detalhes</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ONTEM -->
+  <div class="grupo" id="grupo-ontem">
+    <div class="grupo-label">Ontem</div>
+
+    <div class="notif-item tipo-sistema" data-tipo="sistema" data-vista="cliente" onclick="marcarLida(this)">
+      <div class="notif-icon-wrap ic-verde">📋</div>
+      <div class="notif-body">
+        <div class="notif-titulo">Seu pedido foi publicado com sucesso</div>
+        <div class="notif-desc"><strong>"Disjuntor caiu — preciso urgente"</strong> está ativo e já foi visto por 7 profissionais da sua região em São Paulo.</div>
+        <div class="notif-meta"><span class="notif-hora">Ontem · 14:32</span><span class="notif-tag nt-verde">📋 Pedido</span></div>
+      </div>
+    </div>
+
+    <div class="notif-item nao-lida tipo-avaliacao" data-tipo="avaliacao" data-vista="cliente" onclick="marcarLida(this)">
+      <div class="notif-icon-wrap ic-amarelo">⭐</div>
+      <div class="notif-body">
+        <div class="notif-titulo">Como foi o serviço de Carlos Mendes?</div>
+        <div class="notif-desc">O serviço <strong>"Troca de chuveiro"</strong> foi marcado como concluído. Sua avaliação ajuda outros clientes a escolherem os melhores profissionais!</div>
+        <div class="notif-meta"><span class="notif-hora">Ontem · 17:45</span><span class="notif-tag nt-amarelo">⭐ Avaliação</span></div>
+        <div class="notif-actions">
+          <button class="na-btn na-amarelo" onclick="event.stopPropagation()">⭐ Avaliar agora</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="notif-item tipo-avaliacao" data-tipo="avaliacao" data-vista="profissional" style="display:none" onclick="marcarLida(this)">
+      <div class="notif-icon-wrap ic-amarelo">⭐</div>
+      <div class="notif-body">
+        <div class="notif-titulo">Você recebeu uma avaliação 5 estrelas!</div>
+        <div class="notif-desc">Carlos Oliveira avaliou <strong>"4 tomadas no escritório"</strong> com <strong>5★</strong>: <em>"Trabalho muito bem feito, caprichado e deixou tudo limpo!"</em></div>
+        <div class="notif-meta"><span class="notif-hora">Ontem · 18:10</span><span class="notif-tag nt-amarelo">⭐ Avaliação</span></div>
+      </div>
+    </div>
+
+    <div class="notif-item tipo-interesse" data-tipo="interesse" data-vista="profissional" style="display:none" onclick="marcarLida(this)">
+      <div class="notif-icon-wrap ic-laranja">🔔</div>
+      <div class="notif-body">
+        <div class="notif-titulo">Novo pedido de serviço na sua área!</div>
+        <div class="notif-desc"><strong>"Instalação de ar-condicionado 12.000 BTUs"</strong> em Ibirapuera, SP — 5,8 km de você. Seja rápido, 21 profissionais já viram este pedido!</div>
+        <div class="notif-meta"><span class="notif-hora">Ontem · 11:20</span><span class="notif-tag nt-laranja">🆕 Novo pedido</span></div>
+        <div class="notif-actions">
+          <button class="na-btn na-verde" onclick="event.stopPropagation()">👀 Ver pedido</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ESTA SEMANA -->
+  <div class="grupo" id="grupo-semana">
+    <div class="grupo-label">Esta semana</div>
+
+    <div class="notif-item tipo-aceite" data-tipo="aceite" data-vista="cliente" onclick="marcarLida(this)">
+      <div class="notif-icon-wrap ic-verde">💰</div>
+      <div class="notif-body">
+        <div class="notif-titulo">João Ferreira enviou um orçamento</div>
+        <div class="notif-desc">João enviou uma proposta para <strong>"4 tomadas no escritório"</strong> com início em 15/04: <em>"Posso atender com garantia de 1 ano nos serviços!"</em></div>
+        <div class="notif-meta"><span class="notif-hora">12/04 · 10:15</span><span class="notif-tag nt-verde">💰 Orçamento</span></div>
+        <div class="notif-actions">
+          <button class="na-btn na-verde" onclick="event.stopPropagation()">👁️ Ver proposta</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="notif-item tipo-sistema" data-tipo="sistema" data-vista="cliente" onclick="marcarLida(this)">
+      <div class="notif-icon-wrap ic-verde">🎉</div>
+      <div class="notif-body">
+        <div class="notif-titulo">Bem-vinda ao ServiçoJá, Maria!</div>
+        <div class="notif-desc">Sua conta foi criada com sucesso. Publique seu primeiro pedido e encontre profissionais qualificados e aprovados por IA em São Paulo!</div>
+        <div class="notif-meta"><span class="notif-hora">10/04 · 09:00</span><span class="notif-tag nt-cinza">🎉 Sistema</span></div>
+      </div>
+    </div>
+
+    <div class="notif-item tipo-sistema" data-tipo="sistema" data-vista="profissional" style="display:none" onclick="marcarLida(this)">
+      <div class="notif-icon-wrap ic-verde">🤖</div>
+      <div class="notif-body">
+        <div class="notif-titulo">Parabéns! Você foi aprovado no teste de IA!</div>
+        <div class="notif-desc">Você acertou <strong>98% das questões</strong> no teste de qualificação de Elétrica. Seu perfil está ativo e você já pode receber pedidos de clientes em São Paulo!</div>
+        <div class="notif-meta"><span class="notif-hora">10/04 · 11:30</span><span class="notif-tag nt-verde">🤖 IA</span></div>
+      </div>
+    </div>
+
+    <div class="notif-item tipo-fatura" data-tipo="fatura" data-vista="profissional" style="display:none" onclick="marcarLida(this)">
+      <div class="notif-icon-wrap ic-amarelo">⚠️</div>
+      <div class="notif-body">
+        <div class="notif-titulo">Lembrete: sua fatura vence em 1 dia</div>
+        <div class="notif-desc">Sua fatura de <strong>R$ 110,00</strong> vence amanhã, <strong>17/04/2026</strong>. Pague via PIX ou parcele em 3x no cartão para manter seu acesso ativo.</div>
+        <div class="notif-meta"><span class="notif-hora">11/04 · 08:00</span><span class="notif-tag nt-amarelo">⚠️ Lembrete</span></div>
+        <div class="notif-actions">
+          <button class="na-btn na-amarelo" onclick="event.stopPropagation()">💳 Pagar agora</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="notifs-vazio" id="notifVazio">
+    <div class="nv-icon">🔔</div>
+    <div class="nv-title">Nenhuma notificação nesta categoria</div>
+    <div class="nv-sub">Quando houver novidades, elas aparecerão aqui.</div>
+  </div>
+
+</div>
+
+<script>
+  let vistaAtual = 'cliente';
+  let filtroAtual = 'todos';
+
+
+  function verPerfil(btn) {
+    // After viewing profile, show Aceitar button
+    const actionsDiv = btn.closest('.notif-actions');
+    const aceitarBtn = actionsDiv.querySelector('.na-amarelo');
+    if (aceitarBtn) {
+      aceitarBtn.style.display = 'inline-flex';
+      btn.textContent = '👁️ Perfil visto';
+      btn.style.opacity = '0.6';
+      btn.onclick = null;
+    }
+  }
+
+  function aceitarProf(btn) {
+    const notif = btn.closest('.notif-item');
+    const actionsDiv = btn.closest('.notif-actions');
+    actionsDiv.innerHTML = '<span style="font-size:0.75rem;color:var(--verde);font-weight:700">✅ Profissional aceito! Você será redirecionado ao chat.</span>';
+    notif.classList.remove('nao-lida');
+    atualizarContador();
+  }
+
+  function recusarProf(btn) {
+    const notif = btn.closest('.notif-item');
+    const actionsDiv = btn.closest('.notif-actions');
+    actionsDiv.innerHTML = '<span style="font-size:0.75rem;color:var(--cinza)">✕ Profissional recusado</span>';
+    notif.classList.remove('nao-lida');
+    notif.style.opacity = '0.45';
+    atualizarContador();
+  }
+
+  function marcarLida(el) {
+    el.classList.remove('nao-lida');
+    atualizarContador();
+  }
+
+  function marcarTudo() {
+    document.querySelectorAll('.notif-item.nao-lida').forEach(el => el.classList.remove('nao-lida'));
+    atualizarContador();
+  }
+
+  function atualizarContador() {
+    const visiveis = document.querySelectorAll('.notif-item[style=""],.notif-item:not([style])').length;
+    const naoLidas = document.querySelectorAll('.notif-item.nao-lida').length;
+    document.getElementById('subCount').textContent = `${visiveis} notificações · ${naoLidas} não lidas`;
+    document.getElementById('countBadge').textContent = naoLidas;
+  }
+
+  function filtrarVista(vista, btn) {
+    vistaAtual = vista;
+    document.querySelectorAll('.vt-btn').forEach(b => b.classList.remove('ativo'));
+    btn.classList.add('ativo');
+    if (vista === 'cliente') {
+      document.getElementById('navAv').textContent = '👤';
+      document.getElementById('navNome').textContent = 'Maria Silva';
+      document.getElementById('navSub').textContent = 'Cliente';
+    } else {
+      document.getElementById('navAv').textContent = '👷';
+      document.getElementById('navNome').textContent = 'João Ferreira';
+      document.getElementById('navSub').textContent = 'Profissional · ⚡ Eletricista';
+    }
+    aplicarFiltros();
+  }
+
+  function selFiltro(el, tipo) {
+    filtroAtual = tipo;
+    document.querySelectorAll('.filtro-pill').forEach(p => p.classList.remove('ativo'));
+    el.classList.add('ativo');
+    aplicarFiltros();
+  }
+
+  function aplicarFiltros() {
+    let visiveis = 0;
+    document.querySelectorAll('.notif-item').forEach(item => {
+      const vistaOk = item.dataset.vista === vistaAtual;
+      const tipoOk = filtroAtual === 'todos' || filtroAtual === item.dataset.tipo;
+      const mostrar = vistaOk && tipoOk;
+      item.style.display = mostrar ? 'flex' : 'none';
+      if (mostrar) visiveis++;
+    });
+    ['hoje','ontem','semana'].forEach(g => {
+      const grupo = document.getElementById('grupo-' + g);
+      const temVisivel = Array.from(grupo.querySelectorAll('.notif-item')).some(i => i.style.display !== 'none');
+      grupo.style.display = temVisivel ? 'block' : 'none';
+    });
+    document.getElementById('notifVazio').classList.toggle('vis', visiveis === 0);
+    atualizarContador();
+  }
+
+  aplicarFiltros();
+</script>
+
+<!-- BOTÃO FLUTUANTE DE SUGESTÃO -->
+<div id="sugestaoBtn" onclick="abrirSugestao()" style="
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  background:#132240;border:1px solid rgba(0,201,111,0.3);
+  border-radius:100px;padding:10px 16px;
+  display:flex;align-items:center;gap:7px;
+  cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.35);
+  transition:all 0.2s;font-family:'DM Sans',sans-serif;
+  animation:fadeUpBtn 0.5s 0.8s ease both;opacity:0;
+">
+  <span style="font-size:1rem">💡</span>
+  <span style="font-size:0.75rem;font-weight:600;color:#00C96F">Sugerir melhoria</span>
+</div>
+
+<!-- MODAL SUGESTÃO -->
+<div id="overlaySugestao" style="
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:1000;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
+">
+  <div id="modalSugestao" style="
+    background:#132240;border:1px solid rgba(255,255,255,0.09);
+    border-radius:22px;width:100%;max-width:440px;padding:28px;
+    transform:translateY(20px);transition:transform 0.3s;
+  ">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:2px">💡 Sugerir melhoria</div>
+        <div style="font-size:0.75rem;color:#8A9BB5">Sua opinião nos ajuda a melhorar o ServiçoJá</div>
+      </div>
+      <button onclick="fecharSugestao()" style="background:rgba(255,255,255,0.06);border:none;border-radius:50%;width:30px;height:30px;color:#8A9BB5;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s">✕</button>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Você é:</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="selTipoSug(this,'cliente')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👤 Cliente</button>
+        <button onclick="selTipoSug(this,'profissional')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👷 Profissional</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Categoria:</div>
+      <select id="sugCategoria" style="width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;font-size:0.83rem;padding:10px 12px;outline:none;cursor:pointer;-webkit-appearance:none">
+        <option value="">Selecione uma categoria</option>
+        <option>🎨 Design e visual</option>
+        <option>⚡ Funcionalidade</option>
+        <option>🐛 Reportar problema</option>
+        <option>💬 Comunicação e chat</option>
+        <option>💳 Pagamentos e taxas</option>
+        <option>🤖 Teste de IA</option>
+        <option>📋 Pedidos e orçamentos</option>
+        <option>💡 Nova funcionalidade</option>
+        <option>🔒 Segurança e privacidade</option>
+        <option>🌟 Outro</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom:18px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Sua sugestão:</div>
+      <textarea id="sugTexto" placeholder="Descreva sua ideia ou problema. Seja específico — isso nos ajuda a implementar mais rápido!" style="
+        width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);
+        border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;
+        font-size:0.83rem;padding:12px 14px;outline:none;resize:vertical;
+        min-height:100px;line-height:1.6;transition:border-color 0.2s;
+      " oninput="this.style.borderColor='rgba(0,201,111,0.4)'"></textarea>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button onclick="fecharSugestao()" style="flex:1;background:transparent;border:1.5px solid rgba(255,255,255,0.09);border-radius:12px;padding:12px;color:#8A9BB5;font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.2s">Cancelar</button>
+      <button onclick="enviarSugestao()" style="flex:2;background:#00C96F;border:none;border-radius:12px;padding:12px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all 0.2s">💡 Enviar sugestão</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUCESSO SUGESTÃO -->
+<div id="overlaySugSucesso" style="
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:1001;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
+">
+  <div style="background:#132240;border:1px solid rgba(0,201,111,0.25);border-radius:22px;width:100%;max-width:360px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s" id="modalSugSuc">
+    <div style="font-size:3rem;margin-bottom:12px">🙏</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:8px">Sugestão enviada!</div>
+    <div style="color:#8A9BB5;font-size:0.82rem;line-height:1.6;margin-bottom:22px">Obrigado pelo seu feedback! Nossa equipe lê todas as sugestões. As melhores ideias são implementadas em novas versões do app. 🚀</div>
+    <button onclick="fecharSugSucesso()" style="width:100%;background:#00C96F;border:none;border-radius:12px;padding:13px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer">Fechar</button>
+  </div>
+</div>
+
+<style>
+  @keyframes fadeUpBtn { from { opacity:0;transform:translateY(12px); } to { opacity:1;transform:translateY(0); } }
+  #sugestaoBtn:hover { background:#1a2d4a; transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+  .sug-tipo-btn.sel { background:rgba(0,201,111,0.12) !important; border-color:rgba(0,201,111,0.4) !important; color:#00C96F !important; }
+</style>
+
+<script>
+  var sugTipoAtual = '';
+  function abrirSugestao() {
+    document.getElementById('overlaySugestao').style.opacity='1';
+    document.getElementById('overlaySugestao').style.pointerEvents='all';
+    document.getElementById('modalSugestao').style.transform='translateY(0)';
+  }
+  function fecharSugestao() {
+    document.getElementById('overlaySugestao').style.opacity='0';
+    document.getElementById('overlaySugestao').style.pointerEvents='none';
+    document.getElementById('modalSugestao').style.transform='translateY(20px)';
+  }
+  function selTipoSug(btn, tipo) {
+    sugTipoAtual = tipo;
+    document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+  }
+  function enviarSugestao() {
+    var texto = document.getElementById('sugTexto').value.trim();
+    var cat = document.getElementById('sugCategoria').value;
+    if (!texto) { document.getElementById('sugTexto').style.borderColor='rgba(255,92,92,0.5)'; return; }
+    fecharSugestao();
+    setTimeout(function() {
+      document.getElementById('overlaySugSucesso').style.opacity='1';
+      document.getElementById('overlaySugSucesso').style.pointerEvents='all';
+      document.getElementById('modalSugSuc').style.transform='translateY(0)';
+      document.getElementById('sugTexto').value='';
+      document.getElementById('sugCategoria').value='';
+      sugTipoAtual='';
+      document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
+    }, 200);
+  }
+  function fecharSugSucesso() {
+    document.getElementById('overlaySugSucesso').style.opacity='0';
+    document.getElementById('overlaySugSucesso').style.pointerEvents='none';
+    document.getElementById('modalSugSuc').style.transform='translateY(20px)';
+  }
+  document.getElementById('overlaySugestao').addEventListener('click', function(e) { if(e.target===this) fecharSugestao(); });
+  document.getElementById('overlaySugSucesso').addEventListener('click', function(e) { if(e.target===this) fecharSugSucesso(); });
+</script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(e => {});
+  }
+</script>
+
+<!-- BARRA DE NAVEGAÇÃO MOBILE -->
+<nav class="bottom-nav" id="bottomNav">
+  <a href="meus-pedidos-cliente.html" class="bn-item" id="bn-pedidos">
+    <span class="bn-icon">📋</span>
+    <span class="bn-label">Pedidos</span>
+  </a>
+  <a href="publicar-pedido.html" class="bn-item bn-center" id="bn-publicar">
+    <span class="bn-icon-center">＋</span>
+  </a>
+  <a href="notificacoes.html" class="bn-item" id="bn-notif">
+    <span class="bn-icon">🔔</span>
+    <span class="bn-label">Alertas</span>
+    <span class="bn-badge">3</span>
+  </a>
+</nav>
+
+<style>
+  body { padding-bottom: 70px; }
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: #132240; border-top: 1px solid rgba(255,255,255,0.09);
+    display: flex; align-items: center; justify-content: space-around;
+    padding: 8px 16px 12px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .bn-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    text-decoration: none; color: #8A9BB5; font-size: 0.62rem; font-weight: 600;
+    min-width: 50px; transition: color 0.2s; position: relative;
+  }
+  .bn-item.ativo { color: #00C96F; }
+  .bn-icon { font-size: 1.2rem; }
+  .bn-label { font-family: 'DM Sans', sans-serif; }
+  .bn-center {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: #00C96F; color: #0A1628 !important;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: -14px; box-shadow: 0 4px 16px rgba(0,201,111,0.4);
+    font-size: 0; min-width: 0;
+  }
+  .bn-icon-center { font-size: 1.8rem; color: #0A1628; font-weight: 300; line-height: 1; }
+  .bn-badge {
+    position: absolute; top: -2px; right: 2px;
+    background: #FF6B35; color: white; font-size: 0.55rem; font-weight: 800;
+    width: 14px; height: 14px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 1.5px solid #132240;
+  }
+</style>
+
+</body>
+</html>

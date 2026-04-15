@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiçoJá — João Ferreira · Eletricista</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --verde: #00C96F; --verde-escuro: #009E57;
+    --azul: #0A1628; --azul-medio: #132240; --azul-input: #0F1C35;
+    --branco: #F5F7F2; --cinza: #8A9BB5;
+    --laranja: #FF6B35; --amarelo: #FFB830;
+    --borda: rgba(255,255,255,0.09);
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--azul); color: var(--branco); min-height: 100vh; }
+  body::before {
+    content: ''; position: fixed; top: -180px; right: -180px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,201,111,0.08) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 28px; border-bottom: 1px solid var(--borda);
+    background: var(--azul-medio);
+  }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; text-decoration: none; color: var(--branco); }
+  .logo span { color: var(--verde); }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .btn-nav {
+    background: transparent; border: 1px solid var(--borda); border-radius: 9px;
+    color: var(--cinza); font-size: 0.82rem; padding: 8px 14px;
+    cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+  .btn-nav:hover { border-color: rgba(255,255,255,0.2); color: var(--branco); }
+  .btn-nav-verde {
+    background: var(--verde); border: none; border-radius: 9px;
+    color: var(--azul); font-size: 0.82rem; font-weight: 700; padding: 8px 16px;
+    cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+  .btn-nav-verde:hover { background: var(--verde-escuro); }
+
+  /* HERO */
+  .hero {
+    position: relative; z-index: 5;
+    background: var(--azul-medio); border-bottom: 1px solid var(--borda);
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(0,201,111,0.05) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: 1000px; margin: 0 auto;
+    padding: 36px 24px 28px;
+    display: flex; align-items: flex-start; gap: 24px; flex-wrap: wrap;
+    position: relative; z-index: 2;
+  }
+
+  /* AVATAR */
+  .hero-av-wrap { position: relative; flex-shrink: 0; }
+  .hero-av {
+    width: 100px; height: 100px; border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,107,53,0.3), rgba(255,184,48,0.2));
+    border: 3px solid rgba(255,107,53,0.3);
+    display: flex; align-items: center; justify-content: center; font-size: 2.8rem;
+  }
+  .hero-online {
+    position: absolute; bottom: 4px; right: 4px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--verde); border: 3px solid var(--azul-medio);
+  }
+
+  .hero-info { flex: 1; min-width: 0; }
+  .hero-nome { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.8rem; letter-spacing: -0.5px; margin-bottom: 4px; }
+  .hero-cats { color: var(--cinza); font-size: 0.9rem; margin-bottom: 10px; }
+
+  .hero-badges { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; }
+  .hb {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.72rem; font-weight: 700; padding: 4px 11px; border-radius: 100px;
+  }
+  .hb-verde { background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.25); color: var(--verde); }
+  .hb-amarelo { background: rgba(255,184,48,0.1); border: 1px solid rgba(255,184,48,0.25); color: var(--amarelo); }
+  .hb-laranja { background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.25); color: var(--laranja); }
+
+  .hero-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+  .hm-item { display: flex; align-items: center; gap: 5px; font-size: 0.82rem; color: var(--cinza); }
+  .hm-item strong { color: var(--branco); }
+
+  /* STATS HERO */
+  .hero-stats {
+    display: flex; flex-direction: column; gap: 10px; flex-shrink: 0;
+  }
+  .hs-row { display: flex; gap: 10px; }
+  .hs-card {
+    background: var(--azul-input); border: 1px solid var(--borda);
+    border-radius: 12px; padding: 12px 16px; text-align: center; min-width: 80px;
+  }
+  .hs-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--verde); }
+  .hs-num.amarelo { color: var(--amarelo); }
+  .hs-lbl { font-size: 0.68rem; color: var(--cinza); margin-top: 2px; }
+
+  .btn-interesse {
+    width: 100%; background: var(--verde); border: none; border-radius: 12px;
+    padding: 13px; color: var(--azul); font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 0.92rem; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-interesse:hover { background: var(--verde-escuro); transform: scale(1.02); }
+
+  /* BODY */
+  .body-wrap {
+    max-width: 1000px; margin: 0 auto; padding: 28px 24px 60px;
+    display: grid; grid-template-columns: 1fr 300px; gap: 20px;
+    position: relative; z-index: 5;
+  }
+
+  /* ABAS */
+  .tabs {
+    display: flex; gap: 4px; margin-bottom: 20px;
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 12px; padding: 4px; width: fit-content;
+  }
+  .tab {
+    padding: 8px 18px; border-radius: 9px; cursor: pointer;
+    font-size: 0.82rem; font-weight: 600; color: var(--cinza); transition: all 0.2s;
+  }
+  .tab:hover { color: var(--branco); }
+  .tab.ativo { background: var(--azul); color: var(--branco); }
+
+  /* PAINEL */
+  .painel { display: none; }
+  .painel.ativo { display: block; animation: fadeUp 0.3s ease both; }
+
+  /* SOBRE */
+  .sobre-texto {
+    font-size: 0.9rem; color: var(--cinza); line-height: 1.8; margin-bottom: 20px;
+  }
+  .sobre-texto strong { color: var(--branco); }
+
+  .sobre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .sobre-item {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 12px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .si-icon { font-size: 1.2rem; flex-shrink: 0; }
+  .si-label { font-size: 0.7rem; color: var(--cinza); margin-bottom: 2px; }
+  .si-val { font-size: 0.85rem; font-weight: 600; }
+
+  .servicos-lista { display: flex; flex-direction: column; gap: 8px; }
+  .serv-item {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 12px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    transition: border-color 0.2s;
+  }
+  .serv-item:hover { border-color: rgba(0,201,111,0.2); }
+  .serv-icon { font-size: 1.4rem; }
+  .serv-nome { font-weight: 600; font-size: 0.88rem; margin-bottom: 2px; }
+  .serv-desc { font-size: 0.75rem; color: var(--cinza); }
+  .serv-badge {
+    margin-left: auto; font-size: 0.68rem; font-weight: 700;
+    padding: 3px 8px; border-radius: 100px;
+    background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.2); color: var(--verde);
+  }
+
+  /* PORTFÓLIO */
+  .portfolio-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+  .port-item {
+    aspect-ratio: 1; border-radius: 14px; overflow: hidden;
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; cursor: pointer; transition: all 0.25s; font-size: 2rem;
+    position: relative;
+  }
+  .port-item:hover { border-color: rgba(0,201,111,0.3); transform: scale(1.02); }
+  .port-item span { font-size: 0.72rem; color: var(--cinza); }
+  .port-overlay {
+    position: absolute; inset: 0; background: rgba(0,201,111,0.15);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.2s; font-size: 1.5rem;
+  }
+  .port-item:hover .port-overlay { opacity: 1; }
+
+  /* AVALIAÇÕES */
+  .aval-hero {
+    display: flex; align-items: center; gap: 20px;
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 16px; padding: 20px 24px; margin-bottom: 16px;
+  }
+  .av-nota { text-align: center; }
+  .av-nota-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 3rem; color: var(--amarelo); line-height: 1; }
+  .av-stars { color: var(--amarelo); font-size: 1.1rem; letter-spacing: 2px; margin: 4px 0; }
+  .av-total { font-size: 0.72rem; color: var(--cinza); }
+  .av-bars { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+  .av-bar-row { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; }
+  .av-bar-num { color: var(--cinza); width: 8px; text-align: right; }
+  .av-bar-track { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+  .av-bar-fill { height: 100%; background: var(--amarelo); border-radius: 3px; transition: width 0.8s ease; }
+  .av-bar-pct { color: var(--cinza); width: 30px; text-align: right; }
+
+  .reviews-lista { display: flex; flex-direction: column; gap: 12px; }
+  .rev-card {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 14px; padding: 16px 18px;
+    transition: border-color 0.2s;
+  }
+  .rev-card:hover { border-color: rgba(255,184,48,0.15); }
+  .rev-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; gap: 10px; }
+  .rev-autor { display: flex; align-items: center; gap: 9px; }
+  .rev-av {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, rgba(0,201,111,0.2), rgba(0,78,200,0.15));
+    border: 1.5px solid rgba(0,201,111,0.2);
+    display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
+  }
+  .rev-nome { font-weight: 600; font-size: 0.85rem; margin-bottom: 1px; }
+  .rev-data { font-size: 0.68rem; color: var(--cinza); }
+  .rev-stars-right { color: var(--amarelo); font-size: 0.85rem; flex-shrink: 0; }
+  .rev-servico {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(0,201,111,0.06); border: 1px solid rgba(0,201,111,0.12);
+    color: var(--cinza); font-size: 0.7rem; padding: 2px 9px; border-radius: 100px; margin-bottom: 8px;
+  }
+  .rev-texto { font-size: 0.83rem; color: var(--cinza); line-height: 1.65; }
+
+  /* SIDEBAR */
+  .side-col { display: flex; flex-direction: column; gap: 14px; }
+
+  .side-card {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 16px; overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+  .sc-head {
+    padding: 14px 18px; border-bottom: 1px solid var(--borda);
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem;
+  }
+  .sc-body { padding: 14px 18px; }
+
+  /* CONTATO - PRIVADO */
+  .privado-box {
+    background: var(--azul-input); border: 1px solid rgba(0,201,111,0.15);
+    border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 12px;
+  }
+  .priv-icon { font-size: 1.6rem; margin-bottom: 6px; }
+  .priv-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; margin-bottom: 4px; }
+  .priv-sub { font-size: 0.72rem; color: var(--cinza); line-height: 1.5; }
+
+  .btn-interesse-side {
+    width: 100%; background: var(--verde); border: none; border-radius: 11px;
+    padding: 12px; color: var(--azul); font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: all 0.2s;
+    margin-bottom: 8px;
+  }
+  .btn-interesse-side:hover { background: var(--verde-escuro); }
+
+  .btn-compartilhar {
+    width: 100%; background: transparent; border: 1px solid var(--borda);
+    border-radius: 11px; padding: 10px; color: var(--cinza);
+    font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-compartilhar:hover { border-color: rgba(255,255,255,0.2); color: var(--branco); }
+
+  /* LOCALIZAÇÃO */
+  .loc-map {
+    height: 120px; background: var(--azul-input); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; margin-bottom: 10px; overflow: hidden; position: relative;
+  }
+  .loc-map-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  .loc-pin { position: relative; z-index: 2; font-size: 2rem; }
+  .loc-raio {
+    position: absolute; width: 80px; height: 80px;
+    border-radius: 50%; border: 2px solid rgba(0,201,111,0.3);
+    background: rgba(0,201,111,0.06);
+  }
+  .loc-info-row { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--cinza); margin-bottom: 5px; }
+  .loc-info-row strong { color: var(--branco); }
+
+  /* INFO RÁPIDA */
+  .info-row {
+    display: flex; align-items: center; gap: 8px; padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.8rem;
+  }
+  .info-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .info-row .ir-label { color: var(--cinza); flex: 1; }
+  .info-row .ir-val { font-weight: 600; }
+  .info-row .ir-val.verde { color: var(--verde); }
+
+  /* MODAL FOTO */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(10,22,40,0.95);
+    z-index: 50; display: flex; align-items: center; justify-content: center;
+    padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .overlay.vis { opacity: 1; pointer-events: all; }
+  .foto-modal {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 20px; padding: 20px; max-width: 480px; width: 100%;
+    transform: scale(0.95); transition: transform 0.3s; text-align: center;
+  }
+  .overlay.vis .foto-modal { transform: scale(1); }
+  .foto-modal-img {
+    width: 100%; height: 260px; border-radius: 14px;
+    background: var(--azul-input); display: flex; align-items: center;
+    justify-content: center; font-size: 4rem; margin-bottom: 14px;
+  }
+  .foto-modal-info { font-size: 0.78rem; color: var(--cinza); margin-bottom: 14px; }
+  .btn-fechar-modal {
+    background: transparent; border: 1.5px solid var(--borda); border-radius: 10px;
+    color: var(--cinza); padding: 9px 20px; cursor: pointer; font-size: 0.82rem; transition: all 0.2s;
+  }
+  .btn-fechar-modal:hover { border-color: rgba(255,255,255,0.25); color: var(--branco); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  @media (max-width: 768px) {
+    .body-wrap { grid-template-columns: 1fr; }
+    .side-col { order: -1; }
+    .hero-stats { flex-direction: row; flex-wrap: wrap; }
+    .sobre-grid { grid-template-columns: 1fr; }
+    .portfolio-grid { grid-template-columns: repeat(2,1fr); }
+  }
+  @media (max-width: 480px) {
+    nav { padding: 14px 16px; }
+    .hero-inner { padding: 24px 16px; }
+    .body-wrap { padding: 20px 16px 40px; }
+  }
+</style>
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#00C96F">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ServiçoJá">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo">Serviço<span>Já</span></a>
+  <div class="nav-right">
+    <button class="btn-nav">← Voltar</button>
+    <button class="btn-nav-verde">Publicar pedido</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-inner">
+
+    <div class="hero-av-wrap">
+      <div class="hero-av">👷</div>
+      <div class="hero-online"></div>
+    </div>
+
+    <div class="hero-info">
+      <div class="hero-nome">João Ferreira</div>
+      <div class="hero-cats">⚡ Eletricista · 🔌 Instalações · ❄️ Ar-condicionado</div>
+      <div class="hero-badges">
+        <span class="hb hb-verde">✅ Aprovado pela IA ServiçoJá</span>
+        <span class="hb hb-amarelo">⭐ Top Profissional</span>
+        <span class="hb hb-laranja">🏆 47 serviços realizados</span>
+      </div>
+      <div class="hero-meta">
+        <div class="hm-item">📍 <strong>Vila Mariana, SP</strong></div>
+        <div class="hm-item">🕒 Responde em <strong>~30 min</strong></div>
+        <div class="hm-item">📅 Membro desde <strong>Jan/2026</strong></div>
+        <div class="hm-item" style="color:var(--verde)">● Online agora</div>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hs-row">
+        <div class="hs-card">
+          <div class="hs-num amarelo">4.9</div>
+          <div class="hs-lbl">Avaliação</div>
+        </div>
+        <div class="hs-card">
+          <div class="hs-num">47</div>
+          <div class="hs-lbl">Serviços</div>
+        </div>
+      </div>
+      <div class="hs-row">
+        <div class="hs-card">
+          <div class="hs-num">98%</div>
+          <div class="hs-lbl">Teste IA</div>
+        </div>
+        <div class="hs-card">
+          <div class="hs-num">92%</div>
+          <div class="hs-lbl">Taxa aceite</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="body-wrap">
+
+  <!-- COLUNA PRINCIPAL -->
+  <div>
+    <div class="tabs">
+      <div class="tab ativo" onclick="selTab(this,'sobre')">📋 Sobre</div>
+      <div class="tab" onclick="selTab(this,'portfolio')">🖼️ Portfólio</div>
+      <div class="tab" onclick="selTab(this,'avaliacoes')">⭐ Avaliações</div>
+    </div>
+
+    <!-- SOBRE -->
+    <div class="painel ativo" id="sobre">
+
+      <div class="sobre-texto">
+        Eletricista com <strong>12 anos de experiência</strong> em instalações residenciais e comerciais em São Paulo. Especializado em quadros elétricos, instalações de ar-condicionado e projetos de reforma completa.<br><br>
+        Trabalho com <strong>nota fiscal</strong>, <strong>garantia de 1 ano</strong> em todos os serviços realizados e materiais de primeira linha. Pontualidade e organização são minha marca registrada — sempre deixo o ambiente mais limpo do que encontrei.<br><br>
+        Atendo também fins de semana mediante agendamento prévio.
+      </div>
+
+      <div class="sobre-grid">
+        <div class="sobre-item">
+          <div class="si-icon">🎓</div>
+          <div><div class="si-label">Formação</div><div class="si-val">Técnico em Elétrica · SENAI</div></div>
+        </div>
+        <div class="sobre-item">
+          <div class="si-icon">📅</div>
+          <div><div class="si-label">Experiência</div><div class="si-val">12 anos de atuação</div></div>
+        </div>
+        <div class="sobre-item">
+          <div class="si-icon">🛡️</div>
+          <div><div class="si-label">Garantia</div><div class="si-val">1 ano em todos os serviços</div></div>
+        </div>
+        <div class="sobre-item">
+          <div class="si-icon">📄</div>
+          <div><div class="si-label">Documentação</div><div class="si-val">Nota fiscal inclusa</div></div>
+        </div>
+        <div class="sobre-item">
+          <div class="si-icon">⏰</div>
+          <div><div class="si-label">Disponibilidade</div><div class="si-val">Seg–Sáb · 07h–19h</div></div>
+        </div>
+        <div class="sobre-item">
+          <div class="si-icon">📍</div>
+          <div><div class="si-label">Raio de atendimento</div><div class="si-val">Até 20km · SP</div></div>
+        </div>
+      </div>
+
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.82rem;color:var(--cinza);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:12px">Serviços oferecidos</div>
+      <div class="servicos-lista">
+        <div class="serv-item"><div class="serv-icon">⚡</div><div><div class="serv-nome">Instalações elétricas</div><div class="serv-desc">Tomadas, interruptores, pontos de luz, fiação</div></div><div class="serv-badge">✅ Aprovado IA</div></div>
+        <div class="serv-item"><div class="serv-icon">🔌</div><div><div class="serv-nome">Quadro de distribuição</div><div class="serv-desc">Troca, expansão e manutenção de quadros elétricos</div></div><div class="serv-badge">✅ Aprovado IA</div></div>
+        <div class="serv-item"><div class="serv-icon">❄️</div><div><div class="serv-nome">Ar-condicionado</div><div class="serv-desc">Instalação, manutenção e higienização de splits</div></div><div class="serv-badge">✅ Aprovado IA</div></div>
+        <div class="serv-item"><div class="serv-icon">💡</div><div><div class="serv-nome">Iluminação</div><div class="serv-desc">Spots, fitas LED, lustres e automação de luz</div></div><div class="serv-badge">✅ Aprovado IA</div></div>
+        <div class="serv-item"><div class="serv-icon">🔋</div><div><div class="serv-nome">Energia solar</div><div class="serv-desc">Instalação de inversores e painel de distribuição</div></div><div class="serv-badge">✅ Aprovado IA</div></div>
+      </div>
+    </div>
+
+    <!-- PORTFÓLIO -->
+    <div class="painel" id="portfolio">
+      <div style="font-size:0.82rem;color:var(--cinza);margin-bottom:16px;line-height:1.6">
+        📸 <strong style="color:var(--branco)">9 fotos</strong> de trabalhos realizados — clique para ampliar
+      </div>
+      <div class="portfolio-grid">
+        <div class="port-item" onclick="abrirFoto('Quadro elétrico residencial · Instalação completa')">⚡<span>Quadro elétrico</span><div class="port-overlay">🔍</div></div>
+        <div class="port-item" onclick="abrirFoto('Instalação de tomadas · Escritório comercial')">🔌<span>Tomadas escritório</span><div class="port-overlay">🔍</div></div>
+        <div class="port-item" onclick="abrirFoto('Ar-condicionado split 12.000 BTUs · Instalação')">❄️<span>Ar-condicionado</span><div class="port-overlay">🔍</div></div>
+        <div class="port-item" onclick="abrirFoto('Iluminação LED · Sala de estar')">💡<span>Iluminação LED</span><div class="port-overlay">🔍</div></div>
+        <div class="port-item" onclick="abrirFoto('Disjuntores · Substituição completa')">🔧<span>Disjuntores</span><div class="port-overlay">🔍</div></div>
+        <div class="port-item" onclick="abrirFoto('Fiação aparente · Estilo industrial')">🏠<span>Fiação industrial</span><div class="port-overlay">🔍</div></div>
+        <div class="port-item" onclick="abrirFoto('Ponto de carga veículo elétrico · Garagem')">🔋<span>Carga elétrico</span><div class="port-overlay">🔍</div></div>
+        <div class="port-item" onclick="abrirFoto('Spots embutidos · Cozinha moderna')">✨<span>Spots cozinha</span><div class="port-overlay">🔍</div></div>
+        <div class="port-item" onclick="abrirFoto('Painel solar · Residência unifamiliar')">☀️<span>Painel solar</span><div class="port-overlay">🔍</div></div>
+      </div>
+    </div>
+
+    <!-- AVALIAÇÕES -->
+    <div class="painel" id="avaliacoes">
+      <div class="aval-hero">
+        <div class="av-nota">
+          <div class="av-nota-num">4.9</div>
+          <div class="av-stars">★★★★★</div>
+          <div class="av-total">47 avaliações</div>
+        </div>
+        <div class="av-bars">
+          <div class="av-bar-row"><span class="av-bar-num">5</span><div class="av-bar-track"><div class="av-bar-fill" id="b5" style="width:0%"></div></div><span class="av-bar-pct">85%</span></div>
+          <div class="av-bar-row"><span class="av-bar-num">4</span><div class="av-bar-track"><div class="av-bar-fill" id="b4" style="width:0%"></div></div><span class="av-bar-pct">12%</span></div>
+          <div class="av-bar-row"><span class="av-bar-num">3</span><div class="av-bar-track"><div class="av-bar-fill" id="b3" style="width:0%"></div></div><span class="av-bar-pct">3%</span></div>
+          <div class="av-bar-row"><span class="av-bar-num">2</span><div class="av-bar-track"><div class="av-bar-fill" id="b2" style="width:0%"></div></div><span class="av-bar-pct">0%</span></div>
+          <div class="av-bar-row"><span class="av-bar-num">1</span><div class="av-bar-track"><div class="av-bar-fill" id="b1" style="width:0%"></div></div><span class="av-bar-pct">0%</span></div>
+        </div>
+      </div>
+
+      <div class="reviews-lista">
+        <div class="rev-card">
+          <div class="rev-top">
+            <div class="rev-autor"><div class="rev-av">👤</div><div><div class="rev-nome">Maria Silva</div><div class="rev-data">há 2 dias</div></div></div>
+            <div class="rev-stars-right">★★★★★</div>
+          </div>
+          <div class="rev-servico">⚡ Disjuntor caiu — urgente</div>
+          <div class="rev-texto">Excelente profissional! Chegou no horário marcado, resolveu o problema rápido e ainda verificou o quadro todo sem cobrar a mais. Super recomendo, com certeza vou chamar de novo!</div>
+        </div>
+
+        <div class="rev-card">
+          <div class="rev-top">
+            <div class="rev-autor"><div class="rev-av">👤</div><div><div class="rev-nome">Carlos Oliveira</div><div class="rev-data">há 5 dias</div></div></div>
+            <div class="rev-stars-right">★★★★★</div>
+          </div>
+          <div class="rev-servico">🔌 4 tomadas no escritório</div>
+          <div class="rev-texto">Trabalho muito bem feito, caprichado e deixou tudo limpo. Profissional de verdade, explicou cada etapa do serviço. Nota 10!</div>
+        </div>
+
+        <div class="rev-card">
+          <div class="rev-top">
+            <div class="rev-autor"><div class="rev-av">👤</div><div><div class="rev-nome">Fernanda Lima</div><div class="rev-data">há 1 semana</div></div></div>
+            <div class="rev-stars-right">★★★★☆</div>
+          </div>
+          <div class="rev-servico">⚡ Quadro elétrico completo</div>
+          <div class="rev-texto">Ótimo serviço, demorou um pouco mais do previsto mas o resultado ficou perfeito. Muito cuidadoso com a fiação antiga.</div>
+        </div>
+
+        <div class="rev-card">
+          <div class="rev-top">
+            <div class="rev-autor"><div class="rev-av">👤</div><div><div class="rev-nome">Roberto Santos</div><div class="rev-data">há 2 semanas</div></div></div>
+            <div class="rev-stars-right">★★★★★</div>
+          </div>
+          <div class="rev-servico">❄️ Ar-condicionado split</div>
+          <div class="rev-texto">Instalação perfeita do split, muito organizado e rápido. Explicou a manutenção que devo fazer periodicamente. Parabéns!</div>
+        </div>
+
+        <div class="rev-card">
+          <div class="rev-top">
+            <div class="rev-autor"><div class="rev-av">👤</div><div><div class="rev-nome">Ana Beatriz</div><div class="rev-data">há 3 semanas</div></div></div>
+            <div class="rev-stars-right">★★★★★</div>
+          </div>
+          <div class="rev-servico">💡 Iluminação LED sala</div>
+          <div class="rev-texto">Ficou lindo! Instalou todos os spots exatamente onde pedi, com dimmer e tudo. Muito atencioso e educado. Recomendo de olhos fechados.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="side-col">
+
+    <!-- CONTATO -->
+    <div class="side-card" style="animation-delay:0.05s">
+      <div class="sc-head">💬 Entrar em contato</div>
+      <div class="sc-body">
+        <div class="privado-box">
+          <div class="priv-icon">🔒</div>
+          <div class="priv-title">Como entrar em contato</div>
+          <div class="priv-sub">Publique um pedido de serviço. Se este profissional demonstrar interesse, você receberá uma notificação e poderá aceitar ou recusar. Após aceitar, o chat e os dados de contato são liberados.</div>
+        </div>
+        <div style="background:rgba(0,201,111,0.06);border:1px solid rgba(0,201,111,0.15);border-radius:10px;padding:10px 14px;font-size:0.75rem;color:var(--cinza);line-height:1.6;margin-bottom:10px">
+          <div style="color:var(--verde);font-weight:700;margin-bottom:4px">📋 Como funciona:</div>
+          1. Você publica um pedido<br>
+          2. João vê e demonstra interesse<br>
+          3. Você recebe notificação e decide<br>
+          4. Se aceitar, o chat é liberado
+        </div>
+        <button class="btn-interesse-side" onclick="irPublicarPedido()">📋 Publicar pedido de serviço</button>
+        <button class="btn-compartilhar" onclick="compartilhar()">🔗 Compartilhar perfil</button>
+      </div>
+    </div>
+
+    <!-- LOCALIZAÇÃO -->
+    <div class="side-card" style="animation-delay:0.1s">
+      <div class="sc-head">📍 Localização</div>
+      <div class="sc-body">
+        <div class="loc-map">
+          <div class="loc-map-grid"></div>
+          <div class="loc-raio"></div>
+          <div class="loc-pin">📍</div>
+        </div>
+        <div class="loc-info-row">📍 <strong>Vila Mariana, São Paulo</strong></div>
+        <div class="loc-info-row">📡 Atende até <strong>20km de distância</strong></div>
+        <div class="loc-info-row">🚗 Aceita deslocamentos maiores</div>
+      </div>
+    </div>
+
+    <!-- INFO RÁPIDA -->
+    <div class="side-card" style="animation-delay:0.15s">
+      <div class="sc-head">📊 Informações</div>
+      <div class="sc-body">
+        <div class="info-row"><span class="ir-label">Status</span><span class="ir-val verde">● Online agora</span></div>
+        <div class="info-row"><span class="ir-label">Resposta média</span><span class="ir-val">~30 min</span></div>
+        <div class="info-row"><span class="ir-label">Serviços realizados</span><span class="ir-val">47</span></div>
+        <div class="info-row"><span class="ir-label">Taxa de conclusão</span><span class="ir-val verde">98%</span></div>
+        <div class="info-row"><span class="ir-label">Aprovação no teste IA</span><span class="ir-val verde">98%</span></div>
+        <div class="info-row"><span class="ir-label">Membro desde</span><span class="ir-val">Jan/2026</span></div>
+        <div class="info-row"><span class="ir-label">Disponibilidade</span><span class="ir-val">Seg–Sáb</span></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- MODAL FOTO -->
+<div class="overlay" id="overlayFoto" onclick="if(event.target===this)fecharFoto()">
+  <div class="foto-modal">
+    <div class="foto-modal-img" id="fotoModalImg">🖼️</div>
+    <div class="foto-modal-info" id="fotoModalInfo"></div>
+    <button class="btn-fechar-modal" onclick="fecharFoto()">Fechar</button>
+  </div>
+</div>
+
+<!-- MODAL INTERESSE -->
+<div class="overlay" id="overlayInteresse">
+  <div style="background:var(--azul-medio);border:1px solid rgba(0,201,111,0.25);border-radius:22px;width:100%;max-width:380px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s">
+    <div style="font-size:3rem;margin-bottom:12px">🎉</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:8px">Interesse enviado!</div>
+    <div style="color:var(--cinza);font-size:0.83rem;line-height:1.6;margin-bottom:22px">João Ferreira foi notificado do seu interesse. Ele poderá enviar uma proposta assim que você publicar um pedido de serviço.</div>
+    <button onclick="fecharInteresse()" style="width:100%;background:var(--verde);border:none;border-radius:12px;padding:13px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer">Publicar pedido agora →</button>
+    <button onclick="fecharInteresse()" style="width:100%;background:transparent;border:none;color:var(--cinza);font-size:0.82rem;padding:10px;cursor:pointer;margin-top:4px">Fechar</button>
+  </div>
+</div>
+
+<script>
+  // ABAS
+  function selTab(el, id) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('ativo'));
+    document.querySelectorAll('.painel').forEach(p => p.classList.remove('ativo'));
+    el.classList.add('ativo');
+    document.getElementById(id).classList.add('ativo');
+
+    // Animar barras quando abrir avaliações
+    if (id === 'avaliacoes') {
+      setTimeout(() => {
+        document.getElementById('b5').style.width = '85%';
+        document.getElementById('b4').style.width = '12%';
+        document.getElementById('b3').style.width = '3%';
+        document.getElementById('b2').style.width = '0%';
+        document.getElementById('b1').style.width = '0%';
+      }, 100);
+    }
+  }
+
+  // FOTO
+  function abrirFoto(info) {
+    document.getElementById('fotoModalInfo').textContent = info;
+    document.getElementById('overlayFoto').classList.add('vis');
+  }
+  function fecharFoto() { document.getElementById('overlayFoto').classList.remove('vis'); }
+
+  // INTERESSE
+  function irPublicarPedido() { alert('Você será redirecionado para publicar um pedido de serviço!'); }
+  
+
+  // COMPARTILHAR
+  function compartilhar() {
+    if (navigator.share) {
+      navigator.share({ title: 'João Ferreira · Eletricista · ServiçoJá', url: window.location.href });
+    } else {
+      navigator.clipboard.writeText(window.location.href).catch(()=>{});
+      alert('Link copiado!');
+    }
+  }
+
+  // Fechar overlay clicando fora
+  document.querySelectorAll('.overlay').forEach(ov => {
+    ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('vis'); });
+  });
+</script>
+
+<!-- BOTÃO FLUTUANTE DE SUGESTÃO -->
+<div id="sugestaoBtn" onclick="abrirSugestao()" style="
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  background:#132240;border:1px solid rgba(0,201,111,0.3);
+  border-radius:100px;padding:10px 16px;
+  display:flex;align-items:center;gap:7px;
+  cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.35);
+  transition:all 0.2s;font-family:'DM Sans',sans-serif;
+  animation:fadeUpBtn 0.5s 0.8s ease both;opacity:0;
+">
+  <span style="font-size:1rem">💡</span>
+  <span style="font-size:0.75rem;font-weight:600;color:#00C96F">Sugerir melhoria</span>
+</div>
+
+<!-- MODAL SUGESTÃO -->
+<div id="overlaySugestao" style="
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:1000;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
+">
+  <div id="modalSugestao" style="
+    background:#132240;border:1px solid rgba(255,255,255,0.09);
+    border-radius:22px;width:100%;max-width:440px;padding:28px;
+    transform:translateY(20px);transition:transform 0.3s;
+  ">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:2px">💡 Sugerir melhoria</div>
+        <div style="font-size:0.75rem;color:#8A9BB5">Sua opinião nos ajuda a melhorar o ServiçoJá</div>
+      </div>
+      <button onclick="fecharSugestao()" style="background:rgba(255,255,255,0.06);border:none;border-radius:50%;width:30px;height:30px;color:#8A9BB5;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s">✕</button>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Você é:</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="selTipoSug(this,'cliente')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👤 Cliente</button>
+        <button onclick="selTipoSug(this,'profissional')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👷 Profissional</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Categoria:</div>
+      <select id="sugCategoria" style="width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;font-size:0.83rem;padding:10px 12px;outline:none;cursor:pointer;-webkit-appearance:none">
+        <option value="">Selecione uma categoria</option>
+        <option>🎨 Design e visual</option>
+        <option>⚡ Funcionalidade</option>
+        <option>🐛 Reportar problema</option>
+        <option>💬 Comunicação e chat</option>
+        <option>💳 Pagamentos e taxas</option>
+        <option>🤖 Teste de IA</option>
+        <option>📋 Pedidos e orçamentos</option>
+        <option>💡 Nova funcionalidade</option>
+        <option>🔒 Segurança e privacidade</option>
+        <option>🌟 Outro</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom:18px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Sua sugestão:</div>
+      <textarea id="sugTexto" placeholder="Descreva sua ideia ou problema. Seja específico — isso nos ajuda a implementar mais rápido!" style="
+        width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);
+        border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;
+        font-size:0.83rem;padding:12px 14px;outline:none;resize:vertical;
+        min-height:100px;line-height:1.6;transition:border-color 0.2s;
+      " oninput="this.style.borderColor='rgba(0,201,111,0.4)'"></textarea>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button onclick="fecharSugestao()" style="flex:1;background:transparent;border:1.5px solid rgba(255,255,255,0.09);border-radius:12px;padding:12px;color:#8A9BB5;font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.2s">Cancelar</button>
+      <button onclick="enviarSugestao()" style="flex:2;background:#00C96F;border:none;border-radius:12px;padding:12px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all 0.2s">💡 Enviar sugestão</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUCESSO SUGESTÃO -->
+<div id="overlaySugSucesso" style="
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:1001;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
+">
+  <div style="background:#132240;border:1px solid rgba(0,201,111,0.25);border-radius:22px;width:100%;max-width:360px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s" id="modalSugSuc">
+    <div style="font-size:3rem;margin-bottom:12px">🙏</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:8px">Sugestão enviada!</div>
+    <div style="color:#8A9BB5;font-size:0.82rem;line-height:1.6;margin-bottom:22px">Obrigado pelo seu feedback! Nossa equipe lê todas as sugestões. As melhores ideias são implementadas em novas versões do app. 🚀</div>
+    <button onclick="fecharSugSucesso()" style="width:100%;background:#00C96F;border:none;border-radius:12px;padding:13px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer">Fechar</button>
+  </div>
+</div>
+
+<style>
+  @keyframes fadeUpBtn { from { opacity:0;transform:translateY(12px); } to { opacity:1;transform:translateY(0); } }
+  #sugestaoBtn:hover { background:#1a2d4a; transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+  .sug-tipo-btn.sel { background:rgba(0,201,111,0.12) !important; border-color:rgba(0,201,111,0.4) !important; color:#00C96F !important; }
+</style>
+
+<script>
+  var sugTipoAtual = '';
+  function abrirSugestao() {
+    document.getElementById('overlaySugestao').style.opacity='1';
+    document.getElementById('overlaySugestao').style.pointerEvents='all';
+    document.getElementById('modalSugestao').style.transform='translateY(0)';
+  }
+  function fecharSugestao() {
+    document.getElementById('overlaySugestao').style.opacity='0';
+    document.getElementById('overlaySugestao').style.pointerEvents='none';
+    document.getElementById('modalSugestao').style.transform='translateY(20px)';
+  }
+  function selTipoSug(btn, tipo) {
+    sugTipoAtual = tipo;
+    document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+  }
+  function enviarSugestao() {
+    var texto = document.getElementById('sugTexto').value.trim();
+    var cat = document.getElementById('sugCategoria').value;
+    if (!texto) { document.getElementById('sugTexto').style.borderColor='rgba(255,92,92,0.5)'; return; }
+    fecharSugestao();
+    setTimeout(function() {
+      document.getElementById('overlaySugSucesso').style.opacity='1';
+      document.getElementById('overlaySugSucesso').style.pointerEvents='all';
+      document.getElementById('modalSugSuc').style.transform='translateY(0)';
+      document.getElementById('sugTexto').value='';
+      document.getElementById('sugCategoria').value='';
+      sugTipoAtual='';
+      document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
+    }, 200);
+  }
+  function fecharSugSucesso() {
+    document.getElementById('overlaySugSucesso').style.opacity='0';
+    document.getElementById('overlaySugSucesso').style.pointerEvents='none';
+    document.getElementById('modalSugSuc').style.transform='translateY(20px)';
+  }
+  document.getElementById('overlaySugestao').addEventListener('click', function(e) { if(e.target===this) fecharSugestao(); });
+  document.getElementById('overlaySugSucesso').addEventListener('click', function(e) { if(e.target===this) fecharSugSucesso(); });
+</script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(e => {});
+  }
+</script>
+
+<!-- BARRA DE NAVEGAÇÃO MOBILE -->
+<nav class="bottom-nav" id="bottomNav">
+  <a href="meus-pedidos-cliente.html" class="bn-item" id="bn-pedidos">
+    <span class="bn-icon">📋</span>
+    <span class="bn-label">Pedidos</span>
+  </a>
+  <a href="publicar-pedido.html" class="bn-item bn-center" id="bn-publicar">
+    <span class="bn-icon-center">＋</span>
+  </a>
+  <a href="notificacoes.html" class="bn-item" id="bn-notif">
+    <span class="bn-icon">🔔</span>
+    <span class="bn-label">Alertas</span>
+    <span class="bn-badge">3</span>
+  </a>
+</nav>
+
+<style>
+  body { padding-bottom: 70px; }
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: #132240; border-top: 1px solid rgba(255,255,255,0.09);
+    display: flex; align-items: center; justify-content: space-around;
+    padding: 8px 16px 12px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .bn-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    text-decoration: none; color: #8A9BB5; font-size: 0.62rem; font-weight: 600;
+    min-width: 50px; transition: color 0.2s; position: relative;
+  }
+  .bn-item.ativo { color: #00C96F; }
+  .bn-icon { font-size: 1.2rem; }
+  .bn-label { font-family: 'DM Sans', sans-serif; }
+  .bn-center {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: #00C96F; color: #0A1628 !important;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: -14px; box-shadow: 0 4px 16px rgba(0,201,111,0.4);
+    font-size: 0; min-width: 0;
+  }
+  .bn-icon-center { font-size: 1.8rem; color: #0A1628; font-weight: 300; line-height: 1; }
+  .bn-badge {
+    position: absolute; top: -2px; right: 2px;
+    background: #FF6B35; color: white; font-size: 0.55rem; font-weight: 800;
+    width: 14px; height: 14px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 1.5px solid #132240;
+  }
+</style>
+
+</body>
+</html>

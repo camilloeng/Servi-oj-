@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiçoJá — Cadastro do Cliente</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --verde: #00C96F;
+    --verde-escuro: #009E57;
+    --azul: #0A1628;
+    --azul-medio: #132240;
+    --azul-input: #0F1C35;
+    --branco: #F5F7F2;
+    --cinza: #8A9BB5;
+    --erro: #FF5C5C;
+    --borda: rgba(255,255,255,0.09);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--azul);
+    color: var(--branco);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,201,111,0.10) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 32px;
+    border-bottom: 1px solid var(--borda);
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 1.4rem;
+    text-decoration: none; color: var(--branco);
+  }
+  .logo span { color: var(--verde); }
+  .nav-login {
+    color: var(--cinza); font-size: 0.9rem;
+  }
+  .nav-login a { color: var(--verde); text-decoration: none; font-weight: 600; }
+  .nav-login a:hover { text-decoration: underline; }
+
+  /* LAYOUT PRINCIPAL */
+  .page {
+    position: relative; z-index: 5;
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 20px 60px;
+  }
+
+  .card {
+    background: var(--azul-medio);
+    border: 1px solid var(--borda);
+    border-radius: 24px;
+    padding: 40px 44px;
+    width: 100%;
+    max-width: 520px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  /* PROGRESS */
+  .progress-wrap {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 32px;
+  }
+  .step {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.75rem; font-weight: 600;
+    color: var(--cinza);
+  }
+  .step.active { color: var(--verde); }
+  .step.done { color: var(--verde); opacity: 0.5; }
+  .step-circle {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700;
+  }
+  .step.active .step-circle {
+    background: var(--verde);
+    border-color: var(--verde);
+    color: var(--azul);
+  }
+  .step.done .step-circle {
+    background: transparent;
+  }
+  .step-line {
+    flex: 1; height: 1px;
+    background: var(--borda);
+  }
+
+  /* TITULO */
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 1.6rem;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+  .card-sub {
+    color: var(--cinza); font-size: 0.88rem;
+    margin-bottom: 28px;
+  }
+
+  /* SEÇÃO */
+  .section-label {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 0.75rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--cinza);
+    margin: 24px 0 14px;
+  }
+  .section-label::after {
+    content: ''; flex: 1; height: 1px;
+    background: var(--borda);
+  }
+  .section-label:first-of-type { margin-top: 0; }
+
+  /* CAMPOS */
+  .field { margin-bottom: 14px; }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .row-3 { display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 14px; }
+
+  label {
+    display: block;
+    font-size: 0.8rem; font-weight: 600;
+    color: var(--cinza);
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+  label .req { color: var(--verde); margin-left: 2px; }
+
+  .input-wrap {
+    position: relative;
+    display: flex; align-items: center;
+  }
+  .input-icon {
+    position: absolute; left: 14px;
+    color: var(--cinza); font-size: 0.95rem;
+    pointer-events: none;
+  }
+
+  input, select {
+    width: 100%;
+    background: var(--azul-input);
+    border: 1.5px solid var(--borda);
+    border-radius: 12px;
+    color: var(--branco);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    padding: 13px 14px 13px 40px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+  input.no-icon, select.no-icon { padding-left: 14px; }
+
+  select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A9BB5' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+  select option { background: var(--azul-medio); }
+
+  input:focus, select:focus {
+    border-color: rgba(0,201,111,0.45);
+    box-shadow: 0 0 0 3px rgba(0,201,111,0.08);
+  }
+  input::placeholder { color: rgba(138,155,181,0.5); }
+
+  .senha-toggle {
+    position: absolute; right: 14px;
+    background: none; border: none;
+    color: var(--cinza); cursor: pointer;
+    font-size: 0.85rem; padding: 4px;
+    transition: color 0.2s;
+  }
+  .senha-toggle:hover { color: var(--branco); }
+
+  .hint {
+    font-size: 0.74rem; color: var(--cinza);
+    margin-top: 5px;
+  }
+
+  /* FORÇA DA SENHA */
+  .senha-forca {
+    display: flex; gap: 4px; margin-top: 8px;
+  }
+  .forca-bar {
+    flex: 1; height: 3px; border-radius: 2px;
+    background: var(--borda);
+    transition: background 0.3s;
+  }
+  .forca-bar.fraca { background: var(--erro); }
+  .forca-bar.media { background: #FFB830; }
+  .forca-bar.forte { background: var(--verde); }
+
+  /* TERMOS */
+  .termos {
+    display: flex; align-items: flex-start; gap: 10px;
+    margin: 20px 0 24px;
+  }
+  .checkbox-custom {
+    width: 18px; height: 18px; flex-shrink: 0;
+    border: 1.5px solid var(--borda);
+    border-radius: 5px;
+    background: var(--azul-input);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+    transition: all 0.2s;
+  }
+  .checkbox-custom.checked {
+    background: var(--verde);
+    border-color: var(--verde);
+  }
+  .checkbox-custom.checked::after { content: '✓'; font-size: 0.7rem; color: var(--azul); font-weight: 700; }
+  .termos p { font-size: 0.82rem; color: var(--cinza); line-height: 1.5; }
+  .termos a { color: var(--verde); text-decoration: none; }
+  .termos a:hover { text-decoration: underline; }
+
+  /* BOTÃO */
+  .btn-cadastrar {
+    width: 100%;
+    background: var(--verde);
+    color: var(--azul);
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.01em;
+  }
+  .btn-cadastrar:hover { background: var(--verde-escuro); transform: scale(1.01); }
+  .btn-cadastrar:active { transform: scale(0.99); }
+
+  /* DIVIDER */
+  .divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 20px 0;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px;
+    background: var(--borda);
+  }
+  .divider span { color: var(--cinza); font-size: 0.78rem; }
+
+  /* GOOGLE */
+  .btn-google {
+    width: 100%;
+    background: transparent;
+    border: 1.5px solid var(--borda);
+    border-radius: 14px;
+    padding: 13px;
+    color: var(--branco);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500; font-size: 0.9rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .btn-google:hover {
+    border-color: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.04);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 560px) {
+    .card { padding: 28px 22px; }
+    .row-2, .row-3 { grid-template-columns: 1fr; }
+    nav { padding: 18px 20px; }
+  }
+</style>
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#00C96F">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ServiçoJá">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo">Serviço<span>Já</span></a>
+  <span class="nav-login">Já tem conta? <a href="#">Entrar</a></span>
+</nav>
+
+<div class="page">
+  <div class="card">
+
+    <!-- PROGRESSO -->
+    <div class="progress-wrap">
+      <div class="step active">
+        <div class="step-circle">1</div>
+        Seus dados
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-circle">2</div>
+        Endereço
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-circle">3</div>
+        Confirmação
+      </div>
+    </div>
+
+    <h1 class="card-title">Crie sua conta</h1>
+    <p class="card-sub">Encontre profissionais de confiança perto de você.</p>
+
+    <!-- DADOS PESSOAIS -->
+    <div class="section-label">Dados pessoais</div>
+
+    <div class="field">
+      <label>Nome completo <span class="req">*</span></label>
+      <div class="input-wrap">
+        <span class="input-icon">👤</span>
+        <input type="text" placeholder="Ex: Maria Silva">
+      </div>
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>E-mail <span class="req">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">✉️</span>
+          <input type="email" placeholder="seu@email.com">
+        </div>
+      </div>
+      <div class="field">
+        <label>Telefone / WhatsApp <span class="req">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">📱</span>
+          <input type="tel" placeholder="(11) 99999-9999">
+        </div>
+      </div>
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>Senha <span class="req">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="senhaInput" placeholder="Mínimo 8 caracteres" oninput="verificarSenha(this.value)">
+          <button class="senha-toggle" onclick="toggleSenha()" type="button">👁️</button>
+        </div>
+        <div class="senha-forca">
+          <div class="forca-bar" id="b1"></div>
+          <div class="forca-bar" id="b2"></div>
+          <div class="forca-bar" id="b3"></div>
+          <div class="forca-bar" id="b4"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Confirmar senha <span class="req">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input type="password" placeholder="Repita a senha">
+        </div>
+      </div>
+    </div>
+
+    <!-- ENDEREÇO -->
+    <div class="section-label">Endereço</div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>CEP <span class="req">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">📮</span>
+          <input type="text" placeholder="00000-000" maxlength="9" oninput="buscarCEP(this.value)">
+        </div>
+        <p class="hint">Digite o CEP para preencher automaticamente</p>
+      </div>
+      <div class="field">
+        <label>Número <span class="req">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">#</span>
+          <input type="text" placeholder="Ex: 142">
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Rua / Logradouro <span class="req">*</span></label>
+      <div class="input-wrap">
+        <span class="input-icon">🏠</span>
+        <input type="text" id="rua" placeholder="Preenchido pelo CEP">
+      </div>
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>Bairro <span class="req">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">🗺️</span>
+          <input type="text" id="bairro" placeholder="Preenchido pelo CEP">
+        </div>
+      </div>
+      <div class="field">
+        <label>Complemento</label>
+        <div class="input-wrap">
+          <span class="input-icon">🏢</span>
+          <input type="text" placeholder="Apto, bloco...">
+        </div>
+      </div>
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>Cidade <span class="req">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">🏙️</span>
+          <input type="text" id="cidade" placeholder="Preenchido pelo CEP">
+        </div>
+      </div>
+      <div class="field">
+        <label>Estado <span class="req">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">📍</span>
+          <select id="estado" class="no-icon" style="padding-left: 40px;">
+            <option value="">Selecione</option>
+            <option value="SP" selected>São Paulo</option>
+            <option value="MG">Minas Gerais</option>
+            <option value="RJ">Rio de Janeiro</option>
+            <option value="RS">Rio Grande do Sul</option>
+            <option value="PR">Paraná</option>
+            <option value="BA">Bahia</option>
+            <option value="SC">Santa Catarina</option>
+            <option value="GO">Goiás</option>
+            <option value="PE">Pernambuco</option>
+            <option value="CE">Ceará</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- TERMOS -->
+    <div class="termos">
+      <div class="checkbox-custom" id="checkbox" onclick="toggleCheck()"></div>
+      <p>Concordo com os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a> do ServiçoJá. Meus dados serão compartilhados com o profissional somente após aprovação do orçamento.</p>
+    </div>
+
+    <button class="btn-cadastrar">Criar conta grátis →</button>
+
+    <div class="divider"><span>ou cadastre com</span></div>
+
+    <button class="btn-google">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continuar com Google
+    </button>
+
+  </div>
+</div>
+
+<script>
+  // Toggle senha visível
+  function toggleSenha() {
+    const input = document.getElementById('senhaInput');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
+
+  // Força da senha
+  function verificarSenha(val) {
+    const bars = [document.getElementById('b1'), document.getElementById('b2'), document.getElementById('b3'), document.getElementById('b4')];
+    bars.forEach(b => b.className = 'forca-bar');
+    if (!val) return;
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const cls = score <= 1 ? 'fraca' : score <= 2 ? 'media' : 'forte';
+    for (let i = 0; i < score; i++) bars[i].classList.add(cls);
+  }
+
+  // Checkbox termos
+  let checked = false;
+  function toggleCheck() {
+    checked = !checked;
+    document.getElementById('checkbox').className = 'checkbox-custom' + (checked ? ' checked' : '');
+  }
+
+  // Auto-preencher CEP via ViaCEP
+  async function buscarCEP(val) {
+    const cep = val.replace(/\D/g, '');
+    if (cep.length !== 8) return;
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await res.json();
+      if (!data.erro) {
+        document.getElementById('rua').value = data.logradouro || '';
+        document.getElementById('bairro').value = data.bairro || '';
+        document.getElementById('cidade').value = data.localidade || '';
+        const estado = document.getElementById('estado');
+        for (let opt of estado.options) {
+          if (opt.value === data.uf) { estado.value = data.uf; break; }
+        }
+      }
+    } catch(e) {}
+  }
+</script>
+
+<!-- BOTÃO FLUTUANTE DE SUGESTÃO -->
+<div id="sugestaoBtn" onclick="abrirSugestao()" style="
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  background:#132240;border:1px solid rgba(0,201,111,0.3);
+  border-radius:100px;padding:10px 16px;
+  display:flex;align-items:center;gap:7px;
+  cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.35);
+  transition:all 0.2s;font-family:'DM Sans',sans-serif;
+  animation:fadeUpBtn 0.5s 0.8s ease both;opacity:0;
+">
+  <span style="font-size:1rem">💡</span>
+  <span style="font-size:0.75rem;font-weight:600;color:#00C96F">Sugerir melhoria</span>
+</div>
+
+<!-- MODAL SUGESTÃO -->
+<div id="overlaySugestao" style="
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:1000;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
+">
+  <div id="modalSugestao" style="
+    background:#132240;border:1px solid rgba(255,255,255,0.09);
+    border-radius:22px;width:100%;max-width:440px;padding:28px;
+    transform:translateY(20px);transition:transform 0.3s;
+  ">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:2px">💡 Sugerir melhoria</div>
+        <div style="font-size:0.75rem;color:#8A9BB5">Sua opinião nos ajuda a melhorar o ServiçoJá</div>
+      </div>
+      <button onclick="fecharSugestao()" style="background:rgba(255,255,255,0.06);border:none;border-radius:50%;width:30px;height:30px;color:#8A9BB5;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s">✕</button>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Você é:</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="selTipoSug(this,'cliente')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👤 Cliente</button>
+        <button onclick="selTipoSug(this,'profissional')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👷 Profissional</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Categoria:</div>
+      <select id="sugCategoria" style="width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;font-size:0.83rem;padding:10px 12px;outline:none;cursor:pointer;-webkit-appearance:none">
+        <option value="">Selecione uma categoria</option>
+        <option>🎨 Design e visual</option>
+        <option>⚡ Funcionalidade</option>
+        <option>🐛 Reportar problema</option>
+        <option>💬 Comunicação e chat</option>
+        <option>💳 Pagamentos e taxas</option>
+        <option>🤖 Teste de IA</option>
+        <option>📋 Pedidos e orçamentos</option>
+        <option>💡 Nova funcionalidade</option>
+        <option>🔒 Segurança e privacidade</option>
+        <option>🌟 Outro</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom:18px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Sua sugestão:</div>
+      <textarea id="sugTexto" placeholder="Descreva sua ideia ou problema. Seja específico — isso nos ajuda a implementar mais rápido!" style="
+        width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);
+        border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;
+        font-size:0.83rem;padding:12px 14px;outline:none;resize:vertical;
+        min-height:100px;line-height:1.6;transition:border-color 0.2s;
+      " oninput="this.style.borderColor='rgba(0,201,111,0.4)'"></textarea>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button onclick="fecharSugestao()" style="flex:1;background:transparent;border:1.5px solid rgba(255,255,255,0.09);border-radius:12px;padding:12px;color:#8A9BB5;font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.2s">Cancelar</button>
+      <button onclick="enviarSugestao()" style="flex:2;background:#00C96F;border:none;border-radius:12px;padding:12px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all 0.2s">💡 Enviar sugestão</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUCESSO SUGESTÃO -->
+<div id="overlaySugSucesso" style="
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:1001;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
+">
+  <div style="background:#132240;border:1px solid rgba(0,201,111,0.25);border-radius:22px;width:100%;max-width:360px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s" id="modalSugSuc">
+    <div style="font-size:3rem;margin-bottom:12px">🙏</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:8px">Sugestão enviada!</div>
+    <div style="color:#8A9BB5;font-size:0.82rem;line-height:1.6;margin-bottom:22px">Obrigado pelo seu feedback! Nossa equipe lê todas as sugestões. As melhores ideias são implementadas em novas versões do app. 🚀</div>
+    <button onclick="fecharSugSucesso()" style="width:100%;background:#00C96F;border:none;border-radius:12px;padding:13px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer">Fechar</button>
+  </div>
+</div>
+
+<style>
+  @keyframes fadeUpBtn { from { opacity:0;transform:translateY(12px); } to { opacity:1;transform:translateY(0); } }
+  #sugestaoBtn:hover { background:#1a2d4a; transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+  .sug-tipo-btn.sel { background:rgba(0,201,111,0.12) !important; border-color:rgba(0,201,111,0.4) !important; color:#00C96F !important; }
+</style>
+
+<script>
+  var sugTipoAtual = '';
+  function abrirSugestao() {
+    document.getElementById('overlaySugestao').style.opacity='1';
+    document.getElementById('overlaySugestao').style.pointerEvents='all';
+    document.getElementById('modalSugestao').style.transform='translateY(0)';
+  }
+  function fecharSugestao() {
+    document.getElementById('overlaySugestao').style.opacity='0';
+    document.getElementById('overlaySugestao').style.pointerEvents='none';
+    document.getElementById('modalSugestao').style.transform='translateY(20px)';
+  }
+  function selTipoSug(btn, tipo) {
+    sugTipoAtual = tipo;
+    document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+  }
+  function enviarSugestao() {
+    var texto = document.getElementById('sugTexto').value.trim();
+    var cat = document.getElementById('sugCategoria').value;
+    if (!texto) { document.getElementById('sugTexto').style.borderColor='rgba(255,92,92,0.5)'; return; }
+    fecharSugestao();
+    setTimeout(function() {
+      document.getElementById('overlaySugSucesso').style.opacity='1';
+      document.getElementById('overlaySugSucesso').style.pointerEvents='all';
+      document.getElementById('modalSugSuc').style.transform='translateY(0)';
+      document.getElementById('sugTexto').value='';
+      document.getElementById('sugCategoria').value='';
+      sugTipoAtual='';
+      document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
+    }, 200);
+  }
+  function fecharSugSucesso() {
+    document.getElementById('overlaySugSucesso').style.opacity='0';
+    document.getElementById('overlaySugSucesso').style.pointerEvents='none';
+    document.getElementById('modalSugSuc').style.transform='translateY(20px)';
+  }
+  document.getElementById('overlaySugestao').addEventListener('click', function(e) { if(e.target===this) fecharSugestao(); });
+  document.getElementById('overlaySugSucesso').addEventListener('click', function(e) { if(e.target===this) fecharSugSucesso(); });
+</script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(e => {});
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiçoJá — Chat</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --verde: #00C96F; --verde-escuro: #009E57;
+    --azul: #0A1628; --azul-medio: #132240; --azul-input: #0F1C35;
+    --branco: #F5F7F2; --cinza: #8A9BB5;
+    --laranja: #FF6B35; --amarelo: #FFB830;
+    --borda: rgba(255,255,255,0.09);
+    --bubble-eu: #00C96F; --bubble-outro: #132240;
+  }
+
+  html, body { height: 100%; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--azul); color: var(--branco); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+  /* NAV */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; border-bottom: 1px solid var(--borda);
+    background: var(--azul-medio); flex-shrink: 0; z-index: 10;
+  }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; text-decoration: none; color: var(--branco); }
+  .logo span { color: var(--verde); }
+  .nav-back {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--cinza); font-size: 0.82rem; cursor: pointer; transition: color 0.2s;
+    background: none; border: none;
+  }
+  .nav-back:hover { color: var(--branco); }
+
+  /* LAYOUT */
+  .chat-layout {
+    display: flex; flex: 1; overflow: hidden;
+  }
+
+  /* LISTA DE CONVERSAS */
+  .conv-lista {
+    width: 300px; flex-shrink: 0;
+    border-right: 1px solid var(--borda);
+    display: flex; flex-direction: column;
+    background: var(--azul-medio);
+  }
+
+  .cl-header {
+    padding: 16px 16px 12px; border-bottom: 1px solid var(--borda);
+  }
+  .cl-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; margin-bottom: 10px; }
+  .cl-search {
+    width: 100%; background: var(--azul-input); border: 1px solid var(--borda);
+    border-radius: 10px; padding: 8px 12px 8px 32px; color: var(--branco);
+    font-family: 'DM Sans', sans-serif; font-size: 0.8rem; outline: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238A9BB5' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: 10px center;
+    transition: border-color 0.2s;
+  }
+  .cl-search:focus { border-color: rgba(0,201,111,0.35); }
+  .cl-search::placeholder { color: rgba(138,155,181,0.5); }
+
+  .conv-items { flex: 1; overflow-y: auto; }
+  .conv-items::-webkit-scrollbar { width: 3px; }
+  .conv-items::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+  .conv-item {
+    display: flex; align-items: center; gap: 11px;
+    padding: 12px 16px; cursor: pointer; transition: background 0.2s;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    position: relative;
+  }
+  .conv-item:hover { background: rgba(255,255,255,0.03); }
+  .conv-item.ativo { background: rgba(0,201,111,0.07); }
+  .conv-item.ativo::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: var(--verde); border-radius: 0 2px 2px 0;
+  }
+
+  .conv-av {
+    width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+    position: relative;
+  }
+  .conv-av.cliente { background: linear-gradient(135deg, rgba(0,201,111,0.25), rgba(0,78,200,0.15)); border: 2px solid rgba(0,201,111,0.25); }
+  .conv-av.prof { background: linear-gradient(135deg, rgba(255,107,53,0.25), rgba(255,184,48,0.15)); border: 2px solid rgba(255,107,53,0.25); }
+  .online-dot {
+    position: absolute; bottom: 1px; right: 1px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--verde); border: 2px solid var(--azul-medio);
+  }
+
+  .conv-info { flex: 1; min-width: 0; }
+  .conv-nome { font-weight: 600; font-size: 0.85rem; margin-bottom: 2px; }
+  .conv-preview {
+    font-size: 0.75rem; color: var(--cinza);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .conv-preview.nao-lida { color: var(--branco); font-weight: 500; }
+
+  .conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .conv-hora { font-size: 0.68rem; color: var(--cinza); }
+  .conv-badge {
+    background: var(--verde); color: var(--azul);
+    font-size: 0.62rem; font-weight: 800;
+    width: 18px; height: 18px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ÁREA DO CHAT */
+  .chat-area {
+    flex: 1; display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  /* HEADER DO CHAT */
+  .chat-header {
+    padding: 14px 20px; border-bottom: 1px solid var(--borda);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--azul-medio); flex-shrink: 0;
+  }
+  .ch-left { display: flex; align-items: center; gap: 12px; }
+  .ch-av {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,107,53,0.25), rgba(255,184,48,0.15));
+    border: 2px solid rgba(255,107,53,0.25);
+    display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    position: relative;
+  }
+  .ch-online {
+    position: absolute; bottom: 1px; right: 1px;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--verde); border: 2px solid var(--azul-medio);
+  }
+  .ch-nome { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 2px; }
+  .ch-status { font-size: 0.72rem; color: var(--verde); }
+  .ch-servico {
+    font-size: 0.72rem; color: var(--cinza);
+    background: var(--azul-input); border: 1px solid var(--borda);
+    border-radius: 8px; padding: 4px 10px; max-width: 240px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .ch-actions { display: flex; gap: 6px; }
+  .ch-btn {
+    background: none; border: 1px solid var(--borda); border-radius: 8px;
+    color: var(--cinza); width: 34px; height: 34px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+  }
+  .ch-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--branco); }
+
+  /* MENSAGENS */
+  .mensagens {
+    flex: 1; overflow-y: auto; padding: 20px 20px 10px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .mensagens::-webkit-scrollbar { width: 4px; }
+  .mensagens::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+  /* SEPARADOR DATA */
+  .data-sep {
+    display: flex; align-items: center; gap: 10px;
+    margin: 12px 0 8px; font-size: 0.68rem; color: var(--cinza);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .data-sep::before, .data-sep::after { content: ''; flex: 1; height: 1px; background: var(--borda); }
+
+  /* SISTEMA */
+  .msg-sistema {
+    text-align: center; font-size: 0.72rem; color: var(--cinza);
+    background: rgba(0,201,111,0.06); border: 1px solid rgba(0,201,111,0.12);
+    border-radius: 100px; padding: 5px 14px; margin: 8px auto;
+    max-width: 340px;
+  }
+
+  /* BUBBLE */
+  .msg-wrap {
+    display: flex; gap: 8px; max-width: 72%;
+    animation: msgIn 0.25s ease both;
+  }
+  .msg-wrap.eu { align-self: flex-end; flex-direction: row-reverse; }
+  .msg-wrap.outro { align-self: flex-start; }
+
+  .msg-av-sm {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 0.75rem;
+    margin-top: auto;
+  }
+  .msg-av-sm.prof-av-sm { background: linear-gradient(135deg, rgba(255,107,53,0.25), rgba(255,184,48,0.15)); border: 1.5px solid rgba(255,107,53,0.25); }
+  .msg-av-sm.cli-av-sm { background: linear-gradient(135deg, rgba(0,201,111,0.25), rgba(0,78,200,0.15)); border: 1.5px solid rgba(0,201,111,0.25); }
+
+  .msg-conteudo { display: flex; flex-direction: column; gap: 2px; }
+  .msg-wrap.eu .msg-conteudo { align-items: flex-end; }
+
+  .bubble {
+    padding: 10px 14px; border-radius: 16px;
+    font-size: 0.85rem; line-height: 1.55; max-width: 100%;
+    word-break: break-word;
+  }
+  .bubble.eu {
+    background: var(--verde); color: var(--azul);
+    border-radius: 16px 16px 4px 16px;
+  }
+  .bubble.outro {
+    background: var(--azul-medio); color: var(--branco);
+    border: 1px solid var(--borda);
+    border-radius: 16px 16px 16px 4px;
+  }
+
+  /* FOTO NO CHAT */
+  .bubble-foto {
+    border-radius: 12px; overflow: hidden; max-width: 220px;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .bubble-foto:hover { opacity: 0.9; }
+  .foto-placeholder {
+    width: 220px; height: 150px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 6px;
+    font-size: 2rem;
+  }
+  .foto-placeholder.eu { background: var(--verde-escuro); }
+  .foto-placeholder.outro { background: var(--azul-input); border: 1px solid var(--borda); border-radius: 12px; }
+  .foto-placeholder span { font-size: 0.72rem; font-weight: 600; }
+  .foto-placeholder.eu span { color: rgba(10,22,40,0.7); }
+  .foto-placeholder.outro span { color: var(--cinza); }
+
+  .msg-hora { font-size: 0.62rem; color: var(--cinza); padding: 0 4px; }
+  .msg-lido { font-size: 0.62rem; color: var(--verde); }
+
+  /* INPUT */
+  .chat-input-area {
+    padding: 12px 16px; border-top: 1px solid var(--borda);
+    background: var(--azul-medio); flex-shrink: 0;
+  }
+
+  /* PREVIEW FOTO */
+  .foto-preview-wrap {
+    display: none; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 10px; padding: 8px; background: var(--azul-input);
+    border: 1px solid var(--borda); border-radius: 12px;
+  }
+  .foto-preview-wrap.vis { display: flex; }
+  .foto-prev-item {
+    width: 52px; height: 52px; border-radius: 8px;
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; position: relative; cursor: pointer;
+  }
+  .foto-prev-remove {
+    position: absolute; top: -5px; right: -5px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--erro); color: white; font-size: 0.55rem;
+    display: flex; align-items: center; justify-content: center; font-weight: 700;
+  }
+
+  .input-row { display: flex; align-items: flex-end; gap: 8px; }
+
+  .input-actions { display: flex; gap: 4px; }
+  .ia-btn {
+    background: none; border: 1px solid var(--borda); border-radius: 10px;
+    color: var(--cinza); width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+  }
+  .ia-btn:hover { border-color: rgba(0,201,111,0.35); color: var(--verde); }
+
+  .msg-input-wrap {
+    flex: 1; background: var(--azul-input); border: 1.5px solid var(--borda);
+    border-radius: 14px; display: flex; align-items: flex-end;
+    padding: 8px 12px; transition: border-color 0.2s;
+  }
+  .msg-input-wrap:focus-within { border-color: rgba(0,201,111,0.4); }
+
+  textarea#msgInput {
+    flex: 1; background: none; border: none; outline: none;
+    color: var(--branco); font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem; resize: none; max-height: 100px;
+    line-height: 1.5; padding: 0;
+  }
+  textarea#msgInput::placeholder { color: rgba(138,155,181,0.5); }
+
+  .send-btn {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: var(--verde); border: none;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+  }
+  .send-btn:hover { background: var(--verde-escuro); transform: scale(1.05); }
+  .send-btn:active { transform: scale(0.97); }
+
+  /* MODAL FOTO GRANDE */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(10,22,40,0.95);
+    z-index: 50; display: flex; align-items: center; justify-content: center;
+    padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .overlay.vis { opacity: 1; pointer-events: all; }
+  .foto-grande {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 20px; padding: 20px; max-width: 500px; width: 100%;
+    transform: scale(0.95); transition: transform 0.3s;
+    text-align: center;
+  }
+  .overlay.vis .foto-grande { transform: scale(1); }
+  .foto-grande-img {
+    width: 100%; height: 280px;
+    background: var(--azul-input); border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 4rem; margin-bottom: 12px;
+  }
+  .foto-grande-info { font-size: 0.78rem; color: var(--cinza); margin-bottom: 14px; }
+  .btn-fechar-foto {
+    background: transparent; border: 1.5px solid var(--borda); border-radius: 10px;
+    color: var(--cinza); padding: 9px 20px; cursor: pointer; font-size: 0.82rem; transition: all 0.2s;
+  }
+  .btn-fechar-foto:hover { border-color: rgba(255,255,255,0.25); color: var(--branco); }
+
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 640px) {
+    .conv-lista { display: none; }
+    .chat-area { width: 100%; }
+  }
+</style>
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#00C96F">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ServiçoJá">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo">Serviço<span>Já</span></a>
+  <button class="nav-back">← Voltar aos pedidos</button>
+</nav>
+
+<div class="chat-layout">
+
+  <!-- LISTA DE CONVERSAS -->
+  <div class="conv-lista">
+    <div class="cl-header">
+      <div class="cl-title">Conversas</div>
+      <input class="cl-search" type="text" placeholder="Buscar conversa...">
+    </div>
+    <div class="conv-items">
+
+      <div class="conv-item ativo" onclick="selConv(this)">
+        <div class="conv-av prof"><span>👷</span><div class="online-dot"></div></div>
+        <div class="conv-info">
+          <div class="conv-nome">João Ferreira</div>
+          <div class="conv-preview nao-lida">Posso ir amanhã às 9h, pode ser?</div>
+        </div>
+        <div class="conv-meta">
+          <div class="conv-hora">14:32</div>
+          <div class="conv-badge">2</div>
+        </div>
+      </div>
+
+      <div class="conv-item" onclick="selConv(this)">
+        <div class="conv-av prof"><span>👷</span></div>
+        <div class="conv-info">
+          <div class="conv-nome">Carlos Mendes</div>
+          <div class="conv-preview">Tudo certo, até sexta então!</div>
+        </div>
+        <div class="conv-meta">
+          <div class="conv-hora">Ontem</div>
+        </div>
+      </div>
+
+      <div class="conv-item" onclick="selConv(this)">
+        <div class="conv-av cliente"><span>👤</span><div class="online-dot"></div></div>
+        <div class="conv-info">
+          <div class="conv-nome">Maria Silva <span style="font-size:0.68rem;color:var(--cinza);font-weight:400">(cliente)</span></div>
+          <div class="conv-preview">Obrigada! Ficou perfeito 😊</div>
+        </div>
+        <div class="conv-meta">
+          <div class="conv-hora">Ontem</div>
+        </div>
+      </div>
+
+      <div class="conv-item" onclick="selConv(this)">
+        <div class="conv-av prof"><span>👷</span></div>
+        <div class="conv-info">
+          <div class="conv-nome">Roberto Santos</div>
+          <div class="conv-preview">📷 Foto enviada</div>
+        </div>
+        <div class="conv-meta">
+          <div class="conv-hora">12/04</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ÁREA DO CHAT -->
+  <div class="chat-area">
+
+    <!-- HEADER -->
+    <div class="chat-header">
+      <div class="ch-left">
+        <div class="ch-av">👷<div class="ch-online"></div></div>
+        <div>
+          <div class="ch-nome">João Ferreira</div>
+          <div class="ch-status">● Online agora</div>
+        </div>
+      </div>
+      <div class="ch-servico">⚡ Disjuntor caiu — preciso urgente</div>
+      <div class="ch-actions">
+        <button class="ch-btn" title="Ver perfil">👤</button>
+        <button class="ch-btn" title="Ver pedido">📋</button>
+        <button class="ch-btn" title="Ligar">📞</button>
+      </div>
+    </div>
+
+    <!-- MENSAGENS -->
+    <div class="mensagens" id="mensagens">
+
+      <div class="msg-sistema">🔒 Conversa iniciada após aceite mútuo · 14/04/2026</div>
+      <div class="msg-sistema">Informações de contato liberadas · Endereço e telefone disponíveis</div>
+
+      <div class="data-sep">Hoje</div>
+
+      <!-- PROFISSIONAL -->
+      <div class="msg-wrap outro">
+        <div class="msg-av-sm prof-av-sm">👷</div>
+        <div class="msg-conteudo">
+          <div class="bubble outro">Olá, Maria! Sou o João. Vi seu pedido sobre o disjuntor e posso te ajudar. Que horas você está disponível hoje?</div>
+          <div class="msg-hora">13:45</div>
+        </div>
+      </div>
+
+      <!-- CLIENTE -->
+      <div class="msg-wrap eu">
+        <div class="msg-conteudo">
+          <div class="bubble eu">Oi João! Que bom. Estou disponível a partir das 15h hoje ou amanhã de manhã.</div>
+          <div style="display:flex;align-items:center;gap:4px;justify-content:flex-end">
+            <div class="msg-hora">13:47</div>
+            <div class="msg-lido">✓✓</div>
+          </div>
+        </div>
+        <div class="msg-av-sm cli-av-sm">👤</div>
+      </div>
+
+      <!-- PROFISSIONAL -->
+      <div class="msg-wrap outro">
+        <div class="msg-av-sm prof-av-sm">👷</div>
+        <div class="msg-conteudo">
+          <div class="bubble outro">Hoje às 15h fica ótimo! Pode me mandar uma foto do quadro elétrico? Assim já vou preparado com os materiais certos.</div>
+          <div class="msg-hora">13:49</div>
+        </div>
+      </div>
+
+      <!-- CLIENTE - FOTO -->
+      <div class="msg-wrap eu">
+        <div class="msg-conteudo">
+          <div class="bubble-foto" onclick="abrirFoto('Quadro elétrico · Enviada por você · 13:52')">
+            <div class="foto-placeholder eu">🖼️<span>Quadro elétrico</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;justify-content:flex-end">
+            <div class="msg-hora">13:52</div>
+            <div class="msg-lido">✓✓</div>
+          </div>
+        </div>
+        <div class="msg-av-sm cli-av-sm">👤</div>
+      </div>
+
+      <!-- PROFISSIONAL -->
+      <div class="msg-wrap outro">
+        <div class="msg-av-sm prof-av-sm">👷</div>
+        <div class="msg-conteudo">
+          <div class="bubble outro">Perfeito! Já consigo ver o problema. O disjuntor principal parece estar com defeito. Vou levar um reserva. Confirma o endereço? Rua das Flores, 142 — Moema?</div>
+          <div class="msg-hora">13:54</div>
+        </div>
+      </div>
+
+      <!-- CLIENTE -->
+      <div class="msg-wrap eu">
+        <div class="msg-conteudo">
+          <div class="bubble eu">Isso mesmo! Apartamento 72, 7° andar. Portaria avisada, pode subir direto.</div>
+          <div style="display:flex;align-items:center;gap:4px;justify-content:flex-end">
+            <div class="msg-hora">13:56</div>
+            <div class="msg-lido">✓✓</div>
+          </div>
+        </div>
+        <div class="msg-av-sm cli-av-sm">👤</div>
+      </div>
+
+      <!-- PROFISSIONAL - FOTO -->
+      <div class="msg-wrap outro">
+        <div class="msg-av-sm prof-av-sm">👷</div>
+        <div class="msg-conteudo">
+          <div class="bubble outro">Ótimo! Já to a caminho. Esse é o disjuntor que vou trazer:</div>
+          <div class="bubble-foto" onclick="abrirFoto('Disjuntor reserva · Enviada por João · 14:10')" style="margin-top:4px">
+            <div class="foto-placeholder outro">🔌<span>Disjuntor reserva</span></div>
+          </div>
+          <div class="msg-hora">14:10</div>
+        </div>
+      </div>
+
+      <!-- PROFISSIONAL -->
+      <div class="msg-wrap outro">
+        <div class="msg-av-sm prof-av-sm">👷</div>
+        <div class="msg-conteudo">
+          <div class="bubble outro">Posso ir amanhã às 9h, pode ser? 😊</div>
+          <div class="msg-hora">14:32</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- INPUT -->
+    <div class="chat-input-area">
+
+      <div class="foto-preview-wrap" id="fotoPreviewWrap"></div>
+
+      <div class="input-row">
+        <div class="input-actions">
+          <button class="ia-btn" title="Enviar foto" onclick="document.getElementById('fotoInput').click()">📷</button>
+          <input type="file" id="fotoInput" multiple accept="image/*" style="display:none" onchange="adicionarFotos(this.files)">
+          <button class="ia-btn" title="Anexar arquivo">📎</button>
+        </div>
+
+        <div class="msg-input-wrap">
+          <textarea id="msgInput" rows="1" placeholder="Digite uma mensagem..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        </div>
+
+        <button class="send-btn" onclick="enviarMensagem()">➤</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL FOTO GRANDE -->
+<div class="overlay" id="overlayFoto" onclick="if(event.target===this)fecharFoto()">
+  <div class="foto-grande">
+    <div class="foto-grande-img" id="fotoGrandeImg">🖼️</div>
+    <div class="foto-grande-info" id="fotoGrandeInfo"></div>
+    <button class="btn-fechar-foto" onclick="fecharFoto()">Fechar</button>
+  </div>
+</div>
+
+<script>
+  // AUTO RESIZE TEXTAREA
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+  }
+
+  // ENTER PARA ENVIAR
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      enviarMensagem();
+    }
+  }
+
+  // ENVIAR MENSAGEM
+  function enviarMensagem() {
+    const input = document.getElementById('msgInput');
+    const texto = input.value.trim();
+    const fotos = document.querySelectorAll('.foto-prev-item');
+    if (!texto && fotos.length === 0) return;
+
+    const container = document.getElementById('mensagens');
+
+    // Fotos primeiro
+    fotos.forEach(f => {
+      const wrap = criarBubble('eu');
+      const fotoEl = document.createElement('div');
+      fotoEl.className = 'bubble-foto';
+      fotoEl.onclick = () => abrirFoto('Foto enviada por você · agora');
+      fotoEl.innerHTML = `<div class="foto-placeholder eu">🖼️<span>Foto enviada</span></div>`;
+      wrap.querySelector('.msg-conteudo').insertBefore(fotoEl, wrap.querySelector('.msg-conteudo').firstChild);
+      container.appendChild(wrap);
+    });
+
+    // Texto
+    if (texto) {
+      const wrap = criarBubble('eu', texto);
+      container.appendChild(wrap);
+    }
+
+    input.value = '';
+    input.style.height = 'auto';
+    limparFotos();
+    scrollBaixo();
+
+    // Resposta automática
+    setTimeout(() => {
+      const wrap = criarBubble('outro', 'Recebi! Até logo 😊');
+      container.appendChild(wrap);
+      scrollBaixo();
+    }, 1800);
+  }
+
+  function criarBubble(tipo, texto) {
+    const now = new Date();
+    const hora = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    const wrap = document.createElement('div');
+    wrap.className = `msg-wrap ${tipo}`;
+
+    const av = document.createElement('div');
+    av.className = `msg-av-sm ${tipo === 'eu' ? 'cli-av-sm' : 'prof-av-sm'}`;
+    av.textContent = tipo === 'eu' ? '👤' : '👷';
+
+    const conteudo = document.createElement('div');
+    conteudo.className = 'msg-conteudo';
+
+    if (texto) {
+      const bubble = document.createElement('div');
+      bubble.className = `bubble ${tipo}`;
+      bubble.textContent = texto;
+      conteudo.appendChild(bubble);
+    }
+
+    const metaRow = document.createElement('div');
+    metaRow.style.cssText = `display:flex;align-items:center;gap:4px;${tipo==='eu'?'justify-content:flex-end':''}`;
+    const horaEl = document.createElement('div');
+    horaEl.className = 'msg-hora';
+    horaEl.textContent = hora;
+    metaRow.appendChild(horaEl);
+    if (tipo === 'eu') {
+      const lido = document.createElement('div');
+      lido.className = 'msg-lido';
+      lido.textContent = '✓';
+      metaRow.appendChild(lido);
+    }
+    conteudo.appendChild(metaRow);
+
+    if (tipo === 'eu') {
+      wrap.appendChild(conteudo);
+      wrap.appendChild(av);
+    } else {
+      wrap.appendChild(av);
+      wrap.appendChild(conteudo);
+    }
+    return wrap;
+  }
+
+  // FOTOS
+  let fotosParaEnviar = [];
+  function adicionarFotos(files) {
+    const wrap = document.getElementById('fotoPreviewWrap');
+    Array.from(files).forEach(f => {
+      fotosParaEnviar.push(f);
+      const item = document.createElement('div');
+      item.className = 'foto-prev-item';
+      item.innerHTML = `🖼️<div class="foto-prev-remove" onclick="this.parentElement.remove()">✕</div>`;
+      wrap.appendChild(item);
+    });
+    wrap.classList.add('vis');
+  }
+  function limparFotos() {
+    fotosParaEnviar = [];
+    const wrap = document.getElementById('fotoPreviewWrap');
+    wrap.innerHTML = '';
+    wrap.classList.remove('vis');
+  }
+
+  // SCROLL
+  function scrollBaixo() {
+    const m = document.getElementById('mensagens');
+    m.scrollTop = m.scrollHeight;
+  }
+  scrollBaixo();
+
+  // FOTO GRANDE
+  function abrirFoto(info) {
+    document.getElementById('fotoGrandeInfo').textContent = info;
+    document.getElementById('overlayFoto').classList.add('vis');
+  }
+  function fecharFoto() {
+    document.getElementById('overlayFoto').classList.remove('vis');
+  }
+
+  // SELECIONAR CONVERSA
+  function selConv(el) {
+    document.querySelectorAll('.conv-item').forEach(i => i.classList.remove('ativo'));
+    el.classList.add('ativo');
+    const badge = el.querySelector('.conv-badge');
+    if (badge) badge.remove();
+    const preview = el.querySelector('.conv-preview');
+    if (preview) preview.classList.remove('nao-lida');
+  }
+</script>
+
+<!-- BOTÃO FLUTUANTE DE SUGESTÃO -->
+<div id="sugestaoBtn" onclick="abrirSugestao()" style="
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  background:#132240;border:1px solid rgba(0,201,111,0.3);
+  border-radius:100px;padding:10px 16px;
+  display:flex;align-items:center;gap:7px;
+  cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.35);
+  transition:all 0.2s;font-family:'DM Sans',sans-serif;
+  animation:fadeUpBtn 0.5s 0.8s ease both;opacity:0;
+">
+  <span style="font-size:1rem">💡</span>
+  <span style="font-size:0.75rem;font-weight:600;color:#00C96F">Sugerir melhoria</span>
+</div>
+
+<!-- MODAL SUGESTÃO -->
+<div id="overlaySugestao" style="
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:1000;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
+">
+  <div id="modalSugestao" style="
+    background:#132240;border:1px solid rgba(255,255,255,0.09);
+    border-radius:22px;width:100%;max-width:440px;padding:28px;
+    transform:translateY(20px);transition:transform 0.3s;
+  ">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:2px">💡 Sugerir melhoria</div>
+        <div style="font-size:0.75rem;color:#8A9BB5">Sua opinião nos ajuda a melhorar o ServiçoJá</div>
+      </div>
+      <button onclick="fecharSugestao()" style="background:rgba(255,255,255,0.06);border:none;border-radius:50%;width:30px;height:30px;color:#8A9BB5;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s">✕</button>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Você é:</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="selTipoSug(this,'cliente')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👤 Cliente</button>
+        <button onclick="selTipoSug(this,'profissional')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👷 Profissional</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Categoria:</div>
+      <select id="sugCategoria" style="width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;font-size:0.83rem;padding:10px 12px;outline:none;cursor:pointer;-webkit-appearance:none">
+        <option value="">Selecione uma categoria</option>
+        <option>🎨 Design e visual</option>
+        <option>⚡ Funcionalidade</option>
+        <option>🐛 Reportar problema</option>
+        <option>💬 Comunicação e chat</option>
+        <option>💳 Pagamentos e taxas</option>
+        <option>🤖 Teste de IA</option>
+        <option>📋 Pedidos e orçamentos</option>
+        <option>💡 Nova funcionalidade</option>
+        <option>🔒 Segurança e privacidade</option>
+        <option>🌟 Outro</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom:18px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Sua sugestão:</div>
+      <textarea id="sugTexto" placeholder="Descreva sua ideia ou problema. Seja específico — isso nos ajuda a implementar mais rápido!" style="
+        width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);
+        border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;
+        font-size:0.83rem;padding:12px 14px;outline:none;resize:vertical;
+        min-height:100px;line-height:1.6;transition:border-color 0.2s;
+      " oninput="this.style.borderColor='rgba(0,201,111,0.4)'"></textarea>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button onclick="fecharSugestao()" style="flex:1;background:transparent;border:1.5px solid rgba(255,255,255,0.09);border-radius:12px;padding:12px;color:#8A9BB5;font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.2s">Cancelar</button>
+      <button onclick="enviarSugestao()" style="flex:2;background:#00C96F;border:none;border-radius:12px;padding:12px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all 0.2s">💡 Enviar sugestão</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUCESSO SUGESTÃO -->
+<div id="overlaySugSucesso" style="
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:1001;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
+">
+  <div style="background:#132240;border:1px solid rgba(0,201,111,0.25);border-radius:22px;width:100%;max-width:360px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s" id="modalSugSuc">
+    <div style="font-size:3rem;margin-bottom:12px">🙏</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:8px">Sugestão enviada!</div>
+    <div style="color:#8A9BB5;font-size:0.82rem;line-height:1.6;margin-bottom:22px">Obrigado pelo seu feedback! Nossa equipe lê todas as sugestões. As melhores ideias são implementadas em novas versões do app. 🚀</div>
+    <button onclick="fecharSugSucesso()" style="width:100%;background:#00C96F;border:none;border-radius:12px;padding:13px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer">Fechar</button>
+  </div>
+</div>
+
+<style>
+  @keyframes fadeUpBtn { from { opacity:0;transform:translateY(12px); } to { opacity:1;transform:translateY(0); } }
+  #sugestaoBtn:hover { background:#1a2d4a; transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+  .sug-tipo-btn.sel { background:rgba(0,201,111,0.12) !important; border-color:rgba(0,201,111,0.4) !important; color:#00C96F !important; }
+</style>
+
+<script>
+  var sugTipoAtual = '';
+  function abrirSugestao() {
+    document.getElementById('overlaySugestao').style.opacity='1';
+    document.getElementById('overlaySugestao').style.pointerEvents='all';
+    document.getElementById('modalSugestao').style.transform='translateY(0)';
+  }
+  function fecharSugestao() {
+    document.getElementById('overlaySugestao').style.opacity='0';
+    document.getElementById('overlaySugestao').style.pointerEvents='none';
+    document.getElementById('modalSugestao').style.transform='translateY(20px)';
+  }
+  function selTipoSug(btn, tipo) {
+    sugTipoAtual = tipo;
+    document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+  }
+  function enviarSugestao() {
+    var texto = document.getElementById('sugTexto').value.trim();
+    var cat = document.getElementById('sugCategoria').value;
+    if (!texto) { document.getElementById('sugTexto').style.borderColor='rgba(255,92,92,0.5)'; return; }
+    fecharSugestao();
+    setTimeout(function() {
+      document.getElementById('overlaySugSucesso').style.opacity='1';
+      document.getElementById('overlaySugSucesso').style.pointerEvents='all';
+      document.getElementById('modalSugSuc').style.transform='translateY(0)';
+      document.getElementById('sugTexto').value='';
+      document.getElementById('sugCategoria').value='';
+      sugTipoAtual='';
+      document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
+    }, 200);
+  }
+  function fecharSugSucesso() {
+    document.getElementById('overlaySugSucesso').style.opacity='0';
+    document.getElementById('overlaySugSucesso').style.pointerEvents='none';
+    document.getElementById('modalSugSuc').style.transform='translateY(20px)';
+  }
+  document.getElementById('overlaySugestao').addEventListener('click', function(e) { if(e.target===this) fecharSugestao(); });
+  document.getElementById('overlaySugSucesso').addEventListener('click', function(e) { if(e.target===this) fecharSugSucesso(); });
+</script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(e => {});
+  }
+</script>
+
+<!-- BARRA DE NAVEGAÇÃO MOBILE -->
+<nav class="bottom-nav" id="bottomNav">
+  <a href="meus-pedidos-cliente.html" class="bn-item" id="bn-pedidos">
+    <span class="bn-icon">📋</span>
+    <span class="bn-label">Pedidos</span>
+  </a>
+  <a href="publicar-pedido.html" class="bn-item bn-center" id="bn-publicar">
+    <span class="bn-icon-center">＋</span>
+  </a>
+  <a href="notificacoes.html" class="bn-item" id="bn-notif">
+    <span class="bn-icon">🔔</span>
+    <span class="bn-label">Alertas</span>
+    <span class="bn-badge">3</span>
+  </a>
+</nav>
+
+<style>
+  body { padding-bottom: 70px; }
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: #132240; border-top: 1px solid rgba(255,255,255,0.09);
+    display: flex; align-items: center; justify-content: space-around;
+    padding: 8px 16px 12px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .bn-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    text-decoration: none; color: #8A9BB5; font-size: 0.62rem; font-weight: 600;
+    min-width: 50px; transition: color 0.2s; position: relative;
+  }
+  .bn-item.ativo { color: #00C96F; }
+  .bn-icon { font-size: 1.2rem; }
+  .bn-label { font-family: 'DM Sans', sans-serif; }
+  .bn-center {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: #00C96F; color: #0A1628 !important;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: -14px; box-shadow: 0 4px 16px rgba(0,201,111,0.4);
+    font-size: 0; min-width: 0;
+  }
+  .bn-icon-center { font-size: 1.8rem; color: #0A1628; font-weight: 300; line-height: 1; }
+  .bn-badge {
+    position: absolute; top: -2px; right: 2px;
+    background: #FF6B35; color: white; font-size: 0.55rem; font-weight: 800;
+    width: 14px; height: 14px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 1.5px solid #132240;
+  }
+</style>
+
+</body>
+</html>

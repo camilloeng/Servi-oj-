@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiçoJá — Sistema de Cobrança</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --verde: #00C96F; --verde-escuro: #009E57;
+    --azul: #0A1628; --azul-medio: #132240; --azul-input: #0F1C35;
+    --branco: #F5F7F2; --cinza: #8A9BB5;
+    --laranja: #FF6B35; --amarelo: #FFB830;
+    --erro: #FF5C5C; --borda: rgba(255,255,255,0.09);
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--azul); color: var(--branco); min-height: 100vh; }
+  body::before {
+    content: ''; position: fixed; top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,201,111,0.08) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* NAV DEMO */
+  nav {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 28px; border-bottom: 1px solid var(--borda);
+  }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; text-decoration: none; color: var(--branco); }
+  .logo span { color: var(--verde); }
+  .demo-tabs { display: flex; gap: 6px; }
+  .demo-tab {
+    padding: 7px 16px; border-radius: 8px; cursor: pointer;
+    font-size: 0.78rem; font-weight: 600; color: var(--cinza);
+    border: 1px solid var(--borda); background: none; transition: all 0.2s;
+  }
+  .demo-tab:hover { color: var(--branco); border-color: rgba(255,255,255,0.2); }
+  .demo-tab.ativo { background: var(--azul-medio); color: var(--branco); border-color: rgba(255,255,255,0.15); }
+
+  /* TELAS */
+  .tela { display: none; padding: 32px 24px 60px; position: relative; z-index: 5; }
+  .tela.ativa { display: block; animation: fadeUp 0.4s ease both; }
+
+  /* ========== TELA 1: EMAIL ========== */
+  .email-wrap {
+    max-width: 620px; margin: 0 auto;
+  }
+  .email-preview-label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.75rem; color: var(--cinza); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 16px;
+  }
+  .email-preview-label span {
+    flex: 1; height: 1px; background: var(--borda);
+  }
+
+  .email-client {
+    background: #1a1a2e; border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px; overflow: hidden; margin-bottom: 20px;
+  }
+  .email-client-bar {
+    background: rgba(255,255,255,0.04); padding: 12px 18px;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #FF5F57; }
+  .dot-y { background: #FFBD2E; }
+  .dot-g { background: #28CA41; }
+  .email-client-bar span { font-size: 0.78rem; color: var(--cinza); margin-left: 8px; }
+
+  .email-meta {
+    padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 0.8rem;
+  }
+  .email-meta-row { display: flex; gap: 8px; margin-bottom: 4px; }
+  .email-meta-row:last-child { margin-bottom: 0; }
+  .em-label { color: var(--cinza); width: 50px; flex-shrink: 0; }
+  .em-val { color: var(--branco); }
+
+  .email-body { padding: 0; background: #f8f9fa; }
+
+  /* EMAIL HTML INTERNO */
+  .email-html {
+    font-family: 'DM Sans', sans-serif;
+    background: #f8f9fa; color: #1a1a2a;
+    padding: 32px 28px;
+  }
+  .eh-logo {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem;
+    color: #0A1628; margin-bottom: 24px; display: block;
+  }
+  .eh-logo em { color: #00C96F; font-style: normal; }
+
+  .eh-alerta {
+    background: #fff3cd; border-left: 4px solid #FFB830;
+    border-radius: 8px; padding: 14px 16px; margin-bottom: 20px;
+    font-size: 0.85rem; color: #856404;
+  }
+  .eh-alerta strong { display: block; margin-bottom: 3px; font-size: 0.9rem; }
+
+  .eh-titulo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: #0A1628; margin-bottom: 6px; }
+  .eh-sub { font-size: 0.85rem; color: #555; margin-bottom: 22px; line-height: 1.6; }
+
+  .eh-total-box {
+    background: #0A1628; border-radius: 12px; padding: 18px 20px;
+    margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .eh-total-label { font-size: 0.82rem; color: rgba(255,255,255,0.6); margin-bottom: 4px; }
+  .eh-total-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.8rem; color: #00C96F; }
+  .eh-prazo { text-align: right; }
+  .eh-prazo-label { font-size: 0.72rem; color: rgba(255,255,255,0.5); margin-bottom: 3px; }
+  .eh-prazo-val { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; color: #FF6B35; }
+
+  .eh-sec-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.78rem; color: #888; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
+
+  .eh-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 0.82rem; }
+  .eh-table th { background: #0A1628; color: rgba(255,255,255,0.6); font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 10px 12px; text-align: left; }
+  .eh-table th:last-child { text-align: right; }
+  .eh-table td { padding: 11px 12px; border-bottom: 1px solid #eee; color: #333; vertical-align: top; }
+  .eh-table td:last-child { text-align: right; font-weight: 700; color: #0A1628; white-space: nowrap; }
+  .eh-table tr:last-child td { border-bottom: none; }
+  .td-serv { font-weight: 600; color: #0A1628; margin-bottom: 2px; }
+  .td-cli { font-size: 0.75rem; color: #888; }
+  .td-data { font-size: 0.78rem; color: #555; white-space: nowrap; }
+  .eh-table tfoot td { background: #f0f0f0; font-weight: 700; font-size: 0.88rem; color: #0A1628; border-top: 2px solid #ddd; }
+  .eh-table tfoot td:last-child { color: #00C96F; font-size: 1rem; }
+
+  .eh-btn {
+    display: block; background: #00C96F; color: #0A1628;
+    text-decoration: none; text-align: center;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem;
+    border-radius: 12px; padding: 16px; margin-bottom: 16px;
+    cursor: pointer; border: none; width: 100%;
+    transition: background 0.2s;
+  }
+  .eh-btn:hover { background: #009E57; }
+
+  .eh-aviso {
+    background: #fff0f0; border: 1px solid #ffcccc;
+    border-radius: 8px; padding: 12px 14px; font-size: 0.78rem; color: #c0392b; margin-bottom: 20px; line-height: 1.6;
+  }
+  .eh-footer { font-size: 0.72rem; color: #aaa; line-height: 1.6; border-top: 1px solid #eee; padding-top: 16px; }
+
+  /* SMS PREVIEW */
+  .sms-device {
+    max-width: 300px; margin: 0 auto 20px;
+  }
+  .sms-device-frame {
+    background: #1c1c1e; border-radius: 36px; padding: 16px;
+    border: 3px solid #333; position: relative;
+  }
+  .sms-notch {
+    width: 80px; height: 20px; background: #1c1c1e;
+    border-radius: 0 0 12px 12px; margin: 0 auto 12px;
+  }
+  .sms-screen { background: #000; border-radius: 24px; padding: 16px; min-height: 200px; }
+  .sms-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+  }
+  .sms-av { width: 32px; height: 32px; border-radius: 50%; background: #00C96F; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; color: #0A1628; flex-shrink: 0; }
+  .sms-from { font-size: 0.8rem; color: #fff; font-weight: 600; }
+  .sms-time { font-size: 0.68rem; color: #666; margin-left: auto; }
+  .sms-bubble {
+    background: #1c1c1e; border: 1px solid #333;
+    border-radius: 16px 16px 16px 4px; padding: 12px 14px;
+    font-size: 0.8rem; color: #e5e5e5; line-height: 1.6;
+  }
+  .sms-link { color: #00C96F; text-decoration: underline; word-break: break-all; }
+
+  /* ========== TELA 2: PIX ========== */
+  .pix-wrap { max-width: 480px; margin: 0 auto; }
+
+  .pix-card {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 20px; overflow: hidden;
+  }
+
+  .pix-header {
+    background: linear-gradient(135deg, #0A1628, #132240);
+    padding: 24px 28px; border-bottom: 1px solid var(--borda);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .pix-header-left {}
+  .pix-header-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; margin-bottom: 4px; }
+  .pix-header-sub { color: var(--cinza); font-size: 0.78rem; }
+  .pix-logo-badge {
+    background: #32BCAD; border-radius: 8px; padding: 6px 12px;
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.9rem; color: white;
+  }
+
+  .pix-valor-box {
+    padding: 24px 28px; border-bottom: 1px solid var(--borda);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .pv-label { font-size: 0.78rem; color: var(--cinza); margin-bottom: 4px; }
+  .pv-valor { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2rem; color: var(--verde); }
+  .pv-prazo {
+    text-align: right;
+  }
+  .pv-prazo-label { font-size: 0.72rem; color: var(--cinza); margin-bottom: 4px; }
+  .pv-prazo-val { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--laranja); }
+  .pv-countdown {
+    font-size: 0.72rem; color: var(--cinza); margin-top: 3px;
+  }
+  .pv-countdown strong { color: var(--erro); }
+
+  .pix-body { padding: 24px 28px; }
+
+  .pix-qr-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    background: white; border-radius: 16px; padding: 20px;
+    margin-bottom: 20px;
+  }
+  .pix-qr {
+    width: 160px; height: 160px; margin-bottom: 12px;
+    display: grid; grid-template-columns: repeat(10,1fr); gap: 2px;
+  }
+  .qr-cel { border-radius: 1px; }
+  .pix-qr-label { font-size: 0.72rem; color: #888; font-family: 'DM Sans', sans-serif; }
+
+  .pix-codigo-wrap { margin-bottom: 20px; }
+  .pix-codigo-label { font-size: 0.75rem; color: var(--cinza); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .pix-codigo-box {
+    background: var(--azul-input); border: 1.5px solid var(--borda);
+    border-radius: 12px; padding: 12px 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .pix-codigo-text {
+    flex: 1; font-size: 0.72rem; color: var(--cinza);
+    word-break: break-all; line-height: 1.5;
+    font-family: monospace;
+  }
+  .btn-copiar {
+    background: rgba(0,201,111,0.12); border: 1px solid rgba(0,201,111,0.25);
+    color: var(--verde); border-radius: 8px; padding: 7px 12px;
+    font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .btn-copiar:hover { background: rgba(0,201,111,0.2); }
+  .btn-copiar.copiado { background: rgba(0,201,111,0.2); color: var(--verde); }
+
+  .pix-instrucoes {
+    background: var(--azul-input); border: 1px solid var(--borda);
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 20px;
+  }
+  .pix-inst-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.8rem; margin-bottom: 10px; }
+  .pix-inst-step { display: flex; align-items: flex-start; gap: 8px; font-size: 0.78rem; color: var(--cinza); margin-bottom: 7px; line-height: 1.5; }
+  .pix-inst-step:last-child { margin-bottom: 0; }
+  .pix-step-num { width: 18px; height: 18px; border-radius: 50%; background: rgba(0,201,111,0.15); border: 1px solid rgba(0,201,111,0.3); color: var(--verde); font-size: 0.65rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+
+  .pix-detalhes {
+    border-top: 1px solid var(--borda); padding-top: 16px;
+  }
+  .pix-det-title { font-size: 0.75rem; font-weight: 700; color: var(--cinza); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+  .pix-det-item { display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .pix-det-item:last-child { border-bottom: none; }
+  .pix-det-item .nome { color: var(--cinza); }
+  .pix-det-item .taxa { font-weight: 600; }
+
+  .btn-confirmar {
+    width: 100%; background: #32BCAD; border: none; border-radius: 14px;
+    padding: 15px; color: white; font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s;
+    margin-top: 16px; display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-confirmar:hover { background: #28a99b; }
+
+  /* ========== TELA 3: BLOQUEADO ========== */
+  .bloq-wrap {
+    max-width: 460px; margin: 0 auto;
+  }
+  .bloq-card {
+    background: var(--azul-medio); border: 1.5px solid rgba(255,92,92,0.25);
+    border-radius: 20px; overflow: hidden;
+    box-shadow: 0 0 40px rgba(255,92,92,0.08);
+  }
+  .bloq-header {
+    background: linear-gradient(135deg, rgba(255,92,92,0.12), rgba(255,92,92,0.05));
+    padding: 32px 28px; text-align: center; border-bottom: 1px solid rgba(255,92,92,0.15);
+  }
+  .bloq-icon { font-size: 3rem; margin-bottom: 12px; }
+  .bloq-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; color: var(--erro); margin-bottom: 6px; }
+  .bloq-sub { color: var(--cinza); font-size: 0.85rem; line-height: 1.6; }
+
+  .bloq-body { padding: 24px 28px; }
+
+  .bloq-info {
+    background: var(--azul-input); border: 1px solid rgba(255,92,92,0.2);
+    border-radius: 14px; padding: 18px; margin-bottom: 18px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .bloq-info-label { font-size: 0.78rem; color: var(--cinza); margin-bottom: 4px; }
+  .bloq-info-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--erro); }
+  .bloq-info-right { text-align: right; }
+  .bloq-venc-label { font-size: 0.72rem; color: var(--cinza); margin-bottom: 3px; }
+  .bloq-venc-val { font-size: 0.85rem; font-weight: 700; color: var(--laranja); }
+
+  .bloq-detalhes {
+    background: var(--azul-input); border: 1px solid var(--borda);
+    border-radius: 14px; padding: 14px 16px; margin-bottom: 18px;
+  }
+  .bloq-det-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.8rem; color: var(--cinza); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+  .bloq-det-item { display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .bloq-det-item:last-child { border-bottom: none; }
+  .bloq-det-nome { color: var(--cinza); }
+  .bloq-det-val { font-weight: 600; color: var(--branco); }
+
+  .bloq-aviso {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: rgba(255,92,92,0.06); border: 1px solid rgba(255,92,92,0.15);
+    border-radius: 12px; padding: 12px 14px; margin-bottom: 20px;
+    font-size: 0.78rem; color: var(--cinza); line-height: 1.6;
+  }
+
+  .btn-pagar-bloq {
+    width: 100%; background: #32BCAD; border: none; border-radius: 14px;
+    padding: 16px; color: white; font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-bottom: 10px;
+  }
+  .btn-pagar-bloq:hover { background: #28a99b; }
+
+  .btn-contato {
+    width: 100%; background: transparent; border: 1.5px solid var(--borda);
+    border-radius: 14px; padding: 13px; color: var(--cinza);
+    font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.88rem;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-contato:hover { border-color: rgba(255,255,255,0.25); color: var(--branco); }
+
+  /* MODAL PIX PAGO */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(10,22,40,0.92);
+    z-index: 50; display: flex; align-items: center; justify-content: center;
+    padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .overlay.vis { opacity: 1; pointer-events: all; }
+  .modal-pago {
+    background: var(--azul-medio); border: 1px solid rgba(0,201,111,0.25);
+    border-radius: 24px; width: 100%; max-width: 380px;
+    text-align: center; padding: 40px 28px;
+    transform: translateY(20px); transition: transform 0.3s;
+  }
+  .overlay.vis .modal-pago { transform: translateY(0); }
+  .mp-icon { font-size: 3.5rem; margin-bottom: 14px; }
+  .mp-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; margin-bottom: 8px; }
+  .mp-sub { color: var(--cinza); font-size: 0.85rem; line-height: 1.6; margin-bottom: 24px; }
+  .btn-mp { width: 100%; background: var(--verde); border: none; border-radius: 12px; padding: 14px; color: var(--azul); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
+  .btn-mp:hover { background: var(--verde-escuro); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 560px) {
+    .demo-tabs { gap: 4px; }
+    .demo-tab { padding: 6px 10px; font-size: 0.72rem; }
+    nav { padding: 14px 16px; }
+  }
+</style>
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#00C96F">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ServiçoJá">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo">Serviço<span>Já</span></a>
+  <div class="demo-tabs">
+    <button class="demo-tab ativo" onclick="irTela(1, this)">📧 Email</button>
+    <button class="demo-tab" onclick="irTela(2, this)">📱 SMS</button>
+    <button class="demo-tab" onclick="irTela(3, this)">💳 Pagar PIX</button>
+    <button class="demo-tab" onclick="irTela(4, this)">🔒 Bloqueado</button>
+  </div>
+</nav>
+
+<!-- ======= TELA 1: EMAIL ======= -->
+<div class="tela ativa" id="t1">
+  <div class="email-wrap">
+    <div class="email-preview-label"><span></span>📧 Prévia do email enviado ao profissional<span></span></div>
+
+    <div class="email-client">
+      <div class="email-client-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <span>joao.ferreira@email.com</span>
+      </div>
+      <div class="email-meta">
+        <div class="email-meta-row"><span class="em-label">De:</span><span class="em-val">cobrança@servicoja.com.br</span></div>
+        <div class="email-meta-row"><span class="em-label">Para:</span><span class="em-val">joao.ferreira@email.com</span></div>
+        <div class="email-meta-row"><span class="em-label">Assunto:</span><span class="em-val" style="font-weight:600">⚠️ Sua fatura ServiçoJá — R$ 110,00 vence em 3 dias</span></div>
+        <div class="email-meta-row"><span class="em-label">Data:</span><span class="em-val">14 de abril de 2026, 08:00</span></div>
+      </div>
+
+      <div class="email-body">
+        <div class="email-html">
+          <span class="eh-logo">Serviço<em>Já</em></span>
+
+          <div class="eh-alerta">
+            <strong>⚠️ Pagamento pendente — vence em 3 dias</strong>
+            Você tem uma fatura em aberto referente aos serviços aceitos nos últimos 15 dias. Efetue o pagamento até <strong>17/04/2026</strong> para manter seu acesso ativo.
+          </div>
+
+          <div class="eh-titulo">Olá, João! 👋</div>
+          <div class="eh-sub">Confira abaixo o resumo das taxas de serviço acumuladas no período de <strong>01/04/2026</strong> a <strong>14/04/2026</strong>. O pagamento é feito via PIX e deve ser realizado em até 3 dias.</div>
+
+          <div class="eh-total-box">
+            <div>
+              <div class="eh-total-label">Total a pagar</div>
+              <div class="eh-total-val">R$ 110,00</div>
+            </div>
+            <div class="eh-prazo">
+              <div class="eh-prazo-label">Vencimento</div>
+              <div class="eh-prazo-val">17/04/2026</div>
+            </div>
+          </div>
+
+          <div class="eh-sec-title">Detalhamento dos serviços</div>
+          <table class="eh-table">
+            <thead>
+              <tr>
+                <th>Serviço / Cliente</th>
+                <th>Data aceite</th>
+                <th>Taxa</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="td-serv">Disjuntor caiu — preciso urgente</div>
+                  <div class="td-cli">Cliente: Maria Silva</div>
+                </td>
+                <td class="td-data">02/04/2026</td>
+                <td>R$ 35,00</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="td-serv">Instalação de 4 tomadas no escritório</div>
+                  <div class="td-cli">Cliente: Carlos Oliveira</div>
+                </td>
+                <td class="td-data">06/04/2026</td>
+                <td>R$ 25,00</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="td-serv">Troca de quadro elétrico completo</div>
+                  <div class="td-cli">Cliente: Ana Beatriz</div>
+                </td>
+                <td class="td-data">09/04/2026</td>
+                <td>R$ 50,00</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2" style="padding:11px 12px">Total do período</td>
+                <td style="padding:11px 12px">R$ 110,00</td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <button class="eh-btn" onclick="alert('Abre tela de pagamento PIX')">💳 Pagar agora via PIX — R$ 110,00</button>
+
+          <div class="eh-aviso">
+            🔒 <strong>Atenção:</strong> caso o pagamento não seja realizado até <strong>17/04/2026</strong>, seu acesso ao ServiçoJá será bloqueado automaticamente. Após o pagamento confirmado, o acesso é restaurado em minutos.
+          </div>
+
+          <div class="eh-footer">
+            © 2026 ServiçoJá · São Paulo, SP<br>
+            Dúvidas? Entre em contato: suporte@servicoja.com.br<br>
+            Este é um email automático. Não responda diretamente.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= TELA 2: SMS ======= -->
+<div class="tela" id="t2">
+  <div style="max-width:340px;margin:0 auto">
+    <div class="email-preview-label"><span></span>📱 SMS enviado ao profissional<span></span></div>
+
+    <div class="sms-device">
+      <div class="sms-device-frame">
+        <div class="sms-notch"></div>
+        <div class="sms-screen">
+          <div class="sms-header">
+            <div class="sms-av">SJ</div>
+            <div>
+              <div class="sms-from">ServiçoJá</div>
+            </div>
+            <div class="sms-time">08:00</div>
+          </div>
+          <div class="sms-bubble">
+            📋 <strong>ServiçoJá</strong> — Fatura disponível<br><br>
+            Olá João! Sua fatura de <strong>R$ 110,00</strong> referente a 3 serviços aceitos está disponível.<br><br>
+            ⚠️ Vence em <strong>17/04/2026</strong>. Após o prazo, seu acesso será bloqueado.<br><br>
+            💳 Pague via PIX:<br>
+            <span class="sms-link">servicoja.com.br/pagar/abc123</span><br><br>
+            Dúvidas: suporte@servicoja.com.br
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:18px;font-size:0.8rem;color:var(--cinza);line-height:1.7">
+      <p style="font-family:'Syne',sans-serif;font-weight:700;color:var(--branco);margin-bottom:8px">📋 O que o SMS contém:</p>
+      ✅ Nome do remetente (ServiçoJá)<br>
+      ✅ Valor total da fatura<br>
+      ✅ Número de serviços<br>
+      ✅ Data de vencimento<br>
+      ✅ Link direto para pagamento<br>
+      ✅ Aviso de bloqueio caso não pague
+    </div>
+  </div>
+</div>
+
+<!-- ======= TELA 3: PIX ======= -->
+<div class="tela" id="t3">
+  <div class="pix-wrap">
+    <div class="email-preview-label"><span></span>💳 Tela de pagamento via PIX<span></span></div>
+
+    <div class="pix-card">
+      <div class="pix-header">
+        <div class="pix-header-left">
+          <div class="pix-header-title">Pagamento da fatura</div>
+          <div class="pix-header-sub">ServiçoJá · Período 01/04 – 14/04/2026</div>
+        </div>
+        <div class="pix-logo-badge">PIX</div>
+      </div>
+
+      <div class="pix-valor-box">
+        <div>
+          <div class="pv-label">Total a pagar</div>
+          <div class="pv-valor">R$ 110,00</div>
+        </div>
+        <div class="pv-prazo">
+          <div class="pv-prazo-label">Vence em</div>
+          <div class="pv-prazo-val">17/04/2026</div>
+          <div class="pv-countdown">Faltam <strong id="countdown">2 dias 14h</strong></div>
+        </div>
+      </div>
+
+      <div class="pix-body">
+
+        <div class="pix-qr-wrap">
+          <div class="pix-qr" id="qrCode"></div>
+          <div class="pix-qr-label">Escaneie com o app do seu banco</div>
+        </div>
+
+        <div class="pix-codigo-wrap">
+          <div class="pix-codigo-label">Ou copie o código PIX</div>
+          <div class="pix-codigo-box">
+            <div class="pix-codigo-text" id="pixCode">00020126580014br.gov.bcb.pix0136a629532e-7693-4846-b028-f142d87a25665204000053039865802BR5913SERVICOJA LTDA6009SAO PAULO62070503***6304E59D</div>
+            <button class="btn-copiar" id="btnCopiar" onclick="copiarPix()">📋 Copiar</button>
+          </div>
+        </div>
+
+        <div class="pix-instrucoes">
+          <div class="pix-inst-title">Como pagar</div>
+          <div class="pix-inst-step"><div class="pix-step-num">1</div>Abra o app do seu banco e acesse a área PIX</div>
+          <div class="pix-inst-step"><div class="pix-step-num">2</div>Escaneie o QR Code ou cole o código copiado</div>
+          <div class="pix-inst-step"><div class="pix-step-num">3</div>Confirme o valor de R$ 110,00 e finalize</div>
+          <div class="pix-inst-step"><div class="pix-step-num">4</div>Seu acesso é liberado automaticamente em minutos</div>
+        </div>
+
+        <div class="pix-detalhes">
+          <div class="pix-det-title">Composição da fatura</div>
+          <div class="pix-det-item"><span class="nome">Disjuntor — Maria Silva (02/04)</span><span class="taxa">R$ 35,00</span></div>
+          <div class="pix-det-item"><span class="nome">4 tomadas — Carlos Oliveira (06/04)</span><span class="taxa">R$ 25,00</span></div>
+          <div class="pix-det-item"><span class="nome">Quadro elétrico — Ana Beatriz (09/04)</span><span class="taxa">R$ 50,00</span></div>
+        </div>
+
+        <button class="btn-confirmar" onclick="abrirPago()">✅ Já realizei o pagamento</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= TELA 4: BLOQUEADO ======= -->
+<div class="tela" id="t4">
+  <div class="bloq-wrap">
+    <div class="email-preview-label"><span></span>🔒 Tela de acesso bloqueado (login)<span></span></div>
+
+    <div style="background:var(--azul-medio);border:1px solid var(--borda);border-radius:20px;padding:20px 24px;margin-bottom:16px">
+      <div style="font-size:0.8rem;color:var(--cinza);margin-bottom:10px;font-weight:600">📲 Tela de login — ServiçoJá</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="background:var(--azul-input);border:1px solid var(--borda);border-radius:10px;padding:11px 14px;font-size:0.85rem;color:var(--cinza)">joao.ferreira@email.com</div>
+        <div style="background:var(--azul-input);border:1px solid var(--borda);border-radius:10px;padding:11px 14px;font-size:0.85rem;color:var(--cinza)">••••••••</div>
+      </div>
+    </div>
+
+    <div class="bloq-card">
+      <div class="bloq-header">
+        <div class="bloq-icon">🔒</div>
+        <div class="bloq-title">Acesso bloqueado</div>
+        <div class="bloq-sub">Seu acesso está temporariamente bloqueado por fatura em atraso. Realize o pagamento para retomar suas atividades.</div>
+      </div>
+
+      <div class="bloq-body">
+        <div class="bloq-info">
+          <div>
+            <div class="bloq-info-label">Valor em atraso</div>
+            <div class="bloq-info-val">R$ 110,00</div>
+          </div>
+          <div class="bloq-info-right">
+            <div class="bloq-venc-label">Venceu em</div>
+            <div class="bloq-venc-val">17/04/2026</div>
+          </div>
+        </div>
+
+        <div class="bloq-detalhes">
+          <div class="bloq-det-title">Serviços em atraso</div>
+          <div class="bloq-det-item"><span class="bloq-det-nome">Disjuntor — Maria Silva</span><span class="bloq-det-val">R$ 35,00</span></div>
+          <div class="bloq-det-item"><span class="bloq-det-nome">4 tomadas — Carlos Oliveira</span><span class="bloq-det-val">R$ 25,00</span></div>
+          <div class="bloq-det-item"><span class="bloq-det-nome">Quadro elétrico — Ana Beatriz</span><span class="bloq-det-val">R$ 50,00</span></div>
+        </div>
+
+        <div class="bloq-aviso">
+          <span>⚠️</span>
+          <span>Após confirmação do pagamento via PIX, seu acesso é liberado automaticamente em até <strong style="color:var(--branco)">5 minutos</strong>. Nenhuma ação manual é necessária.</span>
+        </div>
+
+        <button class="btn-pagar-bloq" onclick="irTela(3, null)">💳 Pagar agora via PIX</button>
+        <button class="btn-contato">💬 Falar com suporte</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: PAGAMENTO CONFIRMADO -->
+<div class="overlay" id="overlayPago">
+  <div class="modal-pago">
+    <div class="mp-icon">🎉</div>
+    <div class="mp-title">Pagamento confirmado!</div>
+    <div class="mp-sub">Seu pagamento de <strong>R$ 110,00</strong> foi recebido com sucesso. Seu acesso ao ServiçoJá está liberado. Bons negócios!</div>
+    <button class="btn-mp" onclick="fecharOverlay('overlayPago')">Acessar minha conta →</button>
+  </div>
+</div>
+
+<script>
+  // NAVEGAÇÃO ENTRE TELAS
+  function irTela(n, btnEl) {
+    document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+    document.getElementById('t' + n).classList.add('ativa');
+    if (btnEl) {
+      document.querySelectorAll('.demo-tab').forEach(t => t.classList.remove('ativo'));
+      btnEl.classList.add('ativo');
+    } else {
+      document.querySelectorAll('.demo-tab').forEach((t, i) => t.classList.toggle('ativo', i === n - 1));
+    }
+    window.scrollTo(0, 0);
+  }
+
+  // QR CODE GERADO
+  window.onload = function() {
+    const qr = document.getElementById('qrCode');
+    const pattern = [
+      1,1,1,1,1,1,1,0,1,0,
+      1,0,0,0,0,0,1,0,0,1,
+      1,0,1,1,1,0,1,0,1,0,
+      1,0,1,1,1,0,1,0,0,1,
+      1,0,1,1,1,0,1,0,1,1,
+      1,0,0,0,0,0,1,0,0,0,
+      1,1,1,1,1,1,1,0,1,0,
+      0,0,0,0,0,0,0,0,1,1,
+      1,0,1,1,0,1,1,0,0,1,
+      0,1,0,1,0,0,0,0,1,0,
+    ];
+    pattern.forEach(v => {
+      const cel = document.createElement('div');
+      cel.className = 'qr-cel';
+      cel.style.background = v ? '#0A1628' : '#ffffff';
+      qr.appendChild(cel);
+    });
+
+    // Countdown
+    atualizarCountdown();
+    setInterval(atualizarCountdown, 60000);
+  };
+
+  function atualizarCountdown() {
+    const venc = new Date('2026-04-17T23:59:00');
+    const agora = new Date();
+    const diff = venc - agora;
+    if (diff <= 0) { document.getElementById('countdown').textContent = 'Vencido'; return; }
+    const dias = Math.floor(diff / 86400000);
+    const horas = Math.floor((diff % 86400000) / 3600000);
+    document.getElementById('countdown').textContent = `${dias}d ${horas}h`;
+  }
+
+  // COPIAR PIX
+  function copiarPix() {
+    const code = document.getElementById('pixCode').textContent;
+    navigator.clipboard.writeText(code).catch(() => {});
+    const btn = document.getElementById('btnCopiar');
+    btn.textContent = '✅ Copiado!';
+    btn.classList.add('copiado');
+    setTimeout(() => { btn.textContent = '📋 Copiar'; btn.classList.remove('copiado'); }, 2500);
+  }
+
+  // PAGO
+  function abrirPago() { document.getElementById('overlayPago').classList.add('vis'); }
+  function fecharOverlay(id) { document.getElementById(id).classList.remove('vis'); }
+  document.querySelectorAll('.overlay').forEach(ov => {
+    ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('vis'); });
+  });
+</script>
+
+<!-- BOTÃO FLUTUANTE DE SUGESTÃO -->
+<div id="sugestaoBtn" onclick="abrirSugestao()" style="
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  background:#132240;border:1px solid rgba(0,201,111,0.3);
+  border-radius:100px;padding:10px 16px;
+  display:flex;align-items:center;gap:7px;
+  cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.35);
+  transition:all 0.2s;font-family:'DM Sans',sans-serif;
+  animation:fadeUpBtn 0.5s 0.8s ease both;opacity:0;
+">
+  <span style="font-size:1rem">💡</span>
+  <span style="font-size:0.75rem;font-weight:600;color:#00C96F">Sugerir melhoria</span>
+</div>
+
+<!-- MODAL SUGESTÃO -->
+<div id="overlaySugestao" style="
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:1000;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
+">
+  <div id="modalSugestao" style="
+    background:#132240;border:1px solid rgba(255,255,255,0.09);
+    border-radius:22px;width:100%;max-width:440px;padding:28px;
+    transform:translateY(20px);transition:transform 0.3s;
+  ">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:2px">💡 Sugerir melhoria</div>
+        <div style="font-size:0.75rem;color:#8A9BB5">Sua opinião nos ajuda a melhorar o ServiçoJá</div>
+      </div>
+      <button onclick="fecharSugestao()" style="background:rgba(255,255,255,0.06);border:none;border-radius:50%;width:30px;height:30px;color:#8A9BB5;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s">✕</button>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Você é:</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="selTipoSug(this,'cliente')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👤 Cliente</button>
+        <button onclick="selTipoSug(this,'profissional')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👷 Profissional</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Categoria:</div>
+      <select id="sugCategoria" style="width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;font-size:0.83rem;padding:10px 12px;outline:none;cursor:pointer;-webkit-appearance:none">
+        <option value="">Selecione uma categoria</option>
+        <option>🎨 Design e visual</option>
+        <option>⚡ Funcionalidade</option>
+        <option>🐛 Reportar problema</option>
+        <option>💬 Comunicação e chat</option>
+        <option>💳 Pagamentos e taxas</option>
+        <option>🤖 Teste de IA</option>
+        <option>📋 Pedidos e orçamentos</option>
+        <option>💡 Nova funcionalidade</option>
+        <option>🔒 Segurança e privacidade</option>
+        <option>🌟 Outro</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom:18px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Sua sugestão:</div>
+      <textarea id="sugTexto" placeholder="Descreva sua ideia ou problema. Seja específico — isso nos ajuda a implementar mais rápido!" style="
+        width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);
+        border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;
+        font-size:0.83rem;padding:12px 14px;outline:none;resize:vertical;
+        min-height:100px;line-height:1.6;transition:border-color 0.2s;
+      " oninput="this.style.borderColor='rgba(0,201,111,0.4)'"></textarea>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button onclick="fecharSugestao()" style="flex:1;background:transparent;border:1.5px solid rgba(255,255,255,0.09);border-radius:12px;padding:12px;color:#8A9BB5;font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.2s">Cancelar</button>
+      <button onclick="enviarSugestao()" style="flex:2;background:#00C96F;border:none;border-radius:12px;padding:12px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all 0.2s">💡 Enviar sugestão</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUCESSO SUGESTÃO -->
+<div id="overlaySugSucesso" style="
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:1001;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
+">
+  <div style="background:#132240;border:1px solid rgba(0,201,111,0.25);border-radius:22px;width:100%;max-width:360px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s" id="modalSugSuc">
+    <div style="font-size:3rem;margin-bottom:12px">🙏</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:8px">Sugestão enviada!</div>
+    <div style="color:#8A9BB5;font-size:0.82rem;line-height:1.6;margin-bottom:22px">Obrigado pelo seu feedback! Nossa equipe lê todas as sugestões. As melhores ideias são implementadas em novas versões do app. 🚀</div>
+    <button onclick="fecharSugSucesso()" style="width:100%;background:#00C96F;border:none;border-radius:12px;padding:13px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer">Fechar</button>
+  </div>
+</div>
+
+<style>
+  @keyframes fadeUpBtn { from { opacity:0;transform:translateY(12px); } to { opacity:1;transform:translateY(0); } }
+  #sugestaoBtn:hover { background:#1a2d4a; transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+  .sug-tipo-btn.sel { background:rgba(0,201,111,0.12) !important; border-color:rgba(0,201,111,0.4) !important; color:#00C96F !important; }
+</style>
+
+<script>
+  var sugTipoAtual = '';
+  function abrirSugestao() {
+    document.getElementById('overlaySugestao').style.opacity='1';
+    document.getElementById('overlaySugestao').style.pointerEvents='all';
+    document.getElementById('modalSugestao').style.transform='translateY(0)';
+  }
+  function fecharSugestao() {
+    document.getElementById('overlaySugestao').style.opacity='0';
+    document.getElementById('overlaySugestao').style.pointerEvents='none';
+    document.getElementById('modalSugestao').style.transform='translateY(20px)';
+  }
+  function selTipoSug(btn, tipo) {
+    sugTipoAtual = tipo;
+    document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+  }
+  function enviarSugestao() {
+    var texto = document.getElementById('sugTexto').value.trim();
+    var cat = document.getElementById('sugCategoria').value;
+    if (!texto) { document.getElementById('sugTexto').style.borderColor='rgba(255,92,92,0.5)'; return; }
+    fecharSugestao();
+    setTimeout(function() {
+      document.getElementById('overlaySugSucesso').style.opacity='1';
+      document.getElementById('overlaySugSucesso').style.pointerEvents='all';
+      document.getElementById('modalSugSuc').style.transform='translateY(0)';
+      document.getElementById('sugTexto').value='';
+      document.getElementById('sugCategoria').value='';
+      sugTipoAtual='';
+      document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
+    }, 200);
+  }
+  function fecharSugSucesso() {
+    document.getElementById('overlaySugSucesso').style.opacity='0';
+    document.getElementById('overlaySugSucesso').style.pointerEvents='none';
+    document.getElementById('modalSugSuc').style.transform='translateY(20px)';
+  }
+  document.getElementById('overlaySugestao').addEventListener('click', function(e) { if(e.target===this) fecharSugestao(); });
+  document.getElementById('overlaySugSucesso').addEventListener('click', function(e) { if(e.target===this) fecharSugSucesso(); });
+</script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(e => {});
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiçoJá — Dashboard do Profissional</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --verde: #00C96F; --verde-escuro: #009E57;
+    --azul: #0A1628; --azul-medio: #132240; --azul-input: #0F1C35;
+    --branco: #F5F7F2; --cinza: #8A9BB5;
+    --laranja: #FF6B35; --amarelo: #FFB830;
+    --erro: #FF5C5C; --roxo: #7C3AED;
+    --borda: rgba(255,255,255,0.09);
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--azul); color: var(--branco); min-height: 100vh; }
+  body::before {
+    content: ''; position: fixed; top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,201,111,0.08) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 28px; border-bottom: 1px solid var(--borda);
+    background: var(--azul-medio);
+  }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; text-decoration: none; color: var(--branco); }
+  .logo span { color: var(--verde); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .notif-btn {
+    position: relative; background: var(--azul-input); border: 1px solid var(--borda);
+    border-radius: 10px; width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 1rem; transition: border-color 0.2s;
+  }
+  .notif-btn:hover { border-color: rgba(0,201,111,0.3); }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--laranja); border: 2px solid var(--azul-medio); }
+  .nav-prof { display: flex; align-items: center; gap: 9px; cursor: pointer; }
+  .nav-av {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,107,53,0.3), rgba(255,184,48,0.2));
+    border: 2px solid rgba(255,107,53,0.3);
+    display: flex; align-items: center; justify-content: center; font-size: 1rem;
+  }
+  .nav-nome { font-size: 0.85rem; font-weight: 600; }
+  .nav-cat { font-size: 0.7rem; color: var(--cinza); }
+  .nav-status {
+    display: flex; align-items: center; gap: 5px;
+    background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.2);
+    color: var(--verde); font-size: 0.72rem; font-weight: 700;
+    padding: 4px 10px; border-radius: 100px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--verde); animation: pulse 2s infinite; }
+  .nav-status:hover { background: rgba(0,201,111,0.18); }
+
+  /* LAYOUT */
+  .page { position: relative; z-index: 5; max-width: 1100px; margin: 0 auto; padding: 28px 24px 60px; }
+
+  /* PERFIL HEADER */
+  .prof-hero {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 20px; padding: 24px 28px; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    animation: fadeUp 0.4s ease both;
+    position: relative; overflow: hidden;
+  }
+  .prof-hero::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--verde), var(--laranja));
+  }
+
+  .ph-av {
+    width: 72px; height: 72px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, rgba(255,107,53,0.3), rgba(255,184,48,0.2));
+    border: 3px solid rgba(255,107,53,0.3);
+    display: flex; align-items: center; justify-content: center; font-size: 2rem;
+    position: relative;
+  }
+  .ph-online {
+    position: absolute; bottom: 2px; right: 2px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--verde); border: 2px solid var(--azul-medio);
+  }
+
+  .ph-info { flex: 1; min-width: 0; }
+  .ph-nome { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; margin-bottom: 4px; }
+  .ph-cats { color: var(--cinza); font-size: 0.82rem; margin-bottom: 8px; }
+  .ph-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .ph-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 100px;
+  }
+  .pb-verde { background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.25); color: var(--verde); }
+  .pb-amarelo { background: rgba(255,184,48,0.1); border: 1px solid rgba(255,184,48,0.25); color: var(--amarelo); }
+  .pb-roxo { background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.25); color: #a78bfa; }
+
+  .ph-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+  .ph-stat { text-align: center; }
+  .ph-stat-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--verde); }
+  .ph-stat-lbl { font-size: 0.7rem; color: var(--cinza); margin-top: 1px; }
+
+  .ph-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn-editar-perfil {
+    background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.25);
+    color: var(--verde); border-radius: 10px; padding: 9px 16px;
+    font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-editar-perfil:hover { background: rgba(0,201,111,0.2); }
+  .btn-ver-perfil-pub {
+    background: transparent; border: 1px solid var(--borda);
+    color: var(--cinza); border-radius: 10px; padding: 9px 16px;
+    font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-ver-perfil-pub:hover { border-color: rgba(255,255,255,0.2); color: var(--branco); }
+
+  /* GRID PRINCIPAL */
+  .grid-main { display: grid; grid-template-columns: 1fr 320px; gap: 18px; margin-bottom: 18px; }
+
+  /* STATS ROW */
+  .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 18px; animation: fadeUp 0.4s 0.05s ease both; }
+  .stat-card {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 14px; padding: 16px 18px; position: relative; overflow: hidden;
+  }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .sc-verde::before { background: var(--verde); }
+  .sc-laranja::before { background: var(--laranja); }
+  .sc-amarelo::before { background: var(--amarelo); }
+  .sc-roxo::before { background: var(--roxo); }
+  .sc-icon { font-size: 1.2rem; margin-bottom: 8px; }
+  .sc-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem; margin-bottom: 2px; }
+  .sc-num.verde { color: var(--verde); }
+  .sc-num.laranja { color: var(--laranja); }
+  .sc-num.amarelo { color: var(--amarelo); }
+  .sc-num.roxo { color: #a78bfa; }
+  .sc-lbl { font-size: 0.72rem; color: var(--cinza); }
+  .sc-delta { font-size: 0.68rem; margin-top: 4px; }
+  .sc-delta.up { color: var(--verde); }
+
+  /* CARD GENÉRICO */
+  .card {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 16px; overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+  .card-head {
+    padding: 16px 20px; border-bottom: 1px solid var(--borda);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; }
+  .card-sub { font-size: 0.72rem; color: var(--cinza); margin-top: 2px; }
+  .card-link { font-size: 0.75rem; color: var(--verde); cursor: pointer; transition: opacity 0.2s; }
+  .card-link:hover { opacity: 0.7; }
+
+  /* TRABALHOS */
+  .trabalho-item {
+    padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex; align-items: flex-start; gap: 12px; transition: background 0.2s; cursor: pointer;
+  }
+  .trabalho-item:last-child { border-bottom: none; }
+  .trabalho-item:hover { background: rgba(255,255,255,0.02); }
+
+  .trab-status-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 5px;
+  }
+  .dot-verde { background: var(--verde); box-shadow: 0 0 6px rgba(0,201,111,0.5); }
+  .dot-amarelo { background: var(--amarelo); }
+  .dot-cinza { background: var(--cinza); opacity: 0.5; }
+
+  .trab-info { flex: 1; min-width: 0; }
+  .trab-titulo { font-weight: 600; font-size: 0.88rem; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .trab-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .trab-tag { font-size: 0.7rem; color: var(--cinza); display: flex; align-items: center; gap: 3px; }
+
+  .trab-valor { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--verde); white-space: nowrap; }
+
+  .badge-sm {
+    font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 100px;
+  }
+  .bs-verde { background: rgba(0,201,111,0.12); border: 1px solid rgba(0,201,111,0.25); color: var(--verde); }
+  .bs-amarelo { background: rgba(255,184,48,0.1); border: 1px solid rgba(255,184,48,0.25); color: var(--amarelo); }
+  .bs-cinza { background: rgba(138,155,181,0.1); border: 1px solid rgba(138,155,181,0.2); color: var(--cinza); }
+  .bs-laranja { background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.25); color: var(--laranja); }
+
+  /* GRÁFICO */
+  .grafico-wrap { padding: 16px 20px 20px; }
+  .grafico-bars { display: flex; align-items: flex-end; gap: 6px; height: 80px; }
+  .g-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .g-bar { width: 100%; border-radius: 4px 4px 0 0; background: rgba(0,201,111,0.25); transition: background 0.2s; cursor: pointer; }
+  .g-bar:hover { background: var(--verde); }
+  .g-bar.atual { background: var(--verde); }
+  .g-lbl { font-size: 0.6rem; color: var(--cinza); }
+
+  /* AVALIAÇÕES */
+  .aval-resumo {
+    padding: 16px 20px; display: flex; align-items: center; gap: 16px;
+    border-bottom: 1px solid var(--borda);
+  }
+  .aval-nota-big { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.4rem; color: var(--amarelo); line-height: 1; }
+  .aval-stars { color: var(--amarelo); font-size: 1rem; letter-spacing: 2px; }
+  .aval-total { font-size: 0.72rem; color: var(--cinza); margin-top: 3px; }
+  .aval-bars { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .aval-bar-row { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; }
+  .aval-bar-num { color: var(--cinza); width: 8px; text-align: right; }
+  .aval-bar-track { flex: 1; height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+  .aval-bar-fill { height: 100%; background: var(--amarelo); border-radius: 3px; }
+  .aval-bar-pct { color: var(--cinza); width: 28px; text-align: right; }
+
+  .rev-item { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .rev-item:last-child { border-bottom: none; }
+  .rev-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+  .rev-nome { font-weight: 600; font-size: 0.82rem; }
+  .rev-stars { color: var(--amarelo); font-size: 0.75rem; }
+  .rev-serv { font-size: 0.7rem; color: var(--cinza); margin-bottom: 5px; }
+  .rev-txt { font-size: 0.8rem; color: var(--cinza); line-height: 1.6; }
+  .rev-data { font-size: 0.65rem; color: rgba(138,155,181,0.5); margin-top: 4px; }
+
+  /* SIDEBAR DIREITA */
+  .side-col { display: flex; flex-direction: column; gap: 14px; }
+
+  /* PRÓXIMOS TRABALHOS */
+  .agend-item {
+    padding: 12px 18px; border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .agend-item:last-child { border-bottom: none; }
+  .agend-data {
+    background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.2);
+    border-radius: 10px; padding: 6px 10px; text-align: center; flex-shrink: 0;
+    min-width: 46px;
+  }
+  .agend-dia { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--verde); line-height: 1; }
+  .agend-mes { font-size: 0.62rem; color: var(--cinza); text-transform: uppercase; letter-spacing: 0.05em; }
+  .agend-info { flex: 1; min-width: 0; }
+  .agend-titulo { font-weight: 600; font-size: 0.82rem; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .agend-sub { font-size: 0.72rem; color: var(--cinza); }
+  .agend-hora { font-size: 0.7rem; font-weight: 700; color: var(--laranja); margin-top: 3px; }
+
+  /* FATURA */
+  .fatura-box {
+    padding: 16px 18px;
+  }
+  .fat-periodo { font-size: 0.7rem; color: var(--cinza); margin-bottom: 8px; }
+  .fat-total { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem; color: var(--amarelo); margin-bottom: 4px; }
+  .fat-prazo { font-size: 0.72rem; color: var(--cinza); margin-bottom: 12px; }
+  .fat-items { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .fat-item { display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; }
+  .fat-item .fi-nome { color: var(--cinza); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px; }
+  .fat-item .fi-val { font-weight: 700; white-space: nowrap; }
+  .btn-pagar-fat {
+    width: 100%; background: #32BCAD; border: none; border-radius: 10px;
+    padding: 12px; color: white; font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-pagar-fat:hover { background: #28a99b; }
+
+  /* STATUS CONTA */
+  .conta-status { padding: 14px 18px; }
+  .cs-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; }
+  .cs-label { color: var(--cinza); }
+  .cs-val { font-weight: 600; }
+  .cs-val.verde { color: var(--verde); }
+  .cs-val.amarelo { color: var(--amarelo); }
+  .progress-wrap { margin-top: 4px; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--cinza); margin-bottom: 4px; }
+  .progress-bar { height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--verde); border-radius: 3px; }
+
+  .btn-concluir {
+    background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.25);
+    color: var(--verde); border-radius: 8px; padding: 6px 11px;
+    font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; flex-shrink: 0;
+  }
+  .btn-concluir:hover { background: rgba(0,201,111,0.2); }
+
+  /* MODAL CONCLUIR */
+  .overlay { position:fixed;inset:0;background:rgba(10,22,40,0.92);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s; }
+  .overlay.vis { opacity:1;pointer-events:all; }
+  .modal-concluir {
+    background:var(--azul-medio);border:1px solid var(--borda);border-radius:22px;
+    width:100%;max-width:420px;padding:28px;
+    transform:translateY(20px);transition:transform 0.3s;
+  }
+  .overlay.vis .modal-concluir { transform:translateY(0); }
+  .mc-title { font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:4px; }
+  .mc-sub { color:var(--cinza);font-size:0.82rem;line-height:1.5;margin-bottom:20px; }
+  .mc-servico { background:var(--azul-input);border:1px solid var(--borda);border-radius:10px;padding:10px 14px;font-size:0.82rem;color:var(--cinza);margin-bottom:16px; }
+  .mc-servico strong { color:var(--branco);display:block;margin-bottom:2px; }
+  .mc-label { font-size:0.78rem;font-weight:600;color:var(--cinza);margin-bottom:6px;display:block; }
+  .mc-input-wrap { position:relative;display:flex;align-items:center;margin-bottom:6px; }
+  .mc-prefix { position:absolute;left:13px;color:var(--cinza);font-size:0.85rem;font-weight:600;pointer-events:none; }
+  .mc-input {
+    width:100%;background:var(--azul-input);border:1.5px solid var(--borda);border-radius:12px;
+    color:var(--branco);font-family:'DM Sans',sans-serif;font-size:0.95rem;
+    padding:12px 12px 12px 36px;outline:none;transition:border-color 0.2s;
+  }
+  .mc-input:focus { border-color:rgba(0,201,111,0.45); }
+  .mc-input::placeholder { color:rgba(138,155,181,0.4); }
+  .mc-hint { font-size:0.72rem;color:var(--cinza);margin-bottom:18px; }
+  .mc-btns { display:flex;gap:10px; }
+  .mc-btn-cancel { flex:1;background:transparent;border:1.5px solid var(--borda);border-radius:12px;padding:12px;color:var(--cinza);font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.2s; }
+  .mc-btn-cancel:hover { border-color:rgba(255,255,255,0.2);color:var(--branco); }
+  .mc-btn-ok { flex:2;background:var(--verde);border:none;border-radius:12px;padding:12px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;transition:all 0.2s; }
+  .mc-btn-ok:hover { background:var(--verde-escuro); }
+
+  /* MODAL SUC */
+  .modal-suc-c { background:var(--azul-medio);border:1px solid rgba(0,201,111,0.25);border-radius:22px;width:100%;max-width:360px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s; }
+  .overlay.vis .modal-suc-c { transform:translateY(0); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  @media (max-width: 900px) {
+    .grid-main { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2,1fr); }
+  }
+  @media (max-width: 560px) {
+    .page { padding: 16px 14px 40px; }
+    nav { padding: 14px 16px; }
+    .ph-stats { display: none; }
+  }
+</style>
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#00C96F">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ServiçoJá">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo">Serviço<span>Já</span></a>
+  <div class="nav-right">
+    <div class="nav-status"><div class="nav-status-dot"></div> Disponível</div>
+    <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+    <div class="nav-prof">
+      <div class="nav-av">👷</div>
+      <div>
+        <div class="nav-nome">João Ferreira</div>
+        <div class="nav-cat">⚡ Eletricista</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- PERFIL HERO -->
+  <div class="prof-hero">
+    <div class="ph-av">👷<div class="ph-online"></div></div>
+    <div class="ph-info">
+      <div class="ph-nome">João Ferreira</div>
+      <div class="ph-cats">⚡ Eletricista · 🔌 Instalações · ❄️ Ar-condicionado</div>
+      <div class="ph-badges">
+        <span class="ph-badge pb-verde">✅ Aprovado IA · 98%</span>
+        <span class="ph-badge pb-amarelo">⭐ 4.9 · Top Profissional</span>
+        <span class="ph-badge pb-roxo">🏆 47 serviços</span>
+      </div>
+    </div>
+    <div class="ph-stats">
+      
+      <div class="ph-stat"><div class="ph-stat-num">47</div><div class="ph-stat-lbl">Serviços feitos</div></div>
+      <div class="ph-stat"><div class="ph-stat-num">4.9★</div><div class="ph-stat-lbl">Avaliação</div></div>
+      <div class="ph-stat"><div class="ph-stat-num">92%</div><div class="ph-stat-lbl">Taxa de aceite</div></div>
+    </div>
+    <div class="ph-actions">
+      <button class="btn-editar-perfil">✏️ Editar perfil</button>
+      <button class="btn-ver-perfil-pub">👁️ Ver perfil público</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card sc-verde">
+      <div class="sc-icon">💰</div>
+      <div class="sc-num verde">R$ 2.380</div>
+      <div class="sc-lbl">Ganhos este mês</div>
+      <div class="sc-delta up">↑ 24% vs mês anterior</div>
+    </div>
+    <div class="stat-card sc-laranja">
+      <div class="sc-icon">📋</div>
+      <div class="sc-num laranja">8</div>
+      <div class="sc-lbl">Trabalhos este mês</div>
+      <div class="sc-delta up">↑ 2 vs mês anterior</div>
+    </div>
+    <div class="stat-card sc-amarelo">
+      <div class="sc-icon">👁️</div>
+      <div class="sc-num amarelo">34</div>
+      <div class="sc-lbl">Interesses enviados</div>
+      <div class="sc-delta up">Aceitos: 8 · Taxa 24%</div>
+    </div>
+    <div class="stat-card sc-roxo">
+      <div class="sc-icon">⭐</div>
+      <div class="sc-num roxo">4.9</div>
+      <div class="sc-lbl">Avaliação média</div>
+      <div class="sc-delta up">47 avaliações totais</div>
+    </div>
+  </div>
+
+  <!-- GRID PRINCIPAL -->
+  <div class="grid-main">
+
+    <!-- COLUNA ESQUERDA -->
+    <div style="display:flex;flex-direction:column;gap:16px">
+
+      <!-- TRABALHOS ATIVOS -->
+      <div class="card" style="animation-delay:0.1s">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Trabalhos ativos</div>
+            <div class="card-sub">Em andamento e agendados</div>
+          </div>
+          <span class="card-link">Ver todos →</span>
+        </div>
+
+        <div class="trabalho-item">
+          <div class="trab-status-dot dot-verde"></div>
+          <div class="trab-info">
+            <div class="trab-titulo">Disjuntor caiu — Maria Silva</div>
+            <div class="trab-meta">
+              <span class="trab-tag">📍 Moema, SP</span>
+              <span class="trab-tag">📅 Hoje · 15h</span>
+              <span class="badge-sm bs-verde">Em andamento</span>
+            </div>
+          </div>
+          <button class="btn-concluir" onclick="abrirConcluir(this, 'Disjuntor caiu — Maria Silva')">✔ Concluir</button>
+        </div>
+
+        <div class="trabalho-item">
+          <div class="trab-status-dot dot-amarelo"></div>
+          <div class="trab-info">
+            <div class="trab-titulo">4 tomadas no escritório — Carlos Oliveira</div>
+            <div class="trab-meta">
+              <span class="trab-tag">📍 Brooklin, SP</span>
+              <span class="trab-tag">📅 Amanhã · 09h</span>
+              <span class="badge-sm bs-amarelo">Agendado</span>
+            </div>
+          </div>
+          <button class="btn-concluir" onclick="abrirConcluir(this, '4 tomadas — Carlos Oliveira')">✔ Concluir</button>
+        </div>
+
+        <div class="trabalho-item">
+          <div class="trab-status-dot dot-amarelo"></div>
+          <div class="trab-info">
+            <div class="trab-titulo">Instalação ar-condicionado — Ana Beatriz</div>
+            <div class="trab-meta">
+              <span class="trab-tag">📍 Ibirapuera, SP</span>
+              <span class="trab-tag">📅 16/04 · 14h</span>
+              <span class="badge-sm bs-laranja">Confirmado</span>
+            </div>
+          </div>
+          <button class="btn-concluir" onclick="abrirConcluir(this, 'Instalação ar-condicionado — Ana Beatriz')">✔ Concluir</button>
+        </div>
+      </div>
+
+      <!-- HISTÓRICO -->
+      <div class="card" style="animation-delay:0.15s">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Histórico de serviços</div>
+            <div class="card-sub">Últimos trabalhos concluídos</div>
+          </div>
+          <span class="card-link">Ver tudo →</span>
+        </div>
+
+        <div class="trabalho-item">
+          <div class="trab-status-dot dot-cinza"></div>
+          <div class="trab-info">
+            <div class="trab-titulo">Troca de chuveiro — Roberto Santos</div>
+            <div class="trab-meta">
+              <span class="trab-tag">📅 12/04/26</span>
+              <span class="trab-tag">⭐ 5.0</span>
+              <span class="badge-sm bs-cinza">Concluído</span>
+            </div>
+          </div>
+          <span class="badge-sm bs-cinza">✅</span>
+        </div>
+
+        <div class="trabalho-item">
+          <div class="trab-status-dot dot-cinza"></div>
+          <div class="trab-info">
+            <div class="trab-titulo">Quadro elétrico completo — Fernanda Lima</div>
+            <div class="trab-meta">
+              <span class="trab-tag">📅 09/04/26</span>
+              <span class="trab-tag">⭐ 4.8</span>
+              <span class="badge-sm bs-cinza">Concluído</span>
+            </div>
+          </div>
+          <span class="badge-sm bs-cinza">✅</span>
+        </div>
+
+        <div class="trabalho-item">
+          <div class="trab-status-dot dot-cinza"></div>
+          <div class="trab-info">
+            <div class="trab-titulo">6 pontos de iluminação — Pedro Costa</div>
+            <div class="trab-meta">
+              <span class="trab-tag">📅 06/04/26</span>
+              <span class="trab-tag">⭐ 5.0</span>
+              <span class="badge-sm bs-cinza">Concluído</span>
+            </div>
+          </div>
+          <span class="badge-sm bs-cinza">✅</span>
+        </div>
+
+        <div class="trabalho-item">
+          <div class="trab-status-dot dot-cinza"></div>
+          <div class="trab-info">
+            <div class="trab-titulo">Instalação tomadas 220V — Marcos Alves</div>
+            <div class="trab-meta">
+              <span class="trab-tag">📅 03/04/26</span>
+              <span class="trab-tag">⭐ 4.9</span>
+              <span class="badge-sm bs-cinza">Concluído</span>
+            </div>
+          </div>
+          <span class="badge-sm bs-cinza">✅</span>
+        </div>
+      </div>
+
+
+
+      <!-- AVALIAÇÕES -->
+      <div class="card" style="animation-delay:0.25s">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Avaliações recebidas</div>
+            <div class="card-sub">O que os clientes dizem sobre você</div>
+          </div>
+          <span class="card-link">Ver todas →</span>
+        </div>
+
+        <div class="aval-resumo">
+          <div>
+            <div class="aval-nota-big">4.9</div>
+            <div class="aval-stars">★★★★★</div>
+            <div class="aval-total">47 avaliações</div>
+          </div>
+          <div class="aval-bars">
+            <div class="aval-bar-row"><span class="aval-bar-num">5</span><div class="aval-bar-track"><div class="aval-bar-fill" style="width:85%"></div></div><span class="aval-bar-pct">85%</span></div>
+            <div class="aval-bar-row"><span class="aval-bar-num">4</span><div class="aval-bar-track"><div class="aval-bar-fill" style="width:12%"></div></div><span class="aval-bar-pct">12%</span></div>
+            <div class="aval-bar-row"><span class="aval-bar-num">3</span><div class="aval-bar-track"><div class="aval-bar-fill" style="width:3%"></div></div><span class="aval-bar-pct">3%</span></div>
+            <div class="aval-bar-row"><span class="aval-bar-num">2</span><div class="aval-bar-track"><div class="aval-bar-fill" style="width:0%"></div></div><span class="aval-bar-pct">0%</span></div>
+            <div class="aval-bar-row"><span class="aval-bar-num">1</span><div class="aval-bar-track"><div class="aval-bar-fill" style="width:0%"></div></div><span class="aval-bar-pct">0%</span></div>
+          </div>
+        </div>
+
+        <div class="rev-item">
+          <div class="rev-top"><span class="rev-nome">Maria Silva</span><span class="rev-stars">★★★★★</span></div>
+          <div class="rev-serv">⚡ Disjuntor caiu — urgente</div>
+          <div class="rev-txt">Excelente profissional! Chegou no horário marcado, resolveu o problema rápido e ainda verificou o quadro todo. Super recomendo!</div>
+          <div class="rev-data">há 2 dias</div>
+        </div>
+        <div class="rev-item">
+          <div class="rev-top"><span class="rev-nome">Carlos Oliveira</span><span class="rev-stars">★★★★★</span></div>
+          <div class="rev-serv">🔌 4 tomadas no escritório</div>
+          <div class="rev-txt">Trabalho muito bem feito, caprichado e deixou tudo limpo. Profissional de verdade!</div>
+          <div class="rev-data">há 5 dias</div>
+        </div>
+        <div class="rev-item">
+          <div class="rev-top"><span class="rev-nome">Fernanda Lima</span><span class="rev-stars">★★★★☆</span></div>
+          <div class="rev-serv">⚡ Quadro elétrico completo</div>
+          <div class="rev-txt">Ótimo serviço, demorou um pouco mais do previsto mas o resultado ficou perfeito.</div>
+          <div class="rev-data">há 1 semana</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COLUNA DIREITA -->
+    <div class="side-col">
+
+      <!-- PRÓXIMOS AGENDAMENTOS -->
+      <div class="card" style="animation-delay:0.1s">
+        <div class="card-head">
+          <div>
+            <div class="card-title">📅 Agenda</div>
+            <div class="card-sub">Próximos serviços</div>
+          </div>
+        </div>
+        <div class="agend-item">
+          <div class="agend-data"><div class="agend-dia">14</div><div class="agend-mes">Abr</div></div>
+          <div class="agend-info">
+            <div class="agend-titulo">Disjuntor — Maria Silva</div>
+            <div class="agend-sub">📍 Moema · Ap. 72</div>
+            <div class="agend-hora">🕒 15:00 — 17:00</div>
+          </div>
+        </div>
+        <div class="agend-item">
+          <div class="agend-data"><div class="agend-dia">15</div><div class="agend-mes">Abr</div></div>
+          <div class="agend-info">
+            <div class="agend-titulo">4 tomadas — Carlos Oliveira</div>
+            <div class="agend-sub">📍 Brooklin · Sala 32</div>
+            <div class="agend-hora">🕒 09:00 — 12:00</div>
+          </div>
+        </div>
+        <div class="agend-item">
+          <div class="agend-data"><div class="agend-dia">16</div><div class="agend-mes">Abr</div></div>
+          <div class="agend-info">
+            <div class="agend-titulo">Ar-condicionado — Ana Beatriz</div>
+            <div class="agend-sub">📍 Ibirapuera · 8° andar</div>
+            <div class="agend-hora">🕒 14:00 — 17:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FATURA PENDENTE -->
+      <div class="card" style="animation-delay:0.15s;border-color:rgba(255,184,48,0.2)">
+        <div class="card-head" style="border-color:rgba(255,184,48,0.15)">
+          <div>
+            <div class="card-title">💳 Fatura pendente</div>
+            <div class="card-sub">Período 01/04 – 14/04</div>
+          </div>
+          <span class="badge-sm bs-amarelo">⏳ Pendente</span>
+        </div>
+        <div class="fatura-box">
+          <div class="fat-periodo">3 serviços aceitos no período</div>
+          <div class="fat-total">R$ 110,00</div>
+          <div class="fat-prazo">⏰ Vence em <strong style="color:var(--laranja)">17/04/2026</strong> · 3 dias restantes</div>
+          <div class="fat-items">
+            <div class="fat-item"><span class="fi-nome">Disjuntor — Maria Silva</span><span class="fi-val">R$ 35</span></div>
+            <div class="fat-item"><span class="fi-nome">4 tomadas — Carlos Oliveira</span><span class="fi-val">R$ 25</span></div>
+            <div class="fat-item"><span class="fi-nome">Quadro elétrico — Ana B.</span><span class="fi-val">R$ 50</span></div>
+          </div>
+          <button class="btn-pagar-fat" onclick="alert('Abre tela de pagamento PIX')">💳 Pagar agora · R$ 110,00</button>
+        </div>
+      </div>
+
+      <!-- STATUS DA CONTA -->
+      <div class="card" style="animation-delay:0.2s">
+        <div class="card-head">
+          <div><div class="card-title">🛡️ Status da conta</div></div>
+        </div>
+        <div class="conta-status">
+          <div class="cs-row"><span class="cs-label">Situação</span><span class="cs-val verde">✅ Ativo</span></div>
+          <div class="cs-row"><span class="cs-label">Teste IA</span><span class="cs-val verde">✅ Aprovado · 98%</span></div>
+          <div class="cs-row"><span class="cs-label">Pagamentos</span><span class="cs-val verde">✅ Em dia</span></div>
+          <div class="cs-row"><span class="cs-label">Cadastro</span><span class="cs-val verde">✅ Completo</span></div>
+          <div class="progress-wrap" style="margin-top:10px">
+            <div class="progress-label"><span>Perfil completo</span><span style="color:var(--verde)">90%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:90%"></div></div>
+          </div>
+          <div style="font-size:0.72rem;color:var(--cinza);margin-top:6px">💡 Adicione mais fotos ao portfólio para chegar a 100%</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+  // MODAL CONCLUIR
+  let btnConcluirAtual = null;
+  function abrirConcluir(btn, nome) {
+    btnConcluirAtual = btn;
+    document.getElementById('mcServicoNome').textContent = nome;
+    document.getElementById('mcValor').value = '';
+    document.getElementById('overlayConcluir').classList.add('vis');
+  }
+  function fecharConcluir() { document.getElementById('overlayConcluir').classList.remove('vis'); }
+  function confirmarConcluir() {
+    fecharConcluir();
+    if (btnConcluirAtual) {
+      const item = btnConcluirAtual.closest('.trabalho-item');
+      if (item) {
+        const dot = item.querySelector('.trab-status-dot');
+        if (dot) { dot.className = 'trab-status-dot dot-cinza'; }
+        const badge = item.querySelector('.badge-sm');
+        if (badge) { badge.className = 'badge-sm bs-cinza'; badge.textContent = 'Concluído'; }
+        btnConcluirAtual.style.display = 'none';
+      }
+    }
+    setTimeout(() => document.getElementById('overlaySucConcluir').classList.add('vis'), 200);
+  }
+  function fecharSucConcluir() { document.getElementById('overlaySucConcluir').classList.remove('vis'); }
+  document.addEventListener('click', e => {
+    ['overlayConcluir','overlaySucConcluir'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && e.target === el) el.classList.remove('vis');
+    });
+  });
+
+  // GRÁFICO (removido)
+  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun'];
+  const valores = [980, 1420, 1850, 2380, 0, 0];
+  const max = Math.max(...valores.filter(v=>v>0));
+  const container = document.getElementById('graficoBars');
+  meses.forEach((m, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'g-bar-wrap';
+    const bar = document.createElement('div');
+    bar.className = 'g-bar' + (i === 3 ? ' atual' : '');
+    bar.style.height = valores[i] > 0 ? Math.max((valores[i]/max)*72, 5)+'px' : '5px';
+    if (valores[i] === 0) bar.style.opacity = '0.2';
+    bar.title = valores[i] > 0 ? `R$ ${valores[i].toLocaleString('pt-BR')}` : 'Sem dados';
+    const lbl = document.createElement('div');
+    lbl.className = 'g-lbl';
+    lbl.textContent = m;
+    wrap.appendChild(bar);
+    wrap.appendChild(lbl);
+    container.appendChild(wrap);
+  });
+</script>
+
+<!-- MODAL: CONCLUIR SERVIÇO -->
+<div class="overlay" id="overlayConcluir">
+  <div class="modal-concluir">
+    <div class="mc-title">✅ Marcar como concluído</div>
+    <div class="mc-sub">Informe o valor combinado com o cliente para registrar e fechar o serviço.</div>
+    <div class="mc-servico">
+      <strong id="mcServicoNome">Disjuntor caiu — Maria Silva</strong>
+      O valor ficará registrado no histórico e alimentará as estatísticas da plataforma.
+    </div>
+    <label class="mc-label">Valor fechado com o cliente <span style="font-weight:400;color:rgba(138,155,181,0.5)">(opcional)</span></label>
+    <div class="mc-input-wrap">
+      <span class="mc-prefix">R$</span>
+      <input class="mc-input" type="number" id="mcValor" placeholder="0,00" min="0">
+    </div>
+    <div class="mc-hint">💡 Se preferir não informar, deixe em branco. O registro será feito sem valor.</div>
+    <div class="mc-btns">
+      <button class="mc-btn-cancel" onclick="fecharConcluir()">Cancelar</button>
+      <button class="mc-btn-ok" onclick="confirmarConcluir()">✅ Confirmar conclusão</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUCESSO CONCLUSÃO -->
+<div class="overlay" id="overlaySucConcluir">
+  <div class="modal-suc-c">
+    <div style="font-size:3rem;margin-bottom:12px">🎉</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:8px">Serviço concluído!</div>
+    <div style="color:var(--cinza);font-size:0.83rem;line-height:1.6;margin-bottom:22px">O cliente será notificado para avaliar o serviço. Parabéns pelo trabalho! 🚀</div>
+    <button onclick="fecharSucConcluir()" style="width:100%;background:var(--verde);border:none;border-radius:12px;padding:13px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer">Fechar</button>
+  </div>
+</div>
+
+
+<!-- BOTÃO FLUTUANTE DE SUGESTÃO -->
+<div id="sugestaoBtn" onclick="abrirSugestao()" style="
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  background:#132240;border:1px solid rgba(0,201,111,0.3);
+  border-radius:100px;padding:10px 16px;
+  display:flex;align-items:center;gap:7px;
+  cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.35);
+  transition:all 0.2s;font-family:'DM Sans',sans-serif;
+  animation:fadeUpBtn 0.5s 0.8s ease both;opacity:0;
+">
+  <span style="font-size:1rem">💡</span>
+  <span style="font-size:0.75rem;font-weight:600;color:#00C96F">Sugerir melhoria</span>
+</div>
+
+<!-- MODAL SUGESTÃO -->
+<div id="overlaySugestao" style="
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:1000;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
+">
+  <div id="modalSugestao" style="
+    background:#132240;border:1px solid rgba(255,255,255,0.09);
+    border-radius:22px;width:100%;max-width:440px;padding:28px;
+    transform:translateY(20px);transition:transform 0.3s;
+  ">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:2px">💡 Sugerir melhoria</div>
+        <div style="font-size:0.75rem;color:#8A9BB5">Sua opinião nos ajuda a melhorar o ServiçoJá</div>
+      </div>
+      <button onclick="fecharSugestao()" style="background:rgba(255,255,255,0.06);border:none;border-radius:50%;width:30px;height:30px;color:#8A9BB5;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s">✕</button>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Você é:</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="selTipoSug(this,'cliente')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👤 Cliente</button>
+        <button onclick="selTipoSug(this,'profissional')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👷 Profissional</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Categoria:</div>
+      <select id="sugCategoria" style="width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;font-size:0.83rem;padding:10px 12px;outline:none;cursor:pointer;-webkit-appearance:none">
+        <option value="">Selecione uma categoria</option>
+        <option>🎨 Design e visual</option>
+        <option>⚡ Funcionalidade</option>
+        <option>🐛 Reportar problema</option>
+        <option>💬 Comunicação e chat</option>
+        <option>💳 Pagamentos e taxas</option>
+        <option>🤖 Teste de IA</option>
+        <option>📋 Pedidos e orçamentos</option>
+        <option>💡 Nova funcionalidade</option>
+        <option>🔒 Segurança e privacidade</option>
+        <option>🌟 Outro</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom:18px">
+      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Sua sugestão:</div>
+      <textarea id="sugTexto" placeholder="Descreva sua ideia ou problema. Seja específico — isso nos ajuda a implementar mais rápido!" style="
+        width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);
+        border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;
+        font-size:0.83rem;padding:12px 14px;outline:none;resize:vertical;
+        min-height:100px;line-height:1.6;transition:border-color 0.2s;
+      " oninput="this.style.borderColor='rgba(0,201,111,0.4)'"></textarea>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button onclick="fecharSugestao()" style="flex:1;background:transparent;border:1.5px solid rgba(255,255,255,0.09);border-radius:12px;padding:12px;color:#8A9BB5;font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.2s">Cancelar</button>
+      <button onclick="enviarSugestao()" style="flex:2;background:#00C96F;border:none;border-radius:12px;padding:12px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all 0.2s">💡 Enviar sugestão</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUCESSO SUGESTÃO -->
+<div id="overlaySugSucesso" style="
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:1001;display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
+">
+  <div style="background:#132240;border:1px solid rgba(0,201,111,0.25);border-radius:22px;width:100%;max-width:360px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s" id="modalSugSuc">
+    <div style="font-size:3rem;margin-bottom:12px">🙏</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:8px">Sugestão enviada!</div>
+    <div style="color:#8A9BB5;font-size:0.82rem;line-height:1.6;margin-bottom:22px">Obrigado pelo seu feedback! Nossa equipe lê todas as sugestões. As melhores ideias são implementadas em novas versões do app. 🚀</div>
+    <button onclick="fecharSugSucesso()" style="width:100%;background:#00C96F;border:none;border-radius:12px;padding:13px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer">Fechar</button>
+  </div>
+</div>
+
+<style>
+  @keyframes fadeUpBtn { from { opacity:0;transform:translateY(12px); } to { opacity:1;transform:translateY(0); } }
+  #sugestaoBtn:hover { background:#1a2d4a; transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+  .sug-tipo-btn.sel { background:rgba(0,201,111,0.12) !important; border-color:rgba(0,201,111,0.4) !important; color:#00C96F !important; }
+</style>
+
+<script>
+  var sugTipoAtual = '';
+  function abrirSugestao() {
+    document.getElementById('overlaySugestao').style.opacity='1';
+    document.getElementById('overlaySugestao').style.pointerEvents='all';
+    document.getElementById('modalSugestao').style.transform='translateY(0)';
+  }
+  function fecharSugestao() {
+    document.getElementById('overlaySugestao').style.opacity='0';
+    document.getElementById('overlaySugestao').style.pointerEvents='none';
+    document.getElementById('modalSugestao').style.transform='translateY(20px)';
+  }
+  function selTipoSug(btn, tipo) {
+    sugTipoAtual = tipo;
+    document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+  }
+  function enviarSugestao() {
+    var texto = document.getElementById('sugTexto').value.trim();
+    var cat = document.getElementById('sugCategoria').value;
+    if (!texto) { document.getElementById('sugTexto').style.borderColor='rgba(255,92,92,0.5)'; return; }
+    fecharSugestao();
+    setTimeout(function() {
+      document.getElementById('overlaySugSucesso').style.opacity='1';
+      document.getElementById('overlaySugSucesso').style.pointerEvents='all';
+      document.getElementById('modalSugSuc').style.transform='translateY(0)';
+      document.getElementById('sugTexto').value='';
+      document.getElementById('sugCategoria').value='';
+      sugTipoAtual='';
+      document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
+    }, 200);
+  }
+  function fecharSugSucesso() {
+    document.getElementById('overlaySugSucesso').style.opacity='0';
+    document.getElementById('overlaySugSucesso').style.pointerEvents='none';
+    document.getElementById('modalSugSuc').style.transform='translateY(20px)';
+  }
+  document.getElementById('overlaySugestao').addEventListener('click', function(e) { if(e.target===this) fecharSugestao(); });
+  document.getElementById('overlaySugSucesso').addEventListener('click', function(e) { if(e.target===this) fecharSugSucesso(); });
+</script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(e => {});
+  }
+</script>
+
+<!-- BARRA DE NAVEGAÇÃO MOBILE -->
+<nav class="bottom-nav" id="bottomNav">
+  <a href="meus-pedidos-cliente.html" class="bn-item" id="bn-pedidos">
+    <span class="bn-icon">📋</span>
+    <span class="bn-label">Pedidos</span>
+  </a>
+  <a href="publicar-pedido.html" class="bn-item bn-center" id="bn-publicar">
+    <span class="bn-icon-center">＋</span>
+  </a>
+  <a href="notificacoes.html" class="bn-item" id="bn-notif">
+    <span class="bn-icon">🔔</span>
+    <span class="bn-label">Alertas</span>
+    <span class="bn-badge">3</span>
+  </a>
+</nav>
+
+<style>
+  body { padding-bottom: 70px; }
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: #132240; border-top: 1px solid rgba(255,255,255,0.09);
+    display: flex; align-items: center; justify-content: space-around;
+    padding: 8px 16px 12px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .bn-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    text-decoration: none; color: #8A9BB5; font-size: 0.62rem; font-weight: 600;
+    min-width: 50px; transition: color 0.2s; position: relative;
+  }
+  .bn-item.ativo { color: #00C96F; }
+  .bn-icon { font-size: 1.2rem; }
+  .bn-label { font-family: 'DM Sans', sans-serif; }
+  .bn-center {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: #00C96F; color: #0A1628 !important;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: -14px; box-shadow: 0 4px 16px rgba(0,201,111,0.4);
+    font-size: 0; min-width: 0;
+  }
+  .bn-icon-center { font-size: 1.8rem; color: #0A1628; font-weight: 300; line-height: 1; }
+  .bn-badge {
+    position: absolute; top: -2px; right: 2px;
+    background: #FF6B35; color: white; font-size: 0.55rem; font-weight: 800;
+    width: 14px; height: 14px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 1.5px solid #132240;
+  }
+</style>
+
+</body>
+</html>

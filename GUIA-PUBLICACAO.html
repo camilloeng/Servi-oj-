@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiçoJá — Guia de Publicação</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --verde: #00C96F; --azul: #0A1628; --azul-medio: #132240; --branco: #F5F7F2; --cinza: #8A9BB5; --laranja: #FF6B35; --borda: rgba(255,255,255,0.09); }
+  body { font-family: 'DM Sans', sans-serif; background: var(--azul); color: var(--branco); min-height: 100vh; padding: 40px 24px 60px; }
+  body::before { content: ''; position: fixed; top: -200px; right: -200px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(0,201,111,0.08) 0%, transparent 70%); pointer-events: none; }
+
+  .wrap { max-width: 760px; margin: 0 auto; position: relative; z-index: 1; }
+
+  .header { text-align: center; margin-bottom: 40px; }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem; margin-bottom: 8px; }
+  .logo span { color: var(--verde); }
+  .header h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2rem; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .header p { color: var(--cinza); font-size: 0.95rem; line-height: 1.6; }
+
+  .etapa {
+    background: var(--azul-medio); border: 1px solid var(--borda);
+    border-radius: 18px; padding: 24px 28px; margin-bottom: 16px;
+    position: relative; overflow: hidden;
+  }
+  .etapa::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--verde); }
+
+  .etapa-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; border-radius: 10px;
+    background: rgba(0,201,111,0.15); border: 1px solid rgba(0,201,111,0.25);
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.85rem;
+    color: var(--verde); margin-bottom: 10px;
+  }
+  .etapa h2 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem; margin-bottom: 6px; }
+  .etapa p, .etapa li { font-size: 0.85rem; color: var(--cinza); line-height: 1.75; }
+  .etapa ul, .etapa ol { padding-left: 18px; }
+  .etapa li { margin-bottom: 4px; }
+  .etapa strong { color: var(--branco); }
+
+  .link-box {
+    background: rgba(0,201,111,0.07); border: 1px solid rgba(0,201,111,0.2);
+    border-radius: 10px; padding: 10px 14px; margin: 10px 0;
+    font-size: 0.82rem; display: flex; align-items: center; gap: 8px;
+  }
+  .link-box a { color: var(--verde); text-decoration: none; font-weight: 600; }
+  .link-box a:hover { text-decoration: underline; }
+
+  .aviso {
+    background: rgba(255,107,53,0.07); border: 1px solid rgba(255,107,53,0.2);
+    border-radius: 10px; padding: 12px 14px; margin: 10px 0;
+    font-size: 0.82rem; color: var(--cinza); line-height: 1.6;
+  }
+  .aviso strong { color: var(--laranja); }
+
+  .gratis-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.2);
+    color: var(--verde); font-size: 0.7rem; font-weight: 700;
+    padding: 2px 8px; border-radius: 100px; margin-left: 6px;
+  }
+
+  .code-box {
+    background: #0F1C35; border: 1px solid var(--borda);
+    border-radius: 10px; padding: 12px 14px; margin: 8px 0;
+    font-family: monospace; font-size: 0.82rem; color: var(--verde);
+    word-break: break-all;
+  }
+
+  .resultado {
+    background: linear-gradient(135deg, rgba(0,201,111,0.08), rgba(0,201,111,0.03));
+    border: 1px solid rgba(0,201,111,0.2);
+    border-radius: 18px; padding: 24px 28px; margin-top: 24px; text-align: center;
+  }
+  .resultado h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 8px; }
+  .resultado p { color: var(--cinza); font-size: 0.85rem; line-height: 1.6; }
+
+  .checklist { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; text-align: left; }
+  .check-item { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--cinza); }
+  .check-item input[type=checkbox] { accent-color: var(--verde); width: 15px; height: 15px; cursor: pointer; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="logo">Serviço<span>Já</span></div>
+    <h1>🚀 Guia de Publicação do PWA</h1>
+    <p>Siga os passos abaixo para colocar o ServiçoJá no ar <strong style="color:var(--verde)">de graça</strong> em menos de 30 minutos.</p>
+  </div>
+
+  <!-- ETAPA 1 -->
+  <div class="etapa">
+    <div class="etapa-num">1</div>
+    <h2>Criar conta no GitHub <span class="gratis-badge">✅ Grátis</span></h2>
+    <p>O GitHub é onde você vai guardar todos os arquivos do app de graça.</p>
+    <div class="link-box">🔗 <a href="https://github.com" target="_blank">github.com</a> — Clique em "Sign up" e crie sua conta</div>
+    <ol style="margin-top:8px">
+      <li>Acesse <strong>github.com</strong> e clique em <strong>Sign up</strong></li>
+      <li>Crie sua conta com seu email</li>
+      <li>Clique em <strong>New repository</strong></li>
+      <li>Nome: <strong>servicoja</strong></li>
+      <li>Marque como <strong>Public</strong></li>
+      <li>Clique em <strong>Create repository</strong></li>
+    </ol>
+  </div>
+
+  <!-- ETAPA 2 -->
+  <div class="etapa">
+    <div class="etapa-num">2</div>
+    <h2>Fazer upload dos arquivos</h2>
+    <p>Envie todos os arquivos HTML do ServiçoJá para o repositório.</p>
+    <ol style="margin-top:8px">
+      <li>No seu repositório, clique em <strong>uploading an existing file</strong></li>
+      <li>Arraste <strong>todos os arquivos .html, manifest.json, sw.js e icon.svg</strong> de uma vez</li>
+      <li>Role a página, escreva <strong>"Primeiro upload"</strong> no campo de mensagem</li>
+      <li>Clique em <strong>Commit changes</strong></li>
+    </ol>
+    <div class="aviso">⚠️ <strong>Importante:</strong> certifique-se que o arquivo <strong>index.html</strong> está incluído — ele é a porta de entrada do app.</div>
+  </div>
+
+  <!-- ETAPA 3 -->
+  <div class="etapa">
+    <div class="etapa-num">3</div>
+    <h2>Publicar no Netlify <span class="gratis-badge">✅ Grátis</span></h2>
+    <p>O Netlify pega seus arquivos do GitHub e coloca no ar com link público.</p>
+    <div class="link-box">🔗 <a href="https://netlify.com" target="_blank">netlify.com</a> — Clique em "Sign up with GitHub"</div>
+    <ol style="margin-top:8px">
+      <li>Acesse <strong>netlify.com</strong> e faça login com sua conta GitHub</li>
+      <li>Clique em <strong>Add new site → Import an existing project</strong></li>
+      <li>Escolha <strong>GitHub</strong> e selecione o repositório <strong>servicoja</strong></li>
+      <li>Deixe tudo como está e clique em <strong>Deploy site</strong></li>
+      <li>Aguarde 1 minuto — seu app vai ganhar um link como:</li>
+    </ol>
+    <div class="code-box">https://servicoja-seu-nome.netlify.app</div>
+    <p style="margin-top:8px">Você pode personalizar o nome do link em <strong>Site settings → Change site name</strong> para algo como <strong>servicoja-sp.netlify.app</strong></p>
+  </div>
+
+  <!-- ETAPA 4 -->
+  <div class="etapa">
+    <div class="etapa-num">4</div>
+    <h2>Configurar recebimento de cadastros por email <span class="gratis-badge">✅ Grátis</span></h2>
+    <p>Use o <strong>Formspree</strong> para receber os cadastros de clientes e profissionais diretamente no seu email.</p>
+    <div class="link-box">🔗 <a href="https://formspree.io" target="_blank">formspree.io</a> — Crie uma conta gratuita</div>
+    <ol style="margin-top:8px">
+      <li>Acesse <strong>formspree.io</strong> e crie sua conta</li>
+      <li>Clique em <strong>New Form</strong></li>
+      <li>Crie dois formulários: <strong>"Cadastro Cliente"</strong> e <strong>"Cadastro Profissional"</strong></li>
+      <li>Copie o código de cada formulário — será algo como:</li>
+    </ol>
+    <div class="code-box">https://formspree.io/f/SEU-CODIGO-AQUI</div>
+    <ol start="5" style="margin-top:8px">
+      <li>Nos arquivos <strong>cadastro-cliente.html</strong> e <strong>cadastro-profissional.html</strong>, adicione esse link no botão de finalizar cadastro</li>
+    </ol>
+    <div class="aviso">💡 <strong>Plano gratuito:</strong> 50 envios por mês. Suficiente para validar os primeiros usuários!</div>
+  </div>
+
+  <!-- ETAPA 5 -->
+  <div class="etapa">
+    <div class="etapa-num">5</div>
+    <h2>Configurar Google Planilhas para gerenciar pedidos <span class="gratis-badge">✅ Grátis</span></h2>
+    <p>Enquanto o app não tem backend real, você gerencia os pedidos numa planilha simples.</p>
+    <ol style="margin-top:8px">
+      <li>Acesse <strong>sheets.google.com</strong> e crie uma nova planilha</li>
+      <li>Crie 3 abas: <strong>Clientes, Profissionais, Pedidos</strong></li>
+      <li>Cada cadastro que chegar por email você adiciona na planilha</li>
+      <li>Quando um profissional demonstrar interesse, você conecta os dois pelo <strong>WhatsApp</strong></li>
+    </ol>
+    <div class="link-box">📱 <strong>Dica:</strong> Crie um número de WhatsApp Business exclusivo do ServiçoJá para fazer as conexões de forma profissional.</div>
+  </div>
+
+  <!-- ETAPA 6 -->
+  <div class="etapa">
+    <div class="etapa-num">6</div>
+    <h2>Divulgar e captar os primeiros usuários</h2>
+    <p>Com o app no ar, comece a divulgar para validar o negócio:</p>
+    <ul style="margin-top:8px">
+      <li>Poste o link nos <strong>grupos de WhatsApp</strong> de bairros de São Paulo</li>
+      <li>Crie uma página no <strong>Instagram</strong> para o ServiçoJá</li>
+      <li>Ofereça <strong>gratuidade total</strong> nos primeiros meses para atrair profissionais</li>
+      <li>Peça para amigos e familiares testarem e darem feedback</li>
+      <li>Poste em grupos de <strong>Facebook de bairros</strong> da sua cidade</li>
+    </ul>
+    <div class="aviso">🎯 <strong>Meta inicial:</strong> 20 profissionais cadastrados e 10 pedidos realizados. Com isso você prova que o modelo funciona!</div>
+  </div>
+
+  <!-- ETAPA 7 -->
+  <div class="etapa">
+    <div class="etapa-num">7</div>
+    <h2>Instalar o app no celular</h2>
+    <p>O PWA permite que qualquer pessoa instale o app no celular sem precisar da App Store:</p>
+    <ul style="margin-top:8px">
+      <li><strong>Android (Chrome):</strong> Acesse o link, aparece um banner "Instalar ServiçoJá" — toque em Instalar</li>
+      <li><strong>iPhone (Safari):</strong> Toque no botão de compartilhar ⬆️ → "Adicionar à Tela de Início"</li>
+    </ul>
+    <p style="margin-top:8px">O ícone do ServiçoJá aparece na tela inicial como um app normal! 📱</p>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="resultado">
+    <div style="font-size:2.5rem;margin-bottom:12px">🎉</div>
+    <h2>Tudo pronto para o lançamento!</h2>
+    <p>Com esses 7 passos você tem o ServiçoJá no ar, funcionando, instalável no celular e recebendo cadastros — <strong style="color:var(--verde)">sem gastar nada</strong>.</p>
+    <br>
+    <p>Quando validar o modelo com os primeiros usuários, você terá provas concretas para buscar investimento ou pagar pelo desenvolvimento completo.</p>
+
+    <div class="checklist">
+      <div class="check-item"><input type="checkbox"> Conta no GitHub criada</div>
+      <div class="check-item"><input type="checkbox"> Arquivos enviados para o repositório</div>
+      <div class="check-item"><input type="checkbox"> Site publicado no Netlify</div>
+      <div class="check-item"><input type="checkbox"> Formulários do Formspree configurados</div>
+      <div class="check-item"><input type="checkbox"> Planilha de gerenciamento criada</div>
+      <div class="check-item"><input type="checkbox"> WhatsApp Business criado</div>
+      <div class="check-item"><input type="checkbox"> App instalado no celular</div>
+      <div class="check-item"><input type="checkbox"> Divulgação iniciada</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
