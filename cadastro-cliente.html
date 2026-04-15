@@ -679,9 +679,24 @@
 
 
 <script type="module">
-import { cadastrarUsuario } from './firebase.js';
+// Firebase direto via CDN
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Botão finalizar cadastro
+const firebaseConfig = {
+  apiKey: "AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
+  authDomain: "servicoja-e1f49.firebaseapp.com",
+  projectId: "servicoja-e1f49",
+  storageBucket: "servicoja-e1f49.firebasestorage.app",
+  messagingSenderId: "874413426529",
+  appId: "1:874413426529:web:9891d44afd9ef1750e6720"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
 document.querySelector('.btn-cadastrar').addEventListener('click', async () => {
   const nome = document.querySelector('input[placeholder="Ex: Maria Silva"]').value.trim();
   const email = document.querySelector('input[type="email"]').value.trim();
@@ -691,7 +706,6 @@ document.querySelector('.btn-cadastrar').addEventListener('click', async () => {
   const bairro = document.getElementById('bairro').value.trim();
   const cidade = document.getElementById('cidade').value.trim();
   const estado = document.getElementById('estado').value;
-  const num = document.querySelectorAll('input[type="text"]')[1]?.value.trim();
 
   if (!nome || !email || !senha || !tel) {
     alert('Preencha nome, email, telefone e senha!'); return;
@@ -701,26 +715,32 @@ document.querySelector('.btn-cadastrar').addEventListener('click', async () => {
   }
 
   const btn = document.querySelector('.btn-cadastrar');
+  const textoOriginal = btn.textContent;
   btn.textContent = 'Criando conta...';
   btn.style.opacity = '0.7';
   btn.disabled = true;
 
   try {
-    await cadastrarUsuario(email, senha, {
-      nome, telefone: tel, tipo: 'cliente',
-      endereco: { rua, numero: num, bairro, cidade, estado }
+    const cred = await createUserWithEmailAndPassword(auth, email, senha);
+    await setDoc(doc(db, "usuarios", cred.user.uid), {
+      nome, email, telefone: tel, tipo: 'cliente',
+      endereco: { rua, bairro, cidade, estado },
+      criadoEm: serverTimestamp()
     });
     localStorage.setItem('sj_tipo', 'cliente');
+    localStorage.setItem('sj_uid', cred.user.uid);
     localStorage.setItem('sj_nome', nome);
-    alert('✅ Conta criada com sucesso! Bem-vinda ao ServiçoJá, ' + nome + '!');
+    alert('✅ Conta criada! Bem-vindo(a) ao ServiçoJá, ' + nome + '!');
     window.location.href = 'meus-pedidos-cliente.html';
   } catch(e) {
-    btn.textContent = 'Criar conta grátis';
+    console.error('Erro Firebase:', e);
+    btn.textContent = textoOriginal;
     btn.style.opacity = '1';
     btn.disabled = false;
-    let msg = 'Erro ao criar conta. Tente novamente.';
-    if (e.code === 'auth/email-already-in-use') msg = 'Este email já está cadastrado. Faça login.';
+    let msg = 'Erro ao criar conta: ' + e.message;
+    if (e.code === 'auth/email-already-in-use') msg = 'Este email já está cadastrado. Faça login!';
     if (e.code === 'auth/weak-password') msg = 'Senha muito fraca. Use pelo menos 6 caracteres.';
+    if (e.code === 'auth/invalid-email') msg = 'Email inválido. Verifique e tente novamente.';
     alert(msg);
   }
 });

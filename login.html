@@ -530,7 +530,32 @@
     document.getElementById('senhaInput').classList.remove('erro-input');
   }
 
-  // ENTRAR COM FIREBASE
+  // Inicializar Firebase
+  let auth, db, googleProvider;
+
+  async function initFirebase() {
+    if (auth) return;
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+    const { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+    const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+
+    const app = initializeApp({
+      apiKey: "AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
+      authDomain: "servicoja-e1f49.firebaseapp.com",
+      projectId: "servicoja-e1f49",
+      storageBucket: "servicoja-e1f49.firebasestorage.app",
+      messagingSenderId: "874413426529",
+      appId: "1:874413426529:web:9891d44afd9ef1750e6720"
+    });
+
+    auth = getAuth(app);
+    db = getFirestore(app);
+    googleProvider = new GoogleAuthProvider();
+
+    window._fbAuth = { signInWithEmailAndPassword, signInWithPopup, sendPasswordResetEmail, getDoc, doc };
+  }
+
+  // ENTRAR
   async function entrar() {
     const email = document.getElementById('emailInput').value.trim();
     const senha = document.getElementById('senhaInput').value;
@@ -547,26 +572,24 @@
     btn.classList.add('loading');
 
     try {
-      const { loginEmail, buscarUsuario } = await import('./firebase.js');
-      const user = await loginEmail(email, senha);
-      const dados = await buscarUsuario(user.uid);
-      const nome = dados?.nome || email.split('@')[0];
-      const tipo = dados?.tipo || tipoSel;
+      await initFirebase();
+      const { signInWithEmailAndPassword, getDoc, doc } = window._fbAuth;
+      const cred = await signInWithEmailAndPassword(auth, email, senha);
+      const snap = await getDoc(doc(db, "usuarios", cred.user.uid));
+      const dados = snap.exists() ? snap.data() : {};
+      const nome = dados.nome || email.split('@')[0];
+      const tipo = dados.tipo || tipoSel || 'cliente';
       localStorage.setItem('sj_tipo', tipo);
-      localStorage.setItem('sj_uid', user.uid);
+      localStorage.setItem('sj_uid', cred.user.uid);
       localStorage.setItem('sj_nome', nome);
-      document.getElementById('sucTitle').textContent = `Olá, ${nome}! 👋`;
-      document.getElementById('sucSub').textContent = tipo === 'cliente'
-        ? 'Redirecionando para seus pedidos...'
-        : 'Redirecionando para os trabalhos disponíveis...';
+      document.getElementById('sucTitle').textContent = 'Olá, ' + nome + '! 👋';
+      document.getElementById('sucSub').textContent = tipo === 'cliente' ? 'Redirecionando para seus pedidos...' : 'Redirecionando para os trabalhos...';
       irTela('telaSucesso');
-      setTimeout(() => {
-        window.location.href = tipo === 'cliente' ? 'meus-pedidos-cliente.html' : 'pedidos-profissional.html';
-      }, 2000);
+      setTimeout(() => { window.location.href = tipo === 'cliente' ? 'meus-pedidos-cliente.html' : 'pedidos-profissional.html'; }, 2000);
     } catch(e) {
       btn.classList.remove('loading');
-      let msg = 'Email ou senha incorretos. Tente novamente.';
-      if (e.code === 'auth/user-not-found') msg = 'Usuário não encontrado.';
+      let msg = 'Email ou senha incorretos.';
+      if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') msg = 'Usuário não encontrado. Cadastre-se!';
       if (e.code === 'auth/wrong-password') msg = 'Senha incorreta.';
       if (e.code === 'auth/too-many-requests') msg = 'Muitas tentativas. Tente mais tarde.';
       document.getElementById('erroTexto').textContent = msg;
@@ -578,19 +601,20 @@
   // LOGIN COM GOOGLE
   async function entrarGoogle() {
     try {
-      const { loginGoogle, buscarUsuario } = await import('./firebase.js');
-      const user = await loginGoogle();
-      const dados = await buscarUsuario(user.uid);
-      const tipo = dados?.tipo || tipoSel || 'cliente';
+      await initFirebase();
+      const { signInWithPopup, getDoc, doc } = window._fbAuth;
+      const cred = await signInWithPopup(auth, googleProvider);
+      const snap = await getDoc(doc(db, "usuarios", cred.user.uid));
+      const dados = snap.exists() ? snap.data() : {};
+      const tipo = dados.tipo || tipoSel || 'cliente';
+      const nome = dados.nome || cred.user.displayName;
       localStorage.setItem('sj_tipo', tipo);
-      localStorage.setItem('sj_uid', user.uid);
-      localStorage.setItem('sj_nome', dados?.nome || user.displayName);
-      document.getElementById('sucTitle').textContent = `Olá, ${user.displayName}! 👋`;
-      document.getElementById('sucSub').textContent = 'Login com Google realizado. Redirecionando...';
+      localStorage.setItem('sj_uid', cred.user.uid);
+      localStorage.setItem('sj_nome', nome);
+      document.getElementById('sucTitle').textContent = 'Olá, ' + nome + '! 👋';
+      document.getElementById('sucSub').textContent = 'Redirecionando...';
       irTela('telaSucesso');
-      setTimeout(() => {
-        window.location.href = tipo === 'cliente' ? 'meus-pedidos-cliente.html' : 'pedidos-profissional.html';
-      }, 2000);
+      setTimeout(() => { window.location.href = tipo === 'cliente' ? 'meus-pedidos-cliente.html' : 'pedidos-profissional.html'; }, 2000);
     } catch(e) {
       console.error(e);
       alert('Erro ao fazer login com Google. Tente novamente.');
@@ -603,8 +627,9 @@
     const email = document.querySelector('#telaRecuperar input').value.trim();
     if (!email) { alert('Digite seu email.'); return; }
     try {
-      const { recuperarSenha } = await import('./firebase.js');
-      await recuperarSenha(email);
+      await initFirebase();
+      const { sendPasswordResetEmail } = window._fbAuth;
+      await sendPasswordResetEmail(auth, email);
       irTela('telaLinkEnviado');
     } catch(e) {
       alert('Email não encontrado. Verifique e tente novamente.');
