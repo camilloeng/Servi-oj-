@@ -352,6 +352,23 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    if (!window._fbInitialized) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
+        authDomain: "servicoja-e1f49.firebaseapp.com",
+        projectId: "servicoja-e1f49",
+        storageBucket: "servicoja-e1f49.firebasestorage.app",
+        messagingSenderId: "874413426529",
+        appId: "1:874413426529:web:9891d44afd9ef1750e6720"
+      });
+      window._fbInitialized = true;
+    }
+  </script>
 </head>
 <body>
 
@@ -873,6 +890,53 @@
     border: 1.5px solid #132240;
   }
 </style>
+
+
+<script>
+// Carregar perfil do profissional pela URL
+var profId = new URLSearchParams(window.location.search).get('id');
+
+if (profId) {
+  firebase.firestore().collection('usuarios').doc(profId).get()
+    .then(function(snap) {
+      if (!snap.exists) return;
+      var dados = snap.data();
+      
+      // Atualizar nome
+      var nomeEl = document.querySelector('.hero-nome');
+      if (nomeEl) nomeEl.textContent = dados.nome || '';
+      
+      // Atualizar categorias
+      var catsEl = document.querySelector('.hero-cats');
+      if (catsEl && dados.categorias) catsEl.textContent = dados.categorias.join(' · ');
+      
+      // Avaliação
+      if (dados.avaliacao) {
+        var avalEl = document.querySelector('.av-nota-num');
+        if (avalEl) avalEl.textContent = dados.avaliacao;
+      }
+      
+      // Sobre
+      var sobreEl = document.querySelector('.sobre-texto');
+      if (sobreEl && dados.sobre) sobreEl.textContent = dados.sobre;
+    })
+    .catch(function(e) { console.log(e); });
+    
+  // Carregar avaliações
+  firebase.firestore().collection('usuarios').doc(profId)
+    .collection('avaliacoes')
+    .orderBy('criadoEm', 'desc')
+    .limit(5)
+    .get().then(function(snap) {
+      console.log('Avaliações:', snap.size);
+    }).catch(function(e) { console.log(e); });
+}
+
+// Override irPublicarPedido
+window.irPublicarPedido = function() {
+  window.location.href = 'publicar-pedido.html';
+}
+</script>
 
 </body>
 </html>

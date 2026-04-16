@@ -371,6 +371,23 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    if (!window._fbInitialized) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
+        authDomain: "servicoja-e1f49.firebaseapp.com",
+        projectId: "servicoja-e1f49",
+        storageBucket: "servicoja-e1f49.firebasestorage.app",
+        messagingSenderId: "874413426529",
+        appId: "1:874413426529:web:9891d44afd9ef1750e6720"
+      });
+      window._fbInitialized = true;
+    }
+  </script>
 </head>
 <body>
 
@@ -857,6 +874,26 @@
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(e => {});
   }
+</script>
+
+
+<script>
+firebase.auth().onAuthStateChanged(function(user) {
+  if (!user) { window.location.href = 'login.html'; return; }
+  
+  // Buscar faturas do profissional
+  firebase.firestore().collection('faturas')
+    .where('profissionalId', '==', user.uid)
+    .where('status', '==', 'pendente')
+    .get().then(function(snap) {
+      if (snap.size > 0) {
+        var total = 0;
+        snap.docs.forEach(function(d) { total += d.data().valor || 0; });
+        var valEl = document.querySelector('.pv-valor');
+        if (valEl) valEl.textContent = 'R$ ' + total.toFixed(2);
+      }
+    }).catch(function(e) { console.log(e); });
+});
 </script>
 
 </body>
