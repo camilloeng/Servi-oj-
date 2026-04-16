@@ -584,7 +584,7 @@
       localStorage.setItem('sj_nome', nome);
       document.getElementById('sucTitle').textContent = 'Olá, ' + nome + '! 👋';
       document.getElementById('sucSub').textContent = tipo === 'cliente' ? 'Redirecionando para seus pedidos...' : 'Redirecionando para os trabalhos...';
-      irTela('telaSucesso');
+     
       window.location.href = 'meus-pedidos-cliente.html';
     } catch(e) {
       btn.classList.remove('loading');
@@ -613,7 +613,7 @@
       localStorage.setItem('sj_nome', nome);
       document.getElementById('sucTitle').textContent = 'Olá, ' + nome + '! 👋';
       document.getElementById('sucSub').textContent = 'Redirecionando...';
-      irTela('telaSucesso');
+    
     window.location.href = 'meus-pedidos-cliente.html';
     } catch(e) {
       console.error(e);
