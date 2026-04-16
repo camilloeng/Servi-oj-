@@ -309,6 +309,21 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
+
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey: "AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
+      authDomain: "servicoja-e1f49.firebaseapp.com",
+      projectId: "servicoja-e1f49",
+      storageBucket: "servicoja-e1f49.firebasestorage.app",
+      messagingSenderId: "874413426529",
+      appId: "1:874413426529:web:9891d44afd9ef1750e6720"
+    });
+  </script>
 </head>
 <body>
 
@@ -474,7 +489,7 @@
       <p>Concordo com os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a> do ServiçoJá. Meus dados serão compartilhados com o profissional somente após aprovação do orçamento.</p>
     </div>
 
-    <button class="btn-cadastrar">Criar conta grátis →</button>
+    <button class="btn-cadastrar" id="btnCadastrar" onclick="criarConta()">Criar conta grátis →</button>
 
     <div class="divider"><span>ou cadastre com</span></div>
 
@@ -678,72 +693,61 @@
 </script>
 
 
-<script type="module">
-// Firebase direto via CDN
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
-  authDomain: "servicoja-e1f49.firebaseapp.com",
-  projectId: "servicoja-e1f49",
-  storageBucket: "servicoja-e1f49.firebasestorage.app",
-  messagingSenderId: "874413426529",
-  appId: "1:874413426529:web:9891d44afd9ef1750e6720"
-};
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
 
-document.querySelector('.btn-cadastrar').addEventListener('click', async () => {
-  const nome = document.querySelector('input[placeholder="Ex: Maria Silva"]').value.trim();
-  const email = document.querySelector('input[type="email"]').value.trim();
-  const tel = document.querySelector('input[type="tel"]').value.trim();
-  const senha = document.getElementById('senhaInput').value;
-  const rua = document.getElementById('rua').value.trim();
-  const bairro = document.getElementById('bairro').value.trim();
-  const cidade = document.getElementById('cidade').value.trim();
-  const estado = document.getElementById('estado').value;
 
-  if (!nome || !email || !senha || !tel) {
-    alert('Preencha nome, email, telefone e senha!'); return;
-  }
-  if (senha.length < 6) {
-    alert('A senha precisa ter pelo menos 6 caracteres!'); return;
-  }
 
-  const btn = document.querySelector('.btn-cadastrar');
-  const textoOriginal = btn.textContent;
+
+<script>
+function criarConta() {
+  var nome = document.querySelector('input[placeholder="Ex: Maria Silva"]').value.trim();
+  var inputs = document.querySelectorAll('input[type="email"]');
+  var email = inputs[0] ? inputs[0].value.trim() : '';
+  var telInputs = document.querySelectorAll('input[type="tel"]');
+  var tel = telInputs[0] ? telInputs[0].value.trim() : '';
+  var senhaEl = document.getElementById('senhaInput');
+  var senha = senhaEl ? senhaEl.value : '';
+  var rua = document.getElementById('rua') ? document.getElementById('rua').value : '';
+  var bairro = document.getElementById('bairro') ? document.getElementById('bairro').value : '';
+  var cidade = document.getElementById('cidade') ? document.getElementById('cidade').value : '';
+
+  if (!nome) { alert('⚠️ Digite seu nome completo!'); return; }
+  if (!email) { alert('⚠️ Digite seu email!'); return; }
+  if (!tel) { alert('⚠️ Digite seu telefone!'); return; }
+  if (!senha || senha.length < 6) { alert('⚠️ A senha precisa ter pelo menos 6 caracteres!'); return; }
+
+  var btn = document.getElementById('btnCadastrar');
   btn.textContent = 'Criando conta...';
-  btn.style.opacity = '0.7';
   btn.disabled = true;
 
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email, senha);
-    await setDoc(doc(db, "usuarios", cred.user.uid), {
-      nome, email, telefone: tel, tipo: 'cliente',
-      endereco: { rua, bairro, cidade, estado },
-      criadoEm: serverTimestamp()
+  firebase.auth().createUserWithEmailAndPassword(email, senha)
+    .then(function(cred) {
+      return firebase.firestore().collection('usuarios').doc(cred.user.uid).set({
+        nome: nome,
+        email: email,
+        telefone: tel,
+        tipo: 'cliente',
+        endereco: { rua: rua, bairro: bairro, cidade: cidade },
+        criadoEm: new Date().toISOString()
+      }).then(function() {
+        localStorage.setItem('sj_tipo', 'cliente');
+        localStorage.setItem('sj_uid', cred.user.uid);
+        localStorage.setItem('sj_nome', nome);
+        alert('✅ Conta criada! Bem-vindo(a), ' + nome + '!');
+        window.location.href = 'meus-pedidos-cliente.html';
+      });
+    })
+    .catch(function(e) {
+      btn.textContent = 'Criar conta grátis →';
+      btn.disabled = false;
+      var msg = 'Erro: ' + e.message;
+      if (e.code === 'auth/email-already-in-use') msg = '❌ Este email já está cadastrado!';
+      if (e.code === 'auth/weak-password') msg = '❌ Senha muito fraca. Use 6+ caracteres.';
+      if (e.code === 'auth/invalid-email') msg = '❌ Email inválido.';
+      alert(msg);
     });
-    localStorage.setItem('sj_tipo', 'cliente');
-    localStorage.setItem('sj_uid', cred.user.uid);
-    localStorage.setItem('sj_nome', nome);
-    alert('✅ Conta criada! Bem-vindo(a) ao ServiçoJá, ' + nome + '!');
-    window.location.href = 'meus-pedidos-cliente.html';
-  } catch(e) {
-    console.error('Erro Firebase:', e);
-    btn.textContent = textoOriginal;
-    btn.style.opacity = '1';
-    btn.disabled = false;
-    let msg = 'Erro ao criar conta: ' + e.message;
-    if (e.code === 'auth/email-already-in-use') msg = 'Este email já está cadastrado. Faça login!';
-    if (e.code === 'auth/weak-password') msg = 'Senha muito fraca. Use pelo menos 6 caracteres.';
-    if (e.code === 'auth/invalid-email') msg = 'Email inválido. Verifique e tente novamente.';
-    alert(msg);
-  }
-});
+}
 </script>
 
 </body>
