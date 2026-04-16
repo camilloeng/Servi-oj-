@@ -468,7 +468,16 @@
     <div class="cadastro-link"><a href="#" onclick="voltar('telaLogin');return false;">Lembrei minha senha — Voltar</a></div>
   </div>
 
-  
+  <!-- TELA 4: SUCESSO -->
+  <div class="tela" id="telaSucesso">
+    <div class="suc-wrap">
+      <div class="suc-icon">🎉</div>
+      <div class="suc-title" id="sucTitle">Bem-vindo de volta!</div>
+      <div class="suc-sub" id="sucSub">Login realizado com sucesso. Redirecionando para sua conta...</div>
+      <div class="suc-bar"><div class="suc-bar-fill"></div></div>
+      <div class="suc-hint">Aguarde um momento...</div>
+    </div>
+  </div>
 
   <!-- TELA 5: LINK ENVIADO -->
   <div class="tela" id="telaLinkEnviado">
@@ -573,10 +582,8 @@
       localStorage.setItem('sj_tipo', tipo);
       localStorage.setItem('sj_uid', cred.user.uid);
       localStorage.setItem('sj_nome', nome);
-      document.getElementById('sucTitle').textContent = 'Olá, ' + nome + '! 👋';
-      document.getElementById('sucSub').textContent = tipo === 'cliente' ? 'Redirecionando para seus pedidos...' : 'Redirecionando para os trabalhos...';
-     
-      window.location.href = 'meus-pedidos-cliente.html';
+      irTela('telaSucesso');
+      setTimeout(function() { window.location.href = 'meus-pedidos-cliente.html'; }, 1500);
     } catch(e) {
       btn.classList.remove('loading');
       let msg = 'Email ou senha incorretos.';
@@ -602,10 +609,8 @@
       localStorage.setItem('sj_tipo', tipo);
       localStorage.setItem('sj_uid', cred.user.uid);
       localStorage.setItem('sj_nome', nome);
-      document.getElementById('sucTitle').textContent = 'Olá, ' + nome + '! 👋';
-      document.getElementById('sucSub').textContent = 'Redirecionando...';
-    
-    window.location.href = 'meus-pedidos-cliente.html';
+      irTela('telaSucesso');
+      setTimeout(function() { window.location.href = 'meus-pedidos-cliente.html'; }, 1500);
     } catch(e) {
       console.error(e);
       alert('Erro ao fazer login com Google. Tente novamente.');
