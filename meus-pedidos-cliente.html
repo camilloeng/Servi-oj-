@@ -417,6 +417,35 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
+    authDomain: "servicoja-e1f49.firebaseapp.com",
+    projectId: "servicoja-e1f49",
+    storageBucket: "servicoja-e1f49.firebasestorage.app",
+    messagingSenderId: "874413426529",
+    appId: "1:874413426529:web:9891d44afd9ef1750e6720"
+  });
+
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      // Usuario logado - mostrar nome
+      var nome = localStorage.getItem('sj_nome') || user.displayName || user.email.split('@')[0];
+      var nomeEl = document.querySelector('.avatar-name');
+      if (nomeEl) nomeEl.textContent = nome;
+      var subEl = document.querySelector('.avatar-sub');
+      if (subEl) subEl.textContent = 'Cliente';
+    } else {
+      // Não logado - redirecionar para login
+      window.location.href = 'login.html';
+    }
+  });
+</script>
+
 </head>
 <body>
 
@@ -1072,22 +1101,7 @@
 </style>
 
 
-<script type="module">
-import { buscarMeusPedidos, observarLogin, buscarUsuario } from './firebase.js';
 
-observarLogin(async user => {
-  if (!user) { window.location.href = 'login.html'; return; }
-  const dados = await buscarUsuario(user.uid);
-  if (dados?.nome) {
-    document.querySelector('.avatar-name') && (document.querySelector('.avatar-name').textContent = dados.nome.split(' ')[0]);
-  }
-  // Carregar pedidos reais
-  try {
-    const pedidos = await buscarMeusPedidos();
-    console.log('Pedidos carregados:', pedidos.length);
-  } catch(e) { console.error(e); }
-});
-</script>
 
 </body>
 </html>
