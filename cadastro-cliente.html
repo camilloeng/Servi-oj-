@@ -311,18 +311,23 @@
   <link rel="apple-touch-icon" href="icon.svg">
 
   <!-- Firebase CDN -->
+  
+
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script>
-    firebase.initializeApp({
-      apiKey: "AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
-      authDomain: "servicoja-e1f49.firebaseapp.com",
-      projectId: "servicoja-e1f49",
-      storageBucket: "servicoja-e1f49.firebasestorage.app",
-      messagingSenderId: "874413426529",
-      appId: "1:874413426529:web:9891d44afd9ef1750e6720"
-    });
+    if (!window._fbInitialized) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
+        authDomain: "servicoja-e1f49.firebaseapp.com",
+        projectId: "servicoja-e1f49",
+        storageBucket: "servicoja-e1f49.firebasestorage.app",
+        messagingSenderId: "874413426529",
+        appId: "1:874413426529:web:9891d44afd9ef1750e6720"
+      });
+      window._fbInitialized = true;
+    }
   </script>
 </head>
 <body>
@@ -489,7 +494,7 @@
       <p>Concordo com os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a> do ServiçoJá. Meus dados serão compartilhados com o profissional somente após aprovação do orçamento.</p>
     </div>
 
-    <button class="btn-cadastrar" id="btnCadastrar" onclick="criarConta()">Criar conta grátis →</button>
+    <button class="btn-cadastrar" id="btnCad" onclick="criarConta()" id="btnCadastrar" onclick="criarConta()">Criar conta grátis →</button>
 
     <div class="divider"><span>ou cadastre com</span></div>
 
@@ -699,27 +704,39 @@
 
 
 
+
+
+
 <script>
 function criarConta() {
-  var nome = document.querySelector('input[placeholder="Ex: Maria Silva"]').value.trim();
-  var inputs = document.querySelectorAll('input[type="email"]');
-  var email = inputs[0] ? inputs[0].value.trim() : '';
-  var telInputs = document.querySelectorAll('input[type="tel"]');
-  var tel = telInputs[0] ? telInputs[0].value.trim() : '';
-  var senhaEl = document.getElementById('senhaInput');
-  var senha = senhaEl ? senhaEl.value : '';
+  // Pegar todos os campos
+  var nome = '';
+  var email = '';
+  var tel = '';
+  var senha = '';
+  
+  // Buscar por placeholder
+  document.querySelectorAll('input').forEach(function(inp) {
+    var ph = inp.placeholder || '';
+    if (ph.includes('Maria Silva')) nome = inp.value.trim();
+    if (inp.type === 'email') email = inp.value.trim();
+    if (inp.type === 'tel') tel = inp.value.trim();
+    if (inp.id === 'senhaInput') senha = inp.value;
+  });
+
   var rua = document.getElementById('rua') ? document.getElementById('rua').value : '';
   var bairro = document.getElementById('bairro') ? document.getElementById('bairro').value : '';
   var cidade = document.getElementById('cidade') ? document.getElementById('cidade').value : '';
+  var estado = document.getElementById('estado') ? document.getElementById('estado').value : '';
 
-  if (!nome) { alert('⚠️ Digite seu nome completo!'); return; }
-  if (!email) { alert('⚠️ Digite seu email!'); return; }
-  if (!tel) { alert('⚠️ Digite seu telefone!'); return; }
-  if (!senha || senha.length < 6) { alert('⚠️ A senha precisa ter pelo menos 6 caracteres!'); return; }
+  // Validações
+  if (!nome) { alert('Por favor digite seu nome completo!'); return; }
+  if (!email) { alert('Por favor digite seu email!'); return; }
+  if (!tel) { alert('Por favor digite seu telefone!'); return; }
+  if (!senha || senha.length < 6) { alert('A senha precisa ter pelo menos 6 caracteres!'); return; }
 
-  var btn = document.getElementById('btnCadastrar');
-  btn.textContent = 'Criando conta...';
-  btn.disabled = true;
+  var btn = document.getElementById('btnCad');
+  if (btn) { btn.textContent = 'Criando conta...'; btn.disabled = true; }
 
   firebase.auth().createUserWithEmailAndPassword(email, senha)
     .then(function(cred) {
@@ -728,23 +745,23 @@ function criarConta() {
         email: email,
         telefone: tel,
         tipo: 'cliente',
-        endereco: { rua: rua, bairro: bairro, cidade: cidade },
+        endereco: { rua: rua, bairro: bairro, cidade: cidade, estado: estado },
         criadoEm: new Date().toISOString()
       }).then(function() {
         localStorage.setItem('sj_tipo', 'cliente');
         localStorage.setItem('sj_uid', cred.user.uid);
         localStorage.setItem('sj_nome', nome);
-        alert('✅ Conta criada! Bem-vindo(a), ' + nome + '!');
+        alert('Conta criada com sucesso! Bem-vindo(a), ' + nome + '!');
         window.location.href = 'meus-pedidos-cliente.html';
       });
     })
     .catch(function(e) {
-      btn.textContent = 'Criar conta grátis →';
-      btn.disabled = false;
-      var msg = 'Erro: ' + e.message;
-      if (e.code === 'auth/email-already-in-use') msg = '❌ Este email já está cadastrado!';
-      if (e.code === 'auth/weak-password') msg = '❌ Senha muito fraca. Use 6+ caracteres.';
-      if (e.code === 'auth/invalid-email') msg = '❌ Email inválido.';
+      if (btn) { btn.textContent = 'Criar conta grátis →'; btn.disabled = false; }
+      var msg = 'Erro ao criar conta.';
+      if (e.code === 'auth/email-already-in-use') msg = 'Este email já está cadastrado! Faça login.';
+      if (e.code === 'auth/weak-password') msg = 'Senha fraca. Use pelo menos 6 caracteres.';
+      if (e.code === 'auth/invalid-email') msg = 'Email inválido.';
+      if (e.code === 'auth/network-request-failed') msg = 'Sem conexão. Verifique sua internet.';
       alert(msg);
     });
 }
