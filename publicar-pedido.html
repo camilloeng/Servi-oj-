@@ -375,6 +375,23 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    if (!window._fbInitialized) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
+        authDomain: "servicoja-e1f49.firebaseapp.com",
+        projectId: "servicoja-e1f49",
+        storageBucket: "servicoja-e1f49.firebasestorage.app",
+        messagingSenderId: "874413426529",
+        appId: "1:874413426529:web:9891d44afd9ef1750e6720"
+      });
+      window._fbInitialized = true;
+    }
+  </script>
 </head>
 <body>
 
@@ -928,37 +945,50 @@
 </style>
 
 
-<script type="module">
-import { publicarPedido, observarLogin } from './firebase.js';
 
-observarLogin(user => {
-  if (!user) window.location.href = 'login.html';
-});
 
-// Override publicar function
-window.publicar = async function() {
-  const titulo = document.getElementById('tituloInput')?.value.trim();
-  const desc = document.getElementById('descInput')?.value.trim();
-  const cat = document.querySelector('.cat-pill.sel')?.textContent.trim();
-  const valorTipo = document.querySelector('.valor-btn.sel')?.textContent.includes('aberto') ? 'aberto' : 'aproximado';
-  const valor = document.getElementById('valorInput')?.value || null;
-  const urgencia = document.querySelector('.urg-btn.sel')?.textContent.trim();
-  const endereco = document.querySelector('input[placeholder*="São Paulo"]')?.value.trim();
 
-  if (!titulo || !desc) { alert('Preencha o título e a descrição do pedido!'); return; }
+<script>
+// Override publicar
+window.publicar = function() {
+  var titulo = document.getElementById('tituloInput') ? document.getElementById('tituloInput').value.trim() : '';
+  var desc = document.getElementById('descInput') ? document.getElementById('descInput').value.trim() : '';
+  var catEl = document.querySelector('.cat-pill.sel');
+  var cat = catEl ? catEl.textContent.trim() : '';
+  var valorTipoEl = document.querySelector('.valor-btn.sel');
+  var valorTipo = valorTipoEl && valorTipoEl.textContent.includes('aberto') ? 'aberto' : 'aproximado';
+  var valorEl = document.getElementById('valorInput');
+  var valor = valorEl ? parseFloat(valorEl.value) || null : null;
+  var urgEl = document.querySelector('.urg-btn.sel');
+  var urgencia = urgEl ? urgEl.childNodes[0].textContent.trim() : 'Esta semana';
+  var endEl = document.querySelector('input[placeholder*="Paulo"]');
+  var endereco = endEl ? endEl.value.trim() : '';
+
+  if (!titulo) { alert('Digite o título do pedido!'); return; }
+  if (!desc) { alert('Descreva o serviço que você precisa!'); return; }
   if (!cat) { alert('Selecione uma categoria!'); return; }
 
-  try {
-    const id = await publicarPedido({
-      titulo, descricao: desc, categoria: cat,
-      valorTipo, valor: valor ? parseFloat(valor) : null,
-      urgencia, endereco
-    });
+  var user = firebase.auth().currentUser;
+  if (!user) { alert('Você precisa estar logado para publicar!'); window.location.href='login.html'; return; }
+
+  firebase.firestore().collection('pedidos').add({
+    titulo: titulo,
+    descricao: desc,
+    categoria: cat,
+    valorTipo: valorTipo,
+    valor: valor,
+    urgencia: urgencia,
+    endereco: endereco,
+    clienteId: user.uid,
+    clienteNome: localStorage.getItem('sj_nome') || '',
+    status: 'aberto',
+    interessados: 0,
+    criadoEm: new Date().toISOString()
+  }).then(function(ref) {
     document.getElementById('modalOverlay').classList.add('vis');
-  } catch(e) {
-    console.error(e);
-    alert('Erro ao publicar pedido. Você está logado?');
-  }
+  }).catch(function(e) {
+    alert('Erro ao publicar: ' + e.message);
+  });
 }
 </script>
 

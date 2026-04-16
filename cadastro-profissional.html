@@ -338,6 +338,23 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    if (!window._fbInitialized) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
+        authDomain: "servicoja-e1f49.firebaseapp.com",
+        projectId: "servicoja-e1f49",
+        storageBucket: "servicoja-e1f49.firebasestorage.app",
+        messagingSenderId: "874413426529",
+        appId: "1:874413426529:web:9891d44afd9ef1750e6720"
+      });
+      window._fbInitialized = true;
+    }
+  </script>
 </head>
 <body>
 
@@ -562,7 +579,7 @@
 
     <div class="nav-btns">
       <button class="btn-voltar" onclick="irPara(2)">← Voltar</button>
-      <button class="btn-avancar" onclick="iniciarTesteIA()">Iniciar Teste IA →</button>
+      <button class="btn-avancar" onclick="finalizarCadastroProfissional()">Iniciar Teste IA →</button>
     </div>
   </div>
 
@@ -955,6 +972,74 @@ function repetirTeste() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(e => {});
   }
+</script>
+
+
+<script>
+// Cadastro do Profissional
+function finalizarCadastroProfissional() {
+  var nome = '';
+  var email = '';
+  var tel = '';
+  var senha = '';
+
+  document.querySelectorAll('input').forEach(function(inp) {
+    var ph = inp.placeholder || '';
+    if (ph.includes('João Ferreira')) nome = inp.value.trim();
+    if (inp.type === 'email') email = inp.value.trim();
+    if (inp.type === 'tel') tel = inp.value.trim();
+    if (inp.id === 'senhaProf') senha = inp.value;
+  });
+
+  var docInput = document.getElementById('docInput');
+  var doc = docInput ? docInput.value.trim() : '';
+  var rua = document.getElementById('rua2') ? document.getElementById('rua2').value : '';
+  var bairro = document.getElementById('bairro2') ? document.getElementById('bairro2').value : '';
+  var cidade = document.getElementById('cidade2') ? document.getElementById('cidade2').value : '';
+
+  // Pegar categorias selecionadas
+  var cats = [];
+  document.querySelectorAll('.cat-item.sel').forEach(function(c) {
+    cats.push(c.textContent.replace('✓','').trim());
+  });
+
+  if (!nome) { alert('Digite seu nome completo!'); return; }
+  if (!email) { alert('Digite seu email!'); return; }
+  if (!senha || senha.length < 6) { alert('A senha precisa ter pelo menos 6 caracteres!'); return; }
+  if (cats.length === 0) { alert('Selecione pelo menos uma categoria de serviço!'); return; }
+
+  firebase.auth().createUserWithEmailAndPassword(email, senha)
+    .then(function(cred) {
+      return firebase.firestore().collection('usuarios').doc(cred.user.uid).set({
+        nome: nome,
+        email: email,
+        telefone: tel,
+        tipo: 'profissional',
+        documento: doc,
+        categorias: cats,
+        endereco: { rua: rua, bairro: bairro, cidade: cidade },
+        aprovado: false,
+        avaliacao: 0,
+        totalAvaliacoes: 0,
+        criadoEm: new Date().toISOString()
+      }).then(function() {
+        localStorage.setItem('sj_tipo', 'profissional');
+        localStorage.setItem('sj_uid', cred.user.uid);
+        localStorage.setItem('sj_nome', nome);
+        alert('Cadastro criado! Agora complete o teste de qualificação por IA!');
+        irPara(4); // ir para tela do teste
+      });
+    })
+    .catch(function(e) {
+      var msg = 'Erro ao criar conta.';
+      if (e.code === 'auth/email-already-in-use') msg = 'Este email já está cadastrado! Faça login.';
+      if (e.code === 'auth/weak-password') msg = 'Senha fraca. Use pelo menos 6 caracteres.';
+      alert(msg);
+    });
+}
+
+// Substituir o botão "Iniciar Teste IA" para primeiro salvar dados
+var btnIA = document.querySelector('.btn-avancar');
 </script>
 
 </body>
