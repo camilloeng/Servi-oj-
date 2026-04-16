@@ -585,7 +585,7 @@
       document.getElementById('sucTitle').textContent = 'Olá, ' + nome + '! 👋';
       document.getElementById('sucSub').textContent = tipo === 'cliente' ? 'Redirecionando para seus pedidos...' : 'Redirecionando para os trabalhos...';
       irTela('telaSucesso');
-      setTimeout(function() { window.location.replace(tipo === 'cliente' ? 'meus-pedidos-cliente.html' : 'pedidos-profissional.html'); }, 1500);
+      setTimeout(function() { window.location.href = 'meus-pedidos-cliente.html'; }, 1500);
     } catch(e) {
       btn.classList.remove('loading');
       let msg = 'Email ou senha incorretos.';
@@ -614,7 +614,7 @@
       document.getElementById('sucTitle').textContent = 'Olá, ' + nome + '! 👋';
       document.getElementById('sucSub').textContent = 'Redirecionando...';
       irTela('telaSucesso');
-      setTimeout(function() { window.location.replace(tipo === 'cliente' ? 'meus-pedidos-cliente.html' : 'pedidos-profissional.html'); }, 1500);
+     setTimeout(function() { window.location.href = 'meus-pedidos-cliente.html'; }, 1500);
     } catch(e) {
       console.error(e);
       alert('Erro ao fazer login com Google. Tente novamente.');
