@@ -418,34 +418,25 @@
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
 
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script>
-  firebase.initializeApp({
-    apiKey: "AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
-    authDomain: "servicoja-e1f49.firebaseapp.com",
-    projectId: "servicoja-e1f49",
-    storageBucket: "servicoja-e1f49.firebasestorage.app",
-    messagingSenderId: "874413426529",
-    appId: "1:874413426529:web:9891d44afd9ef1750e6720"
-  });
 
-  firebase.auth().onAuthStateChanged(function(user) {
-    if (user) {
-      // Usuario logado - mostrar nome
-      var nome = localStorage.getItem('sj_nome') || user.displayName || user.email.split('@')[0];
-      var nomeEl = document.querySelector('.avatar-name');
-      if (nomeEl) nomeEl.textContent = nome;
-      var subEl = document.querySelector('.avatar-sub');
-      if (subEl) subEl.textContent = 'Cliente';
-    } else {
-      // Não logado - redirecionar para login
-      window.location.href = 'login.html';
+
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    if (!window._fbInitialized) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
+        authDomain: "servicoja-e1f49.firebaseapp.com",
+        projectId: "servicoja-e1f49",
+        storageBucket: "servicoja-e1f49.firebasestorage.app",
+        messagingSenderId: "874413426529",
+        appId: "1:874413426529:web:9891d44afd9ef1750e6720"
+      });
+      window._fbInitialized = true;
     }
-  });
-</script>
-
+  </script>
 </head>
 <body>
 
@@ -1102,6 +1093,30 @@
 
 
 
+
+
+<script>
+firebase.auth().onAuthStateChanged(function(user) {
+  if (!user) { window.location.href = 'login.html'; return; }
+  
+  // Atualizar nome
+  var nome = localStorage.getItem('sj_nome') || '';
+  var nomeEl = document.querySelector('.avatar-name');
+  if (nomeEl && nome) nomeEl.textContent = nome;
+  
+  // Contar pedidos
+  firebase.firestore().collection('pedidos')
+    .where('clienteId', '==', user.uid)
+    .onSnapshot(function(snap) {
+      var ativos = snap.docs.filter(function(d) { return d.data().status === 'aberto'; }).length;
+      var concluidos = snap.docs.filter(function(d) { return d.data().status === 'concluido'; }).length;
+      
+      var statCards = document.querySelectorAll('.stat-num');
+      if (statCards[0]) statCards[0].textContent = ativos;
+      if (statCards[2]) statCards[2].textContent = concluidos;
+    }, function(err) { console.log(err); });
+});
+</script>
 
 </body>
 </html>

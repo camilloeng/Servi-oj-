@@ -135,6 +135,23 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    if (!window._fbInitialized) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
+        authDomain: "servicoja-e1f49.firebaseapp.com",
+        projectId: "servicoja-e1f49",
+        storageBucket: "servicoja-e1f49.firebasestorage.app",
+        messagingSenderId: "874413426529",
+        appId: "1:874413426529:web:9891d44afd9ef1750e6720"
+      });
+      window._fbInitialized = true;
+    }
+  </script>
 </head>
 <body>
 
@@ -652,16 +669,32 @@
 </style>
 
 
-<script type="module">
-import { observarNotificacoes, observarLogin, marcarNotificacaoLida } from './firebase.js';
 
-observarLogin(user => {
+
+
+<script>
+firebase.auth().onAuthStateChanged(function(user) {
   if (!user) { window.location.href = 'login.html'; return; }
-  observarNotificacoes(notifs => {
-    const naoLidas = notifs.filter(n => !n.lida).length;
-    document.getElementById('countBadge') && (document.getElementById('countBadge').textContent = naoLidas);
-    document.getElementById('subCount') && (document.getElementById('subCount').textContent = `${notifs.length} notificações · ${naoLidas} não lidas`);
-  });
+  
+  var tipo = localStorage.getItem('sj_tipo') || 'cliente';
+  
+  // Mostrar notifs da vista correta
+  filtrarVista(tipo, document.querySelector('.vt-btn.' + (tipo === 'profissional' ? 'vt-btn:last-child' : 'ativo')));
+  
+  // Observar notificações em tempo real
+  firebase.firestore()
+    .collection('usuarios').doc(user.uid)
+    .collection('notificacoes')
+    .orderBy('criadoEm', 'desc')
+    .onSnapshot(function(snap) {
+      var naoLidas = snap.docs.filter(function(d) { return !d.data().lida; }).length;
+      var badge = document.getElementById('countBadge');
+      if (badge) badge.textContent = naoLidas;
+      var sub = document.getElementById('subCount');
+      if (sub) sub.textContent = snap.docs.length + ' notificações · ' + naoLidas + ' não lidas';
+    }, function(err) {
+      console.log('Notif erro:', err.message);
+    });
 });
 </script>
 

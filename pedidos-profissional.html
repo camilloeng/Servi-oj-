@@ -410,6 +410,23 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+    if (!window._fbInitialized) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
+        authDomain: "servicoja-e1f49.firebaseapp.com",
+        projectId: "servicoja-e1f49",
+        storageBucket: "servicoja-e1f49.firebasestorage.app",
+        messagingSenderId: "874413426529",
+        appId: "1:874413426529:web:9891d44afd9ef1750e6720"
+      });
+      window._fbInitialized = true;
+    }
+  </script>
 </head>
 <body>
 
@@ -1024,39 +1041,57 @@
 </style>
 
 
-<script type="module">
-import { observarPedidos, demonstrarInteresse, observarLogin, buscarUsuario } from './firebase.js';
 
-observarLogin(async user => {
+
+
+<script>
+firebase.auth().onAuthStateChanged(function(user) {
   if (!user) { window.location.href = 'login.html'; return; }
-  const dados = await buscarUsuario(user.uid);
-  if (dados?.nome) {
-    document.querySelector('.nav-nome') && (document.querySelector('.nav-nome').textContent = dados.nome.split(' ')[0]);
-  }
+  
+  // Atualizar nome na nav
+  var nome = localStorage.getItem('sj_nome') || '';
+  var nomeEl = document.querySelector('.avatar-name');
+  if (nomeEl && nome) nomeEl.textContent = nome;
+  
+  // Carregar pedidos disponíveis em tempo real
+  carregarPedidos(user.uid);
 });
 
-// Override registrar interesse
-window.registrarInteresse = async function(btn) {
-  const pedidoCard = btn.closest('.pedido-card');
-  const pedidoId = pedidoCard?.dataset.pedidoId;
-  if (!pedidoId) {
-    // Demo mode
-    btn.className = 'interesse-btn enviado';
-    btn.textContent = '✅ Interesse enviado';
-    btn.onclick = null;
-    document.getElementById('overlayConfirmInteresse').classList.add('vis');
-    return;
+function carregarPedidos(uid) {
+  firebase.firestore().collection('pedidos')
+    .where('status', '==', 'aberto')
+    .orderBy('criadoEm', 'desc')
+    .onSnapshot(function(snap) {
+      var total = snap.docs.length;
+      var h2 = document.querySelector('.main-header h2');
+      if (h2) h2.textContent = total + ' pedidos encontrados';
+    }, function(err) {
+      console.log('Pedidos erro:', err.message);
+    });
+}
+
+// Override registrarInteresse
+window.registrarInteresse = function(btn) {
+  var user = firebase.auth().currentUser;
+  if (!user) { alert('Faça login primeiro!'); return; }
+  
+  var card = btn.closest('.pedido-card');
+  var pedidoId = card ? card.dataset.pedidoId : null;
+  
+  btn.className = 'interesse-btn enviado';
+  btn.textContent = '✅ Interesse enviado';
+  btn.onclick = null;
+  
+  if (pedidoId) {
+    firebase.firestore().collection('pedidos').doc(pedidoId)
+      .collection('interessados').add({
+        profissionalId: user.uid,
+        nome: localStorage.getItem('sj_nome') || '',
+        criadoEm: new Date().toISOString()
+      }).catch(function(e) { console.log(e); });
   }
-  try {
-    await demonstrarInteresse(pedidoId);
-    btn.className = 'interesse-btn enviado';
-    btn.textContent = '✅ Interesse enviado';
-    btn.onclick = null;
-    document.getElementById('overlayConfirmInteresse').classList.add('vis');
-  } catch(e) {
-    console.error(e);
-    alert('Erro ao registrar interesse. Tente novamente.');
-  }
+  
+  document.getElementById('overlayConfirmInteresse').classList.add('vis');
 }
 </script>
 
