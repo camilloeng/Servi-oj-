@@ -583,7 +583,7 @@
       localStorage.setItem('sj_uid', cred.user.uid);
       localStorage.setItem('sj_nome', nome);
       irTela('telaSucesso');
-      setTimeout(function() { window.location.href = 'meus-pedidos-cliente.html'; }, 1500);
+      setTimeout(function() { window.location.href = tipo === 'profissional' ? 'dashboard-profissional.html' : 'meus-pedidos-cliente.html';'; }, 1500);
     } catch(e) {
       btn.classList.remove('loading');
       let msg = 'Email ou senha incorretos.';
@@ -610,7 +610,7 @@
       localStorage.setItem('sj_uid', cred.user.uid);
       localStorage.setItem('sj_nome', nome);
       irTela('telaSucesso');
-      setTimeout(function() { window.location.href = 'meus-pedidos-cliente.html'; }, 1500);
+      setTimeout(function() { window.location.href = tipo === 'profissional' ? 'dashboard-profissional.html' : 'meus-pedidos-cliente.html';'; }, 1500);
     } catch(e) {
       console.error(e);
       alert('Erro ao fazer login com Google. Tente novamente.');
