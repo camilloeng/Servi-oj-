@@ -14,333 +14,127 @@
     --laranja: #FF6B35; --erro: #FF5C5C;
     --borda: rgba(255,255,255,0.09);
   }
-
   html, body { height: 100%; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--azul);
-    color: var(--branco);
-    min-height: 100vh;
-    display: flex;
-  }
-
-  /* LADO ESQUERDO — VISUAL */
-  .left-panel {
-    flex: 1; display: flex; flex-direction: column;
-    justify-content: space-between; padding: 40px 48px;
-    background: linear-gradient(160deg, #0d1f3c 0%, #0a1628 60%, #071220 100%);
-    position: relative; overflow: hidden;
-  }
-
-  /* DECORAÇÃO */
-  .left-panel::before {
-    content: ''; position: absolute; top: -120px; right: -120px;
-    width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(0,201,111,0.12) 0%, transparent 65%);
-    pointer-events: none;
-  }
-  .left-panel::after {
-    content: ''; position: absolute; bottom: -80px; left: -80px;
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(255,107,53,0.07) 0%, transparent 65%);
-    pointer-events: none;
-  }
-
-  /* GRID PONTILHADO */
-  .grid-bg {
-    position: absolute; inset: 0; pointer-events: none;
-    background-image:
-      radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
-    background-size: 40px 40px;
-    mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.4) 0%, transparent 70%);
-  }
-
-  .left-logo {
-    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem;
-    position: relative; z-index: 2; text-decoration: none; color: var(--branco);
-  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--azul); color: var(--branco); min-height: 100vh; display: flex; }
+  .left-panel { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 40px 48px; background: linear-gradient(160deg, #0d1f3c 0%, #0a1628 60%, #071220 100%); position: relative; overflow: hidden; }
+  .left-panel::before { content: ''; position: absolute; top: -120px; right: -120px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(0,201,111,0.12) 0%, transparent 65%); pointer-events: none; }
+  .left-panel::after { content: ''; position: absolute; bottom: -80px; left: -80px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,107,53,0.07) 0%, transparent 65%); pointer-events: none; }
+  .grid-bg { position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 40px 40px; mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.4) 0%, transparent 70%); }
+  .left-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem; position: relative; z-index: 2; text-decoration: none; color: var(--branco); }
   .left-logo span { color: var(--verde); }
-
-  .left-content {
-    position: relative; z-index: 2;
-    max-width: 420px;
-  }
-
-  .left-badge {
-    display: inline-flex; align-items: center; gap: 7px;
-    background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.2);
-    color: var(--verde); font-size: 0.75rem; font-weight: 700;
-    padding: 5px 14px; border-radius: 100px; margin-bottom: 22px;
-    text-transform: uppercase; letter-spacing: 0.05em;
-  }
+  .left-content { position: relative; z-index: 2; max-width: 420px; }
+  .left-badge { display: inline-flex; align-items: center; gap: 7px; background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.2); color: var(--verde); font-size: 0.75rem; font-weight: 700; padding: 5px 14px; border-radius: 100px; margin-bottom: 22px; text-transform: uppercase; letter-spacing: 0.05em; }
   .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--verde); animation: pulse 2s infinite; }
-
-  .left-title {
-    font-family: 'Syne', sans-serif; font-weight: 800;
-    font-size: clamp(2rem, 3vw, 2.8rem);
-    line-height: 1.1; letter-spacing: -1.5px;
-    margin-bottom: 16px;
-  }
+  .left-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(2rem, 3vw, 2.8rem); line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 16px; }
   .left-title em { font-style: normal; color: var(--verde); }
-
-  .left-sub {
-    color: var(--cinza); font-size: 0.95rem; line-height: 1.7;
-    margin-bottom: 32px;
-  }
-
-  /* STATS */
-
-  .cats-grid {
-    display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 20px;
-  }
-  .cat-thumb {
-    background: rgba(255,255,255,0.04); border: 1px solid var(--borda);
-    border-radius: 12px; padding: 10px 6px; text-align: center;
-    font-size: 1.3rem; cursor: default; transition: all 0.2s;
-  }
+  .left-sub { color: var(--cinza); font-size: 0.95rem; line-height: 1.7; margin-bottom: 32px; }
+  .cats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 20px; }
+  .cat-thumb { background: rgba(255,255,255,0.04); border: 1px solid var(--borda); border-radius: 12px; padding: 10px 6px; text-align: center; font-size: 1.3rem; cursor: default; transition: all 0.2s; }
   .cat-thumb:hover { background: rgba(0,201,111,0.08); border-color: rgba(0,201,111,0.2); }
   .cat-thumb span { display: block; font-size: 0.62rem; color: var(--cinza); margin-top: 4px; }
-
   .left-stats { display: flex; gap: 20px; flex-wrap: wrap; }
-  .lst {
-    background: rgba(255,255,255,0.04); border: 1px solid var(--borda);
-    border-radius: 14px; padding: 14px 18px;
-  }
+  .lst { background: rgba(255,255,255,0.04); border: 1px solid var(--borda); border-radius: 14px; padding: 14px 18px; }
   .lst-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; color: var(--verde); }
   .lst-lbl { font-size: 0.72rem; color: var(--cinza); margin-top: 2px; }
-
-  /* DEPOIMENTO */
-  .left-footer {
-    position: relative; z-index: 2;
-  }
-  .depoimento {
-    background: rgba(255,255,255,0.04); border: 1px solid var(--borda);
-    border-radius: 16px; padding: 18px 20px;
-  }
-  .dep-texto {
-    font-size: 0.85rem; color: var(--cinza); line-height: 1.6;
-    margin-bottom: 12px; font-style: italic;
-  }
+  .left-footer { position: relative; z-index: 2; }
+  .depoimento { background: rgba(255,255,255,0.04); border: 1px solid var(--borda); border-radius: 16px; padding: 18px 20px; }
+  .dep-texto { font-size: 0.85rem; color: var(--cinza); line-height: 1.6; margin-bottom: 12px; font-style: italic; }
   .dep-texto strong { color: var(--branco); font-style: normal; }
   .dep-autor { display: flex; align-items: center; gap: 10px; }
-  .dep-av {
-    width: 34px; height: 34px; border-radius: 50%;
-    background: linear-gradient(135deg, rgba(0,201,111,0.3), rgba(0,78,200,0.2));
-    border: 2px solid rgba(0,201,111,0.25);
-    display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
-  }
+  .dep-av { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, rgba(0,201,111,0.3), rgba(0,78,200,0.2)); border: 2px solid rgba(0,201,111,0.25); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
   .dep-nome { font-weight: 600; font-size: 0.82rem; }
   .dep-cargo { font-size: 0.7rem; color: var(--cinza); }
   .dep-stars { margin-left: auto; color: #FFB830; font-size: 0.8rem; }
-
-  /* LADO DIREITO — FORMULÁRIO */
-  .right-panel {
-    width: 480px; flex-shrink: 0;
-    display: flex; flex-direction: column;
-    justify-content: center;
-    padding: 40px 44px;
-    background: var(--azul-medio);
-    border-left: 1px solid var(--borda);
-    position: relative;
-  }
-
-  /* TELAS */
+  .right-panel { width: 480px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; padding: 40px 44px; background: var(--azul-medio); border-left: 1px solid var(--borda); position: relative; }
   .tela { display: none; animation: fadeUp 0.4s ease both; }
   .tela.ativa { display: block; }
-
-  /* SELEÇÃO TIPO */
-  .tipo-title {
-    font-family: 'Syne', sans-serif; font-weight: 800;
-    font-size: 1.5rem; letter-spacing: -0.5px; margin-bottom: 6px;
-  }
+  .tipo-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.5px; margin-bottom: 6px; }
   .tipo-sub { color: var(--cinza); font-size: 0.88rem; margin-bottom: 28px; line-height: 1.5; }
-
   .tipo-cards { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
-  .tipo-card {
-    background: var(--azul-input); border: 2px solid var(--borda);
-    border-radius: 16px; padding: 18px 20px;
-    cursor: pointer; transition: all 0.25s;
-    display: flex; align-items: center; gap: 14px;
-  }
+  .tipo-card { background: var(--azul-input); border: 2px solid var(--borda); border-radius: 16px; padding: 18px 20px; cursor: pointer; transition: all 0.25s; display: flex; align-items: center; gap: 14px; }
   .tipo-card:hover { border-color: rgba(0,201,111,0.35); transform: translateX(3px); }
   .tipo-card.sel { border-color: var(--verde); background: rgba(0,201,111,0.06); }
   .tipo-icon { font-size: 1.8rem; flex-shrink: 0; }
-  .tipo-info {}
   .tipo-nome { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 3px; }
   .tipo-desc { font-size: 0.78rem; color: var(--cinza); line-height: 1.4; }
   .tipo-arrow { margin-left: auto; color: var(--cinza); font-size: 0.9rem; transition: all 0.2s; }
   .tipo-card:hover .tipo-arrow, .tipo-card.sel .tipo-arrow { color: var(--verde); transform: translateX(3px); }
-
-  .btn-continuar {
-    width: 100%; background: var(--verde); border: none; border-radius: 14px;
-    padding: 15px; color: var(--azul); font-family: 'Syne', sans-serif;
-    font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s;
-    opacity: 0.4;
-  }
+  .btn-continuar { width: 100%; background: var(--verde); border: none; border-radius: 14px; padding: 15px; color: var(--azul); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; opacity: 0.4; }
   .btn-continuar.ativo { opacity: 1; }
   .btn-continuar.ativo:hover { background: var(--verde-escuro); transform: scale(1.01); }
-
-  /* FORM LOGIN */
-  .form-title {
-    font-family: 'Syne', sans-serif; font-weight: 800;
-    font-size: 1.5rem; letter-spacing: -0.5px; margin-bottom: 4px;
-  }
+  .form-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.5px; margin-bottom: 4px; }
   .form-sub { color: var(--cinza); font-size: 0.85rem; margin-bottom: 28px; line-height: 1.5; }
   .form-sub a { color: var(--verde); text-decoration: none; }
   .form-sub a:hover { text-decoration: underline; }
-
   .field { margin-bottom: 14px; }
   label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--cinza); margin-bottom: 5px; }
-
   .input-wrap { position: relative; display: flex; align-items: center; }
   .input-icon { position: absolute; left: 13px; color: var(--cinza); font-size: 0.9rem; pointer-events: none; }
-
-  input {
-    width: 100%; background: var(--azul-input); border: 1.5px solid var(--borda);
-    border-radius: 12px; color: var(--branco);
-    font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
-    padding: 13px 13px 13px 38px; outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
+  input { width: 100%; background: var(--azul-input); border: 1.5px solid var(--borda); border-radius: 12px; color: var(--branco); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; padding: 13px 13px 13px 38px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
   input:focus { border-color: rgba(0,201,111,0.45); box-shadow: 0 0 0 3px rgba(0,201,111,0.08); }
   input::placeholder { color: rgba(138,155,181,0.45); }
   input.erro-input { border-color: rgba(255,92,92,0.5); }
-
-  .senha-toggle {
-    position: absolute; right: 12px;
-    background: none; border: none; color: var(--cinza);
-    cursor: pointer; font-size: 0.85rem; transition: color 0.2s;
-  }
+  .senha-toggle { position: absolute; right: 12px; background: none; border: none; color: var(--cinza); cursor: pointer; font-size: 0.85rem; transition: color 0.2s; }
   .senha-toggle:hover { color: var(--branco); }
-
   .forgot { text-align: right; margin-top: 5px; }
   .forgot a { font-size: 0.75rem; color: var(--cinza); text-decoration: none; transition: color 0.2s; }
   .forgot a:hover { color: var(--verde); }
-
-  /* ERRO */
-  .erro-msg {
-    background: rgba(255,92,92,0.08); border: 1px solid rgba(255,92,92,0.2);
-    border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; color: var(--erro);
-    margin-bottom: 14px; display: none; align-items: center; gap: 6px;
-  }
+  .erro-msg { background: rgba(255,92,92,0.08); border: 1px solid rgba(255,92,92,0.2); border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; color: var(--erro); margin-bottom: 14px; display: none; align-items: center; gap: 6px; }
   .erro-msg.vis { display: flex; }
-
-  .btn-entrar {
-    width: 100%; background: var(--verde); border: none; border-radius: 14px;
-    padding: 15px; color: var(--azul); font-family: 'Syne', sans-serif;
-    font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s;
-    margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
+  .btn-entrar { width: 100%; background: var(--verde); border: none; border-radius: 14px; padding: 15px; color: var(--azul); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .btn-entrar:hover { background: var(--verde-escuro); transform: scale(1.01); }
   .btn-entrar:active { transform: scale(0.99); }
   .btn-entrar.loading { opacity: 0.7; pointer-events: none; }
-
-  /* SPINNER */
-  .spinner-sm {
-    width: 16px; height: 16px; border: 2px solid rgba(10,22,40,0.3);
-    border-top-color: var(--azul); border-radius: 50%;
-    animation: spin 0.6s linear infinite; display: none;
-  }
+  .spinner-sm { width: 16px; height: 16px; border: 2px solid rgba(10,22,40,0.3); border-top-color: var(--azul); border-radius: 50%; animation: spin 0.6s linear infinite; display: none; }
   .btn-entrar.loading .spinner-sm { display: block; }
   .btn-entrar.loading .btn-text { display: none; }
-
-  /* DIVIDER */
-  .divider {
-    display: flex; align-items: center; gap: 10px; margin: 4px 0 14px;
-  }
+  .divider { display: flex; align-items: center; gap: 10px; margin: 4px 0 14px; }
   .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--borda); }
   .divider span { font-size: 0.72rem; color: var(--cinza); }
-
-  /* GOOGLE */
-  .btn-google {
-    width: 100%; background: transparent; border: 1.5px solid var(--borda);
-    border-radius: 14px; padding: 13px; color: var(--branco);
-    font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 0.88rem;
-    cursor: pointer; transition: all 0.2s;
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    margin-bottom: 20px;
-  }
+  .btn-google { width: 100%; background: transparent; border: 1.5px solid var(--borda); border-radius: 14px; padding: 13px; color: var(--branco); font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; }
   .btn-google:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.03); }
-
-  .cadastro-link {
-    text-align: center; font-size: 0.82rem; color: var(--cinza);
-  }
+  .cadastro-link { text-align: center; font-size: 0.82rem; color: var(--cinza); }
   .cadastro-link a { color: var(--verde); text-decoration: none; font-weight: 600; }
   .cadastro-link a:hover { text-decoration: underline; }
-
-  /* BACK BTN */
-  .back-btn {
-    background: none; border: none; color: var(--cinza); font-size: 0.82rem;
-    cursor: pointer; display: flex; align-items: center; gap: 5px;
-    margin-bottom: 24px; transition: color 0.2s; padding: 0;
-  }
+  .back-btn { background: none; border: none; color: var(--cinza); font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 5px; margin-bottom: 24px; transition: color 0.2s; padding: 0; }
   .back-btn:hover { color: var(--branco); }
-
-  /* TIPO BADGE */
-  .tipo-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.2);
-    color: var(--verde); font-size: 0.72rem; font-weight: 700;
-    padding: 4px 12px; border-radius: 100px; margin-bottom: 16px;
-  }
-
-  /* RECUPERAR SENHA */
+  .tipo-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.2); color: var(--verde); font-size: 0.72rem; font-weight: 700; padding: 4px 12px; border-radius: 100px; margin-bottom: 16px; }
   .rec-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; margin-bottom: 6px; }
   .rec-sub { color: var(--cinza); font-size: 0.85rem; margin-bottom: 24px; line-height: 1.5; }
-  .btn-enviar-rec {
-    width: 100%; background: var(--verde); border: none; border-radius: 14px;
-    padding: 15px; color: var(--azul); font-family: 'Syne', sans-serif;
-    font-weight: 700; font-size: 0.92rem; cursor: pointer; transition: all 0.2s; margin-bottom: 12px;
-  }
+  .btn-enviar-rec { width: 100%; background: var(--verde); border: none; border-radius: 14px; padding: 15px; color: var(--azul); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.92rem; cursor: pointer; transition: all 0.2s; margin-bottom: 12px; }
   .btn-enviar-rec:hover { background: var(--verde-escuro); }
-
-  /* SUCESSO LOGIN */
   .suc-wrap { text-align: center; padding: 20px 0; }
   .suc-icon { font-size: 3.5rem; margin-bottom: 14px; animation: popIn 0.4s ease both; }
   .suc-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; margin-bottom: 8px; }
   .suc-sub { color: var(--cinza); font-size: 0.85rem; line-height: 1.6; margin-bottom: 24px; }
   .suc-bar { height: 4px; background: var(--borda); border-radius: 2px; overflow: hidden; }
   .suc-bar-fill { height: 100%; background: var(--verde); border-radius: 2px; width: 0; animation: fillBar 2.5s ease forwards; }
-  .suc-hint { font-size: 0.72rem; color: var(--cinza); text-align: center; margin-top: 8px; }
-
   @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
   @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   @keyframes fillBar { from { width: 0; } to { width: 100%; } }
-
-  @media (max-width: 900px) {
-    .left-panel { display: none; }
-    .right-panel { width: 100%; border-left: none; }
-  }
-  @media (max-width: 480px) {
-    .right-panel { padding: 32px 24px; }
-  }
+  @media (max-width: 900px) { .left-panel { display: none; } .right-panel { width: 100%; border-left: none; } }
+  @media (max-width: 480px) { .right-panel { padding: 32px 24px; } }
 </style>
-
-  <!-- PWA -->
-  <meta name="theme-color" content="#00C96F">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="ServiçoJá">
-  <meta name="mobile-web-app-capable" content="yes">
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icon.svg">
+<meta name="theme-color" content="#00C96F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ServiçoJá">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
 </head>
 <body>
 
-<!-- LADO ESQUERDO -->
 <div class="left-panel">
   <div class="grid-bg"></div>
-
   <a href="#" class="left-logo">Serviço<span>Já</span></a>
-
   <div class="left-content">
     <div class="left-badge"><div class="badge-dot"></div> Disponível em São Paulo</div>
     <h1 class="left-title">O profissional certo,<br>na hora <em>certa</em></h1>
     <p class="left-sub">Conectamos você a profissionais qualificados e aprovados por IA em diversas categorias.</p>
-
     <div class="cats-grid">
       <div class="cat-thumb">⚡<span>Elétrica</span></div>
       <div class="cat-thumb">🔧<span>Encanamento</span></div>
@@ -353,37 +147,30 @@
       <div class="cat-thumb">🌿<span>Jardinagem</span></div>
       <div class="cat-thumb">🛋️<span>Montagem</span></div>
     </div>
-
     <div class="left-stats">
       <div class="lst"><div class="lst-num">12k+</div><div class="lst-lbl">Profissionais</div></div>
       <div class="lst"><div class="lst-num">50k+</div><div class="lst-lbl">Serviços feitos</div></div>
       <div class="lst"><div class="lst-num">4.9★</div><div class="lst-lbl">Avaliação média</div></div>
     </div>
   </div>
-
   <div class="left-footer">
     <div class="depoimento">
       <div class="dep-texto">"Encontrei um eletricista em menos de <strong>2 horas</strong>. Serviço impecável e com garantia. Nunca mais vou procurar profissional de outro jeito!"</div>
       <div class="dep-autor">
         <div class="dep-av">👤</div>
-        <div>
-          <div class="dep-nome">Maria Silva</div>
-          <div class="dep-cargo">Cliente · São Paulo, SP</div>
-        </div>
+        <div><div class="dep-nome">Maria Silva</div><div class="dep-cargo">Cliente · São Paulo, SP</div></div>
         <div class="dep-stars">★★★★★</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- LADO DIREITO -->
 <div class="right-panel">
 
   <!-- TELA 1: ESCOLHER TIPO -->
   <div class="tela ativa" id="telaTipo">
     <div class="tipo-title">Bem-vindo ao ServiçoJá! 👋</div>
     <div class="tipo-sub">Selecione como deseja usar o app para começar.</div>
-
     <div class="tipo-cards">
       <div class="tipo-card" onclick="selTipo(this,'cliente')">
         <div class="tipo-icon">👤</div>
@@ -402,11 +189,9 @@
         <div class="tipo-arrow">→</div>
       </div>
     </div>
-
     <button class="btn-continuar" id="btnContinuar" onclick="irLogin()">Continuar →</button>
-
     <div class="divider" style="margin-top:20px"><span>não tem conta?</span></div>
-    <div class="cadastro-link"><a href="#" onclick="irCadastro();return false;" →</a></div>
+    <div class="cadastro-link"><a href="#" onclick="irCadastro();return false;">Criar conta grátis →</a></div>
   </div>
 
   <!-- TELA 2: LOGIN -->
@@ -414,10 +199,8 @@
     <button class="back-btn" onclick="voltar('telaTipo')">← Voltar</button>
     <div class="tipo-badge" id="tipoBadge">👤 Entrando como cliente</div>
     <div class="form-title">Entre na sua conta</div>
-    <div class="form-sub">Não tem conta? <a href="#">Cadastre-se grátis</a></div>
-
+    <div class="form-sub">Não tem conta? <a href="#" onclick="irCadastro();return false;">Cadastre-se grátis</a></div>
     <div class="erro-msg" id="erroMsg">⚠️ <span id="erroTexto">Email ou senha incorretos.</span></div>
-
     <div class="field">
       <label>E-mail</label>
       <div class="input-wrap">
@@ -425,7 +208,6 @@
         <input type="email" id="emailInput" placeholder="seu@email.com" oninput="limparErro()">
       </div>
     </div>
-
     <div class="field">
       <label>Senha</label>
       <div class="input-wrap">
@@ -435,19 +217,16 @@
       </div>
       <div class="forgot"><a href="#" onclick="irRecuperar(); return false;">Esqueceu a senha?</a></div>
     </div>
-
     <button class="btn-entrar" id="btnEntrar" onclick="entrar()">
       <span class="btn-text">Entrar</span>
       <div class="spinner-sm"></div>
     </button>
-
     <div class="divider"><span>ou entre com</span></div>
     <button class="btn-google" onclick="entrarGoogle()">
       <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Continuar com Google
     </button>
-
-    <div class="cadastro-link">Não tem conta? <a href="#" onclick="irCadastro();return false;" →</a></div>
+    <div class="cadastro-link">Não tem conta? <a href="#" onclick="irCadastro();return false;">Criar conta grátis →</a></div>
   </div>
 
   <!-- TELA 3: RECUPERAR SENHA -->
@@ -455,7 +234,6 @@
     <button class="back-btn" onclick="voltar('telaLogin')">← Voltar</button>
     <div class="rec-title">Recuperar senha 🔑</div>
     <div class="rec-sub">Digite seu email e enviaremos um link para você criar uma nova senha.</div>
-
     <div class="field">
       <label>E-mail cadastrado</label>
       <div class="input-wrap">
@@ -463,23 +241,11 @@
         <input type="email" placeholder="seu@email.com">
       </div>
     </div>
-
     <button class="btn-enviar-rec" onclick="enviarRecuperacao()">📧 Enviar link de recuperação</button>
     <div class="cadastro-link"><a href="#" onclick="voltar('telaLogin');return false;">Lembrei minha senha — Voltar</a></div>
   </div>
 
-  <!-- TELA 4: SUCESSO -->
-  <div class="tela" id="telaSucesso">
-    <div class="suc-wrap">
-      <div class="suc-icon">🎉</div>
-      <div class="suc-title" id="sucTitle">Bem-vindo de volta!</div>
-      <div class="suc-sub" id="sucSub">Login realizado com sucesso. Redirecionando para sua conta...</div>
-      <div class="suc-bar"><div class="suc-bar-fill"></div></div>
-      <div class="suc-hint">Aguarde um momento...</div>
-    </div>
-  </div>
-
-  <!-- TELA 5: LINK ENVIADO -->
+  <!-- TELA 4: LINK ENVIADO -->
   <div class="tela" id="telaLinkEnviado">
     <div class="suc-wrap">
       <div class="suc-icon">📧</div>
@@ -494,7 +260,6 @@
 <script>
   let tipoSel = '';
 
-  // SELECIONAR TIPO
   function selTipo(el, tipo) {
     document.querySelectorAll('.tipo-card').forEach(c => c.classList.remove('sel'));
     el.classList.add('sel');
@@ -504,7 +269,14 @@
     document.getElementById('btnContinuar').textContent = tipoSel === 'cliente' ? 'Continuar como cliente →' : 'Continuar como profissional →';
   }
 
-  // IR PARA LOGIN
+  function irCadastro() {
+    if (tipoSel === 'profissional') {
+      window.location.href = 'cadastro-profissional.html';
+    } else {
+      window.location.href = 'cadastro-cliente.html';
+    }
+  }
+
   function irLogin() {
     if (!tipoSel) return;
     const badge = document.getElementById('tipoBadge');
@@ -530,7 +302,6 @@
     document.getElementById('senhaInput').classList.remove('erro-input');
   }
 
-  // Inicializar Firebase
   let auth, db, googleProvider;
 
   async function initFirebase() {
@@ -551,11 +322,9 @@
     auth = getAuth(app);
     db = getFirestore(app);
     googleProvider = new GoogleAuthProvider();
-
     window._fbAuth = { signInWithEmailAndPassword, signInWithPopup, sendPasswordResetEmail, getDoc, doc };
   }
 
-  // ENTRAR
   async function entrar() {
     const email = document.getElementById('emailInput').value.trim();
     const senha = document.getElementById('senhaInput').value;
@@ -570,7 +339,6 @@
     }
 
     btn.classList.add('loading');
-
     try {
       await initFirebase();
       const { signInWithEmailAndPassword, getDoc, doc } = window._fbAuth;
@@ -582,8 +350,7 @@
       localStorage.setItem('sj_tipo', tipo);
       localStorage.setItem('sj_uid', cred.user.uid);
       localStorage.setItem('sj_nome', nome);
-      irTela('telaSucesso');
-      setTimeout(function() { window.location.href = tipo === 'profissional' ? 'dashboard-profissional.html' : 'meus-pedidos-cliente.html';'; }, 1500);
+      window.location.href = tipo === 'profissional' ? 'dashboard-profissional.html' : 'meus-pedidos-cliente.html';
     } catch(e) {
       btn.classList.remove('loading');
       let msg = 'Email ou senha incorretos.';
@@ -596,7 +363,6 @@
     }
   }
 
-  // LOGIN COM GOOGLE
   async function entrarGoogle() {
     try {
       await initFirebase();
@@ -609,16 +375,15 @@
       localStorage.setItem('sj_tipo', tipo);
       localStorage.setItem('sj_uid', cred.user.uid);
       localStorage.setItem('sj_nome', nome);
-      irTela('telaSucesso');
-      setTimeout(function() { window.location.href = tipo === 'profissional' ? 'dashboard-profissional.html' : 'meus-pedidos-cliente.html';'; }, 1500);
+      window.location.href = tipo === 'profissional' ? 'dashboard-profissional.html' : 'meus-pedidos-cliente.html';
     } catch(e) {
       console.error(e);
       alert('Erro ao fazer login com Google. Tente novamente.');
     }
   }
 
-  // RECUPERAR SENHA
   function irRecuperar() { irTela('telaRecuperar'); }
+
   async function enviarRecuperacao() {
     const email = document.querySelector('#telaRecuperar input').value.trim();
     if (!email) { alert('Digite seu email.'); return; }
@@ -633,50 +398,30 @@
   }
 </script>
 
-<!-- BOTÃO FLUTUANTE DE SUGESTÃO -->
-<div id="sugestaoBtn" onclick="abrirSugestao()" style="
-  position:fixed;bottom:24px;right:24px;z-index:999;
-  background:#132240;border:1px solid rgba(0,201,111,0.3);
-  border-radius:100px;padding:10px 16px;
-  display:flex;align-items:center;gap:7px;
-  cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.35);
-  transition:all 0.2s;font-family:'DM Sans',sans-serif;
-  animation:fadeUpBtn 0.5s 0.8s ease both;opacity:0;
-">
+<div id="sugestaoBtn" onclick="abrirSugestao()" style="position:fixed;bottom:24px;right:24px;z-index:999;background:#132240;border:1px solid rgba(0,201,111,0.3);border-radius:100px;padding:10px 16px;display:flex;align-items:center;gap:7px;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.35);transition:all 0.2s;font-family:'DM Sans',sans-serif;animation:fadeUpBtn 0.5s 0.8s ease both;opacity:0;">
   <span style="font-size:1rem">💡</span>
   <span style="font-size:0.75rem;font-weight:600;color:#00C96F">Sugerir melhoria</span>
 </div>
 
-<!-- MODAL SUGESTÃO -->
-<div id="overlaySugestao" style="
-  position:fixed;inset:0;background:rgba(10,22,40,0.92);
-  z-index:1000;display:flex;align-items:center;justify-content:center;
-  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
-">
-  <div id="modalSugestao" style="
-    background:#132240;border:1px solid rgba(255,255,255,0.09);
-    border-radius:22px;width:100%;max-width:440px;padding:28px;
-    transform:translateY(20px);transition:transform 0.3s;
-  ">
+<div id="overlaySugestao" style="position:fixed;inset:0;background:rgba(10,22,40,0.92);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;">
+  <div id="modalSugestao" style="background:#132240;border:1px solid rgba(255,255,255,0.09);border-radius:22px;width:100%;max-width:440px;padding:28px;transform:translateY(20px);transition:transform 0.3s;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
       <div>
         <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:2px">💡 Sugerir melhoria</div>
         <div style="font-size:0.75rem;color:#8A9BB5">Sua opinião nos ajuda a melhorar o ServiçoJá</div>
       </div>
-      <button onclick="fecharSugestao()" style="background:rgba(255,255,255,0.06);border:none;border-radius:50%;width:30px;height:30px;color:#8A9BB5;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s">✕</button>
+      <button onclick="fecharSugestao()" style="background:rgba(255,255,255,0.06);border:none;border-radius:50%;width:30px;height:30px;color:#8A9BB5;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;">✕</button>
     </div>
-
     <div style="margin-bottom:12px">
       <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Você é:</div>
       <div style="display:flex;gap:8px">
-        <button onclick="selTipoSug(this,'cliente')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👤 Cliente</button>
-        <button onclick="selTipoSug(this,'profissional')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👷 Profissional</button>
+        <button onclick="selTipoSug(this,'cliente')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;">👤 Cliente</button>
+        <button onclick="selTipoSug(this,'profissional')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;">👷 Profissional</button>
       </div>
     </div>
-
     <div style="margin-bottom:12px">
       <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Categoria:</div>
-      <select id="sugCategoria" style="width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;font-size:0.83rem;padding:10px 12px;outline:none;cursor:pointer;-webkit-appearance:none">
+      <select id="sugCategoria" style="width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;font-size:0.83rem;padding:10px 12px;outline:none;cursor:pointer;">
         <option value="">Selecione uma categoria</option>
         <option>🎨 Design e visual</option>
         <option>⚡ Funcionalidade</option>
@@ -690,41 +435,29 @@
         <option>🌟 Outro</option>
       </select>
     </div>
-
     <div style="margin-bottom:18px">
       <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Sua sugestão:</div>
-      <textarea id="sugTexto" placeholder="Descreva sua ideia ou problema. Seja específico — isso nos ajuda a implementar mais rápido!" style="
-        width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);
-        border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;
-        font-size:0.83rem;padding:12px 14px;outline:none;resize:vertical;
-        min-height:100px;line-height:1.6;transition:border-color 0.2s;
-      " oninput="this.style.borderColor='rgba(0,201,111,0.4)'"></textarea>
+      <textarea id="sugTexto" placeholder="Descreva sua ideia ou problema..." style="width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;font-size:0.83rem;padding:12px 14px;outline:none;resize:vertical;min-height:100px;line-height:1.6;"></textarea>
     </div>
-
     <div style="display:flex;gap:8px">
-      <button onclick="fecharSugestao()" style="flex:1;background:transparent;border:1.5px solid rgba(255,255,255,0.09);border-radius:12px;padding:12px;color:#8A9BB5;font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.2s">Cancelar</button>
-      <button onclick="enviarSugestao()" style="flex:2;background:#00C96F;border:none;border-radius:12px;padding:12px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all 0.2s">💡 Enviar sugestão</button>
+      <button onclick="fecharSugestao()" style="flex:1;background:transparent;border:1.5px solid rgba(255,255,255,0.09);border-radius:12px;padding:12px;color:#8A9BB5;font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;">Cancelar</button>
+      <button onclick="enviarSugestao()" style="flex:2;background:#00C96F;border:none;border-radius:12px;padding:12px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;">💡 Enviar sugestão</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL SUCESSO SUGESTÃO -->
-<div id="overlaySugSucesso" style="
-  position:fixed;inset:0;background:rgba(10,22,40,0.92);
-  z-index:1001;display:flex;align-items:center;justify-content:center;
-  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
-">
-  <div style="background:#132240;border:1px solid rgba(0,201,111,0.25);border-radius:22px;width:100%;max-width:360px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s" id="modalSugSuc">
+<div id="overlaySugSucesso" style="position:fixed;inset:0;background:rgba(10,22,40,0.92);z-index:1001;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;">
+  <div id="modalSugSuc" style="background:#132240;border:1px solid rgba(0,201,111,0.25);border-radius:22px;width:100%;max-width:360px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s;">
     <div style="font-size:3rem;margin-bottom:12px">🙏</div>
     <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:8px">Sugestão enviada!</div>
-    <div style="color:#8A9BB5;font-size:0.82rem;line-height:1.6;margin-bottom:22px">Obrigado pelo seu feedback! Nossa equipe lê todas as sugestões. As melhores ideias são implementadas em novas versões do app. 🚀</div>
-    <button onclick="fecharSugSucesso()" style="width:100%;background:#00C96F;border:none;border-radius:12px;padding:13px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer">Fechar</button>
+    <div style="color:#8A9BB5;font-size:0.82rem;line-height:1.6;margin-bottom:22px">Obrigado pelo seu feedback!</div>
+    <button onclick="fecharSugSucesso()" style="width:100%;background:#00C96F;border:none;border-radius:12px;padding:13px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer;">Fechar</button>
   </div>
 </div>
 
 <style>
   @keyframes fadeUpBtn { from { opacity:0;transform:translateY(12px); } to { opacity:1;transform:translateY(0); } }
-  #sugestaoBtn:hover { background:#1a2d4a; transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+  #sugestaoBtn:hover { background:#1a2d4a; transform:translateY(-2px); }
   .sug-tipo-btn.sel { background:rgba(0,201,111,0.12) !important; border-color:rgba(0,201,111,0.4) !important; color:#00C96F !important; }
 </style>
 
@@ -747,7 +480,6 @@
   }
   function enviarSugestao() {
     var texto = document.getElementById('sugTexto').value.trim();
-    var cat = document.getElementById('sugCategoria').value;
     if (!texto) { document.getElementById('sugTexto').style.borderColor='rgba(255,92,92,0.5)'; return; }
     fecharSugestao();
     setTimeout(function() {
@@ -768,7 +500,6 @@
   document.getElementById('overlaySugestao').addEventListener('click', function(e) { if(e.target===this) fecharSugestao(); });
   document.getElementById('overlaySugSucesso').addEventListener('click', function(e) { if(e.target===this) fecharSugSucesso(); });
 </script>
-
 
 <script>
   if ('serviceWorker' in navigator) {
