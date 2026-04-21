@@ -3,77 +3,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ServiçoJá — Cadastro do Cliente</title>
+<title>ServiçoJá — Dashboard Profissional</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-  :root {
-    --verde: #00C96F; --verde-escuro: #009E57;
-    --azul: #0A1628; --azul-medio: #132240; --azul-input: #0F1C35;
-    --branco: #F5F7F2; --cinza: #8A9BB5;
-    --erro: #FF5C5C; --borda: rgba(255,255,255,0.09);
-  }
-  body { font-family: 'DM Sans', sans-serif; background: var(--azul); color: var(--branco); min-height: 100vh; display: flex; flex-direction: column; }
-  body::before { content: ''; position: fixed; top: -200px; right: -200px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(0,201,111,0.10) 0%, transparent 70%); pointer-events: none; z-index: 0; }
-  nav { position: relative; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 22px 32px; border-bottom: 1px solid var(--borda); }
-  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; text-decoration: none; color: var(--branco); }
-  .logo span { color: var(--verde); }
-  .nav-login { color: var(--cinza); font-size: 0.9rem; }
-  .nav-login a { color: var(--verde); text-decoration: none; font-weight: 600; }
-  .page { position: relative; z-index: 5; flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 48px 20px 60px; }
-  .card { background: var(--azul-medio); border: 1px solid var(--borda); border-radius: 24px; padding: 40px 44px; width: 100%; max-width: 520px; animation: fadeUp 0.5s ease both; }
-  .progress-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 32px; }
-  .step { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; color: var(--cinza); }
-  .step.active { color: var(--verde); }
-  .step-circle { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; }
-  .step.active .step-circle { background: var(--verde); border-color: var(--verde); color: var(--azul); }
-  .step-line { flex: 1; height: 1px; background: var(--borda); }
-  .card-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem; margin-bottom: 6px; letter-spacing: -0.5px; }
-  .card-sub { color: var(--cinza); font-size: 0.88rem; margin-bottom: 28px; }
-  .section-label { display: flex; align-items: center; gap: 8px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--cinza); margin: 24px 0 14px; }
-  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--borda); }
-  .section-label:first-of-type { margin-top: 0; }
-  .field { margin-bottom: 14px; }
-  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--cinza); margin-bottom: 6px; }
-  label .req { color: var(--verde); margin-left: 2px; }
-  .input-wrap { position: relative; display: flex; align-items: center; }
-  .input-icon { position: absolute; left: 14px; color: var(--cinza); font-size: 0.95rem; pointer-events: none; }
-  input, select { width: 100%; background: var(--azul-input); border: 1.5px solid var(--borda); border-radius: 12px; color: var(--branco); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; padding: 13px 14px 13px 40px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; }
-  input.no-icon, select.no-icon { padding-left: 14px; }
-  select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A9BB5' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
-  select option { background: var(--azul-medio); }
-  input:focus, select:focus { border-color: rgba(0,201,111,0.45); box-shadow: 0 0 0 3px rgba(0,201,111,0.08); }
-  input::placeholder { color: rgba(138,155,181,0.5); }
-  input.campo-erro { border-color: rgba(255,92,92,0.6) !important; }
-  .msg-erro { font-size: 0.74rem; color: var(--erro); margin-top: 4px; display: none; }
-  .msg-erro.vis { display: block; }
-  .senha-toggle { position: absolute; right: 14px; background: none; border: none; color: var(--cinza); cursor: pointer; font-size: 0.85rem; padding: 4px; transition: color 0.2s; }
-  .senha-toggle:hover { color: var(--branco); }
-  .hint { font-size: 0.74rem; color: var(--cinza); margin-top: 5px; }
-  .senha-forca { display: flex; gap: 4px; margin-top: 8px; }
-  .forca-bar { flex: 1; height: 3px; border-radius: 2px; background: var(--borda); transition: background 0.3s; }
-  .forca-bar.fraca { background: var(--erro); }
-  .forca-bar.media { background: #FFB830; }
-  .forca-bar.forte { background: var(--verde); }
-  .termos { display: flex; align-items: flex-start; gap: 10px; margin: 20px 0 24px; }
-  .checkbox-custom { width: 18px; height: 18px; flex-shrink: 0; border: 1.5px solid var(--borda); border-radius: 5px; background: var(--azul-input); cursor: pointer; display: flex; align-items: center; justify-content: center; margin-top: 1px; transition: all 0.2s; }
-  .checkbox-custom.checked { background: var(--verde); border-color: var(--verde); }
-  .checkbox-custom.checked::after { content: '✓'; font-size: 0.7rem; color: var(--azul); font-weight: 700; }
-  .termos p { font-size: 0.82rem; color: var(--cinza); line-height: 1.5; }
-  .termos a { color: var(--verde); text-decoration: none; }
-  .btn-cadastrar { width: 100%; background: var(--verde); color: var(--azul); border: none; border-radius: 14px; padding: 16px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; transition: background 0.2s, transform 0.15s; }
-  .btn-cadastrar:hover { background: var(--verde-escuro); transform: scale(1.01); }
-  .btn-cadastrar:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-  .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
-  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--borda); }
-  .divider span { color: var(--cinza); font-size: 0.78rem; }
-  .btn-google { width: 100%; background: transparent; border: 1.5px solid var(--borda); border-radius: 14px; padding: 13px; color: var(--branco); font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: border-color 0.2s, background 0.2s; }
-  .btn-google:hover { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.04); }
-  .erro-geral { background: rgba(255,92,92,0.08); border: 1px solid rgba(255,92,92,0.25); border-radius: 12px; padding: 12px 16px; font-size: 0.82rem; color: var(--erro); margin-bottom: 16px; display: none; }
-  .erro-geral.vis { display: block; }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  @media (max-width: 560px) { .card { padding: 28px 22px; } .row-2 { grid-template-columns: 1fr; } nav { padding: 18px 20px; } }
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{--verde:#00C96F;--verde-escuro:#009E57;--azul:#0A1628;--azul-medio:#132240;--azul-input:#0F1C35;--branco:#F5F7F2;--cinza:#8A9BB5;--laranja:#FF6B35;--amarelo:#FFB830;--erro:#FF5C5C;--borda:rgba(255,255,255,0.09)}
+  body{font-family:'DM Sans',sans-serif;background:var(--azul);color:var(--branco);min-height:100vh}
+  body::before{content:'';position:fixed;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(0,201,111,0.09) 0%,transparent 70%);pointer-events:none;z-index:0}
+  nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--borda)}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;text-decoration:none;color:var(--branco)}
+  .logo span{color:var(--verde)}
+  .nav-right{display:flex;align-items:center;gap:14px}
+  .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,rgba(0,201,111,0.3),rgba(0,78,200,0.2));border:2px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+  .nav-name{font-size:0.85rem;font-weight:600}
+  .nav-sub{font-size:0.72rem;color:var(--cinza)}
+  .btn-sair{background:none;border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.78rem;padding:6px 12px;cursor:pointer;transition:all 0.2s}
+  .btn-sair:hover{border-color:rgba(255,92,92,0.4);color:var(--erro)}
+  .page{position:relative;z-index:5;max-width:1100px;margin:0 auto;padding:32px 24px 60px}
+  .page-header{margin-bottom:24px}
+  .page-header h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;letter-spacing:-0.5px;margin-bottom:4px}
+  .page-header p{color:var(--cinza);font-size:0.88rem}
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+  .stat-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:18px 20px}
+  .stat-icon{font-size:1.4rem;margin-bottom:8px}
+  .stat-num{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;margin-bottom:2px}
+  .stat-lbl{font-size:0.75rem;color:var(--cinza)}
+  /* APROVAÇÕES */
+  .cats-aprovadas{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+  .cat-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde);font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:100px}
+  /* FILTROS */
+  .filtros-bar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+  .filtro-label{font-size:0.78rem;color:var(--cinza);font-weight:600}
+  .filtro-pills{display:flex;gap:6px;flex-wrap:wrap}
+  .fpill{background:var(--azul-input);border:1.5px solid var(--borda);border-radius:100px;padding:6px 14px;font-size:0.78rem;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+  .fpill:hover{border-color:rgba(0,201,111,0.3)}
+  .fpill.ativo{background:rgba(0,201,111,0.12);border-color:rgba(0,201,111,0.45);color:var(--verde);font-weight:600}
+  /* CARDS PEDIDO */
+  .pedidos-grid{display:flex;flex-direction:column;gap:14px}
+  .pedido-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:18px;overflow:hidden;transition:border-color 0.2s}
+  .pedido-card:hover{border-color:rgba(0,201,111,0.25)}
+  .pedido-top{padding:20px 24px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start}
+  .pedido-cats{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+  .pcat{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.2);color:var(--verde);font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:100px}
+  .pedido-titulo{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:6px;line-height:1.3}
+  .pedido-desc{color:var(--cinza);font-size:0.82rem;line-height:1.6;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .pedido-meta{display:flex;flex-wrap:wrap;gap:12px}
+  .pmeta{font-size:0.76rem;color:var(--cinza);display:flex;align-items:center;gap:4px}
+  .pmeta strong{color:var(--branco)}
+  /* TAXA CARD */
+  .taxa-card{background:var(--azul-input);border:1px solid var(--borda);border-radius:14px;padding:14px 18px;text-align:center;min-width:140px;flex-shrink:0}
+  .taxa-label{font-size:0.68rem;color:var(--cinza);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px}
+  .taxa-valor{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:var(--laranja);margin-bottom:2px}
+  .taxa-hint{font-size:0.65rem;color:var(--cinza);line-height:1.4}
+  .taxa-loading{font-size:0.75rem;color:var(--cinza);animation:pulse 1.5s infinite}
+  /* BOTTOM */
+  .pedido-bottom{padding:0 24px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--borda);padding-top:14px}
+  .urg-badge{display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:100px}
+  .urg-urgente{background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.3);color:var(--laranja)}
+  .urg-semana{background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.25);color:var(--amarelo)}
+  .urg-pressa{background:rgba(138,155,181,0.1);border:1px solid rgba(138,155,181,0.2);color:var(--cinza)}
+  .btn-proposta{background:var(--verde);border:none;border-radius:10px;padding:10px 20px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s}
+  .btn-proposta:hover{background:var(--verde-escuro);transform:scale(1.02)}
+  /* VAZIO / LOADING */
+  .loading-wrap{text-align:center;padding:60px 20px;color:var(--cinza)}
+  .spinner{width:40px;height:40px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
+  .vazio{text-align:center;padding:60px 20px;display:none}
+  .vazio.vis{display:block}
+  .vazio-icon{font-size:3rem;opacity:0.3;margin-bottom:12px}
+  .vazio p{color:var(--cinza);font-size:0.88rem;line-height:1.6}
+  /* MODAL PROPOSTA */
+  .overlay{position:fixed;inset:0;background:rgba(10,22,40,0.92);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s}
+  .overlay.vis{opacity:1;pointer-events:all}
+  .modal{background:var(--azul-medio);border:1px solid var(--borda);border-radius:24px;width:100%;max-width:440px;padding:32px;transform:translateY(20px);transition:transform 0.3s}
+  .overlay.vis .modal{transform:translateY(0)}
+  .modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:6px}
+  .modal-sub{color:var(--cinza);font-size:0.82rem;margin-bottom:20px;line-height:1.5}
+  .modal-field{margin-bottom:14px}
+  .modal-field label{display:block;font-size:0.76rem;font-weight:600;color:var(--cinza);margin-bottom:5px}
+  .modal-field input,.modal-field textarea{width:100%;background:var(--azul-input);border:1.5px solid var(--borda);border-radius:10px;color:var(--branco);font-family:'DM Sans',sans-serif;font-size:0.88rem;padding:11px 14px;outline:none;transition:border-color 0.2s}
+  .modal-field textarea{resize:vertical;min-height:80px;line-height:1.5}
+  .modal-field input:focus,.modal-field textarea:focus{border-color:rgba(0,201,111,0.45)}
+  .modal-field input::placeholder,.modal-field textarea::placeholder{color:rgba(138,155,181,0.45)}
+  .taxa-resumo{background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:10px;padding:12px 16px;font-size:0.78rem;color:var(--cinza);margin-bottom:18px;line-height:1.6}
+  .taxa-resumo strong{color:var(--laranja)}
+  .modal-btns{display:flex;gap:10px}
+  .btn-cancelar{flex:1;background:transparent;border:1.5px solid var(--borda);border-radius:10px;padding:12px;color:var(--cinza);font-family:'Syne',sans-serif;font-weight:600;font-size:0.88rem;cursor:pointer}
+  .btn-enviar{flex:2;background:var(--verde);border:none;border-radius:10px;padding:12px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer}
+  .btn-enviar:hover{background:var(--verde-escuro)}
+  .sem-aprovacao{background:rgba(255,92,92,0.07);border:1px solid rgba(255,92,92,0.2);border-radius:14px;padding:20px 24px;margin-bottom:24px;display:none}
+  .sem-aprovacao.vis{display:block}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  @media(max-width:640px){.stats-row{grid-template-columns:1fr 1fr}.page{padding:20px 16px 40px}nav{padding:16px 18px}.pedido-top{grid-template-columns:1fr}.taxa-card{text-align:left;display:flex;align-items:center;gap:14px}}
 </style>
 <meta name="theme-color" content="#00C96F">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -84,16 +106,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-  if (!window._fbInitialized) {
-    firebase.initializeApp({
-      apiKey: "AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
-      authDomain: "servicoja-e1f49.firebaseapp.com",
-      projectId: "servicoja-e1f49",
-      storageBucket: "servicoja-e1f49.firebasestorage.app",
-      messagingSenderId: "874413426529",
-      appId: "1:874413426529:web:9891d44afd9ef1750e6720"
-    });
-    window._fbInitialized = true;
+  if(!window._fbInitialized){
+    firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",authDomain:"servicoja-e1f49.firebaseapp.com",projectId:"servicoja-e1f49",storageBucket:"servicoja-e1f49.firebasestorage.app",messagingSenderId:"874413426529",appId:"1:874413426529:web:9891d44afd9ef1750e6720"});
+    window._fbInitialized=true;
   }
 </script>
 </head>
@@ -101,467 +116,318 @@
 
 <nav>
   <a href="login.html" class="logo">Serviço<span>Já</span></a>
-  <span class="nav-login">Já tem conta? <a href="login.html">Entrar</a></span>
+  <div class="nav-right">
+    <div class="avatar">👷</div>
+    <div>
+      <div class="nav-name" id="nomeNav">Profissional</div>
+      <div class="nav-sub">Conta profissional</div>
+    </div>
+    <button class="btn-sair" onclick="sair()">Sair</button>
+  </div>
 </nav>
 
 <div class="page">
-  <div class="card">
 
-    <div class="progress-wrap">
-      <div class="step active"><div class="step-circle">1</div> Seus dados</div>
-      <div class="step-line"></div>
-      <div class="step"><div class="step-circle">2</div> Endereço</div>
-      <div class="step-line"></div>
-      <div class="step"><div class="step-circle">3</div> Confirmação</div>
+  <div class="page-header">
+    <h1>Olá, <span id="nomeHeader">Profissional</span>! 👷</h1>
+    <p>Veja os pedidos disponíveis nas suas áreas de atuação e envie propostas</p>
+  </div>
+
+  <!-- AVISO SEM APROVAÇÃO -->
+  <div class="sem-aprovacao" id="semAprovacao">
+    <strong style="color:var(--erro)">⚠️ Nenhuma profissão aprovada ainda</strong>
+    <p style="font-size:0.82rem;color:var(--cinza);margin-top:4px">Complete o teste de IA para começar a receber pedidos. <a href="cadastro-profissional.html" style="color:var(--verde)">Fazer teste →</a></p>
+  </div>
+
+  <!-- CATEGORIAS APROVADAS -->
+  <div id="catsAprovadas" style="margin-bottom:20px"></div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-num" style="color:var(--verde)" id="statDisp">0</div><div class="stat-lbl">Pedidos disponíveis</div></div>
+    <div class="stat-card"><div class="stat-icon">📨</div><div class="stat-num" style="color:var(--amarelo)" id="statEnv">0</div><div class="stat-lbl">Propostas enviadas</div></div>
+    <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-num" style="color:var(--cinza)" id="statAc">0</div><div class="stat-lbl">Aceitas</div></div>
+    <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-num" style="color:var(--amarelo)">—</div><div class="stat-lbl">Avaliação</div></div>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="filtros-bar">
+    <span class="filtro-label">Filtrar por:</span>
+    <div class="filtro-pills" id="filtroPills">
+      <div class="fpill ativo" data-cat="todos" onclick="selFiltro(this)">🔍 Todos</div>
     </div>
+  </div>
 
-    <h1 class="card-title">Crie sua conta</h1>
-    <p class="card-sub">Encontre profissionais de confiança perto de você.</p>
+  <!-- LOADING -->
+  <div class="loading-wrap" id="loading">
+    <div class="spinner"></div>
+    <p>Carregando pedidos disponíveis...</p>
+  </div>
 
-    <div class="erro-geral" id="erroGeral"></div>
+  <!-- LISTA -->
+  <div class="pedidos-grid" id="listaPedidos"></div>
 
-    <!-- DADOS PESSOAIS -->
-    <div class="section-label">Dados pessoais</div>
+  <!-- VAZIO -->
+  <div class="vazio" id="estadoVazio">
+    <div class="vazio-icon">📭</div>
+    <p>Nenhum pedido disponível para suas categorias no momento.<br>Novos pedidos aparecem aqui em tempo real!</p>
+  </div>
 
-    <div class="field">
-      <label>Nome completo <span class="req">*</span></label>
-      <div class="input-wrap">
-        <span class="input-icon">👤</span>
-        <input type="text" id="nomeInput" placeholder="Ex: Maria Silva">
-      </div>
-      <div class="msg-erro" id="erroNome">Digite seu nome completo (nome e sobrenome)</div>
+</div>
+
+<!-- MODAL PROPOSTA -->
+<div class="overlay" id="overlayProposta">
+  <div class="modal">
+    <div class="modal-title">💬 Enviar proposta</div>
+    <div class="modal-sub" id="modalPedidoTitulo"></div>
+    <div class="modal-field">
+      <label>Seu valor para o serviço (R$) *</label>
+      <input type="number" id="propValor" placeholder="Ex: 350">
     </div>
-
-    <div class="row-2">
-      <div class="field">
-        <label>E-mail <span class="req">*</span></label>
-        <div class="input-wrap">
-          <span class="input-icon">✉️</span>
-          <input type="email" id="emailInput" placeholder="seu@email.com">
-        </div>
-        <div class="msg-erro" id="erroEmail">Digite um email válido</div>
-      </div>
-      <div class="field">
-        <label>Telefone / WhatsApp <span class="req">*</span></label>
-        <div class="input-wrap">
-          <span class="input-icon">📱</span>
-          <input type="tel" id="telefoneInput" placeholder="(11) 99999-9999">
-        </div>
-        <div class="msg-erro" id="erroTelefone">Digite seu telefone</div>
-      </div>
+    <div class="modal-field">
+      <label>Mensagem para o cliente *</label>
+      <textarea id="propMensagem" placeholder="Descreva como você realizaria o serviço, sua experiência e prazo estimado..."></textarea>
     </div>
-
-    <div class="row-2">
-      <div class="field">
-        <label>Senha <span class="req">*</span></label>
-        <div class="input-wrap">
-          <span class="input-icon">🔒</span>
-          <input type="password" id="senhaInput" placeholder="Mínimo 8 caracteres" oninput="verificarSenha(this.value)">
-          <button class="senha-toggle" onclick="toggleSenha()" type="button">👁️</button>
-        </div>
-        <div class="senha-forca">
-          <div class="forca-bar" id="b1"></div>
-          <div class="forca-bar" id="b2"></div>
-          <div class="forca-bar" id="b3"></div>
-          <div class="forca-bar" id="b4"></div>
-        </div>
-        <div class="msg-erro" id="erroSenha">A senha deve ter pelo menos 8 caracteres</div>
-      </div>
-      <div class="field">
-        <label>Confirmar senha <span class="req">*</span></label>
-        <div class="input-wrap">
-          <span class="input-icon">🔒</span>
-          <input type="password" id="confirmarSenhaInput" placeholder="Repita a senha">
-        </div>
-        <div class="msg-erro" id="erroConfirmarSenha">As senhas não coincidem</div>
-      </div>
+    <div class="taxa-resumo" id="taxaResumo">
+      💡 Taxa do ServiçoJá: <strong id="taxaModal">—</strong> — cobrada apenas se o cliente aceitar sua proposta.
     </div>
-
-    <!-- ENDEREÇO -->
-    <div class="section-label">Endereço</div>
-
-    <div class="row-2">
-      <div class="field">
-        <label>CEP <span class="req">*</span></label>
-        <div class="input-wrap">
-          <span class="input-icon">📮</span>
-          <input type="text" id="cepInput" placeholder="00000-000" maxlength="9" oninput="buscarCEP(this.value)">
-        </div>
-        <p class="hint">Digite o CEP para preencher automaticamente</p>
-        <div class="msg-erro" id="erroCep">Digite um CEP válido</div>
-      </div>
-      <div class="field">
-        <label>Número <span class="req">*</span></label>
-        <div class="input-wrap">
-          <span class="input-icon">#</span>
-          <input type="text" id="numeroInput" placeholder="Ex: 142">
-        </div>
-        <div class="msg-erro" id="erroNumero">Digite o número</div>
-      </div>
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+      <button class="btn-enviar" onclick="enviarProposta()">🚀 Enviar proposta</button>
     </div>
-
-    <div class="field">
-      <label>Rua / Logradouro <span class="req">*</span></label>
-      <div class="input-wrap">
-        <span class="input-icon">🏠</span>
-        <input type="text" id="rua" placeholder="Preenchido pelo CEP">
-      </div>
-      <div class="msg-erro" id="erroRua">Digite a rua</div>
-    </div>
-
-    <div class="row-2">
-      <div class="field">
-        <label>Bairro <span class="req">*</span></label>
-        <div class="input-wrap">
-          <span class="input-icon">🗺️</span>
-          <input type="text" id="bairro" placeholder="Preenchido pelo CEP">
-        </div>
-        <div class="msg-erro" id="erroBairro">Digite o bairro</div>
-      </div>
-      <div class="field">
-        <label>Complemento</label>
-        <div class="input-wrap">
-          <span class="input-icon">🏢</span>
-          <input type="text" id="complementoInput" placeholder="Apto, bloco...">
-        </div>
-      </div>
-    </div>
-
-    <div class="row-2">
-      <div class="field">
-        <label>Cidade <span class="req">*</span></label>
-        <div class="input-wrap">
-          <span class="input-icon">🏙️</span>
-          <input type="text" id="cidade" placeholder="Preenchido pelo CEP">
-        </div>
-        <div class="msg-erro" id="erroCidade">Digite a cidade</div>
-      </div>
-      <div class="field">
-        <label>Estado <span class="req">*</span></label>
-        <div class="input-wrap">
-          <span class="input-icon">📍</span>
-          <select id="estado" class="no-icon" style="padding-left: 40px;">
-            <option value="">Selecione</option>
-            <option value="AC">Acre</option>
-            <option value="AL">Alagoas</option>
-            <option value="AP">Amapá</option>
-            <option value="AM">Amazonas</option>
-            <option value="BA">Bahia</option>
-            <option value="CE">Ceará</option>
-            <option value="DF">Distrito Federal</option>
-            <option value="ES">Espírito Santo</option>
-            <option value="GO">Goiás</option>
-            <option value="MA">Maranhão</option>
-            <option value="MT">Mato Grosso</option>
-            <option value="MS">Mato Grosso do Sul</option>
-            <option value="MG">Minas Gerais</option>
-            <option value="PA">Pará</option>
-            <option value="PB">Paraíba</option>
-            <option value="PR">Paraná</option>
-            <option value="PE">Pernambuco</option>
-            <option value="PI">Piauí</option>
-            <option value="RJ">Rio de Janeiro</option>
-            <option value="RN">Rio Grande do Norte</option>
-            <option value="RS">Rio Grande do Sul</option>
-            <option value="RO">Rondônia</option>
-            <option value="RR">Roraima</option>
-            <option value="SC">Santa Catarina</option>
-            <option value="SP">São Paulo</option>
-            <option value="SE">Sergipe</option>
-            <option value="TO">Tocantins</option>
-          </select>
-        </div>
-        <div class="msg-erro" id="erroEstado">Selecione o estado</div>
-      </div>
-    </div>
-
-    <!-- TERMOS -->
-    <div class="termos">
-      <div class="checkbox-custom" id="checkbox" onclick="toggleCheck()"></div>
-      <p>Concordo com os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a> do ServiçoJá.</p>
-    </div>
-
-    <button class="btn-cadastrar" id="btnCad" onclick="criarConta()">Criar conta grátis →</button>
-
-    <div class="divider"><span>ou cadastre com</span></div>
-
-    <button class="btn-google" onclick="cadastroGoogle()">
-      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-      Continuar com Google
-    </button>
-
   </div>
 </div>
 
 <script>
-  let checked = false;
+const uid = localStorage.getItem('sj_uid');
+const nome = localStorage.getItem('sj_nome') || 'Profissional';
+document.getElementById('nomeNav').textContent = nome;
+document.getElementById('nomeHeader').textContent = nome.split(' ')[0];
 
-  function toggleSenha() {
-    const input = document.getElementById('senhaInput');
-    input.type = input.type === 'password' ? 'text' : 'password';
-  }
+let categoriasAprovadas = [];
+let todosPedidos = [];
+let filtroAtual = 'todos';
+let pedidoAtual = null;
+let taxasCalculadas = {};
 
-  function verificarSenha(val) {
-    const bars = ['b1','b2','b3','b4'].map(id => document.getElementById(id));
-    bars.forEach(b => b.className = 'forca-bar');
-    if (!val) return;
-    let score = 0;
-    if (val.length >= 8) score++;
-    if (/[A-Z]/.test(val)) score++;
-    if (/[0-9]/.test(val)) score++;
-    if (/[^A-Za-z0-9]/.test(val)) score++;
-    const cls = score <= 1 ? 'fraca' : score <= 2 ? 'media' : 'forte';
-    for (let i = 0; i < score; i++) bars[i].classList.add(cls);
-  }
+// CALCULAR TAXA COM IA (simulada com lógica determinística baseada no pedido)
+function calcularTaxa(pedido) {
+  // Taxa base: R$10 a R$50 baseado em complexidade
+  let pontos = 0;
 
-  function toggleCheck() {
-    checked = !checked;
-    document.getElementById('checkbox').className = 'checkbox-custom' + (checked ? ' checked' : '');
-  }
+  // Urgência
+  if (pedido.urgencia && pedido.urgencia.includes('Urgente')) pontos += 30;
+  else if (pedido.urgencia && pedido.urgencia.includes('semana')) pontos += 15;
+  else pontos += 5;
 
-  function mostrarErro(id, mostrar) {
-    const el = document.getElementById(id);
-    if (el) el.className = 'msg-erro' + (mostrar ? ' vis' : '');
-  }
+  // Valor do serviço
+  const val = parseFloat(pedido.valor) || 0;
+  if (val >= 1000) pontos += 30;
+  else if (val >= 500) pontos += 20;
+  else if (val >= 200) pontos += 10;
+  else if (val > 0) pontos += 5;
+  else pontos += 10; // em aberto — assume médio
 
-  function marcarCampo(id, erro) {
-    const el = document.getElementById(id);
-    if (el) {
-      if (erro) el.classList.add('campo-erro');
-      else el.classList.remove('campo-erro');
-    }
-  }
+  // Tamanho da descrição (mais detalhado = mais complexo)
+  const desc = (pedido.descricao || '').length;
+  if (desc >= 300) pontos += 20;
+  else if (desc >= 150) pontos += 10;
+  else pontos += 5;
 
-  async function buscarCEP(val) {
-    const cep = val.replace(/\D/g, '');
-    if (cep.length !== 8) return;
-    try {
-      const res = await fetch('https://viacep.com.br/ws/' + cep + '/json/');
-      const data = await res.json();
-      if (!data.erro) {
-        document.getElementById('rua').value = data.logradouro || '';
-        document.getElementById('bairro').value = data.bairro || '';
-        document.getElementById('cidade').value = data.localidade || '';
-        const estado = document.getElementById('estado');
-        for (let opt of estado.options) {
-          if (opt.value === data.uf) { estado.value = data.uf; break; }
-        }
+  // Múltiplas categorias
+  const numCats = Array.isArray(pedido.categorias) ? pedido.categorias.length : 1;
+  if (numCats >= 3) pontos += 15;
+  else if (numCats >= 2) pontos += 8;
+
+  // Converter pontos (max ~95) para faixa R$10-R$50
+  const taxa = Math.round(10 + (pontos / 95) * 40);
+  return Math.min(50, Math.max(10, taxa));
+}
+
+function formatarData(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('pt-BR');
+}
+
+async function carregarDados() {
+  if (!uid) { window.location.href = 'login.html'; return; }
+
+  // Buscar dados do profissional
+  try {
+    const snap = await firebase.firestore().collection('usuarios').doc(uid).get();
+    if (snap.exists()) {
+      const dados = snap.data();
+      categoriasAprovadas = dados.categoriasAprovadas || [];
+
+      // Mostrar badges de categorias aprovadas
+      if (categoriasAprovadas.length > 0) {
+        document.getElementById('catsAprovadas').innerHTML =
+          '<div style="margin-bottom:6px;font-size:0.75rem;color:var(--cinza);font-weight:600">✅ Suas profissões aprovadas:</div>' +
+          '<div class="cats-aprovadas">' +
+          categoriasAprovadas.map(c => `<span class="cat-badge">✅ ${c}</span>`).join('') +
+          '</div>';
+
+        // Montar filtros
+        const pills = document.getElementById('filtroPills');
+        categoriasAprovadas.forEach(cat => {
+          const p = document.createElement('div');
+          p.className = 'fpill';
+          p.setAttribute('data-cat', cat);
+          p.textContent = cat;
+          p.onclick = function() { selFiltro(this); };
+          pills.appendChild(p);
+        });
+      } else {
+        document.getElementById('semAprovacao').classList.add('vis');
       }
-    } catch(e) {}
+    }
+  } catch(e) { console.error(e); }
+
+  // Buscar pedidos disponíveis nas categorias aprovadas
+  await carregarPedidos();
+}
+
+async function carregarPedidos() {
+  if (categoriasAprovadas.length === 0) {
+    document.getElementById('loading').style.display = 'none';
+    return;
   }
 
-  function criarConta() {
-    // Limpar erros anteriores
-    document.getElementById('erroGeral').className = 'erro-geral';
+  try {
+    // Buscar pedidos abertos
+    const snap = await firebase.firestore().collection('pedidos')
+      .where('status', '==', 'aberto').get();
 
-    const nome = document.getElementById('nomeInput').value.trim();
-    const email = document.getElementById('emailInput').value.trim();
-    const telefone = document.getElementById('telefoneInput').value.trim();
-    const senha = document.getElementById('senhaInput').value;
-    const confirmarSenha = document.getElementById('confirmarSenhaInput').value;
-    const cep = document.getElementById('cepInput').value.trim();
-    const numero = document.getElementById('numeroInput').value.trim();
-    const rua = document.getElementById('rua').value.trim();
-    const bairro = document.getElementById('bairro').value.trim();
-    const cidade = document.getElementById('cidade').value.trim();
-    const estado = document.getElementById('estado').value;
-
-    let valido = true;
-
-    // Validar nome completo (mínimo 2 palavras)
-    const nomePartes = nome.split(' ').filter(p => p.length > 0);
-    if (nomePartes.length < 2) {
-      marcarCampo('nomeInput', true);
-      mostrarErro('erroNome', true);
-      valido = false;
-    } else {
-      marcarCampo('nomeInput', false);
-      mostrarErro('erroNome', false);
-    }
-
-    // Validar email
-    if (!email || !/\S+@\S+\.\S+/.test(email)) {
-      marcarCampo('emailInput', true);
-      mostrarErro('erroEmail', true);
-      valido = false;
-    } else {
-      marcarCampo('emailInput', false);
-      mostrarErro('erroEmail', false);
-    }
-
-    // Validar telefone
-    if (!telefone || telefone.replace(/\D/g,'').length < 10) {
-      marcarCampo('telefoneInput', true);
-      mostrarErro('erroTelefone', true);
-      valido = false;
-    } else {
-      marcarCampo('telefoneInput', false);
-      mostrarErro('erroTelefone', false);
-    }
-
-    // Validar senha
-    if (!senha || senha.length < 8) {
-      marcarCampo('senhaInput', true);
-      mostrarErro('erroSenha', true);
-      valido = false;
-    } else {
-      marcarCampo('senhaInput', false);
-      mostrarErro('erroSenha', false);
-    }
-
-    // Validar confirmação de senha
-    if (senha !== confirmarSenha) {
-      marcarCampo('confirmarSenhaInput', true);
-      mostrarErro('erroConfirmarSenha', true);
-      valido = false;
-    } else {
-      marcarCampo('confirmarSenhaInput', false);
-      mostrarErro('erroConfirmarSenha', false);
-    }
-
-    // Validar CEP
-    if (!cep || cep.replace(/\D/g,'').length !== 8) {
-      marcarCampo('cepInput', true);
-      mostrarErro('erroCep', true);
-      valido = false;
-    } else {
-      marcarCampo('cepInput', false);
-      mostrarErro('erroCep', false);
-    }
-
-    // Validar número
-    if (!numero) {
-      marcarCampo('numeroInput', true);
-      mostrarErro('erroNumero', true);
-      valido = false;
-    } else {
-      marcarCampo('numeroInput', false);
-      mostrarErro('erroNumero', false);
-    }
-
-    // Validar rua
-    if (!rua) {
-      marcarCampo('rua', true);
-      mostrarErro('erroRua', true);
-      valido = false;
-    } else {
-      marcarCampo('rua', false);
-      mostrarErro('erroRua', false);
-    }
-
-    // Validar bairro
-    if (!bairro) {
-      marcarCampo('bairro', true);
-      mostrarErro('erroBairro', true);
-      valido = false;
-    } else {
-      marcarCampo('bairro', false);
-      mostrarErro('erroBairro', false);
-    }
-
-    // Validar cidade
-    if (!cidade) {
-      marcarCampo('cidade', true);
-      mostrarErro('erroCidade', true);
-      valido = false;
-    } else {
-      marcarCampo('cidade', false);
-      mostrarErro('erroCidade', false);
-    }
-
-    // Validar estado
-    if (!estado) {
-      marcarCampo('estado', true);
-      mostrarErro('erroEstado', true);
-      valido = false;
-    } else {
-      marcarCampo('estado', false);
-      mostrarErro('erroEstado', false);
-    }
-
-    // Validar termos
-    if (!checked) {
-      const erroGeral = document.getElementById('erroGeral');
-      erroGeral.textContent = '⚠️ Você precisa aceitar os Termos de Uso para continuar.';
-      erroGeral.className = 'erro-geral vis';
-      valido = false;
-    }
-
-    if (!valido) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-
-    const btn = document.getElementById('btnCad');
-    btn.textContent = 'Criando conta...';
-    btn.disabled = true;
-
-    firebase.auth().createUserWithEmailAndPassword(email, senha)
-      .then(function(cred) {
-        return firebase.firestore().collection('usuarios').doc(cred.user.uid).set({
-          nome: nome,
-          email: email,
-          telefone: telefone,
-          tipo: 'cliente',
-          endereco: {
-            cep: cep,
-            rua: rua,
-            numero: numero,
-            complemento: document.getElementById('complementoInput').value.trim(),
-            bairro: bairro,
-            cidade: cidade,
-            estado: estado
-          },
-          criadoEm: new Date().toISOString()
-        }).then(function() {
-          localStorage.setItem('sj_tipo', 'cliente');
-          localStorage.setItem('sj_uid', cred.user.uid);
-          localStorage.setItem('sj_nome', nome);
-          window.location.href = 'meus-pedidos-cliente.html';
-        });
+    // Filtrar pelos que batem com as categorias aprovadas do profissional
+    todosPedidos = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .filter(p => {
+        const cats = Array.isArray(p.categorias) ? p.categorias : [p.categorias];
+        return cats.some(c => categoriasAprovadas.includes(c));
       })
-      .catch(function(e) {
-        btn.textContent = 'Criar conta grátis →';
-        btn.disabled = false;
-        const erroGeral = document.getElementById('erroGeral');
-        let msg = 'Erro ao criar conta. Tente novamente.';
-        if (e.code === 'auth/email-already-in-use') msg = '⚠️ Este email já está cadastrado! Faça login.';
-        if (e.code === 'auth/weak-password') msg = '⚠️ Senha fraca. Use pelo menos 8 caracteres.';
-        if (e.code === 'auth/invalid-email') msg = '⚠️ Email inválido.';
-        erroGeral.textContent = msg;
-        erroGeral.className = 'erro-geral vis';
-      });
-  }
+      .sort((a, b) => (b.criadoEm || '').localeCompare(a.criadoEm || ''));
 
-  function cadastroGoogle() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider)
-      .then(function(cred) {
-        const nome = cred.user.displayName || '';
-        const email = cred.user.email || '';
-        return firebase.firestore().collection('usuarios').doc(cred.user.uid).set({
-          nome: nome,
-          email: email,
-          tipo: 'cliente',
-          criadoEm: new Date().toISOString()
-        }, { merge: true }).then(function() {
-          localStorage.setItem('sj_tipo', 'cliente');
-          localStorage.setItem('sj_uid', cred.user.uid);
-          localStorage.setItem('sj_nome', nome);
-          window.location.href = 'meus-pedidos-cliente.html';
-        });
+    document.getElementById('statDisp').textContent = todosPedidos.length;
+    document.getElementById('loading').style.display = 'none';
+    renderPedidos();
+  } catch(e) {
+    document.getElementById('loading').innerHTML = '<p style="color:var(--erro)">Erro ao carregar pedidos.</p>';
+  }
+}
+
+function selFiltro(el) {
+  document.querySelectorAll('.fpill').forEach(p => p.classList.remove('ativo'));
+  el.classList.add('ativo');
+  filtroAtual = el.getAttribute('data-cat');
+  renderPedidos();
+}
+
+function renderPedidos() {
+  const lista = document.getElementById('listaPedidos');
+  const filtrado = filtroAtual === 'todos' ? todosPedidos :
+    todosPedidos.filter(p => {
+      const cats = Array.isArray(p.categorias) ? p.categorias : [p.categorias];
+      return cats.includes(filtroAtual);
+    });
+
+  if (filtrado.length === 0) {
+    lista.innerHTML = '';
+    document.getElementById('estadoVazio').classList.add('vis');
+    return;
+  }
+  document.getElementById('estadoVazio').classList.remove('vis');
+
+  lista.innerHTML = filtrado.map(p => {
+    const cats = Array.isArray(p.categorias) ? p.categorias : [p.categorias || '—'];
+    const orcamento = p.orcamento === 'aproximado' && p.valor ? 'R$ ' + parseFloat(p.valor).toLocaleString('pt-BR') : 'Em aberto';
+    const taxa = calcularTaxa(p);
+    taxasCalculadas[p.id] = taxa;
+
+    let urgClass = 'urg-pressa', urgLabel = p.urgencia || '🗓️ Sem pressa';
+    if ((p.urgencia || '').includes('Urgente')) urgClass = 'urg-urgente';
+    else if ((p.urgencia || '').includes('semana')) urgClass = 'urg-semana';
+
+    return `
+    <div class="pedido-card" style="animation:fadeUp 0.4s ease both">
+      <div class="pedido-top">
+        <div>
+          <div class="pedido-cats">${cats.map(c => `<span class="pcat">${c}</span>`).join('')}</div>
+          <div class="pedido-titulo">${p.titulo || 'Sem título'}</div>
+          <div class="pedido-desc">${p.descricao || 'Sem descrição.'}</div>
+          <div class="pedido-meta">
+            <div class="pmeta">📅 <strong>${formatarData(p.criadoEm)}</strong></div>
+            <div class="pmeta">💰 <strong>${orcamento}</strong></div>
+            <div class="pmeta">📍 <strong>${(p.endereco||'').split(',').slice(-1)[0]||'—'}</strong></div>
+          </div>
+        </div>
+        <div class="taxa-card">
+          <div class="taxa-label">Taxa ServiçoJá</div>
+          <div class="taxa-valor">R$ ${taxa}</div>
+          <div class="taxa-hint">Cobrada só se<br>cliente aceitar</div>
+        </div>
+      </div>
+      <div class="pedido-bottom">
+        <span class="urg-badge ${urgClass}">${urgLabel}</span>
+        <button class="btn-proposta" onclick="abrirProposta('${p.id}')">💬 Enviar proposta</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function abrirProposta(id) {
+  pedidoAtual = todosPedidos.find(p => p.id === id);
+  if (!pedidoAtual) return;
+  document.getElementById('modalPedidoTitulo').textContent = pedidoAtual.titulo || 'Pedido';
+  document.getElementById('taxaModal').textContent = 'R$ ' + (taxasCalculadas[id] || '—');
+  document.getElementById('propValor').value = '';
+  document.getElementById('propMensagem').value = '';
+  document.getElementById('overlayProposta').classList.add('vis');
+}
+
+function fecharModal() {
+  document.getElementById('overlayProposta').classList.remove('vis');
+  pedidoAtual = null;
+}
+
+async function enviarProposta() {
+  const valor = document.getElementById('propValor').value.trim();
+  const mensagem = document.getElementById('propMensagem').value.trim();
+  if (!valor || !mensagem) { alert('Preencha o valor e a mensagem!'); return; }
+  if (!pedidoAtual) return;
+
+  try {
+    await firebase.firestore().collection('pedidos').doc(pedidoAtual.id).update({
+      interessados: firebase.firestore.FieldValue.arrayUnion({
+        profissionalId: uid,
+        profissionalNome: nome,
+        valor: parseFloat(valor),
+        mensagem: mensagem,
+        taxa: taxasCalculadas[pedidoAtual.id] || 10,
+        enviadoEm: new Date().toISOString()
       })
-      .catch(function(e) {
-        alert('Erro ao cadastrar com Google: ' + e.message);
-      });
+    });
+    fecharModal();
+    const env = parseInt(document.getElementById('statEnv').textContent) || 0;
+    document.getElementById('statEnv').textContent = env + 1;
+    alert('✅ Proposta enviada com sucesso! O cliente será notificado.');
+  } catch(e) {
+    alert('Erro ao enviar proposta. Tente novamente.');
   }
-</script>
+}
 
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(e => {});
-  }
-</script>
+function sair() {
+  firebase.auth().signOut().then(() => {
+    localStorage.clear();
+    window.location.href = 'login.html';
+  });
+}
 
+document.getElementById('overlayProposta').addEventListener('click', function(e) {
+  if (e.target === this) fecharModal();
+});
+
+carregarDados();
+</script>
+<script>if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(e=>{});}</script>
 </body>
 </html>
