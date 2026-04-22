@@ -63,8 +63,8 @@ const todasCats = JSON.parse(localStorage.getItem('sj_categorias') || '[]');
 firebase.auth().onAuthStateChanged(async function(user){
   if(!user){ window.location.href='login.html'; return; }
 
-  const uidBase = uid ? uid.replace('_prof','') : user.uid;
-  const possiveisIds = [uidBase+'_prof', uidBase, user.uid+'_prof', user.uid].filter((v,i,a)=>v && a.indexOf(v)===i);
+  const authUid = user.uid;
+  const possiveisIds = [authUid+'_prof', authUid, uid ? uid.replace('_prof','')+'_prof' : null, uid].filter(v=>v);
   let dados = {};
 
   for (const id of possiveisIds) {
