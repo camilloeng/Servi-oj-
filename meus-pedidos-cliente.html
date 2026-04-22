@@ -328,8 +328,8 @@
             <p style="font-size:0.83rem;color:var(--cinza);line-height:1.7;margin-bottom:16px">${p.descricao || 'Sem descrição.'}</p>
             ${(p.fotos && p.fotos.length > 0) ? `
             <div class="int-header"><span class="int-titulo">📎 Fotos anexadas (${p.fotos.length})</span></div>
-            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
-              ${p.fotos.map(f => `<div style="width:80px;height:80px;border-radius:10px;overflow:hidden;border:1px solid var(--borda);cursor:pointer" onclick="window.open('${f}','_blank')"><img src="${f}" style="width:100%;height:100%;object-fit:cover" loading="lazy"></div>`).join('')}
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px" id="fotos-${p.id}">
+              ${p.fotos.map((f,i) => `<div style="width:80px;height:80px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.09);cursor:pointer" onclick="abrirFoto('${p.id}',${i})"><img src="${f}" style="width:100%;height:100%;object-fit:cover" loading="lazy"></div>`).join('')}
             </div>` : ''}
             ${p.status === 'aberto' ? `<button onclick="editarPedido('${p.id}')" style="background:rgba(255,255,255,0.06);border:1px solid var(--borda);border-radius:8px;padding:7px 14px;color:var(--cinza);font-size:0.78rem;cursor:pointer;margin-bottom:14px">✏️ Editar pedido</button>` : ''}
             ${dadosProfHTML}
@@ -357,6 +357,14 @@
     const isOpen = intDiv.classList.contains('open');
     intDiv.classList.toggle('open', !isOpen);
     expIcon.classList.toggle('open', !isOpen);
+  }
+
+  function abrirFoto(pedidoId, idx) {
+    const pedido = todosPedidos.find(p => p.id === pedidoId);
+    if (!pedido || !pedido.fotos) return;
+    const img = pedido.fotos[idx];
+    const w = window.open('', '_blank');
+    w.document.write('<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="'+img+'" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>');
   }
 
   function editarPedido(pedidoId) {
