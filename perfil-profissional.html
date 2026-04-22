@@ -7,61 +7,74 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-  :root{--verde:#00C96F;--verde-escuro:#009E57;--azul:#0A1628;--azul-medio:#132240;--azul-input:#0F1C35;--branco:#F5F7F2;--cinza:#8A9BB5;--laranja:#FF6B35;--amarelo:#FFB830;--erro:#FF5C5C;--borda:rgba(255,255,255,0.09)}
+  :root{--verde:#00C96F;--verde-escuro:#009E57;--azul:#0A1628;--azul-medio:#132240;--azul-input:#0F1C35;--branco:#F5F7F2;--cinza:#8A9BB5;--laranja:#FF6B35;--amarelo:#FFB830;--borda:rgba(255,255,255,0.09)}
   body{font-family:'DM Sans',sans-serif;background:var(--azul);color:var(--branco);min-height:100vh}
-  nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--borda)}
-  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--branco);text-decoration:none}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid var(--borda);position:relative;z-index:10}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--branco);text-decoration:none}
   .logo span{color:var(--verde)}
   .btn-voltar{background:none;border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.78rem;padding:6px 14px;cursor:pointer;transition:all 0.2s}
-  .btn-voltar:hover{color:var(--branco);border-color:rgba(255,255,255,0.2)}
-  .page{max-width:900px;margin:0 auto;padding:32px 24px 60px}
-  /* HEADER */
-  .perfil-header{background:var(--azul-medio);border:1px solid var(--borda);border-radius:20px;padding:28px;margin-bottom:16px;display:flex;align-items:center;gap:24px}
-  .perfil-av{width:80px;height:80px;border-radius:50%;background:rgba(0,201,111,0.15);border:3px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:2.2rem;flex-shrink:0}
-  .perfil-nome{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;margin-bottom:4px;color:var(--branco)}
-  .perfil-sub{font-size:0.82rem;color:var(--cinza);margin-bottom:10px}
-  .nota-wrap{display:flex;align-items:center;gap:8px}
-  .estrelas{color:var(--amarelo);font-size:1rem;letter-spacing:2px}
-  .nota-num{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--amarelo)}
-  .nota-total{font-size:0.75rem;color:var(--cinza)}
-  .cats-badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
-  .cat-badge{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde);font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:100px}
+  .btn-voltar:hover{color:var(--branco)}
+  /* CAPA */
+  .capa{height:160px;background:linear-gradient(135deg,#0d2137 0%,#132240 50%,#0a1e35 100%);position:relative;overflow:hidden}
+  .capa::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 70% 50%,rgba(0,201,111,0.15) 0%,transparent 60%)}
+  /* LAYOUT */
+  .layout{max-width:1000px;margin:0 auto;padding:0 24px 60px;display:grid;grid-template-columns:260px 1fr;gap:20px;margin-top:-60px;position:relative;z-index:5}
+  /* SIDEBAR */
+  .sidebar{display:flex;flex-direction:column;gap:12px}
+  .perfil-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:18px;padding:20px;text-align:center}
+  .av-wrap{position:relative;margin:0 auto 12px;width:90px;height:90px}
+  .av-img{width:90px;height:90px;border-radius:50%;background:rgba(0,201,111,0.15);border:3px solid var(--azul-medio);box-shadow:0 0 0 3px rgba(0,201,111,0.3);object-fit:cover;display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden}
+  .av-edit{position:absolute;bottom:2px;right:2px;width:26px;height:26px;border-radius:50%;background:var(--verde);border:2px solid var(--azul-medio);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.7rem}
+  .prof-nome{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--branco);margin-bottom:3px}
+  .prof-cidade{font-size:0.75rem;color:var(--cinza);margin-bottom:10px}
+  .nota-wrap{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px}
+  .estrelas{color:var(--amarelo);font-size:0.9rem}
+  .nota-n{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--amarelo)}
+  .nota-t{font-size:0.72rem;color:var(--cinza)}
+  .cats-wrap{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+  .cat-badge{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde);font-size:0.68rem;font-weight:700;padding:3px 8px;border-radius:100px}
   /* STATS */
-  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
-  .stat-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:16px;text-align:center}
-  .stat-n{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--verde);margin-bottom:3px}
-  .stat-l{font-size:0.72rem;color:var(--cinza)}
-  /* CARDS */
-  .card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:22px 24px;margin-bottom:16px}
-  .card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--branco)}
-  .info-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--borda);font-size:0.85rem}
+  .stats-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:14px}
+  .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .stat-item{text-align:center;padding:8px 4px;border-radius:10px;background:var(--azul-input)}
+  .stat-n{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--verde);margin-bottom:2px}
+  .stat-l{font-size:0.65rem;color:var(--cinza);line-height:1.3}
+  /* INFO CARDS */
+  .info-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:14px 16px}
+  .info-title{font-size:0.7rem;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+  .info-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--borda);font-size:0.78rem}
   .info-row:last-child{border-bottom:none}
-  .info-lbl{color:var(--cinza);font-size:0.78rem}
-  .info-val{color:var(--branco);font-weight:500;text-align:right;max-width:60%}
+  .info-lbl{color:var(--cinza)}
+  .info-val{color:var(--branco);font-weight:500}
+  .btn-prof{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.3);border-radius:9px;padding:9px;color:var(--verde);font-size:0.75rem;font-weight:700;cursor:pointer;width:100%;text-align:center;transition:all 0.2s}
+  .btn-prof:hover{background:rgba(0,201,111,0.18)}
+  /* MAIN */
+  .main{display:flex;flex-direction:column;gap:14px;padding-top:70px}
+  .main-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:20px 22px}
+  .main-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;color:var(--branco);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
   /* PORTFÓLIO */
-  .portfolio-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
-  .foto-item{aspect-ratio:1;border-radius:10px;background:var(--azul-input);border:1px solid var(--borda);overflow:hidden;position:relative;cursor:pointer}
-  .foto-item img{width:100%;height:100%;object-fit:cover}
-  .foto-item .remove-foto{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(255,92,92,0.9);color:white;font-size:0.65rem;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:opacity 0.2s;font-weight:700}
-  .foto-item:hover .remove-foto{opacity:1}
-  .foto-add{aspect-ratio:1;border-radius:10px;border:2px dashed rgba(255,255,255,0.1);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;color:var(--cinza);font-size:1.4rem;gap:4px}
-  .foto-add span{font-size:0.65rem}
+  .portfolio-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .foto-item{aspect-ratio:1;border-radius:10px;overflow:hidden;position:relative;cursor:pointer;background:var(--azul-input);border:1px solid var(--borda)}
+  .foto-item img{width:100%;height:100%;object-fit:cover;display:block}
+  .foto-item .rm{position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:rgba(255,92,92,0.9);color:#fff;font-size:0.6rem;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:opacity 0.2s;font-weight:700}
+  .foto-item:hover .rm{opacity:1}
+  .foto-add{aspect-ratio:1;border-radius:10px;border:2px dashed rgba(255,255,255,0.1);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--cinza);font-size:1.2rem;gap:3px;transition:all 0.2s}
+  .foto-add span{font-size:0.6rem}
   .foto-add:hover{border-color:rgba(0,201,111,0.4);color:var(--verde)}
-  .btn-add-foto{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.3);border-radius:9px;padding:8px 16px;color:var(--verde);font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s}
-  .btn-add-foto:hover{background:rgba(0,201,111,0.18)}
   /* AVALIAÇÕES */
-  .aval-card{background:var(--azul-input);border:1px solid var(--borda);border-radius:12px;padding:14px 16px;margin-bottom:10px}
-  .aval-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-  .aval-av{width:32px;height:32px;border-radius:50%;background:rgba(0,201,111,0.15);border:1.5px solid rgba(0,201,111,0.25);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0}
-  .aval-nome{font-weight:600;font-size:0.85rem;color:var(--branco)}
-  .aval-data{font-size:0.7rem;color:var(--cinza)}
-  .aval-estrelas{margin-left:auto;color:var(--amarelo);font-size:0.85rem}
-  .aval-texto{font-size:0.82rem;color:var(--cinza);line-height:1.6}
-  .sem-avaliacoes{text-align:center;padding:30px;color:var(--cinza);font-size:0.85rem}
+  .aval-item{background:var(--azul-input);border:1px solid var(--borda);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+  .aval-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .aval-av{width:30px;height:30px;border-radius:50%;background:rgba(0,201,111,0.12);border:1.5px solid rgba(0,201,111,0.2);display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;overflow:hidden}
+  .aval-av img{width:100%;height:100%;object-fit:cover}
+  .aval-nome{font-weight:600;font-size:0.82rem;color:var(--branco)}
+  .aval-data{font-size:0.68rem;color:var(--cinza)}
+  .aval-stars{margin-left:auto;color:var(--amarelo);font-size:0.8rem}
+  .aval-txt{font-size:0.8rem;color:var(--cinza);line-height:1.6}
+  .sem-av{text-align:center;padding:24px;color:var(--cinza);font-size:0.82rem}
   /* SPINNER */
   .spinner{width:40px;height:40px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;margin:60px auto}
   @keyframes spin{to{transform:rotate(360deg)}}
-  @media(max-width:640px){.portfolio-grid{grid-template-columns:repeat(3,1fr)}.stats-row{grid-template-columns:1fr 1fr}.perfil-header{flex-direction:column;text-align:center}.nota-wrap{justify-content:center}}
+  @media(max-width:700px){.layout{grid-template-columns:1fr;margin-top:0}.main{padding-top:0}.portfolio-grid{grid-template-columns:repeat(3,1fr)}}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -79,211 +92,253 @@
   <button class="btn-voltar" onclick="history.back()">← Voltar ao dashboard</button>
 </nav>
 
-<div class="page">
-  <div id="pageContent"><div class="spinner"></div></div>
+<div class="capa"></div>
+
+<div class="layout" id="layout" style="display:none">
+  <div class="sidebar">
+    <div class="perfil-card">
+      <div class="av-wrap">
+        <div class="av-img" id="avImg">👷</div>
+        <div class="av-edit" onclick="document.getElementById('fotoInput').click()" title="Trocar foto">✏️</div>
+      </div>
+      <div class="prof-nome" id="profNome">—</div>
+      <div class="prof-cidade" id="profCidade">—</div>
+      <div class="nota-wrap">
+        <span class="estrelas" id="profEstrelas">☆☆☆☆☆</span>
+        <span class="nota-n" id="profNota">—</span>
+        <span class="nota-t" id="profAvals"></span>
+      </div>
+      <div class="cats-wrap" id="profCats"></div>
+    </div>
+
+    <div class="stats-card">
+      <div class="stats-grid">
+        <div class="stat-item"><div class="stat-n" id="statAvals">0</div><div class="stat-l">Avaliações</div></div>
+        <div class="stat-item"><div class="stat-n" style="color:var(--amarelo)" id="statNota">—</div><div class="stat-l">Nota média</div></div>
+        <div class="stat-item"><div class="stat-n" style="color:var(--cinza)" id="statFotos">0</div><div class="stat-l">Fotos</div></div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-title">Dados pessoais</div>
+      <div class="info-row"><span class="info-lbl">E-mail</span><span class="info-val" id="iEmail">—</span></div>
+      <div class="info-row"><span class="info-lbl">WhatsApp</span><span class="info-val" id="iTel">—</span></div>
+      <div class="info-row"><span class="info-lbl">Cidade</span><span class="info-val" id="iCidade">—</span></div>
+      <div class="info-row"><span class="info-lbl">Raio</span><span class="info-val" id="iRaio">—</span></div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-title">💰 Taxas pendentes</div>
+      <div style="font-weight:800;font-size:1.1rem;color:var(--laranja);margin-bottom:3px" id="taxaValor">R$ 0,00</div>
+      <div style="font-size:0.7rem;color:var(--cinza);margin-bottom:10px">Vencimento: <strong id="taxaVenc" style="color:var(--amarelo)">—</strong></div>
+      <div class="btn-prof" id="btnPagar" style="background:rgba(255,107,53,0.1);border-color:rgba(255,107,53,0.3);color:var(--laranja)" onclick="alert('Em breve: pagamento via Pix/cartão. Entre em contato: (11) 99999-9999')">Pagar agora</div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-title">Profissões aprovadas</div>
+      <div id="profissoesLista"></div>
+      <div style="margin-top:10px">
+        <div class="btn-prof" onclick="window.location.href='cadastro-profissional.html?teste=1'">+ Adicionar profissão</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="main-card">
+      <div class="main-title">
+        📝 Sobre mim
+      </div>
+      <p id="profSobre" style="font-size:0.83rem;color:var(--cinza);line-height:1.7">—</p>
+    </div>
+
+    <div class="main-card">
+      <div class="main-title">
+        🖼️ Portfólio
+        <button class="btn-prof" style="width:auto;padding:6px 14px" onclick="document.getElementById('fotoPortInput').click()">+ Adicionar fotos</button>
+      </div>
+      <div class="portfolio-grid" id="portfolioGrid"></div>
+      <p style="font-size:0.68rem;color:var(--cinza);margin-top:8px">Máximo 15 fotos · Clique para ampliar · Passe o mouse para remover</p>
+    </div>
+
+    <div class="main-card">
+      <div class="main-title">⭐ Avaliações dos clientes</div>
+      <div id="avaliacesList"></div>
+    </div>
+  </div>
 </div>
 
-<input type="file" id="fotoInput" accept="image/*" multiple style="display:none">
+<div id="loading" style="text-align:center;padding:80px"><div class="spinner"></div></div>
+
+<input type="file" id="fotoInput" accept="image/*" style="display:none">
+<input type="file" id="fotoPortInput" accept="image/*" multiple style="display:none">
 
 <script>
+const IMGBB_KEY = '327d0067238019843e43362c2f7096c7';
 let profDocId = null;
 let fotosAtuais = [];
 
-firebase.auth().onAuthStateChanged(async function(user){
-  if(!user){ window.location.href='login.html'; return; }
-
-  let dados = {};
-  let docId = null;
-
-  // Buscar por email — mais confiável
-  try {
-    const q = await firebase.firestore().collection('usuarios')
-      .where('email','==',user.email)
-      .where('tipo','==','profissional')
-      .get();
-    if(!q.empty){
-      dados = q.docs[0].data();
-      docId = q.docs[0].id;
-    }
-  } catch(e){}
-
-  // Fallback por UID
-  if(!dados.nome){
-    for(const id of [user.uid+'_prof', user.uid]){
-      try{
-        const s = await firebase.firestore().collection('usuarios').doc(id).get();
-        if(s.exists() && s.data().nome){ dados=s.data(); docId=id; break; }
-      }catch(e){}
-    }
-  }
-
-  profDocId = docId;
-  fotosAtuais = dados.portfolio || [];
-
-  // Buscar avaliações
-  let avaliacoes = [];
-  try{
-    const av = await firebase.firestore().collection('avaliacoes')
-      .where('profissionalId','==',docId).get();
-    avaliacoes = av.docs.map(d=>d.data());
-  }catch(e){}
-
-  renderPerfil(dados, avaliacoes);
-});
-
-function calcNota(avaliacoes){
-  if(!avaliacoes.length) return null;
-  const soma = avaliacoes.reduce((s,a)=>s+(a.nota||0),0);
-  return (soma/avaliacoes.length).toFixed(1);
+async function uploadImgBB(base64) {
+  const formData = new FormData();
+  formData.append('image', base64.split(',')[1] || base64);
+  const res = await fetch('https://api.imgbb.com/1/upload?key='+IMGBB_KEY, {method:'POST',body:formData});
+  const data = await res.json();
+  if(data.success) return data.data.url;
+  throw new Error(data.error?.message || 'Upload falhou');
 }
 
-function estrelas(nota){
+function estrelas(nota) {
   if(!nota) return '☆☆☆☆☆';
   const n = Math.round(parseFloat(nota));
   return '★'.repeat(n)+'☆'.repeat(5-n);
 }
 
-function renderPerfil(d, avaliacoes){
+firebase.auth().onAuthStateChanged(async function(user){
+  if(!user){ window.location.href='login.html'; return; }
+
+  let dados = {};
+  try {
+    const q = await firebase.firestore().collection('usuarios')
+      .where('email','==',user.email).where('tipo','==','profissional').get();
+    if(!q.empty){ dados=q.docs[0].data(); profDocId=q.docs[0].id; }
+  } catch(e){}
+
+  if(!dados.nome){
+    for(const id of [user.uid+'_prof',user.uid]){
+      try{
+        const s=await firebase.firestore().collection('usuarios').doc(id).get();
+        if(s.exists()&&s.data().nome){dados=s.data();profDocId=id;break;}
+      }catch(e){}
+    }
+  }
+
+  fotosAtuais = dados.portfolio || [];
+
+  let avaliacoes = [];
+  try{
+    const av=await firebase.firestore().collection('avaliacoes').where('profissionalId','==',profDocId).get();
+    avaliacoes=av.docs.map(d=>d.data());
+  }catch(e){}
+
+  renderPerfil(dados, avaliacoes);
+});
+
+function renderPerfil(d, avs) {
   const end = d.endereco || {};
-  // Atualizar avatar com foto real
-  if (d.fotoPerfil) {
-    const av = document.getElementById('profAvHeader');
-    if(av) av.innerHTML = '<img src="'+d.fotoPerfil+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
-  }
-  const nota = calcNota(avaliacoes);
+  const nota = avs.length ? (avs.reduce((s,a)=>s+(a.nota||0),0)/avs.length).toFixed(1) : null;
   const cats = d.categoriasAprovadas || [];
-  const fotos = d.portfolio || [];
-  const page = document.getElementById('pageContent');
 
-  page.innerHTML = `
-    <div class="perfil-header">
-      <div class="perfil-av" id="profAvHeader" style="overflow:hidden">👷</div>
-      <div>
-        <div class="perfil-nome">${d.nome||'—'}</div>
-        <div class="perfil-sub">📍 ${end.cidade||'—'}, ${end.estado||'—'} &nbsp;·&nbsp; Membro desde ${d.criadoEm ? new Date(d.criadoEm).toLocaleDateString('pt-BR',{month:'long',year:'numeric'}) : '—'}</div>
-        <div class="nota-wrap">
-          <span class="estrelas">${estrelas(nota)}</span>
-          <span class="nota-num">${nota||'—'}</span>
-          <span class="nota-total">${avaliacoes.length} avaliação(ões)</span>
-        </div>
-        <div class="cats-badges">${cats.map(c=>`<span class="cat-badge">✅ ${c}</span>`).join('')}</div>
-      </div>
-    </div>
+  // Avatar
+  const avEl = document.getElementById('avImg');
+  if(d.fotoPerfil) avEl.innerHTML='<img src="'+d.fotoPerfil+'" style="width:100%;height:100%;object-fit:cover">';
 
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-n" style="color:var(--amarelo)">${nota||'—'}</div><div class="stat-l">Avaliação média</div></div>
-      <div class="stat-card"><div class="stat-n">${avaliacoes.length}</div><div class="stat-l">Avaliações</div></div>
-      <div class="stat-card"><div class="stat-n" style="color:var(--cinza)">${fotos.length}</div><div class="stat-l">Fotos no portfólio</div></div>
-    </div>
+  // Info básica
+  document.getElementById('profNome').textContent = d.nome || '—';
+  document.getElementById('profCidade').textContent = (end.cidade&&end.estado) ? '📍 '+end.cidade+', '+end.estado : '—';
+  document.getElementById('profEstrelas').textContent = estrelas(nota);
+  document.getElementById('profNota').textContent = nota || '—';
+  document.getElementById('profAvals').textContent = avs.length+' avaliação(ões)';
+  document.getElementById('profCats').innerHTML = cats.map(c=>'<span class="cat-badge">✅ '+c+'</span>').join('');
 
-    <div class="card">
-      <div class="card-title">👤 Dados pessoais</div>
-      <div class="info-row"><span class="info-lbl">Nome completo</span><span class="info-val">${d.nome||'—'}</span></div>
-      <div class="info-row"><span class="info-lbl">E-mail</span><span class="info-val">${d.email||'—'}</span></div>
-      <div class="info-row"><span class="info-lbl">WhatsApp</span><span class="info-val">${d.telefone||'—'}</span></div>
-      <div class="info-row"><span class="info-lbl">Raio de atendimento</span><span class="info-val">${d.raioAtendimento ? d.raioAtendimento+' km' : '—'}</span></div>
-    </div>
+  // Stats
+  document.getElementById('statAvals').textContent = avs.length;
+  document.getElementById('statNota').textContent = nota || '—';
+  document.getElementById('statFotos').textContent = fotosAtuais.length;
 
-    <div class="card">
-      <div class="card-title">📍 Endereço de atuação</div>
-      <div class="info-row"><span class="info-lbl">Cidade</span><span class="info-val">${end.cidade||'—'}, ${end.estado||'—'}</span></div>
-      <div class="info-row"><span class="info-lbl">Bairro</span><span class="info-val">${end.bairro||'—'}</span></div>
-      <div class="info-row"><span class="info-lbl">CEP</span><span class="info-val">${end.cep||'—'}</span></div>
-    </div>
+  // Info sidebar
+  document.getElementById('iEmail').textContent = d.email || '—';
+  document.getElementById('iTel').textContent = d.telefone || '—';
+  document.getElementById('iCidade').textContent = end.cidade ? end.cidade+', '+end.estado : '—';
+  document.getElementById('iRaio').textContent = d.raioAtendimento ? d.raioAtendimento+' km' : '—';
 
-    <div class="card">
-      <div class="card-title">📝 Sobre mim</div>
-      <p style="color:var(--cinza);font-size:0.85rem;line-height:1.7">${d.sobre||'—'}</p>
-    </div>
-
-    <div class="card">
-      <div class="card-title">
-        🖼️ Portfólio de trabalhos
-        <button class="btn-add-foto" onclick="document.getElementById('fotoInput').click()">+ Adicionar fotos</button>
-      </div>
-      <div class="portfolio-grid" id="portfolioGrid">${renderFotos(fotos)}</div>
-      <p style="font-size:0.72rem;color:var(--cinza)">Máximo de 15 fotos · Clique em uma foto para removê-la</p>
-    </div>
-
-    <div class="card">
-      <div class="card-title">⭐ Avaliações dos clientes</div>
-      ${avaliacoes.length > 0 ? avaliacoes.sort((a,b)=>b.criadoEm-a.criadoEm).map(av=>`
-        <div class="aval-card">
-          <div class="aval-header">
-            <div class="aval-av">👤</div>
-            <div>
-              <div class="aval-nome">${av.clienteNome||'Cliente'}</div>
-              <div class="aval-data">${av.criadoEm ? new Date(av.criadoEm).toLocaleDateString('pt-BR') : '—'}</div>
-            </div>
-            <div class="aval-estrelas">${estrelas(av.nota)} ${av.nota}/5</div>
-          </div>
-          <div class="aval-texto">${av.comentario||''}</div>
-        </div>`).join('') : '<div class="sem-avaliacoes">📭 Nenhuma avaliação ainda.<br>As avaliações aparecem após os clientes concluírem serviços.</div>'}
-    </div>
-
-    <div class="card">
-      <div class="card-title">🛠️ Profissões aprovadas</div>
-      ${cats.map(c=>`<div class="info-row"><span class="info-lbl">${c}</span><span style="color:var(--verde);font-size:0.78rem;font-weight:700">✅ Aprovado</span></div>`).join('')}
-      ${(d.categorias||[]).filter(c=>!cats.includes(c)).map(c=>`<div class="info-row"><span class="info-lbl">${c}</span><span style="color:var(--cinza);font-size:0.78rem">⏳ Pendente</span></div>`).join('')}
-      <div style="margin-top:14px">
-        <button class="btn-add-foto" onclick="window.location.href='cadastro-profissional.html?teste=1'">+ Adicionar nova profissão</button>
-      </div>
-    </div>`;
-
-  // Setup upload
-  document.getElementById('fotoInput').onchange = function(){ adicionarFotos(this.files); };
-}
-
-function renderFotos(fotos){
-  const slots = fotos.map((f,i)=>`
-    <div class="foto-item">
-      <img src="${f}" alt="Foto ${i+1}">
-      <div class="remove-foto" onclick="removerFoto(${i})">✕</div>
-    </div>`).join('');
-  const addBtn = fotos.length < 15 ? `<div class="foto-add" onclick="document.getElementById('fotoInput').click()">➕<span>Adicionar</span></div>` : '';
-  return slots + addBtn;
-}
-
-const IMGBB_KEY = '327d0067238019843e43362c2f7096c7';
-async function uploadImgBB(file) {
-  const formData = new FormData();
-  if (typeof file === 'string') { formData.append('image', file.split(',')[1] || file); }
-  else { formData.append('image', file); }
-  const res = await fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_KEY, {method:'POST',body:formData});
-  const data = await res.json();
-  if (data.success) return data.data.url;
-  throw new Error(data.error?.message || 'Upload falhou');
-}
-
-async function adicionarFotos(files) {
-  if(!profDocId) return;
-  const disponiveis = 15 - fotosAtuais.length;
-  if(disponiveis <= 0) { alert('Máximo de 15 fotos!'); return; }
-  const arr = Array.from(files).slice(0, disponiveis);
-  document.getElementById('portfolioGrid').innerHTML += '<div style="padding:8px;color:#8A9BB5;font-size:0.75rem">Enviando ' + arr.length + ' foto(s)...</div>';
-  for (const f of arr) {
-    try {
-      const localUrl = await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(f);});
-      const url = await uploadImgBB(localUrl);
-      fotosAtuais.push(url);
-    } catch(e) { alert('Erro: ' + e.message); }
+  // Taxa acumulada
+  const taxa = d.taxaAcumulada || 0;
+  document.getElementById('taxaValor').textContent = 'R$ ' + taxa.toFixed(2).replace('.',',');
+  if(taxa > 0) {
+    const venc = new Date(); venc.setDate(venc.getDate()+10);
+    document.getElementById('taxaVenc').textContent = venc.toLocaleDateString('pt-BR');
   }
-  await salvarFotos();
-  document.getElementById('portfolioGrid').innerHTML = renderFotos(fotosAtuais);
+
+  // Profissões
+  document.getElementById('profissoesLista').innerHTML =
+    cats.map(c=>'<div class="info-row"><span class="info-lbl">'+c+'</span><span style="color:var(--verde);font-size:0.72rem;font-weight:700">✅ Aprovado</span></div>').join('') +
+    (d.categorias||[]).filter(c=>!cats.includes(c)).map(c=>'<div class="info-row"><span class="info-lbl">'+c+'</span><span style="color:var(--cinza);font-size:0.72rem">⏳ Pendente</span></div>').join('');
+
+  // Sobre
+  document.getElementById('profSobre').textContent = d.sobre || 'Nenhuma descrição adicionada ainda.';
+
+  // Portfólio
+  renderFotos();
+
+  // Avaliações
+  document.getElementById('avaliacesList').innerHTML = avs.length>0
+    ? avs.sort((a,b)=>(b.criadoEm||'').localeCompare(a.criadoEm||'')).map(av=>`
+      <div class="aval-item">
+        <div class="aval-head">
+          <div class="aval-av">${av.fotoCliente?'<img src="'+av.fotoCliente+'">':'👤'}</div>
+          <div><div class="aval-nome">${av.clienteNome||'Cliente'}</div><div class="aval-data">${av.criadoEm?new Date(av.criadoEm).toLocaleDateString('pt-BR'):'—'}</div></div>
+          <div class="aval-stars">${estrelas(av.nota)} ${av.nota}/5</div>
+        </div>
+        <div class="aval-txt">${av.comentario||''}</div>
+      </div>`).join('')
+    : '<div class="sem-av">📭 Nenhuma avaliação ainda.<br>Aparecem após clientes concluírem serviços.</div>';
+
+  document.getElementById('loading').style.display='none';
+  document.getElementById('layout').style.display='grid';
 }
 
-async function removerFoto(idx){
+function renderFotos() {
+  const grid = document.getElementById('portfolioGrid');
+  grid.innerHTML = fotosAtuais.map((f,i)=>`
+    <div class="foto-item" onclick="window.open('${f}','_blank')">
+      <img src="${f}" loading="lazy">
+      <div class="rm" onclick="event.stopPropagation();removerFoto(${i})">✕</div>
+    </div>`).join('') +
+    (fotosAtuais.length<15?'<div class="foto-add" onclick="document.getElementById(\'fotoPortInput\').click()">➕<span>Adicionar</span></div>':'');
+  document.getElementById('statFotos').textContent = fotosAtuais.length;
+}
+
+async function removerFoto(idx) {
   if(!confirm('Remover esta foto?')) return;
   fotosAtuais.splice(idx,1);
   await salvarFotos();
-  document.getElementById('portfolioGrid').innerHTML = renderFotos(fotosAtuais);
+  renderFotos();
 }
 
-async function salvarFotos(){
-  try{
-    await firebase.firestore().collection('usuarios').doc(profDocId).update({ portfolio: fotosAtuais });
-  }catch(e){ alert('Erro ao salvar: '+e.message); }
+async function salvarFotos() {
+  try{ await firebase.firestore().collection('usuarios').doc(profDocId).update({portfolio:fotosAtuais}); }
+  catch(e){ alert('Erro ao salvar: '+e.message); }
 }
+
+// Foto de perfil
+document.getElementById('fotoInput').onchange = async function() {
+  if(!this.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const avEl = document.getElementById('avImg');
+    avEl.innerHTML = '<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover">';
+    try {
+      const url = await uploadImgBB(e.target.result);
+      await firebase.firestore().collection('usuarios').doc(profDocId).update({fotoPerfil:url});
+    } catch(err){ alert('Erro ao salvar foto: '+err.message); }
+  };
+  reader.readAsDataURL(this.files[0]);
+};
+
+// Portfólio
+document.getElementById('fotoPortInput').onchange = async function() {
+  const files = Array.from(this.files);
+  const disp = 15-fotosAtuais.length;
+  if(disp<=0){alert('Máximo 15 fotos!');return;}
+  for(const f of files.slice(0,disp)){
+    try{
+      const b64 = await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(f);});
+      const url = await uploadImgBB(b64);
+      fotosAtuais.push(url);
+    }catch(e){alert('Erro: '+e.message);}
+  }
+  await salvarFotos();
+  renderFotos();
+};
 </script>
 </body>
 </html>
