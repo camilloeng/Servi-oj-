@@ -9,93 +9,112 @@
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
   :root{--verde:#00C96F;--verde-escuro:#009E57;--azul:#0A1628;--azul-medio:#132240;--azul-input:#0F1C35;--branco:#F5F7F2;--cinza:#8A9BB5;--laranja:#FF6B35;--amarelo:#FFB830;--erro:#FF5C5C;--borda:rgba(255,255,255,0.09)}
   body{font-family:'DM Sans',sans-serif;background:var(--azul);color:var(--branco);min-height:100vh}
-  body::before{content:'';position:fixed;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(0,201,111,0.09) 0%,transparent 70%);pointer-events:none;z-index:0}
-  nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--borda)}
-  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;text-decoration:none;color:var(--branco)}
+  a{color:inherit;text-decoration:none}
+  nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--borda)}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--branco)}
   .logo span{color:var(--verde)}
-  .nav-right{display:flex;align-items:center;gap:14px}
-  .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,rgba(0,201,111,0.3),rgba(0,78,200,0.2));border:2px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
-  .nav-name{font-size:0.85rem;font-weight:600}
+  .nav-r{display:flex;align-items:center;gap:12px}
+  .av{width:36px;height:36px;border-radius:50%;background:rgba(0,201,111,0.2);border:2px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+  .nav-name{font-size:0.85rem;font-weight:600;color:var(--branco)}
   .nav-sub{font-size:0.72rem;color:var(--cinza)}
   .btn-sair{background:none;border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.78rem;padding:6px 12px;cursor:pointer;transition:all 0.2s}
   .btn-sair:hover{border-color:rgba(255,92,92,0.4);color:var(--erro)}
-  .page{position:relative;z-index:5;max-width:1100px;margin:0 auto;padding:32px 24px 60px}
-  .page-header{margin-bottom:24px}
-  .page-header h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;letter-spacing:-0.5px;margin-bottom:4px}
-  .page-header p{color:var(--cinza);font-size:0.88rem}
-  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
-  .stat-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:18px 20px}
-  .stat-icon{font-size:1.4rem;margin-bottom:8px}
-  .stat-num{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;margin-bottom:2px}
-  .stat-lbl{font-size:0.75rem;color:var(--cinza)}
-  /* APROVAÇÕES */
-  .cats-aprovadas{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
-  .cat-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde);font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:100px}
-  /* FILTROS */
-  .filtros-bar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
-  .filtro-label{font-size:0.78rem;color:var(--cinza);font-weight:600}
-  .filtro-pills{display:flex;gap:6px;flex-wrap:wrap}
-  .fpill{background:var(--azul-input);border:1.5px solid var(--borda);border-radius:100px;padding:6px 14px;font-size:0.78rem;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+  .layout{display:grid;grid-template-columns:220px 1fr;gap:16px;max-width:1200px;margin:0 auto;padding:24px 24px 60px}
+  /* SIDEBAR */
+  .sidebar{display:flex;flex-direction:column;gap:10px}
+  .prof-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:16px;text-align:center}
+  .prof-av{width:56px;height:56px;border-radius:50%;background:rgba(0,201,111,0.15);border:2px solid rgba(0,201,111,0.3);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem}
+  .prof-name{font-weight:700;font-size:0.9rem;color:var(--branco);margin-bottom:2px}
+  .prof-sub{font-size:0.72rem;color:var(--cinza);margin-bottom:8px}
+  .rating{display:flex;align-items:center;justify-content:center;gap:4px;font-size:0.78rem;color:var(--amarelo)}
+  .bloco{background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:14px}
+  .bloco-title{font-size:0.68rem;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+  .cat-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--borda);font-size:0.78rem;color:var(--branco)}
+  .cat-row:last-child{border-bottom:none}
+  .cat-ok{color:var(--verde);font-size:0.68rem;font-weight:700}
+  .cat-pend{color:var(--cinza);font-size:0.68rem}
+  .nav-menu{background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:6px;display:flex;flex-direction:column;gap:2px}
+  .nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:0.78rem;cursor:pointer;color:var(--cinza);transition:all 0.2s}
+  .nav-item:hover{color:var(--branco);background:rgba(255,255,255,0.04)}
+  .nav-item.ativo{background:rgba(0,201,111,0.1);color:var(--verde);font-weight:600}
+  .btn-teste{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.3);border-radius:10px;padding:10px;color:var(--verde);font-size:0.78rem;font-weight:700;cursor:pointer;width:100%;text-align:center;transition:all 0.2s}
+  .btn-teste:hover{background:rgba(0,201,111,0.18)}
+  /* TAXA BOX — compacta */
+  .taxa-box{background:var(--azul-medio);border:1px solid rgba(255,107,53,0.4);border-radius:12px;padding:11px 13px}
+  .taxa-box .bloco-title{margin-bottom:6px}
+  .taxa-valor{font-weight:800;font-size:1.1rem;color:var(--laranja);margin-bottom:3px}
+  .taxa-venc{font-size:0.7rem;color:var(--cinza);margin-bottom:8px}
+  .taxa-venc strong{color:var(--amarelo)}
+  .btn-pagar{background:var(--laranja);border:none;border-radius:7px;padding:7px;color:var(--branco);font-size:0.72rem;font-weight:700;cursor:pointer;width:100%;margin-bottom:5px}
+  .taxa-hist{font-size:0.68rem;color:var(--cinza);text-align:center;cursor:pointer;text-decoration:underline}
+  /* BLOQUEADO */
+  .bloqueado-box{background:rgba(255,92,92,0.07);border:2px solid rgba(255,92,92,0.4);border-radius:12px;padding:12px;text-align:center;display:none}
+  .bloqueado-box.vis{display:block}
+  .bloq-icon{font-size:1.4rem;margin-bottom:4px}
+  .bloq-title{font-weight:800;font-size:0.82rem;color:var(--erro);margin-bottom:4px}
+  .bloq-sub{font-size:0.7rem;color:var(--cinza);line-height:1.5;margin-bottom:8px}
+  .btn-regularizar{background:var(--erro);border:none;border-radius:7px;padding:7px;color:var(--branco);font-size:0.72rem;font-weight:700;cursor:pointer;width:100%}
+  /* MAIN */
+  .main{display:flex;flex-direction:column;gap:14px}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .stat{background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:14px 16px}
+  .stat-n{font-weight:800;font-size:1.5rem;margin-bottom:2px}
+  .stat-l{font-size:0.72rem;color:var(--cinza)}
+  .section-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--branco)}
+  .filtros{display:flex;gap:6px;flex-wrap:wrap}
+  .fpill{background:var(--azul-input);border:1.5px solid var(--borda);border-radius:100px;padding:5px 12px;font-size:0.75rem;color:var(--cinza);cursor:pointer;transition:all 0.2s;white-space:nowrap}
   .fpill:hover{border-color:rgba(0,201,111,0.3)}
   .fpill.ativo{background:rgba(0,201,111,0.12);border-color:rgba(0,201,111,0.45);color:var(--verde);font-weight:600}
-  /* CARDS PEDIDO */
-  .pedidos-grid{display:flex;flex-direction:column;gap:14px}
-  .pedido-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:18px;overflow:hidden;transition:border-color 0.2s}
+  /* PEDIDO CARD */
+  .pedido-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:16px 20px;transition:border-color 0.2s;animation:fadeUp 0.4s ease both}
   .pedido-card:hover{border-color:rgba(0,201,111,0.25)}
-  .pedido-top{padding:20px 24px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start}
-  .pedido-cats{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+  .p-cats{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
   .pcat{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.2);color:var(--verde);font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:100px}
-  .pedido-titulo{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:6px;line-height:1.3}
-  .pedido-desc{color:var(--cinza);font-size:0.82rem;line-height:1.6;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .pedido-meta{display:flex;flex-wrap:wrap;gap:12px}
-  .pmeta{font-size:0.76rem;color:var(--cinza);display:flex;align-items:center;gap:4px}
-  .pmeta strong{color:var(--branco)}
-  /* TAXA CARD */
-  .taxa-card{background:var(--azul-input);border:1px solid var(--borda);border-radius:14px;padding:14px 18px;text-align:center;min-width:140px;flex-shrink:0}
-  .taxa-label{font-size:0.68rem;color:var(--cinza);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px}
-  .taxa-valor{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:var(--laranja);margin-bottom:2px}
-  .taxa-hint{font-size:0.65rem;color:var(--cinza);line-height:1.4}
-  .taxa-loading{font-size:0.75rem;color:var(--cinza);animation:pulse 1.5s infinite}
-  /* BOTTOM */
-  .pedido-bottom{padding:0 24px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--borda);padding-top:14px}
-  .urg-badge{display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:100px}
+  .p-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;color:var(--branco);margin-bottom:5px;line-height:1.3}
+  .p-desc{color:var(--cinza);font-size:0.8rem;line-height:1.6;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .p-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid var(--borda);padding-top:10px}
+  .p-meta{display:flex;flex-wrap:wrap;gap:10px}
+  .pm{font-size:0.75rem;color:var(--cinza)}
+  .pm strong{color:var(--branco)}
+  .p-actions{display:flex;align-items:center;gap:8px}
+  .taxa-badge{background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.25);border-radius:7px;padding:4px 10px;font-size:0.72rem;color:var(--laranja);font-weight:700;white-space:nowrap}
+  .btn-prop{background:transparent;border:1.5px solid var(--verde);border-radius:9px;padding:7px 16px;color:var(--verde);font-weight:700;font-size:0.8rem;cursor:pointer;transition:all 0.2s}
+  .btn-prop:hover{background:var(--verde);color:var(--azul)}
+  /* URGÊNCIA */
+  .urg{display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:700;padding:3px 8px;border-radius:100px}
   .urg-urgente{background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.3);color:var(--laranja)}
   .urg-semana{background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.25);color:var(--amarelo)}
   .urg-pressa{background:rgba(138,155,181,0.1);border:1px solid rgba(138,155,181,0.2);color:var(--cinza)}
-  .btn-proposta{background:var(--verde);border:none;border-radius:10px;padding:10px 20px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s}
-  .btn-proposta:hover{background:var(--verde-escuro);transform:scale(1.02)}
-  /* VAZIO / LOADING */
-  .loading-wrap{text-align:center;padding:60px 20px;color:var(--cinza)}
-  .spinner{width:40px;height:40px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
-  .vazio{text-align:center;padding:60px 20px;display:none}
-  .vazio.vis{display:block}
-  .vazio-icon{font-size:3rem;opacity:0.3;margin-bottom:12px}
-  .vazio p{color:var(--cinza);font-size:0.88rem;line-height:1.6}
-  /* MODAL PROPOSTA */
+  /* MODAL */
   .overlay{position:fixed;inset:0;background:rgba(10,22,40,0.92);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s}
   .overlay.vis{opacity:1;pointer-events:all}
-  .modal{background:var(--azul-medio);border:1px solid var(--borda);border-radius:24px;width:100%;max-width:440px;padding:32px;transform:translateY(20px);transition:transform 0.3s}
+  .modal{background:var(--azul-medio);border:1px solid var(--borda);border-radius:22px;width:100%;max-width:430px;padding:28px;transform:translateY(20px);transition:transform 0.3s}
   .overlay.vis .modal{transform:translateY(0)}
-  .modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:6px}
-  .modal-sub{color:var(--cinza);font-size:0.82rem;margin-bottom:20px;line-height:1.5}
-  .modal-field{margin-bottom:14px}
-  .modal-field label{display:block;font-size:0.76rem;font-weight:600;color:var(--cinza);margin-bottom:5px}
-  .modal-field input,.modal-field textarea{width:100%;background:var(--azul-input);border:1.5px solid var(--borda);border-radius:10px;color:var(--branco);font-family:'DM Sans',sans-serif;font-size:0.88rem;padding:11px 14px;outline:none;transition:border-color 0.2s}
-  .modal-field textarea{resize:vertical;min-height:80px;line-height:1.5}
-  .modal-field input:focus,.modal-field textarea:focus{border-color:rgba(0,201,111,0.45)}
-  .modal-field input::placeholder,.modal-field textarea::placeholder{color:rgba(138,155,181,0.45)}
-  .taxa-resumo{background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:10px;padding:12px 16px;font-size:0.78rem;color:var(--cinza);margin-bottom:18px;line-height:1.6}
-  .taxa-resumo strong{color:var(--laranja)}
-  .modal-btns{display:flex;gap:10px}
-  .btn-cancelar{flex:1;background:transparent;border:1.5px solid var(--borda);border-radius:10px;padding:12px;color:var(--cinza);font-family:'Syne',sans-serif;font-weight:600;font-size:0.88rem;cursor:pointer}
-  .btn-enviar{flex:2;background:var(--verde);border:none;border-radius:10px;padding:12px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer}
-  .btn-enviar:hover{background:var(--verde-escuro)}
-  .sem-aprovacao{background:rgba(255,92,92,0.07);border:1px solid rgba(255,92,92,0.2);border-radius:14px;padding:20px 24px;margin-bottom:24px;display:none}
-  .sem-aprovacao.vis{display:block}
+  .modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--branco);margin-bottom:4px}
+  .modal-sub{color:var(--cinza);font-size:0.8rem;margin-bottom:18px;line-height:1.5}
+  .mfield{margin-bottom:12px}
+  .mfield label{display:block;font-size:0.74rem;font-weight:600;color:var(--cinza);margin-bottom:4px}
+  .mfield input,.mfield textarea{width:100%;background:var(--azul-input);border:1.5px solid var(--borda);border-radius:10px;color:var(--branco);font-family:'DM Sans',sans-serif;font-size:0.85rem;padding:10px 13px;outline:none;transition:border-color 0.2s}
+  .mfield textarea{resize:vertical;min-height:80px;line-height:1.5}
+  .mfield input:focus,.mfield textarea:focus{border-color:rgba(0,201,111,0.45)}
+  .mfield input::placeholder,.mfield textarea::placeholder{color:rgba(138,155,181,0.4)}
+  .taxa-info{background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:9px;padding:10px 13px;font-size:0.76rem;color:var(--cinza);margin-bottom:16px;line-height:1.6}
+  .taxa-info strong{color:var(--laranja)}
+  .modal-btns{display:flex;gap:8px}
+  .btn-cancel{flex:1;background:transparent;border:1.5px solid var(--borda);border-radius:10px;padding:11px;color:var(--cinza);font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer}
+  .btn-send{flex:2;background:var(--verde);border:none;border-radius:10px;padding:11px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer}
+  .btn-send:hover{background:var(--verde-escuro)}
+  /* LOADING/VAZIO */
+  .loading-wrap{text-align:center;padding:60px 20px;color:var(--cinza)}
+  .spinner{width:38px;height:38px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px}
+  .vazio{text-align:center;padding:60px 20px;display:none}
+  .vazio.vis{display:block}
+  .vazio-icon{font-size:2.5rem;opacity:0.3;margin-bottom:10px}
+  .vazio p{color:var(--cinza);font-size:0.85rem;line-height:1.6}
   @keyframes spin{to{transform:rotate(360deg)}}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-  @media(max-width:640px){.stats-row{grid-template-columns:1fr 1fr}.page{padding:20px 16px 40px}nav{padding:16px 18px}.pedido-top{grid-template-columns:1fr}.taxa-card{text-align:left;display:flex;align-items:center;gap:14px}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  @media(max-width:768px){.layout{grid-template-columns:1fr}.sidebar{order:2}.stats{grid-template-columns:1fr 1fr}}
 </style>
 <meta name="theme-color" content="#00C96F">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -116,8 +135,8 @@
 
 <nav>
   <a href="login.html" class="logo">Serviço<span>Já</span></a>
-  <div class="nav-right">
-    <div class="avatar">👷</div>
+  <div class="nav-r">
+    <div class="av">👷</div>
     <div>
       <div class="nav-name" id="nomeNav">Profissional</div>
       <div class="nav-sub">Conta profissional</div>
@@ -126,74 +145,86 @@
   </div>
 </nav>
 
-<div class="page">
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="prof-card">
+      <div class="prof-av">👷</div>
+      <div class="prof-name" id="nomeCard">Profissional</div>
+      <div class="prof-sub" id="cidadeCard">Verificado ✓</div>
+      <div class="rating">★★★★★ <span style="color:var(--cinza)">—</span></div>
+    </div>
 
-  <div class="page-header">
-    <h1>Olá, <span id="nomeHeader">Profissional</span>! 👷</h1>
-    <p>Veja os pedidos disponíveis nas suas áreas de atuação e envie propostas</p>
-  </div>
+    <div class="bloco">
+      <div class="bloco-title">Minhas profissões</div>
+      <div id="catsLista"><div style="color:var(--cinza);font-size:0.78rem">Carregando...</div></div>
+    </div>
 
-  <!-- AVISO SEM APROVAÇÃO -->
-  <div class="sem-aprovacao" id="semAprovacao">
-    <strong style="color:var(--erro)">⚠️ Nenhuma profissão aprovada ainda</strong>
-    <p style="font-size:0.82rem;color:var(--cinza);margin-top:4px">Complete o teste de IA para começar a receber pedidos. <a href="cadastro-profissional.html" style="color:var(--verde)">Fazer teste →</a></p>
-  </div>
+    <div class="nav-menu">
+      <div class="nav-item ativo">📋 Pedidos disponíveis</div>
+      <div class="nav-item">📨 Minhas propostas</div>
+      <div class="nav-item">✅ Trabalhos aceitos</div>
+      <div class="nav-item">👤 Meu perfil</div>
+    </div>
 
-  <!-- CATEGORIAS APROVADAS -->
-  <div id="catsAprovadas" style="margin-bottom:20px"></div>
+    <div class="btn-teste" onclick="window.location.href='cadastro-profissional.html'">+ Fazer mais testes de profissão</div>
 
-  <!-- STATS -->
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-num" style="color:var(--verde)" id="statDisp">0</div><div class="stat-lbl">Pedidos disponíveis</div></div>
-    <div class="stat-card"><div class="stat-icon">📨</div><div class="stat-num" style="color:var(--amarelo)" id="statEnv">0</div><div class="stat-lbl">Propostas enviadas</div></div>
-    <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-num" style="color:var(--cinza)" id="statAc">0</div><div class="stat-lbl">Aceitas</div></div>
-    <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-num" style="color:var(--amarelo)">—</div><div class="stat-lbl">Avaliação</div></div>
-  </div>
+    <!-- TAXA PENDENTE -->
+    <div class="taxa-box" id="taxaBox" style="display:none">
+      <div class="bloco-title">💰 Taxas pendentes</div>
+      <div class="taxa-valor" id="taxaValor">R$ 0,00</div>
+      <div class="taxa-venc">Vencimento: <strong id="taxaVenc">—</strong></div>
+      <button class="btn-pagar" onclick="abrirPagamento()">Pagar agora</button>
+      <div class="taxa-hist">Ver histórico de taxas</div>
+    </div>
 
-  <!-- FILTROS -->
-  <div class="filtros-bar">
-    <span class="filtro-label">Filtrar por:</span>
-    <div class="filtro-pills" id="filtroPills">
-      <div class="fpill ativo" data-cat="todos" onclick="selFiltro(this)">🔍 Todos</div>
+    <!-- CONTA BLOQUEADA -->
+    <div class="bloqueado-box" id="bloqueadoBox">
+      <div class="bloq-icon">🔒</div>
+      <div class="bloq-title">Conta bloqueada</div>
+      <div class="bloq-sub">Taxas em atraso. Regularize para voltar a receber pedidos.</div>
+      <button class="btn-regularizar" onclick="abrirPagamento()">Regularizar agora</button>
     </div>
   </div>
 
-  <!-- LOADING -->
-  <div class="loading-wrap" id="loading">
-    <div class="spinner"></div>
-    <p>Carregando pedidos disponíveis...</p>
+  <!-- MAIN -->
+  <div class="main">
+    <div class="stats">
+      <div class="stat"><div class="stat-n" style="color:var(--verde)" id="statDisp">0</div><div class="stat-l">Pedidos disponíveis</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--amarelo)" id="statEnv">0</div><div class="stat-l">Propostas enviadas</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--cinza)" id="statAc">0</div><div class="stat-l">Trabalhos aceitos</div></div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">Pedidos disponíveis</div>
+      <div class="filtros" id="filtroPills">
+        <div class="fpill ativo" data-cat="todos" onclick="selFiltro(this)">🔍 Todos</div>
+      </div>
+    </div>
+
+    <div class="loading-wrap" id="loading"><div class="spinner"></div><p>Carregando pedidos...</p></div>
+    <div id="listaPedidos"></div>
+    <div class="vazio" id="estadoVazio"><div class="vazio-icon">📭</div><p>Nenhum pedido disponível para suas categorias no momento.</p></div>
   </div>
-
-  <!-- LISTA -->
-  <div class="pedidos-grid" id="listaPedidos"></div>
-
-  <!-- VAZIO -->
-  <div class="vazio" id="estadoVazio">
-    <div class="vazio-icon">📭</div>
-    <p>Nenhum pedido disponível para suas categorias no momento.<br>Novos pedidos aparecem aqui em tempo real!</p>
-  </div>
-
 </div>
 
 <!-- MODAL PROPOSTA -->
 <div class="overlay" id="overlayProposta">
   <div class="modal">
     <div class="modal-title">💬 Enviar proposta</div>
-    <div class="modal-sub" id="modalPedidoTitulo"></div>
-    <div class="modal-field">
+    <div class="modal-sub" id="modalTitulo"></div>
+    <div class="mfield">
       <label>Seu valor para o serviço (R$) *</label>
       <input type="number" id="propValor" placeholder="Ex: 350">
     </div>
-    <div class="modal-field">
+    <div class="mfield">
       <label>Mensagem para o cliente *</label>
-      <textarea id="propMensagem" placeholder="Descreva como você realizaria o serviço, sua experiência e prazo estimado..."></textarea>
+      <textarea id="propMsg" placeholder="Descreva como realizaria o serviço, sua experiência e prazo..."></textarea>
     </div>
-    <div class="taxa-resumo" id="taxaResumo">
-      💡 Taxa do ServiçoJá: <strong id="taxaModal">—</strong> — cobrada apenas se o cliente aceitar sua proposta.
-    </div>
+    <div class="taxa-info">💡 Taxa ServiçoJá: <strong id="taxaModal">—</strong> — cobrada somente se o cliente aceitar sua proposta.</div>
     <div class="modal-btns">
-      <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
-      <button class="btn-enviar" onclick="enviarProposta()">🚀 Enviar proposta</button>
+      <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+      <button class="btn-send" onclick="enviarProposta()">🚀 Enviar proposta</button>
     </div>
   </div>
 </div>
@@ -202,111 +233,118 @@
 const uid = localStorage.getItem('sj_uid');
 const nome = localStorage.getItem('sj_nome') || 'Profissional';
 document.getElementById('nomeNav').textContent = nome;
-document.getElementById('nomeHeader').textContent = nome.split(' ')[0];
+document.getElementById('nomeCard').textContent = nome;
 
 let categoriasAprovadas = [];
 let todosPedidos = [];
 let filtroAtual = 'todos';
 let pedidoAtual = null;
-let taxasCalculadas = {};
+let taxasCalc = {};
+let bloqueado = false;
 
-// CALCULAR TAXA COM IA (simulada com lógica determinística baseada no pedido)
-function calcularTaxa(pedido) {
-  // Taxa base: R$10 a R$50 baseado em complexidade
-  let pontos = 0;
-
-  // Urgência
-  if (pedido.urgencia && pedido.urgencia.includes('Urgente')) pontos += 30;
-  else if (pedido.urgencia && pedido.urgencia.includes('semana')) pontos += 15;
-  else pontos += 5;
-
-  // Valor do serviço
-  const val = parseFloat(pedido.valor) || 0;
-  if (val >= 1000) pontos += 30;
-  else if (val >= 500) pontos += 20;
-  else if (val >= 200) pontos += 10;
-  else if (val > 0) pontos += 5;
-  else pontos += 10; // em aberto — assume médio
-
-  // Tamanho da descrição (mais detalhado = mais complexo)
-  const desc = (pedido.descricao || '').length;
-  if (desc >= 300) pontos += 20;
-  else if (desc >= 150) pontos += 10;
-  else pontos += 5;
-
-  // Múltiplas categorias
-  const numCats = Array.isArray(pedido.categorias) ? pedido.categorias.length : 1;
-  if (numCats >= 3) pontos += 15;
-  else if (numCats >= 2) pontos += 8;
-
-  // Converter pontos (max ~95) para faixa R$10-R$50
-  const taxa = Math.round(10 + (pontos / 95) * 40);
-  return Math.min(50, Math.max(10, taxa));
+function calcularTaxa(p) {
+  let pts = 0;
+  if ((p.urgencia||'').includes('Urgente')) pts += 30;
+  else if ((p.urgencia||'').includes('semana')) pts += 15;
+  else pts += 5;
+  const val = parseFloat(p.valor) || 0;
+  if (val >= 1000) pts += 30; else if (val >= 500) pts += 20; else if (val >= 200) pts += 10; else pts += 10;
+  const desc = (p.descricao||'').length;
+  if (desc >= 300) pts += 20; else if (desc >= 150) pts += 10; else pts += 5;
+  const nc = Array.isArray(p.categorias) ? p.categorias.length : 1;
+  if (nc >= 3) pts += 15; else if (nc >= 2) pts += 8;
+  return Math.min(50, Math.max(10, Math.round(10 + (pts / 95) * 40)));
 }
 
-function formatarData(iso) {
+function formatData(iso) {
   if (!iso) return '—';
-  const d = new Date(iso);
+  return new Date(iso).toLocaleDateString('pt-BR');
+}
+
+function calcVencimento() {
+  const d = new Date();
+  d.setDate(d.getDate() + 10);
   return d.toLocaleDateString('pt-BR');
 }
 
-async function carregarDados() {
+async function init() {
   if (!uid) { window.location.href = 'login.html'; return; }
-
-  // Buscar dados do profissional
   try {
     const snap = await firebase.firestore().collection('usuarios').doc(uid).get();
-    if (snap.exists()) {
-      const dados = snap.data();
-      categoriasAprovadas = dados.categoriasAprovadas || [];
+    if (!snap.exists()) { window.location.href = 'login.html'; return; }
+    const dados = snap.data();
+    categoriasAprovadas = dados.categoriasAprovadas || [];
+    bloqueado = dados.bloqueado || false;
+    const taxaAcum = dados.taxaAcumulada || 0;
 
-      // Mostrar badges de categorias aprovadas
-      if (categoriasAprovadas.length > 0) {
-        document.getElementById('catsAprovadas').innerHTML =
-          '<div style="margin-bottom:6px;font-size:0.75rem;color:var(--cinza);font-weight:600">✅ Suas profissões aprovadas:</div>' +
-          '<div class="cats-aprovadas">' +
-          categoriasAprovadas.map(c => `<span class="cat-badge">✅ ${c}</span>`).join('') +
-          '</div>';
+    if (dados.endereco && dados.endereco.cidade) {
+      document.getElementById('cidadeCard').textContent = dados.endereco.cidade + ' — Verificado ✓';
+    }
 
-        // Montar filtros
-        const pills = document.getElementById('filtroPills');
-        categoriasAprovadas.forEach(cat => {
-          const p = document.createElement('div');
-          p.className = 'fpill';
-          p.setAttribute('data-cat', cat);
-          p.textContent = cat;
-          p.onclick = function() { selFiltro(this); };
-          pills.appendChild(p);
-        });
-      } else {
-        document.getElementById('semAprovacao').classList.add('vis');
+    // Mostrar categorias na sidebar
+    const lista = document.getElementById('catsLista');
+    if (categoriasAprovadas.length > 0) {
+      lista.innerHTML = categoriasAprovadas.map(c =>
+        `<div class="cat-row"><span>${c}</span><span class="cat-ok">✓ Aprovado</span></div>`
+      ).join('') + (dados.categorias||[]).filter(c => !categoriasAprovadas.includes(c)).map(c =>
+        `<div class="cat-row"><span style="color:var(--cinza)">${c}</span><span class="cat-pend">Pendente</span></div>`
+      ).join('');
+    } else {
+      lista.innerHTML = '<div style="color:var(--cinza);font-size:0.78rem">Nenhuma aprovação ainda</div>';
+    }
+
+    // Filtros por categoria
+    const pills = document.getElementById('filtroPills');
+    categoriasAprovadas.forEach(cat => {
+      const p = document.createElement('div');
+      p.className = 'fpill'; p.setAttribute('data-cat', cat);
+      p.textContent = cat; p.onclick = function(){ selFiltro(this); };
+      pills.appendChild(p);
+    });
+
+    // Taxa acumulada
+    if (taxaAcum > 0) {
+      document.getElementById('taxaBox').style.display = 'block';
+      document.getElementById('taxaValor').textContent = 'R$ ' + taxaAcum.toFixed(2).replace('.',',');
+      document.getElementById('taxaVenc').textContent = calcVencimento();
+    }
+
+    // Verificar bloqueio automático
+    if (dados.taxaVencimento) {
+      const venc = new Date(dados.taxaVencimento);
+      if (new Date() > venc && taxaAcum > 0) {
+        bloqueado = true;
+        await firebase.firestore().collection('usuarios').doc(uid).update({ bloqueado: true });
       }
     }
-  } catch(e) { console.error(e); }
 
-  // Buscar pedidos disponíveis nas categorias aprovadas
-  await carregarPedidos();
+    if (bloqueado) {
+      document.getElementById('bloqueadoBox').classList.add('vis');
+      document.getElementById('loading').style.display = 'none';
+      return;
+    }
+
+    await carregarPedidos();
+  } catch(e) {
+    console.error(e);
+    document.getElementById('loading').innerHTML = '<p style="color:var(--erro)">Erro ao carregar dados.</p>';
+  }
 }
 
 async function carregarPedidos() {
   if (categoriasAprovadas.length === 0) {
     document.getElementById('loading').style.display = 'none';
+    document.getElementById('estadoVazio').classList.add('vis');
     return;
   }
-
   try {
-    // Buscar pedidos abertos
-    const snap = await firebase.firestore().collection('pedidos')
-      .where('status', '==', 'aberto').get();
-
-    // Filtrar pelos que batem com as categorias aprovadas do profissional
-    todosPedidos = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+    const snap = await firebase.firestore().collection('pedidos').where('status','==','aberto').get();
+    todosPedidos = snap.docs.map(d => ({id:d.id,...d.data()}))
       .filter(p => {
         const cats = Array.isArray(p.categorias) ? p.categorias : [p.categorias];
         return cats.some(c => categoriasAprovadas.includes(c));
       })
-      .sort((a, b) => (b.criadoEm || '').localeCompare(a.criadoEm || ''));
-
+      .sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
     document.getElementById('statDisp').textContent = todosPedidos.length;
     document.getElementById('loading').style.display = 'none';
     renderPedidos();
@@ -325,50 +363,32 @@ function selFiltro(el) {
 function renderPedidos() {
   const lista = document.getElementById('listaPedidos');
   const filtrado = filtroAtual === 'todos' ? todosPedidos :
-    todosPedidos.filter(p => {
-      const cats = Array.isArray(p.categorias) ? p.categorias : [p.categorias];
-      return cats.includes(filtroAtual);
-    });
-
-  if (filtrado.length === 0) {
-    lista.innerHTML = '';
-    document.getElementById('estadoVazio').classList.add('vis');
-    return;
-  }
+    todosPedidos.filter(p => { const c = Array.isArray(p.categorias)?p.categorias:[p.categorias]; return c.includes(filtroAtual); });
+  if (filtrado.length === 0) { lista.innerHTML = ''; document.getElementById('estadoVazio').classList.add('vis'); return; }
   document.getElementById('estadoVazio').classList.remove('vis');
-
   lista.innerHTML = filtrado.map(p => {
-    const cats = Array.isArray(p.categorias) ? p.categorias : [p.categorias || '—'];
-    const orcamento = p.orcamento === 'aproximado' && p.valor ? 'R$ ' + parseFloat(p.valor).toLocaleString('pt-BR') : 'Em aberto';
+    const cats = Array.isArray(p.categorias) ? p.categorias : [p.categorias||'—'];
     const taxa = calcularTaxa(p);
-    taxasCalculadas[p.id] = taxa;
-
-    let urgClass = 'urg-pressa', urgLabel = p.urgencia || '🗓️ Sem pressa';
-    if ((p.urgencia || '').includes('Urgente')) urgClass = 'urg-urgente';
-    else if ((p.urgencia || '').includes('semana')) urgClass = 'urg-semana';
-
-    return `
-    <div class="pedido-card" style="animation:fadeUp 0.4s ease both">
-      <div class="pedido-top">
-        <div>
-          <div class="pedido-cats">${cats.map(c => `<span class="pcat">${c}</span>`).join('')}</div>
-          <div class="pedido-titulo">${p.titulo || 'Sem título'}</div>
-          <div class="pedido-desc">${p.descricao || 'Sem descrição.'}</div>
-          <div class="pedido-meta">
-            <div class="pmeta">📅 <strong>${formatarData(p.criadoEm)}</strong></div>
-            <div class="pmeta">💰 <strong>${orcamento}</strong></div>
-            <div class="pmeta">📍 <strong>${(p.endereco||'').split(',').slice(-1)[0]||'—'}</strong></div>
-          </div>
+    taxasCalc[p.id] = taxa;
+    const orc = p.orcamento === 'aproximado' && p.valor ? 'R$ '+parseFloat(p.valor).toLocaleString('pt-BR') : 'Em aberto';
+    let urgClass='urg-pressa', urgLabel=p.urgencia||'🗓️ Sem pressa';
+    if ((p.urgencia||'').includes('Urgente')) urgClass='urg-urgente';
+    else if ((p.urgencia||'').includes('semana')) urgClass='urg-semana';
+    return `<div class="pedido-card">
+      <div class="p-cats">${cats.map(c=>`<span class="pcat">${c}</span>`).join('')}</div>
+      <div class="p-title">${p.titulo||'Sem título'}</div>
+      <div class="p-desc">${p.descricao||'Sem descrição.'}</div>
+      <div class="p-footer">
+        <div class="p-meta">
+          <span class="pm">📅 <strong>${formatData(p.criadoEm)}</strong></span>
+          <span class="pm">💰 <strong>${orc}</strong></span>
+          <span class="pm">📍 <strong>${(p.endereco||'').split(',').slice(-1)[0]||'—'}</strong></span>
+          <span class="urg ${urgClass}">${urgLabel}</span>
         </div>
-        <div class="taxa-card">
-          <div class="taxa-label">Taxa ServiçoJá</div>
-          <div class="taxa-valor">R$ ${taxa}</div>
-          <div class="taxa-hint">Cobrada só se<br>cliente aceitar</div>
+        <div class="p-actions">
+          <div class="taxa-badge">Taxa: R$ ${taxa}</div>
+          <button class="btn-prop" onclick="abrirProposta('${p.id}')">Enviar proposta</button>
         </div>
-      </div>
-      <div class="pedido-bottom">
-        <span class="urg-badge ${urgClass}">${urgLabel}</span>
-        <button class="btn-proposta" onclick="abrirProposta('${p.id}')">💬 Enviar proposta</button>
       </div>
     </div>`;
   }).join('');
@@ -377,56 +397,52 @@ function renderPedidos() {
 function abrirProposta(id) {
   pedidoAtual = todosPedidos.find(p => p.id === id);
   if (!pedidoAtual) return;
-  document.getElementById('modalPedidoTitulo').textContent = pedidoAtual.titulo || 'Pedido';
-  document.getElementById('taxaModal').textContent = 'R$ ' + (taxasCalculadas[id] || '—');
+  document.getElementById('modalTitulo').textContent = pedidoAtual.titulo || 'Pedido';
+  document.getElementById('taxaModal').textContent = 'R$ ' + (taxasCalc[id] || '—');
   document.getElementById('propValor').value = '';
-  document.getElementById('propMensagem').value = '';
+  document.getElementById('propMsg').value = '';
   document.getElementById('overlayProposta').classList.add('vis');
 }
 
-function fecharModal() {
-  document.getElementById('overlayProposta').classList.remove('vis');
-  pedidoAtual = null;
-}
+function fecharModal() { document.getElementById('overlayProposta').classList.remove('vis'); pedidoAtual = null; }
 
 async function enviarProposta() {
   const valor = document.getElementById('propValor').value.trim();
-  const mensagem = document.getElementById('propMensagem').value.trim();
-  if (!valor || !mensagem) { alert('Preencha o valor e a mensagem!'); return; }
+  const msg = document.getElementById('propMsg').value.trim();
+  if (!valor || !msg) { alert('Preencha o valor e a mensagem!'); return; }
   if (!pedidoAtual) return;
-
+  const taxa = taxasCalc[pedidoAtual.id] || 10;
   try {
     await firebase.firestore().collection('pedidos').doc(pedidoAtual.id).update({
       interessados: firebase.firestore.FieldValue.arrayUnion({
-        profissionalId: uid,
-        profissionalNome: nome,
-        valor: parseFloat(valor),
-        mensagem: mensagem,
-        taxa: taxasCalculadas[pedidoAtual.id] || 10,
+        profissionalId: uid, profissionalNome: nome,
+        valor: parseFloat(valor), mensagem: msg, taxa: taxa,
         enviadoEm: new Date().toISOString()
       })
     });
+    // Acumular taxa pendente no perfil
+    await firebase.firestore().collection('usuarios').doc(uid).update({
+      taxaAcumulada: firebase.firestore.FieldValue.increment(0), // só acumula quando cliente aceitar
+    });
     fecharModal();
-    const env = parseInt(document.getElementById('statEnv').textContent) || 0;
+    const env = parseInt(document.getElementById('statEnv').textContent)||0;
     document.getElementById('statEnv').textContent = env + 1;
-    alert('✅ Proposta enviada com sucesso! O cliente será notificado.');
-  } catch(e) {
-    alert('Erro ao enviar proposta. Tente novamente.');
-  }
+    alert('✅ Proposta enviada! O cliente será notificado.');
+  } catch(e) { alert('Erro ao enviar proposta.'); }
 }
 
-function sair() {
-  firebase.auth().signOut().then(() => {
-    localStorage.clear();
-    window.location.href = 'login.html';
-  });
+function abrirPagamento() {
+  alert('Em breve: integração com Pix/cartão para pagamento das taxas. Entre em contato via WhatsApp para regularizar: (11) 99999-9999');
 }
 
-document.getElementById('overlayProposta').addEventListener('click', function(e) {
-  if (e.target === this) fecharModal();
-});
+async function sair() {
+  await firebase.auth().signOut();
+  localStorage.clear();
+  window.location.href = 'login.html';
+}
 
-carregarDados();
+document.getElementById('overlayProposta').addEventListener('click', function(e){ if(e.target===this) fecharModal(); });
+init();
 </script>
 <script>if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(e=>{});}</script>
 </body>
