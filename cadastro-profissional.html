@@ -545,12 +545,17 @@ function salvarProfissional(){
     .then(function(cred){ return criarPerfilProfissional(cred.user.uid); })
     .catch(function(e){
       if(e.code === 'auth/email-already-in-use'){
-        // Email já existe (cliente) — fazer login e criar perfil profissional
+        // Tentar login com email/senha
         firebase.auth().signInWithEmailAndPassword(email, senha)
           .then(function(cred){ return criarPerfilProfissional(cred.user.uid); })
           .catch(function(e2){
+            // Se falhou, pode ser conta Google — tentar usar usuário atual
+            const currentUser = firebase.auth().currentUser;
+            if(currentUser && currentUser.email === email){
+              return criarPerfilProfissional(currentUser.uid);
+            }
             const eg=document.getElementById('erroGeral3');
-            eg.textContent='⚠️ Senha incorreta. Use a mesma senha do seu cadastro de cliente.';
+            eg.textContent='⚠️ Este email usa login pelo Google. Saia e entre com Google, depois faça o cadastro profissional.';
             eg.className='erro-geral vis';
           });
       } else {
