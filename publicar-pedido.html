@@ -504,62 +504,42 @@
     const endereco = document.getElementById('enderecoInput').value.trim();
 
     if (catsSel.length === 0) { document.getElementById('erroCats').classList.add('vis'); window.scrollTo({top:0,behavior:'smooth'}); return; }
-    if (!titulo) { alert('Digite o título do pedido!'); return; }
-    if (!desc || desc.length < 20) { alert('Descreva o serviço com pelo menos 20 caracteres!'); return; }
-    if (!endereco) { alert('Digite o endereço do serviço!'); return; }
-    if (!authUser) { 
-      // Tentar pegar usuário atual diretamente
-      const currentUser = firebase.auth().currentUser;
-      if (currentUser) { authUser = currentUser; }
-      else { alert('Sessão não encontrada. Faça login novamente.'); window.location.href='login.html'; return; }
-    }
+    if (!titulo) { alert('Digite o título!'); return; }
+    if (!desc || desc.length < 20) { alert('Descreva com pelo menos 20 caracteres!'); return; }
+    if (!endereco) { alert('Digite o endereço!'); return; }
+
+    const user = firebase.auth().currentUser;
+    if (!user) { alert('Faça login novamente.'); window.location.href='login.html'; return; }
 
     const btn = document.getElementById('btnPublicar');
-    btn.disabled = true; btn.textContent = 'Publicando...';
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Salvando...';
 
     const nome = localStorage.getItem('sj_nome') || 'Cliente';
-    const valor = valorTipo === 'aproximado' ? document.getElementById('valorInput').value : null;
+    const valorEl = document.getElementById('valorInput');
+    const valor = (valorTipo === 'aproximado' && valorEl) ? parseFloat(valorEl.value) : null;
+
+    const dados = {
+      titulo, descricao: desc, categorias: catsSel, urgencia: urgSel,
+      orcamento: valorTipo, valor: valor || null, endereco,
+      clienteNome: nome
+    };
+
+    const reset = function(txt) { btn.disabled=false; btn.innerHTML=txt; };
 
     if (pedidoEditarId) {
-      // MODO EDIÇÃO
-      firebase.firestore().collection('pedidos').doc(pedidoEditarId).update({
-        titulo: titulo, descricao: desc, categorias: catsSel,
-        urgencia: urgSel, orcamento: valorTipo,
-        valor: valor ? parseFloat(valor) : null, endereco: endereco
-      }).then(function() {
-        localStorage.removeItem('sj_pedido_editar_data');
-        window.location.href = 'meus-pedidos-cliente.html';
-      }).catch(function(e) {
-        btn.disabled=false; btn.innerHTML='💾 Salvar alterações';
-        alert('Erro: '+e.message);
-      });
+      firebase.firestore().collection('pedidos').doc(pedidoEditarId).update(dados)
+        .then(function() { localStorage.removeItem('sj_pedido_editar_data'); window.location.href='meus-pedidos-cliente.html'; })
+        .catch(function(e) { reset('💾 Salvar alterações'); alert('Erro: '+e.message); });
       return;
     }
 
-    const pedido = {
-      titulo: titulo,
-      descricao: desc,
-      categorias: catsSel,
-      urgencia: urgSel,
-      orcamento: valorTipo,
-      valor: valor ? parseFloat(valor) : null,
-      endereco: endereco,
-      clienteId: authUser.uid,
-      clienteNome: nome,
-      status: 'aberto',
-      criadoEm: new Date().toISOString(),
-      interessados: []
-    };
-
-    firebase.firestore().collection('pedidos').add(pedido)
-      .then(function() {
-        document.getElementById('modalOverlay').classList.add('vis');
-        btn.disabled = false;
-      })
-      .catch(function(e) {
-        btn.disabled = false; btn.innerHTML = '🚀 Publicar pedido';
-        alert('Erro ao publicar: ' + e.message);
-      });
+    firebase.firestore().collection('pedidos').add({
+      ...dados, clienteId: user.uid, status: 'aberto',
+      criadoEm: new Date().toISOString(), interessados: []
+    })
+    .then(function() { reset('🚀 Publicar pedido'); document.getElementById('modalOverlay').classList.add('vis'); })
+    .catch(function(e) { reset('🚀 Publicar pedido'); alert('Erro: '+e.message); });
   }
 </script>
 <script>if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(e=>{});}</script>
