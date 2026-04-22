@@ -138,6 +138,18 @@
       <div class="avatar-name" id="nomeUsuario">...</div>
       <div class="avatar-sub">Cliente</div>
     </div>
+    <div style="position:relative" id="notifWrap">
+  <button id="notifBtn" onclick="toggleNotif()" style="position:relative;width:36px;height:36px;border-radius:50%;background:#0F1C35;border:1px solid rgba(255,255,255,0.09);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">
+    🔔<span id="notifBadge" style="display:none;position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;border-radius:50%;background:#FF6B35;color:#fff;font-size:9px;font-weight:700;align-items:center;justify-content:center;border:2px solid #132240;padding:0 2px"></span>
+  </button>
+  <div id="notifDropdown" style="display:none;position:absolute;right:0;top:46px;width:310px;background:#132240;border:1px solid rgba(255,255,255,0.09);border-radius:14px;overflow:hidden;z-index:100;box-shadow:0 8px 32px rgba(0,0,0,0.4)">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.09)">
+      <span style="font-weight:700;font-size:13px;color:#F5F7F2">🔔 Notificações</span>
+      <span onclick="marcarTodasLidas()" style="font-size:11px;color:#8A9BB5;cursor:pointer;text-decoration:underline">Marcar lidas</span>
+    </div>
+    <div id="notifLista" style="max-height:340px;overflow-y:auto"></div>
+  </div>
+</div>
     <button class="btn-novo" onclick="window.location.href='publicar-pedido.html'">+ Novo pedido</button>
   </div>
 </nav>
@@ -390,6 +402,10 @@
       pedido.profissionalAceitoIdx = intIdx;
       pedido.profissionalAceitoNome = prof.profissionalNome;
       renderPedidos();
+      // Notificar profissional
+      criarNotificacao(prof.profissionalId, 'aceite',
+        'Sua proposta para "'+pedido.titulo+'" foi aceita! Entre em contato com o cliente.',
+        'dashboard-profissional.html');
       alert('✅ Proposta aceita! Os dados do profissional agora aparecem no pedido.');
     } catch(e) { alert('Erro: ' + e.message); }
   }
@@ -459,6 +475,10 @@
       pedido.status = 'concluido';
       document.getElementById('overlayAvaliacao').classList.remove('vis');
       renderPedidos();
+      // Notificar profissional sobre avaliação
+      criarNotificacao(profId, 'avaliacao',
+        clienteNome+' avaliou seu trabalho com '+nota+' estrelas!',
+        'perfil-profissional.html');
       alert('✅ Serviço concluído e avaliação enviada! Obrigado!');
     } catch(e) { alert('Erro: ' + e.message); }
   }
@@ -489,6 +509,7 @@
     // Usar UID real do Firebase Auth, não do localStorage
     window._authUid = user.uid;
     carregarPedidos();
+    setTimeout(function(){ carregarNotificacoes(window._authUid || user.uid); }, 1000);
   });
 </script>
 
