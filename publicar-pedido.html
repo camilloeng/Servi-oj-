@@ -535,10 +535,11 @@
     if (!desc || desc.length < 20) { alert('Descreva o serviço com pelo menos 20 caracteres!'); return; }
     if (!endereco) { alert('Digite o endereço do serviço!'); return; }
 
-    const user = firebase.auth().currentUser;
-    if (!user) { alert('Sessão expirada. Faça login novamente.'); window.location.href='login.html'; return; }
-    const uid = user.uid;
+    // Usar onAuthStateChanged para garantir sessão ativa
     const nome = localStorage.getItem('sj_nome') || 'Cliente';
+    const _titulo=titulo, _desc=desc, _endereco=endereco;
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (!user) { window.location.href='login.html'; return; }
     const valor = valorTipo === 'aproximado' ? document.getElementById('valorInput').value : null;
 
     const pedido = {
@@ -549,7 +550,7 @@
       orcamento: valorTipo,
       valor: valor ? parseFloat(valor) : null,
       endereco: endereco,
-      clienteId: uid,
+      clienteId: user.uid,
       clienteNome: nome,
       status: 'aberto',
       criadoEm: new Date().toISOString(),
