@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ServiçoJá Conecta — Cadastro do Profissional</title>
+<title>ServiçoJá — Cadastro do Profissional</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -150,7 +150,7 @@
 </head>
 <body>
 <nav>
-  <a href="login.html" class="logo">Serviço<span>Já</span> Conecta</a>
+  <a href="login.html" class="logo">Serviço<span>Já</span></a>
   <span class="nav-login">Já tem conta? <a href="login.html">Entrar</a></span>
 </nav>
 <div class="steps-bar" id="stepsBar">
@@ -413,12 +413,23 @@ window.addEventListener('load', function(){
   }
 });
 
-function previewFoto(input){
+const IMGBB_KEY = '327d0067238019843e43362c2f7096c7';
+let fotoProfUrl = null;
+
+async function previewFoto(input){
   if(input.files&&input.files[0]){
     const reader=new FileReader();
-    reader.onload=function(e){
+    reader.onload=async function(e){
       const c=document.getElementById('fotoCircle');
-      c.innerHTML='<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+      c.innerHTML='<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.5);color:#fff;font-size:9px;text-align:center;padding:2px">Enviando...</div>';
+      c.style.position='relative';
+      try {
+        const formData = new FormData();
+        formData.append('image', e.target.result.split(',')[1]);
+        const res = await fetch('https://api.imgbb.com/1/upload?key='+IMGBB_KEY, {method:'POST',body:formData});
+        const data = await res.json();
+        if(data.success){ fotoProfUrl = data.data.url; c.innerHTML='<img src="'+fotoProfUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">'; }
+      } catch(e2){ fotoProfUrl = e.target.result; }
     };
     reader.readAsDataURL(input.files[0]);
   }
@@ -525,7 +536,8 @@ function salvarProfissional(){
     categorias:categoriasSelecionadas,
     endereco:{cep:document.getElementById('cepProf').value.trim(),rua:document.getElementById('rua2').value.trim(),numero:document.getElementById('numeroProf').value.trim(),bairro:document.getElementById('bairro2').value.trim(),cidade:document.getElementById('cidade2').value.trim(),estado:document.getElementById('estado2').value,complemento:document.getElementById('complementoProf').value.trim()},
     raioAtendimento:document.getElementById('raioProf').value,
-    aprovado:false,categoriasAprovadas:[],avaliacao:0,criadoEm:new Date().toISOString()
+    aprovado:false,categoriasAprovadas:[],avaliacao:0,criadoEm:new Date().toISOString(),
+    fotoPerfil: fotoProfUrl || null
   };
 
   function criarPerfilProfissional(uid) {
