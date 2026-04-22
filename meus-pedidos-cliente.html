@@ -176,25 +176,15 @@
     if (!uid) { window.location.href = 'login.html'; return; }
     try {
       const snap = await firebase.firestore().collection('pedidos')
-        .where('clienteId', '==', uid)
-        .orderBy('criadoEm', 'desc')
-        .get();
+        .where('clienteId', '==', uid).get();
 
-      todosPedidos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      todosPedidos = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+        .sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
+
       document.getElementById('loading').style.display = 'none';
       renderPedidos();
     } catch(e) {
-      // Se não tem índice, tenta sem orderBy
-      try {
-        const snap2 = await firebase.firestore().collection('pedidos')
-          .where('clienteId', '==', uid).get();
-        todosPedidos = snap2.docs.map(d => ({ id: d.id, ...d.data() }))
-          .sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
-        document.getElementById('loading').style.display = 'none';
-        renderPedidos();
-      } catch(e2) {
-        document.getElementById('loading').innerHTML = '<p style="color:var(--erro)">Erro ao carregar pedidos.</p>';
-      }
+      document.getElementById('loading').innerHTML = '<p style="color:var(--erro)">Erro ao carregar pedidos: ' + e.message + '</p>';
     }
   }
 
