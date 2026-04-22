@@ -12,27 +12,56 @@
   nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--borda)}
   .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--branco);text-decoration:none}
   .logo span{color:var(--verde)}
-  .btn-voltar{background:none;border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.78rem;padding:6px 14px;cursor:pointer}
+  .btn-voltar{background:none;border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.78rem;padding:6px 14px;cursor:pointer;transition:all 0.2s}
   .btn-voltar:hover{color:var(--branco);border-color:rgba(255,255,255,0.2)}
-  .page{max-width:800px;margin:0 auto;padding:32px 24px 60px}
-  .perfil-header{display:flex;align-items:center;gap:24px;background:var(--azul-medio);border:1px solid var(--borda);border-radius:20px;padding:28px;margin-bottom:20px}
-  .perfil-av{width:80px;height:80px;border-radius:50%;background:rgba(0,201,111,0.15);border:3px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0}
-  .perfil-info h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;margin-bottom:4px}
-  .perfil-info p{color:var(--cinza);font-size:0.85rem;margin-bottom:8px}
-  .rating{color:var(--amarelo);font-size:0.85rem}
-  .card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:24px;margin-bottom:16px}
-  .card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+  .page{max-width:900px;margin:0 auto;padding:32px 24px 60px}
+  /* HEADER */
+  .perfil-header{background:var(--azul-medio);border:1px solid var(--borda);border-radius:20px;padding:28px;margin-bottom:16px;display:flex;align-items:center;gap:24px}
+  .perfil-av{width:80px;height:80px;border-radius:50%;background:rgba(0,201,111,0.15);border:3px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:2.2rem;flex-shrink:0}
+  .perfil-nome{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;margin-bottom:4px;color:var(--branco)}
+  .perfil-sub{font-size:0.82rem;color:var(--cinza);margin-bottom:10px}
+  .nota-wrap{display:flex;align-items:center;gap:8px}
+  .estrelas{color:var(--amarelo);font-size:1rem;letter-spacing:2px}
+  .nota-num{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--amarelo)}
+  .nota-total{font-size:0.75rem;color:var(--cinza)}
+  .cats-badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+  .cat-badge{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde);font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:100px}
+  /* STATS */
+  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+  .stat-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:16px;text-align:center}
+  .stat-n{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--verde);margin-bottom:3px}
+  .stat-l{font-size:0.72rem;color:var(--cinza)}
+  /* CARDS */
+  .card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:22px 24px;margin-bottom:16px}
+  .card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--branco)}
   .info-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--borda);font-size:0.85rem}
   .info-row:last-child{border-bottom:none}
   .info-lbl{color:var(--cinza);font-size:0.78rem}
-  .info-val{color:var(--branco);font-weight:500}
-  .cat-aprovada{display:inline-flex;align-items:center;gap:5px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde);font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:100px;margin:3px}
-  .cat-pendente{display:inline-flex;align-items:center;gap:5px;background:rgba(138,155,181,0.1);border:1px solid rgba(138,155,181,0.2);color:var(--cinza);font-size:0.75rem;padding:5px 12px;border-radius:100px;margin:3px}
-  .btn-teste{display:inline-flex;align-items:center;gap:6px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.3);color:var(--verde);font-size:0.8rem;font-weight:700;padding:8px 16px;border-radius:10px;cursor:pointer;margin-top:12px}
-  .btn-sair{width:100%;background:rgba(255,92,92,0.08);border:1px solid rgba(255,92,92,0.25);border-radius:12px;padding:13px;color:var(--erro);font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;transition:all 0.2s}
-  .btn-sair:hover{background:rgba(255,92,92,0.15)}
-  .spinner{width:36px;height:36px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;margin:40px auto}
+  .info-val{color:var(--branco);font-weight:500;text-align:right;max-width:60%}
+  /* PORTFÓLIO */
+  .portfolio-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
+  .foto-item{aspect-ratio:1;border-radius:10px;background:var(--azul-input);border:1px solid var(--borda);overflow:hidden;position:relative;cursor:pointer}
+  .foto-item img{width:100%;height:100%;object-fit:cover}
+  .foto-item .remove-foto{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(255,92,92,0.9);color:white;font-size:0.65rem;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:opacity 0.2s;font-weight:700}
+  .foto-item:hover .remove-foto{opacity:1}
+  .foto-add{aspect-ratio:1;border-radius:10px;border:2px dashed rgba(255,255,255,0.1);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;color:var(--cinza);font-size:1.4rem;gap:4px}
+  .foto-add span{font-size:0.65rem}
+  .foto-add:hover{border-color:rgba(0,201,111,0.4);color:var(--verde)}
+  .btn-add-foto{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.3);border-radius:9px;padding:8px 16px;color:var(--verde);font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s}
+  .btn-add-foto:hover{background:rgba(0,201,111,0.18)}
+  /* AVALIAÇÕES */
+  .aval-card{background:var(--azul-input);border:1px solid var(--borda);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+  .aval-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .aval-av{width:32px;height:32px;border-radius:50%;background:rgba(0,201,111,0.15);border:1.5px solid rgba(0,201,111,0.25);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0}
+  .aval-nome{font-weight:600;font-size:0.85rem;color:var(--branco)}
+  .aval-data{font-size:0.7rem;color:var(--cinza)}
+  .aval-estrelas{margin-left:auto;color:var(--amarelo);font-size:0.85rem}
+  .aval-texto{font-size:0.82rem;color:var(--cinza);line-height:1.6}
+  .sem-avaliacoes{text-align:center;padding:30px;color:var(--cinza);font-size:0.85rem}
+  /* SPINNER */
+  .spinner{width:40px;height:40px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;margin:60px auto}
   @keyframes spin{to{transform:rotate(360deg)}}
+  @media(max-width:640px){.portfolio-grid{grid-template-columns:repeat(3,1fr)}.stats-row{grid-template-columns:1fr 1fr}.perfil-header{flex-direction:column;text-align:center}.nota-wrap{justify-content:center}}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -50,108 +79,195 @@
   <button class="btn-voltar" onclick="history.back()">← Voltar ao dashboard</button>
 </nav>
 
-<div class="page" id="pageContent">
-  <div class="spinner"></div>
+<div class="page">
+  <div id="pageContent"><div class="spinner"></div></div>
 </div>
 
+<input type="file" id="fotoInput" accept="image/*" multiple style="display:none">
+
 <script>
-const uid = localStorage.getItem('sj_uid');
-const nome = localStorage.getItem('sj_nome') || 'Profissional';
-const categoriasAprovadas = JSON.parse(localStorage.getItem('sj_categoriasAprovadas') || '[]');
-const todasCats = JSON.parse(localStorage.getItem('sj_categorias') || '[]');
+let profDocId = null;
+let fotosAtuais = [];
 
 firebase.auth().onAuthStateChanged(async function(user){
   if(!user){ window.location.href='login.html'; return; }
 
-  const authUid = user.uid;
   let dados = {};
+  let docId = null;
 
-  const idsParaTentar = [authUid + '_prof', authUid];
-  
-  for (const id of idsParaTentar) {
-    try {
-      const snap = await firebase.firestore().collection('usuarios').doc(id).get();
-      if (snap.exists() && snap.data().nome) {
-        dados = snap.data();
-        localStorage.setItem('sj_uid', id);
-        localStorage.setItem('sj_nome', dados.nome);
-        break;
-      }
-    } catch(e) {}
+  // Buscar por email — mais confiável
+  try {
+    const q = await firebase.firestore().collection('usuarios')
+      .where('email','==',user.email)
+      .where('tipo','==','profissional')
+      .get();
+    if(!q.empty){
+      dados = q.docs[0].data();
+      docId = q.docs[0].id;
+    }
+  } catch(e){}
+
+  // Fallback por UID
+  if(!dados.nome){
+    for(const id of [user.uid+'_prof', user.uid]){
+      try{
+        const s = await firebase.firestore().collection('usuarios').doc(id).get();
+        if(s.exists() && s.data().nome){ dados=s.data(); docId=id; break; }
+      }catch(e){}
+    }
   }
 
-  // Se ainda não achou, buscar por email
-  if (!dados.nome) {
-    try {
-      const q = await firebase.firestore().collection('usuarios')
-        .where('email', '==', user.email)
-        .where('tipo', '==', 'profissional')
-        .get();
-      if (!q.empty) {
-        dados = q.docs[0].data();
-        localStorage.setItem('sj_uid', q.docs[0].id);
-        localStorage.setItem('sj_nome', dados.nome);
-      }
-    } catch(e) {}
-  }
+  profDocId = docId;
+  fotosAtuais = dados.portfolio || [];
 
-  renderPerfil(dados);
+  // Buscar avaliações
+  let avaliacoes = [];
+  try{
+    const av = await firebase.firestore().collection('avaliacoes')
+      .where('profissionalId','==',docId).get();
+    avaliacoes = av.docs.map(d=>d.data());
+  }catch(e){}
+
+  renderPerfil(dados, avaliacoes);
 });
 
-function renderPerfil(d) {
+function calcNota(avaliacoes){
+  if(!avaliacoes.length) return null;
+  const soma = avaliacoes.reduce((s,a)=>s+(a.nota||0),0);
+  return (soma/avaliacoes.length).toFixed(1);
+}
+
+function estrelas(nota){
+  if(!nota) return '☆☆☆☆☆';
+  const n = Math.round(parseFloat(nota));
+  return '★'.repeat(n)+'☆'.repeat(5-n);
+}
+
+function renderPerfil(d, avaliacoes){
   const end = d.endereco || {};
+  const nota = calcNota(avaliacoes);
+  const cats = d.categoriasAprovadas || [];
+  const fotos = d.portfolio || [];
   const page = document.getElementById('pageContent');
+
   page.innerHTML = `
     <div class="perfil-header">
       <div class="perfil-av">👷</div>
-      <div class="perfil-info">
-        <h1>${d.nome || nome}</h1>
-        <p>📍 ${end.cidade || '—'}, ${end.estado || '—'}</p>
-        <div class="rating">★★★★★ <span style="color:var(--cinza)">— avaliações</span></div>
+      <div>
+        <div class="perfil-nome">${d.nome||'—'}</div>
+        <div class="perfil-sub">📍 ${end.cidade||'—'}, ${end.estado||'—'} &nbsp;·&nbsp; Membro desde ${d.criadoEm ? new Date(d.criadoEm).toLocaleDateString('pt-BR',{month:'long',year:'numeric'}) : '—'}</div>
+        <div class="nota-wrap">
+          <span class="estrelas">${estrelas(nota)}</span>
+          <span class="nota-num">${nota||'—'}</span>
+          <span class="nota-total">${avaliacoes.length} avaliação(ões)</span>
+        </div>
+        <div class="cats-badges">${cats.map(c=>`<span class="cat-badge">✅ ${c}</span>`).join('')}</div>
       </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-n" style="color:var(--amarelo)">${nota||'—'}</div><div class="stat-l">Avaliação média</div></div>
+      <div class="stat-card"><div class="stat-n">${avaliacoes.length}</div><div class="stat-l">Avaliações</div></div>
+      <div class="stat-card"><div class="stat-n" style="color:var(--cinza)">${fotos.length}</div><div class="stat-l">Fotos no portfólio</div></div>
     </div>
 
     <div class="card">
       <div class="card-title">👤 Dados pessoais</div>
-      <div class="info-row"><span class="info-lbl">Nome</span><span class="info-val">${d.nome || nome}</span></div>
-      <div class="info-row"><span class="info-lbl">E-mail</span><span class="info-val">${d.email || '—'}</span></div>
-      <div class="info-row"><span class="info-lbl">WhatsApp</span><span class="info-val">${d.telefone || '—'}</span></div>
-      <div class="info-row"><span class="info-lbl">Documento</span><span class="info-val">${d.documento ? '••• registrado' : '—'}</span></div>
+      <div class="info-row"><span class="info-lbl">Nome completo</span><span class="info-val">${d.nome||'—'}</span></div>
+      <div class="info-row"><span class="info-lbl">E-mail</span><span class="info-val">${d.email||'—'}</span></div>
+      <div class="info-row"><span class="info-lbl">WhatsApp</span><span class="info-val">${d.telefone||'—'}</span></div>
+      <div class="info-row"><span class="info-lbl">Raio de atendimento</span><span class="info-val">${d.raioAtendimento ? d.raioAtendimento+' km' : '—'}</span></div>
     </div>
 
     <div class="card">
-      <div class="card-title">📍 Endereço</div>
-      <div class="info-row"><span class="info-lbl">Rua</span><span class="info-val">${end.rua || '—'}, ${end.numero || ''}</span></div>
-      <div class="info-row"><span class="info-lbl">Bairro</span><span class="info-val">${end.bairro || '—'}</span></div>
-      <div class="info-row"><span class="info-lbl">Cidade</span><span class="info-val">${end.cidade || '—'} — ${end.estado || '—'}</span></div>
-      <div class="info-row"><span class="info-lbl">CEP</span><span class="info-val">${end.cep || '—'}</span></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">🛠️ Minhas profissões</div>
-      <div style="flex-wrap:wrap;display:flex;gap:4px;margin-bottom:8px">
-        ${categoriasAprovadas.map(c => `<span class="cat-aprovada">✅ ${c}</span>`).join('')}
-        ${todasCats.filter(c => !categoriasAprovadas.includes(c)).map(c => `<span class="cat-pendente">⏳ ${c}</span>`).join('')}
-      </div>
-      <div style="margin-top:8px">
-        <button class="btn-teste" onclick="window.location.href='cadastro-profissional.html?teste=1'">+ Adicionar nova profissão</button>
-      </div>
+      <div class="card-title">📍 Endereço de atuação</div>
+      <div class="info-row"><span class="info-lbl">Cidade</span><span class="info-val">${end.cidade||'—'}, ${end.estado||'—'}</span></div>
+      <div class="info-row"><span class="info-lbl">Bairro</span><span class="info-val">${end.bairro||'—'}</span></div>
+      <div class="info-row"><span class="info-lbl">CEP</span><span class="info-val">${end.cep||'—'}</span></div>
     </div>
 
     <div class="card">
       <div class="card-title">📝 Sobre mim</div>
-      <p style="color:var(--cinza);font-size:0.85rem;line-height:1.7">${d.sobre || '—'}</p>
+      <p style="color:var(--cinza);font-size:0.85rem;line-height:1.7">${d.sobre||'—'}</p>
     </div>
 
-    <button class="btn-sair" onclick="sair()">🚪 Sair da conta</button>
-  `;
+    <div class="card">
+      <div class="card-title">
+        🖼️ Portfólio de trabalhos
+        <button class="btn-add-foto" onclick="document.getElementById('fotoInput').click()">+ Adicionar fotos</button>
+      </div>
+      <div class="portfolio-grid" id="portfolioGrid">${renderFotos(fotos)}</div>
+      <p style="font-size:0.72rem;color:var(--cinza)">Máximo de 15 fotos · Clique em uma foto para removê-la</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⭐ Avaliações dos clientes</div>
+      ${avaliacoes.length > 0 ? avaliacoes.sort((a,b)=>b.criadoEm-a.criadoEm).map(av=>`
+        <div class="aval-card">
+          <div class="aval-header">
+            <div class="aval-av">👤</div>
+            <div>
+              <div class="aval-nome">${av.clienteNome||'Cliente'}</div>
+              <div class="aval-data">${av.criadoEm ? new Date(av.criadoEm).toLocaleDateString('pt-BR') : '—'}</div>
+            </div>
+            <div class="aval-estrelas">${estrelas(av.nota)} ${av.nota}/5</div>
+          </div>
+          <div class="aval-texto">${av.comentario||''}</div>
+        </div>`).join('') : '<div class="sem-avaliacoes">📭 Nenhuma avaliação ainda.<br>As avaliações aparecem após os clientes concluírem serviços.</div>'}
+    </div>
+
+    <div class="card">
+      <div class="card-title">🛠️ Profissões aprovadas</div>
+      ${cats.map(c=>`<div class="info-row"><span class="info-lbl">${c}</span><span style="color:var(--verde);font-size:0.78rem;font-weight:700">✅ Aprovado</span></div>`).join('')}
+      ${(d.categorias||[]).filter(c=>!cats.includes(c)).map(c=>`<div class="info-row"><span class="info-lbl">${c}</span><span style="color:var(--cinza);font-size:0.78rem">⏳ Pendente</span></div>`).join('')}
+      <div style="margin-top:14px">
+        <button class="btn-add-foto" onclick="window.location.href='cadastro-profissional.html?teste=1'">+ Adicionar nova profissão</button>
+      </div>
+    </div>`;
+
+  // Setup upload
+  document.getElementById('fotoInput').onchange = function(){ adicionarFotos(this.files); };
 }
 
-function sair(){
-  firebase.auth().signOut().then(function(){
-    localStorage.clear();
-    window.location.href='login.html';
-  });
+function renderFotos(fotos){
+  const slots = fotos.map((f,i)=>`
+    <div class="foto-item">
+      <img src="${f}" alt="Foto ${i+1}">
+      <div class="remove-foto" onclick="removerFoto(${i})">✕</div>
+    </div>`).join('');
+  const addBtn = fotos.length < 15 ? `<div class="foto-add" onclick="document.getElementById('fotoInput').click()">➕<span>Adicionar</span></div>` : '';
+  return slots + addBtn;
+}
+
+async function adicionarFotos(files){
+  if(!profDocId) return;
+  const arr = Array.from(files);
+  const disponiveis = 15 - fotosAtuais.length;
+  if(disponiveis <= 0){ alert('Máximo de 15 fotos atingido!'); return; }
+
+  // Converter para base64 (sem Firebase Storage)
+  const novas = await Promise.all(arr.slice(0,disponiveis).map(f => new Promise(res=>{
+    const r = new FileReader();
+    r.onload = e => res(e.target.result);
+    r.readAsDataURL(f);
+  })));
+
+  fotosAtuais = [...fotosAtuais, ...novas];
+  await salvarFotos();
+  document.getElementById('portfolioGrid').innerHTML = renderFotos(fotosAtuais);
+}
+
+async function removerFoto(idx){
+  if(!confirm('Remover esta foto?')) return;
+  fotosAtuais.splice(idx,1);
+  await salvarFotos();
+  document.getElementById('portfolioGrid').innerHTML = renderFotos(fotosAtuais);
+}
+
+async function salvarFotos(){
+  try{
+    await firebase.firestore().collection('usuarios').doc(profDocId).update({ portfolio: fotosAtuais });
+  }catch(e){ alert('Erro ao salvar: '+e.message); }
 }
 </script>
 </body>
