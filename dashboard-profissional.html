@@ -454,8 +454,14 @@ async function sair() {
   window.location.href = 'login.html';
 }
 
-document.getElementById('overlayProposta').addEventListener('click', function(e){ if(e.target===this) fecharModal(); });
-init();
+// Aguardar autenticação do Firebase antes de carregar
+firebase.auth().onAuthStateChanged(function(user) {
+  if (!user) {
+    window.location.href = 'login.html';
+    return;
+  }
+  init();
+});
 </script>
 <script>if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(e=>{});}</script>
 </body>
