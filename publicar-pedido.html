@@ -359,53 +359,40 @@
     if (!user) { window.location.href = 'login.html'; return; }
     authUser = user;
 
-    // Modo edição
+    // Modo edição - usar dados do localStorage (já carregados do Firestore)
     if (pedidoEditarId) {
-      try {
-        const snap = await firebase.firestore().collection('pedidos').doc(pedidoEditarId).get();
-        if (snap.exists()) {
-          const d = snap.data();
-          document.getElementById('tituloInput').value = d.titulo || '';
-          document.getElementById('descInput').value = d.descricao || '';
-          document.getElementById('enderecoInput').value = d.endereco || '';
-          if (d.valor) document.getElementById('valorInput').value = d.valor;
-          if (d.orcamento === 'aproximado') selValor('aproximado', document.querySelectorAll('.valor-btn')[1]);
-          // Categorias
-          if (d.categorias) {
-            d.categorias.forEach(cat => {
-              document.querySelectorAll('.cat-pill').forEach(p => {
-                if (p.getAttribute('onclick') && p.getAttribute('onclick').includes("'"+cat+"'")) {
-                  p.classList.add('sel');
-                  if (!catsSel.includes(cat)) catsSel.push(cat);
-                }
-              });
+      const dadosSalvos = localStorage.getItem('sj_pedido_editar_data');
+      if (dadosSalvos) {
+        const d = JSON.parse(dadosSalvos);
+        document.getElementById('tituloInput').value = d.titulo || '';
+        document.getElementById('descInput').value = d.descricao || '';
+        if (d.descricao) document.getElementById('charCount').textContent = (d.descricao||'').length;
+        document.getElementById('enderecoInput').value = d.endereco || '';
+        if (d.valor) document.getElementById('valorInput').value = d.valor;
+        if (d.orcamento === 'aproximado') selValor('aproximado', document.querySelectorAll('.valor-btn')[1]);
+        // Categorias
+        if (d.categorias) {
+          d.categorias.forEach(cat => {
+            document.querySelectorAll('.cat-pill').forEach(p => {
+              if (p.getAttribute('onclick') && p.getAttribute('onclick').includes("'"+cat+"'")) {
+                p.classList.add('sel');
+                if (!catsSel.includes(cat)) catsSel.push(cat);
+              }
             });
-          }
-          // Urgência
+          });
+        }
+        // Urgência
+        if (d.urgencia) {
           document.querySelectorAll('.urg-btn').forEach(b => {
-            if (d.urgencia && b.getAttribute('onclick') && b.getAttribute('onclick').includes("'"+d.urgencia+"'")) {
+            if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'"+d.urgencia+"'")) {
               document.querySelectorAll('.urg-btn').forEach(x=>x.classList.remove('sel'));
               b.classList.add('sel'); urgSel = d.urgencia;
             }
           });
-          // Fotos existentes
-          if (d.fotos && d.fotos.length > 0) {
-            const prev = document.getElementById('filesPreview');
-            d.fotos.forEach(f => {
-              const thumb = document.createElement('div');
-              thumb.className = 'file-thumb';
-              thumb.style.cssText = 'background-image:url('+f+');background-size:cover;background-position:center';
-              prev.appendChild(thumb);
-            });
-            arquivos = d.fotos; // manter fotos existentes
-            document.getElementById('uploadArea').style.display = 'none';
-            document.getElementById('addMoreBtn').style.display = 'block';
-            document.getElementById('fotoCount').textContent = d.fotos.length + '/10 fotos';
-          }
-          document.getElementById('btnPublicar').innerHTML = '💾 Salvar alterações';
-          atualizarPreview();
         }
-      } catch(e) { console.error('Erro ao carregar pedido:', e); }
+        document.getElementById('btnPublicar').innerHTML = '💾 Salvar alterações';
+        atualizarPreview();
+      }
     }
   });
 
@@ -535,9 +522,10 @@
         urgencia: urgSel, orcamento: valorTipo,
         valor: valor ? parseFloat(valor) : null, endereco: endereco
       }).then(function() {
+        localStorage.removeItem('sj_pedido_editar_data');
         window.location.href = 'meus-pedidos-cliente.html';
       }).catch(function(e) {
-        btn.disabled=false; btn.textContent='💾 Salvar alterações';
+        btn.disabled=false; btn.innerHTML='💾 Salvar alterações';
         alert('Erro: '+e.message);
       });
       return;
@@ -555,16 +543,16 @@
       clienteNome: nome,
       status: 'aberto',
       criadoEm: new Date().toISOString(),
-      interessados: [],
-      fotos: arquivos.filter(a => typeof a === 'string') // só base64 strings
+      interessados: []
     };
 
     firebase.firestore().collection('pedidos').add(pedido)
       .then(function() {
         document.getElementById('modalOverlay').classList.add('vis');
+        btn.disabled = false;
       })
       .catch(function(e) {
-        btn.disabled = false; btn.textContent = '🚀 Publicar pedido';
+        btn.disabled = false; btn.innerHTML = '🚀 Publicar pedido';
         alert('Erro ao publicar: ' + e.message);
       });
   }
