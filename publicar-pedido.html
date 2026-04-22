@@ -395,6 +395,60 @@
     document.getElementById('prevAnexos').textContent = arquivos.length > 0 ? arquivos.length+' arquivo(s)' : 'Nenhum';
   }
 
+  // Verificar modo edição
+  const urlParams = new URLSearchParams(window.location.search);
+  const pedidoEditarId = urlParams.get('editar');
+  if (pedidoEditarId) {
+    firebase.auth().onAuthStateChanged(async function(user) {
+      if (!user) return;
+      try {
+        const snap = await firebase.firestore().collection('pedidos').doc(pedidoEditarId).get();
+        if (snap.exists()) {
+          const d = snap.data();
+          // Preencher campos
+          document.getElementById('tituloInput').value = d.titulo || '';
+          document.getElementById('descInput').value = d.descricao || '';
+          document.getElementById('enderecoInput').value = d.endereco || '';
+          if (d.valor) document.getElementById('valorInput').value = d.valor;
+          // Categorias
+          if (d.categorias) {
+            d.categorias.forEach(cat => {
+              const pill = Array.from(document.querySelectorAll('.cat-pill')).find(p => p.textContent.trim().includes(cat.replace(/^.+? /,'')));
+              if (pill) toggleCat(pill, cat);
+            });
+          }
+          // Urgência
+          if (d.urgencia) {
+            document.querySelectorAll('.urg-btn').forEach(b => { if(b.textContent.includes(d.urgencia.replace(/^.+? /,''))) selUrg(b, d.urgencia); });
+          }
+          // Modo orçamento
+          if (d.orcamento === 'aproximado') {
+            const btn = document.querySelectorAll('.valor-btn')[1];
+            selValor('aproximado', btn);
+          }
+          // Mostrar fotos existentes
+          if (d.fotos && d.fotos.length > 0) {
+            const prev = document.getElementById('filesPreview');
+            d.fotos.forEach(f => {
+              const thumb = document.createElement('div');
+              thumb.className = 'file-thumb';
+              thumb.style.backgroundImage = 'url('+f+')';
+              thumb.style.backgroundSize = 'cover';
+              thumb.style.backgroundPosition = 'center';
+              thumb.innerHTML = '<span class="icon" style="display:none"></span><span style="display:none"></span>';
+              prev.appendChild(thumb);
+            });
+            document.getElementById('uploadArea').style.display = 'none';
+            document.getElementById('addMoreBtn').style.display = 'block';
+          }
+          // Mudar botão para Salvar edição
+          document.getElementById('btnPublicar').innerHTML = '💾 Salvar alterações';
+          atualizarPreview();
+        }
+      } catch(e) {}
+    });
+  }
+
   function triggerUpload() {
     const input = document.getElementById('fileInput');
     input.value = ''; // reset para permitir selecionar os mesmos arquivos
@@ -465,6 +519,21 @@
 
     const nome = localStorage.getItem('sj_nome') || 'Cliente';
     const valor = valorTipo === 'aproximado' ? document.getElementById('valorInput').value : null;
+
+    if (pedidoEditarId) {
+      // MODO EDIÇÃO
+      firebase.firestore().collection('pedidos').doc(pedidoEditarId).update({
+        titulo: titulo, descricao: desc, categorias: catsSel,
+        urgencia: urgSel, orcamento: valorTipo,
+        valor: valor ? parseFloat(valor) : null, endereco: endereco
+      }).then(function() {
+        window.location.href = 'meus-pedidos-cliente.html';
+      }).catch(function(e) {
+        btn.disabled=false; btn.textContent='💾 Salvar alterações';
+        alert('Erro: '+e.message);
+      });
+      return;
+    }
 
     const pedido = {
       titulo: titulo,
