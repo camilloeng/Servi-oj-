@@ -64,7 +64,8 @@ firebase.auth().onAuthStateChanged(async function(user){
   if(!user){ window.location.href='login.html'; return; }
 
   // Tentar uid do localStorage, depois _prof, depois uid do Auth
-  const possiveisIds = [uid, uid+'_prof', user.uid, user.uid+'_prof'].filter((v,i,a)=>a.indexOf(v)===i);
+  const uidBase = uid ? uid.replace('_prof','') : user.uid;
+  const possiveisIds = [uidBase+'_prof', uidBase, user.uid+'_prof', user.uid].filter((v,i,a)=>v && a.indexOf(v)===i);
   let dados = {};
 
   for (const id of possiveisIds) {
