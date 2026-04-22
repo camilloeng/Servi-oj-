@@ -396,6 +396,20 @@
             }
           });
         }
+        // Fotos existentes - adicionar ao array arquivos
+        if (d.fotos && d.fotos.length > 0) {
+          arquivos = [...d.fotos];
+          const prev = document.getElementById('filesPreview');
+          d.fotos.forEach(f => {
+            const thumb = document.createElement('div');
+            thumb.className = 'file-thumb';
+            thumb.style.cssText = 'background-image:url('+f+');background-size:cover;background-position:center';
+            prev.appendChild(thumb);
+          });
+          document.getElementById('uploadArea').style.display = 'none';
+          document.getElementById('addMoreBtn').style.display = 'block';
+          document.getElementById('fotoCount').textContent = d.fotos.length + '/10 fotos';
+        }
         document.getElementById('btnPublicar').innerHTML = '💾 Salvar alterações';
         atualizarPreview();
       }
@@ -534,7 +548,10 @@
     const reset = function(txt) { btn.disabled=false; btn.innerHTML=txt; };
 
     if (pedidoEditarId) {
-      firebase.firestore().collection('pedidos').doc(pedidoEditarId).update(dados)
+      firebase.firestore().collection('pedidos').doc(pedidoEditarId).update({
+        ...dados,
+        fotos: arquivos.filter(a => typeof a === 'string').slice(0,5)
+      })
         .then(function() { localStorage.removeItem('sj_pedido_editar_data'); window.location.href='meus-pedidos-cliente.html'; })
         .catch(function(e) { reset('💾 Salvar alterações'); alert('Erro: '+e.message); });
       return;
