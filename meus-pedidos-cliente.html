@@ -326,6 +326,13 @@
               <span class="int-titulo">📝 Descrição</span>
             </div>
             <p style="font-size:0.83rem;color:var(--cinza);line-height:1.7;margin-bottom:16px">${p.descricao || 'Sem descrição.'}</p>
+            ${(p.fotos && p.fotos.length > 0) ? `
+            <div class="int-header"><span class="int-titulo">📎 Fotos anexadas (${p.fotos.length})</span></div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+              ${p.fotos.map((f,i) => `<div style="width:80px;height:80px;border-radius:10px;overflow:hidden;border:1px solid var(--borda);cursor:pointer" onclick="window.open('${f}','_blank')"><img src="${f}" style="width:100%;height:100%;object-fit:cover"></div>`).join('')}
+            </div>` : ''}
+            <label onclick="document.getElementById('addFoto-${p.id}').click()" style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.3);color:var(--verde);font-size:0.75rem;font-weight:700;padding:6px 12px;border-radius:8px;cursor:pointer;margin-bottom:16px">📎 ${(p.fotos && p.fotos.length > 0) ? 'Adicionar mais fotos' : 'Anexar fotos'}</label>
+            <input type="file" id="addFoto-${p.id}" multiple accept="image/*" style="display:none" onchange="adicionarFotosPedido('${p.id}', this.files)">
             ${dadosProfHTML}
             <div class="int-header" style="margin-top:16px">
               <span class="int-titulo">💬 Propostas recebidas</span>
@@ -351,6 +358,27 @@
     const isOpen = intDiv.classList.contains('open');
     intDiv.classList.toggle('open', !isOpen);
     expIcon.classList.toggle('open', !isOpen);
+  }
+
+  async function adicionarFotosPedido(pedidoId, files) {
+    const pedido = todosPedidos.find(p => p.id === pedidoId);
+    if (!pedido) return;
+    const fotosAtuais = pedido.fotos || [];
+    const disponiveis = 10 - fotosAtuais.length;
+    if (disponiveis <= 0) { alert('Máximo de 10 fotos atingido!'); return; }
+
+    const novas = await Promise.all(Array.from(files).slice(0, disponiveis).map(f => new Promise(res => {
+      const r = new FileReader();
+      r.onload = e => res(e.target.result);
+      r.readAsDataURL(f);
+    })));
+
+    const todasFotos = [...fotosAtuais, ...novas];
+    try {
+      await firebase.firestore().collection('pedidos').doc(pedidoId).update({ fotos: todasFotos });
+      pedido.fotos = todasFotos;
+      renderPedidos();
+    } catch(e) { alert('Erro ao salvar fotos: ' + e.message); }
   }
 
   async function aceitarProposta(pedidoId, intIdx) {
