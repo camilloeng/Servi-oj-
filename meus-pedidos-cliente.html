@@ -173,10 +173,11 @@
 
   // Carregar pedidos do Firebase
   async function carregarPedidos() {
-    if (!uid) { window.location.href = 'login.html'; return; }
+    if (!uid && !window._authUid) { window.location.href = 'login.html'; return; }
+    const queryUid = window._authUid || uid;
     try {
       const snap = await firebase.firestore().collection('pedidos')
-        .where('clienteId', '==', uid).get();
+        .where('clienteId', '==', queryUid).get();
 
       todosPedidos = snap.docs.map(d => ({ id: d.id, ...d.data() }))
         .sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
@@ -284,6 +285,8 @@
 
   firebase.auth().onAuthStateChanged(function(user) {
     if (!user) { window.location.href = 'login.html'; return; }
+    // Usar UID real do Firebase Auth, não do localStorage
+    window._authUid = user.uid;
     carregarPedidos();
   });
 </script>
