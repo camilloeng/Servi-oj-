@@ -522,6 +522,8 @@ function salvarProfissional(){
         localStorage.setItem('sj_tipo','profissional');
         localStorage.setItem('sj_uid', docId);
         localStorage.setItem('sj_nome', nome);
+        localStorage.setItem('sj_categorias', JSON.stringify(categoriasSelecionadas));
+        localStorage.setItem('sj_categoriasAprovadas', JSON.stringify([]));
         irPara(4); montarSelecaoProfissao();
       });
   }
@@ -1153,6 +1155,7 @@ function mostrarResultado(){
   if(!aprovado)document.getElementById('tentRestantes').textContent=restam>0?'🔄 Você ainda tem '+restam+' tentativa(s) hoje':'⛔ Limite diário atingido.';
   if(aprovado&&!categoriasAprovadas.includes(categoriaTesteAtual)){
     categoriasAprovadas.push(categoriaTesteAtual);
+    localStorage.setItem('sj_categoriasAprovadas', JSON.stringify(categoriasAprovadas));
     const uid=localStorage.getItem('sj_uid');
     if(uid)firebase.firestore().collection('usuarios').doc(uid).update({categoriasAprovadas:categoriasAprovadas,aprovado:true});
   }
