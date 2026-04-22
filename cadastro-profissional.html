@@ -1124,15 +1124,20 @@ function renderPergunta(){
   document.getElementById('progFill').style.width=((atual+1)/20*100)+'%';
   document.getElementById('progNum').textContent=(atual+1)+' / 20';
   document.getElementById('pergunta').textContent=q.p;
+  // Embaralhar opções mantendo rastreio da correta
+  const indices=[0,1,2,3];
+  for(let i=indices.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[indices[i],indices[j]]=[indices[j],indices[i]];}
+  const novaCorreta=indices.indexOf(q.c);
   const letras=['A','B','C','D'];
-  document.getElementById('opcoes').innerHTML=q.ops.map((op,i)=>'<div class="quiz-op" onclick="selOp(this,'+i+')" data-i="'+i+'"><div class="op-letra">'+letras[i]+'</div>'+op+'</div>').join('');
+  document.getElementById('opcoes').innerHTML=indices.map((oi,i)=>
+    '<div class="quiz-op" onclick="selOp(this,'+i+','+novaCorreta+')" data-i="'+i+'"><div class="op-letra">'+letras[i]+'</div>'+q.ops[oi]+'</div>'
+  ).join('');
   document.getElementById('btnProxima').classList.remove('vis');opcaoSel=null;
 }
-function selOp(el,idx){
+function selOp(el,idx,correta){
   if(opcaoSel!==null)return;opcaoSel=idx;
-  const q=perguntas[atual];
-  document.querySelectorAll('.quiz-op').forEach((op,i)=>{if(i===q.c)op.classList.add('certa');else if(i===idx&&idx!==q.c)op.classList.add('errada');});
-  if(idx===q.c)acertos++;
+  document.querySelectorAll('.quiz-op').forEach((op,i)=>{if(i===correta)op.classList.add('certa');else if(i===idx&&idx!==correta)op.classList.add('errada');});
+  if(idx===correta)acertos++;
   document.getElementById('btnProxima').classList.add('vis');
 }
 function proximaPergunta(){atual++;if(atual>=20){mostrarResultado();return;}renderPergunta();}
