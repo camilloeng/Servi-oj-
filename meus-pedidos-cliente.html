@@ -91,6 +91,20 @@
   .overlay.vis{opacity:1;pointer-events:all}
   .modal-suc{background:var(--azul-medio);border:1px solid var(--borda);border-radius:24px;width:100%;max-width:380px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s}
   .overlay.vis .modal-suc{transform:translateY(0)}
+  .modal-aval{background:var(--azul-medio);border:1px solid var(--borda);border-radius:24px;width:100%;max-width:420px;padding:32px;transform:translateY(20px);transition:transform 0.3s}
+  .overlay.vis .modal-aval{transform:translateY(0)}
+  .aval-titulo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--branco);margin-bottom:6px}
+  .aval-sub{color:var(--cinza);font-size:0.82rem;margin-bottom:20px;line-height:1.5}
+  .estrelas-wrap{display:flex;justify-content:center;gap:8px;margin-bottom:6px}
+  .estrela-btn{font-size:2rem;cursor:pointer;opacity:0.3;transition:all 0.15s;background:none;border:none;padding:0}
+  .estrela-btn:hover,.estrela-btn.sel{opacity:1}
+  .nota-label{text-align:center;font-size:0.78rem;color:var(--cinza);margin-bottom:18px;min-height:18px}
+  .aval-textarea{width:100%;background:var(--azul-input);border:1.5px solid var(--borda);border-radius:12px;color:var(--branco);font-family:'DM Sans',sans-serif;font-size:0.85rem;padding:12px 14px;outline:none;resize:vertical;min-height:90px;line-height:1.6;margin-bottom:16px}
+  .aval-textarea:focus{border-color:rgba(0,201,111,0.45)}
+  .aval-textarea::placeholder{color:rgba(138,155,181,0.4)}
+  .aval-btns{display:flex;gap:8px}
+  .btn-aval-cancel{flex:1;background:transparent;border:1.5px solid var(--borda);border-radius:10px;padding:12px;color:var(--cinza);font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer}
+  .btn-aval-send{flex:2;background:var(--verde);border:none;border-radius:10px;padding:12px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer}
   .suc-icon{font-size:3.2rem;margin-bottom:14px}
   .suc-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:8px}
   .suc-sub{color:var(--cinza);font-size:0.83rem;line-height:1.6;margin-bottom:22px}
@@ -164,6 +178,27 @@
     <div class="vazio-icon">📋</div>
     <p>Nenhum pedido encontrado.<br>Publique seu primeiro pedido e receba orçamentos!</p>
     <button class="btn-vazio" onclick="window.location.href='publicar-pedido.html'">+ Publicar pedido</button>
+  </div>
+</div>
+
+<!-- MODAL AVALIAÇÃO -->
+<div class="overlay" id="overlayAvaliacao">
+  <div class="modal-aval">
+    <div class="aval-titulo">⭐ Avaliar profissional</div>
+    <div class="aval-sub">Como foi o serviço? Sua avaliação ajuda outros clientes a escolherem bons profissionais.</div>
+    <div class="estrelas-wrap">
+      <button class="estrela-btn" onclick="selNota(1)">⭐</button>
+      <button class="estrela-btn" onclick="selNota(2)">⭐</button>
+      <button class="estrela-btn" onclick="selNota(3)">⭐</button>
+      <button class="estrela-btn" onclick="selNota(4)">⭐</button>
+      <button class="estrela-btn" onclick="selNota(5)">⭐</button>
+    </div>
+    <div class="nota-label" id="notaSelecionada"></div>
+    <textarea class="aval-textarea" id="avalComentario" placeholder="Conte como foi o serviço, a pontualidade, qualidade do trabalho..."></textarea>
+    <div class="aval-btns">
+      <button class="btn-aval-cancel" onclick="document.getElementById('overlayAvaliacao').classList.remove('vis')">Cancelar</button>
+      <button class="btn-aval-send" onclick="enviarAvaliacao()">⭐ Enviar avaliação</button>
+    </div>
   </div>
 </div>
 
@@ -339,16 +374,72 @@
     } catch(e) { alert('Erro: ' + e.message); }
   }
 
-  async function concluirServico(pedidoId) {
-    if (!confirm('Marcar este serviço como concluído?')) return;
+  let pedidoParaAvaliar = null;
+
+  function selNota(n) {
+    window._notaAval = n;
+    const labels = ['','😞 Ruim','😐 Regular','🙂 Bom','😊 Muito bom','🤩 Excelente!'];
+    document.getElementById('notaSelecionada').textContent = labels[n];
+    document.querySelectorAll('.estrela-btn').forEach((s,i) => {
+      s.classList.toggle('sel', i < n);
+    });
+  }
+
+  function concluirServico(pedidoId) {
+    pedidoParaAvaliar = todosPedidos.find(p => p.id === pedidoId);
+    // Resetar modal
+    document.querySelectorAll('.estrela-btn').forEach(s => s.classList.remove('sel'));
+    document.getElementById('avalComentario').value = '';
+    document.getElementById('notaSelecionada').textContent = '';
+    window._notaAval = 0;
+    document.getElementById('overlayAvaliacao').classList.add('vis');
+  }
+
+  async function enviarAvaliacao() {
+    const nota = window._notaAval || 0;
+    const comentario = document.getElementById('avalComentario').value.trim();
+    if (nota === 0) { alert('Selecione uma nota!'); return; }
+    if (!comentario) { alert('Escreva um comentário!'); return; }
+    if (!pedidoParaAvaliar) return;
+
     try {
-      await firebase.firestore().collection('pedidos').doc(pedidoId).update({
-        status: 'concluido', concluidoEm: new Date().toISOString()
+      const pedido = pedidoParaAvaliar;
+      const profId = pedido.profissionalAceitoId;
+      const profNome = pedido.profissionalAceitoNome;
+      const clienteNome = localStorage.getItem('sj_nome') || 'Cliente';
+
+      // Salvar avaliação
+      await firebase.firestore().collection('avaliacoes').add({
+        profissionalId: profId,
+        profissionalNome: profNome,
+        clienteNome: clienteNome,
+        pedidoId: pedido.id,
+        nota: nota,
+        comentario: comentario,
+        criadoEm: new Date().toISOString()
       });
-      const pedido = todosPedidos.find(p => p.id === pedidoId);
-      if (pedido) pedido.status = 'concluido';
+
+      // Atualizar pedido como concluído
+      await firebase.firestore().collection('pedidos').doc(pedido.id).update({
+        status: 'concluido',
+        concluidoEm: new Date().toISOString(),
+        avaliacao: nota
+      });
+
+      // Recalcular média do profissional
+      const avalSnap = await firebase.firestore().collection('avaliacoes')
+        .where('profissionalId', '==', profId).get();
+      const avals = avalSnap.docs.map(d => d.data());
+      const media = avals.reduce((s,a) => s+(a.nota||0), 0) / avals.length;
+      await firebase.firestore().collection('usuarios').doc(profId).update({
+        avaliacao: parseFloat(media.toFixed(1)),
+        totalAvaliacoes: avals.length
+      });
+
+      pedido.status = 'concluido';
+      document.getElementById('overlayAvaliacao').classList.remove('vis');
       renderPedidos();
-      alert('✅ Serviço marcado como concluído!');
+      alert('✅ Serviço concluído e avaliação enviada! Obrigado!');
     } catch(e) { alert('Erro: ' + e.message); }
   }
 
