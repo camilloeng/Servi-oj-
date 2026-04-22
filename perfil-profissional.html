@@ -70,7 +70,7 @@ firebase.auth().onAuthStateChanged(async function(user){
   for (const id of possiveisIds) {
     try {
       const snap = await firebase.firestore().collection('usuarios').doc(id).get();
-      if (snap.exists() && snap.data().tipo === 'profissional') {
+      if (snap.exists() && snap.data().tipo === 'profissional' && snap.data().nome) {
         dados = snap.data();
         break;
       }
