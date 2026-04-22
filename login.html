@@ -347,11 +347,18 @@
       const nome = dados.nome || email.split('@')[0];
       const tipo = dados.tipo || tipoSel || 'cliente';
 
+      // VALIDAR: tipo selecionado deve bater com o tipo da conta
+      if (tipoSel && tipo !== tipoSel) {
+        await firebase.auth().signOut();
+        btn.classList.remove('loading');
+        mostrarErroLogin('Esta conta está cadastrada como ' + (tipo === 'profissional' ? 'profissional' : 'cliente') + '. Volte e selecione a opção correta.');
+        return;
+      }
+
       localStorage.setItem('sj_tipo', tipo);
       localStorage.setItem('sj_uid', cred.user.uid);
       localStorage.setItem('sj_nome', nome);
 
-      // REDIRECIONAR conforme tipo — SEM referenciar sucTitle/sucSub
       if (tipo === 'profissional') {
         window.location.href = 'dashboard-profissional.html';
       } else {
