@@ -290,10 +290,27 @@ function calcVencimento() {
 }
 
 async function init() {
-  // Usar dados do localStorage — não depende do Firestore para perfil
   const nome = localStorage.getItem('sj_nome') || 'Profissional';
   categoriasAprovadas = JSON.parse(localStorage.getItem('sj_categoriasAprovadas') || '[]');
   const todasCats = JSON.parse(localStorage.getItem('sj_categorias') || '[]');
+
+  // Se não tem categorias no localStorage, buscar do Firestore
+  if (categoriasAprovadas.length === 0) {
+    try {
+      const user = firebase.auth().currentUser;
+      if (user) {
+        for (const id of [user.uid+'_prof', user.uid]) {
+          const snap = await firebase.firestore().collection('usuarios').doc(id).get();
+          if (snap.exists() && (snap.data().categoriasAprovadas||[]).length > 0) {
+            categoriasAprovadas = snap.data().categoriasAprovadas;
+            localStorage.setItem('sj_categoriasAprovadas', JSON.stringify(categoriasAprovadas));
+            localStorage.setItem('sj_uid', id);
+            break;
+          }
+        }
+      }
+    } catch(e) {}
+  }
 
   document.getElementById('nomeNav').textContent = nome;
   document.getElementById('nomeCard').textContent = nome;
