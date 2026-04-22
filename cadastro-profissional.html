@@ -466,7 +466,6 @@ async function validarEtapa1(){
   try{
     const methods=await firebase.auth().fetchSignInMethodsForEmail(email);
     if(methods&&methods.length>0){
-      // Buscar conta no Firestore — query simples por email
       try {
         const snapCheck = await firebase.firestore().collection('usuarios').where('email','==',email).get();
         if(!snapCheck.empty){
@@ -476,19 +475,14 @@ async function validarEtapa1(){
             marcarCampo('emailProf',true);mostrarErro('erroEmailProf',true);
             btn.textContent='Próximo →';btn.disabled=false;window.scrollTo({top:0,behavior:'smooth'});return;
           }
-          // tipo === 'cliente' — permite continuar como profissional
-        } else {
-          // Email existe no Auth mas não no Firestore — bloquear
-          const eg=document.getElementById('erroGeral1');eg.textContent='⚠️ Este email já está cadastrado! Faça login.';eg.className='erro-geral vis';
-          marcarCampo('emailProf',true);mostrarErro('erroEmailProf',true);
-          btn.textContent='Próximo →';btn.disabled=false;window.scrollTo({top:0,behavior:'smooth'});return;
+          // É cliente — salva UID existente para usar depois
+          window._clienteExistenteUID = snapCheck.docs[0].id;
+          window._clienteExistente = true;
         }
-      } catch(e2) {
-        // Se falhou a query, bloquear por segurança
-        const eg=document.getElementById('erroGeral1');eg.textContent='⚠️ Este email já está cadastrado! Faça login.';eg.className='erro-geral vis';
-        marcarCampo('emailProf',true);mostrarErro('erroEmailProf',true);
-        btn.textContent='Próximo →';btn.disabled=false;window.scrollTo({top:0,behavior:'smooth'});return;
-      }
+      } catch(e2) {}
+    } else {
+      window._clienteExistente = false;
+      window._clienteExistenteUID = null;
     }
   }catch(e){}
   btn.textContent='Próximo →';btn.disabled=false;irPara(2);
@@ -511,19 +505,45 @@ function salvarProfissional(){
   const nome=document.getElementById('nomeProf').value.trim();
   const email=document.getElementById('emailProf').value.trim();
   const senha=document.getElementById('senhaProf').value;
+
+  const dadosProfissional = {
+    nome:nome, email:email, telefone:document.getElementById('telefoneProf').value.trim(), tipo:'profissional',
+    documento:document.getElementById('docInput').value.trim(), sobre:document.getElementById('sobreProf').value.trim(),
+    categorias:categoriasSelecionadas,
+    endereco:{cep:document.getElementById('cepProf').value.trim(),rua:document.getElementById('rua2').value.trim(),numero:document.getElementById('numeroProf').value.trim(),bairro:document.getElementById('bairro2').value.trim(),cidade:document.getElementById('cidade2').value.trim(),estado:document.getElementById('estado2').value,complemento:document.getElementById('complementoProf').value.trim()},
+    raioAtendimento:document.getElementById('raioProf').value,
+    aprovado:false,categoriasAprovadas:[],avaliacao:0,criadoEm:new Date().toISOString()
+  };
+
+  // Se é cliente existente — fazer login e atualizar documento
+  if(window._clienteExistente && window._clienteExistenteUID){
+    firebase.auth().signInWithEmailAndPassword(email, senha)
+      .then(function(cred){
+        // Criar documento profissional separado com sufixo _prof
+        return firebase.firestore().collection('usuarios').doc(cred.user.uid + '_prof').set(dadosProfissional)
+          .then(function(){
+            localStorage.setItem('sj_tipo','profissional');
+            localStorage.setItem('sj_uid', cred.user.uid + '_prof');
+            localStorage.setItem('sj_nome',nome);
+            irPara(4);montarSelecaoProfissao();
+          });
+      })
+      .catch(function(e){
+        const eg=document.getElementById('erroGeral3');
+        eg.textContent='⚠️ Senha incorreta para o email informado. Verifique sua senha de cliente.';
+        eg.className='erro-geral vis';
+      });
+    return;
+  }
+
+  // Novo usuário — criar conta normalmente
   firebase.auth().createUserWithEmailAndPassword(email,senha)
     .then(function(cred){
-      return firebase.firestore().collection('usuarios').doc(cred.user.uid).set({
-        nome:nome,email:email,telefone:document.getElementById('telefoneProf').value.trim(),tipo:'profissional',
-        documento:document.getElementById('docInput').value.trim(),sobre:document.getElementById('sobreProf').value.trim(),
-        categorias:categoriasSelecionadas,
-        endereco:{cep:document.getElementById('cepProf').value.trim(),rua:document.getElementById('rua2').value.trim(),numero:document.getElementById('numeroProf').value.trim(),bairro:document.getElementById('bairro2').value.trim(),cidade:document.getElementById('cidade2').value.trim(),estado:document.getElementById('estado2').value,complemento:document.getElementById('complementoProf').value.trim()},
-        raioAtendimento:document.getElementById('raioProf').value,
-        aprovado:false,categoriasAprovadas:[],avaliacao:0,criadoEm:new Date().toISOString()
-      }).then(function(){
-        localStorage.setItem('sj_tipo','profissional');localStorage.setItem('sj_uid',cred.user.uid);localStorage.setItem('sj_nome',nome);
-        irPara(4);montarSelecaoProfissao();
-      });
+      return firebase.firestore().collection('usuarios').doc(cred.user.uid).set(dadosProfissional)
+        .then(function(){
+          localStorage.setItem('sj_tipo','profissional');localStorage.setItem('sj_uid',cred.user.uid);localStorage.setItem('sj_nome',nome);
+          irPara(4);montarSelecaoProfissao();
+        });
     })
     .catch(function(e){
       const eg=document.getElementById('erroGeral3');
