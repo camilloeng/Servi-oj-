@@ -535,7 +535,9 @@
     if (!desc || desc.length < 20) { alert('Descreva o serviço com pelo menos 20 caracteres!'); return; }
     if (!endereco) { alert('Digite o endereço do serviço!'); return; }
 
-    const uid = localStorage.getItem('sj_uid');
+    const user = firebase.auth().currentUser;
+    if (!user) { alert('Sessão expirada. Faça login novamente.'); window.location.href='login.html'; return; }
+    const uid = user.uid;
     const nome = localStorage.getItem('sj_nome') || 'Cliente';
     const valor = valorTipo === 'aproximado' ? document.getElementById('valorInput').value : null;
 
@@ -547,26 +549,20 @@
       orcamento: valorTipo,
       valor: valor ? parseFloat(valor) : null,
       endereco: endereco,
-      clienteId: uid || '',
+      clienteId: uid,
       clienteNome: nome,
       status: 'aberto',
       criadoEm: new Date().toISOString(),
       interessados: []
     };
 
-    if (uid) {
-      firebase.firestore().collection('pedidos').add(pedido)
-        .then(function() {
-          document.getElementById('modalOverlay').classList.add('vis');
-        })
-        .catch(function(e) {
-          console.error(e);
-          // Mesmo com erro, mostra modal (dados podem já ter sido salvos)
-          document.getElementById('modalOverlay').classList.add('vis');
-        });
-    } else {
-      document.getElementById('modalOverlay').classList.add('vis');
-    }
+    firebase.firestore().collection('pedidos').add(pedido)
+      .then(function() {
+        document.getElementById('modalOverlay').classList.add('vis');
+      })
+      .catch(function(e) {
+        alert('Erro ao publicar: ' + e.message);
+      });
   }
 
   function irParaPedidos() {
