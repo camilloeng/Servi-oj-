@@ -169,10 +169,11 @@
   <h1 class="card-title">Dados pessoais</h1>
   <p class="card-sub">Suas informações ficam protegidas e só aparecem ao cliente após ele aceitar sua proposta.</p>
   <div class="erro-geral" id="erroGeral1"></div>
-  <div class="foto-upload">
-    <div class="foto-circle">📷</div>
-    <div class="foto-info"><p>Foto de perfil</p><span>Aparece no seu perfil público</span><br><button class="btn-foto">Escolher foto</button></div>
+  <div class="foto-upload" onclick="document.getElementById('fotoInput').click()" style="cursor:pointer">
+    <div class="foto-circle" id="fotoCircle">📷</div>
+    <div class="foto-info"><p>Foto de perfil</p><span>Aparece no seu perfil público</span><br><button class="btn-foto" type="button">Escolher foto</button></div>
   </div>
+  <input type="file" id="fotoInput" accept="image/*" style="display:none" onchange="previewFoto(this)">
   <div class="section-label">Informações básicas</div>
   <div class="field">
     <label>Nome completo <span class="req">*</span></label>
@@ -399,6 +400,16 @@
 let stepAtual=1,categoriasSelecionadas=[],categoriaTesteAtual='',categoriasAprovadas=[],tentativas=1;
 const MAX_TENT=4;
 
+function previewFoto(input){
+  if(input.files&&input.files[0]){
+    const reader=new FileReader();
+    reader.onload=function(e){
+      const c=document.getElementById('fotoCircle');
+      c.innerHTML='<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
 function irPara(n){
   document.getElementById('p'+stepAtual).classList.remove('ativo');
   document.getElementById('p'+n).classList.add('ativo');
@@ -455,17 +466,26 @@ async function validarEtapa1(){
   try{
     const methods=await firebase.auth().fetchSignInMethodsForEmail(email);
     if(methods&&methods.length>0){
-      // Verificar se é conta de cliente — se for, permite criar perfil profissional
+      // Buscar conta no Firestore — query simples por email
       try {
-        const snapCheck = await firebase.firestore().collection('usuarios').where('email','==',email).where('tipo','==','profissional').get();
+        const snapCheck = await firebase.firestore().collection('usuarios').where('email','==',email).get();
         if(!snapCheck.empty){
-          const eg=document.getElementById('erroGeral1');eg.textContent='⚠️ Este email já tem cadastro de profissional! Faça login.';eg.className='erro-geral vis';
+          const dados = snapCheck.docs[0].data();
+          if(dados.tipo === 'profissional'){
+            const eg=document.getElementById('erroGeral1');eg.textContent='⚠️ Este email já tem cadastro de profissional! Faça login.';eg.className='erro-geral vis';
+            marcarCampo('emailProf',true);mostrarErro('erroEmailProf',true);
+            btn.textContent='Próximo →';btn.disabled=false;window.scrollTo({top:0,behavior:'smooth'});return;
+          }
+          // tipo === 'cliente' — permite continuar como profissional
+        } else {
+          // Email existe no Auth mas não no Firestore — bloquear
+          const eg=document.getElementById('erroGeral1');eg.textContent='⚠️ Este email já está cadastrado! Faça login.';eg.className='erro-geral vis';
           marcarCampo('emailProf',true);mostrarErro('erroEmailProf',true);
           btn.textContent='Próximo →';btn.disabled=false;window.scrollTo({top:0,behavior:'smooth'});return;
         }
-        // É cliente — permite continuar (vai criar conta profissional separada)
-      } catch(e) {
-        const eg=document.getElementById('erroGeral1');eg.textContent='⚠️ Este email já está cadastrado! Faça login ou use outro email.';eg.className='erro-geral vis';
+      } catch(e2) {
+        // Se falhou a query, bloquear por segurança
+        const eg=document.getElementById('erroGeral1');eg.textContent='⚠️ Este email já está cadastrado! Faça login.';eg.className='erro-geral vis';
         marcarCampo('emailProf',true);mostrarErro('erroEmailProf',true);
         btn.textContent='Próximo →';btn.disabled=false;window.scrollTo({top:0,behavior:'smooth'});return;
       }
