@@ -400,6 +400,19 @@
 let stepAtual=1,categoriasSelecionadas=[],categoriaTesteAtual='',categoriasAprovadas=[],tentativas=1;
 const MAX_TENT=4;
 
+// Se veio do dashboard para fazer mais testes, pular direto para etapa 4
+window.addEventListener('load', function(){
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('teste') === '1') {
+    categoriasAprovadas = JSON.parse(localStorage.getItem('sj_categoriasAprovadas') || '[]');
+    categoriasSelecionadas = JSON.parse(localStorage.getItem('sj_categorias') || '[]');
+    // Mostrar só a etapa 4 sem o resto
+    document.getElementById('stepsBar').style.display = 'none';
+    irPara(4);
+    montarSelecaoProfissao();
+  }
+});
+
 function previewFoto(input){
   if(input.files&&input.files[0]){
     const reader=new FileReader();
