@@ -239,20 +239,30 @@ function renderFotos(fotos){
   return slots + addBtn;
 }
 
-async function adicionarFotos(files){
+const IMGBB_KEY = '327d0067238019843e43362c2f7096c7';
+async function uploadImgBB(file) {
+  const formData = new FormData();
+  if (typeof file === 'string') { formData.append('image', file.split(',')[1] || file); }
+  else { formData.append('image', file); }
+  const res = await fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_KEY, {method:'POST',body:formData});
+  const data = await res.json();
+  if (data.success) return data.data.url;
+  throw new Error(data.error?.message || 'Upload falhou');
+}
+
+async function adicionarFotos(files) {
   if(!profDocId) return;
-  const arr = Array.from(files);
   const disponiveis = 15 - fotosAtuais.length;
-  if(disponiveis <= 0){ alert('Máximo de 15 fotos atingido!'); return; }
-
-  // Converter para base64 (sem Firebase Storage)
-  const novas = await Promise.all(arr.slice(0,disponiveis).map(f => new Promise(res=>{
-    const r = new FileReader();
-    r.onload = e => res(e.target.result);
-    r.readAsDataURL(f);
-  })));
-
-  fotosAtuais = [...fotosAtuais, ...novas];
+  if(disponiveis <= 0) { alert('Máximo de 15 fotos!'); return; }
+  const arr = Array.from(files).slice(0, disponiveis);
+  document.getElementById('portfolioGrid').innerHTML += '<div style="padding:8px;color:#8A9BB5;font-size:0.75rem">Enviando ' + arr.length + ' foto(s)...</div>';
+  for (const f of arr) {
+    try {
+      const localUrl = await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(f);});
+      const url = await uploadImgBB(localUrl);
+      fotosAtuais.push(url);
+    } catch(e) { alert('Erro: ' + e.message); }
+  }
   await salvarFotos();
   document.getElementById('portfolioGrid').innerHTML = renderFotos(fotosAtuais);
 }
