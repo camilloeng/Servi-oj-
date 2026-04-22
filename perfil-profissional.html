@@ -66,7 +66,6 @@ firebase.auth().onAuthStateChanged(async function(user){
   const authUid = user.uid;
   let dados = {};
 
-  // Tentar authUid_prof primeiro, depois authUid direto
   const idsParaTentar = [authUid + '_prof', authUid];
   
   for (const id of idsParaTentar) {
@@ -74,14 +73,26 @@ firebase.auth().onAuthStateChanged(async function(user){
       const snap = await firebase.firestore().collection('usuarios').doc(id).get();
       if (snap.exists() && snap.data().nome) {
         dados = snap.data();
-        // Corrigir localStorage com UID correto
         localStorage.setItem('sj_uid', id);
         localStorage.setItem('sj_nome', dados.nome);
         break;
       }
-    } catch(e) {
-      document.getElementById('pageContent').innerHTML += '<p style="color:orange;font-size:11px">Erro '+id+': '+e.message+'</p>';
-    }
+    } catch(e) {}
+  }
+
+  // Se ainda não achou, buscar por email
+  if (!dados.nome) {
+    try {
+      const q = await firebase.firestore().collection('usuarios')
+        .where('email', '==', user.email)
+        .where('tipo', '==', 'profissional')
+        .get();
+      if (!q.empty) {
+        dados = q.docs[0].data();
+        localStorage.setItem('sj_uid', q.docs[0].id);
+        localStorage.setItem('sj_nome', dados.nome);
+      }
+    } catch(e) {}
   }
 
   renderPerfil(dados);
