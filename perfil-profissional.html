@@ -64,28 +64,24 @@ firebase.auth().onAuthStateChanged(async function(user){
   if(!user){ window.location.href='login.html'; return; }
 
   const authUid = user.uid;
-  const possiveisIds = [authUid+'_prof', authUid, uid ? uid.replace('_prof','')+'_prof' : null, uid].filter(v=>v);
   let dados = {};
 
-  for (const id of possiveisIds) {
+  // Tentar authUid_prof primeiro, depois authUid direto
+  const idsParaTentar = [authUid + '_prof', authUid];
+  
+  for (const id of idsParaTentar) {
     try {
       const snap = await firebase.firestore().collection('usuarios').doc(id).get();
-      if (snap.exists() && snap.data().tipo === 'profissional' && snap.data().nome) {
+      if (snap.exists() && snap.data().nome) {
         dados = snap.data();
+        // Corrigir localStorage com UID correto
+        localStorage.setItem('sj_uid', id);
+        localStorage.setItem('sj_nome', dados.nome);
         break;
       }
     } catch(e) {
-      document.getElementById('pageContent').innerHTML += '<p style="color:orange;font-size:12px">Erro doc '+id+': '+e.message+'</p>';
+      document.getElementById('pageContent').innerHTML += '<p style="color:orange;font-size:11px">Erro '+id+': '+e.message+'</p>';
     }
-  }
-
-  // Se não achou no Firestore, usar localStorage
-  if (!dados.nome) {
-    dados = {
-      nome: localStorage.getItem('sj_nome') || '—',
-      email: '—', telefone: '—', documento: '—', sobre: '—',
-      endereco: {}, tipo: 'profissional'
-    };
   }
 
   renderPerfil(dados);
