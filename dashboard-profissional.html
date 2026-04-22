@@ -170,7 +170,7 @@
     <div class="btn-teste" onclick="window.location.href='cadastro-profissional.html?teste=1'">+ Fazer mais testes de profissão</div>
 
     <!-- TAXA PENDENTE -->
-    <div class="taxa-box" id="taxaBox" style="display:none">
+    <div class="taxa-box" id="taxaBox">
       <div class="bloco-title">💰 Taxas pendentes</div>
       <div class="taxa-valor" id="taxaValor">R$ 0,00</div>
       <div class="taxa-venc">Vencimento: <strong id="taxaVenc">—</strong></div>
@@ -214,14 +214,14 @@
     <div class="modal-title">💬 Enviar proposta</div>
     <div class="modal-sub" id="modalTitulo"></div>
     <div class="mfield">
-      <label>Seu valor para o serviço (R$) *</label>
-      <input type="number" id="propValor" placeholder="Ex: 350">
+      <label>Seu valor para o serviço (R$) <span style="color:var(--cinza);font-size:0.7rem">(opcional — deixe em branco se preferir visita primeiro)</span></label>
+      <input type="number" id="propValor" placeholder="Ex: 350 (opcional)">
     </div>
     <div class="mfield">
       <label>Mensagem para o cliente *</label>
       <textarea id="propMsg" placeholder="Descreva como realizaria o serviço, sua experiência e prazo..."></textarea>
     </div>
-    <div class="taxa-info">💡 Taxa ServiçoJá: <strong id="taxaModal">—</strong> — cobrada somente se o cliente aceitar sua proposta.</div>
+    <div class="taxa-info">💡 Taxa ServiçoJá: <strong id="taxaModal">—</strong> — A taxa será cobrada somente se o cliente aceitar ouvir sua proposta.</div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
       <button class="btn-send" onclick="enviarProposta()">🚀 Enviar proposta</button>
@@ -357,7 +357,7 @@ function renderPedidos() {
         </div>
         <div class="p-actions">
           <div class="taxa-badge">Taxa: R$ ${taxa}</div>
-          <button class="btn-prop" onclick="abrirProposta('${p.id}')">Enviar proposta</button>
+          <button class="btn-prop" onclick="abrirProposta('${p.id}')">Me interesso</button>
         </div>
       </div>
     </div>`;
@@ -379,16 +379,17 @@ function fecharModal() { document.getElementById('overlayProposta').classList.re
 async function enviarProposta() {
   const valor = document.getElementById('propValor').value.trim();
   const msg = document.getElementById('propMsg').value.trim();
-  if (!valor || !msg) { alert('Preencha o valor e a mensagem!'); return; }
+  if (!msg) { alert('Escreva uma mensagem para o cliente!'); return; }
   if (!pedidoAtual) return;
   const taxa = taxasCalc[pedidoAtual.id] || 10;
   try {
     await firebase.firestore().collection('pedidos').doc(pedidoAtual.id).update({
       interessados: firebase.firestore.FieldValue.arrayUnion({
         profissionalId: uid, profissionalNome: nome,
-        valor: parseFloat(valor), mensagem: msg, taxa: taxa,
+        valor: valor ? parseFloat(valor) : null, mensagem: msg, taxa: taxa,
         enviadoEm: new Date().toISOString()
-      })
+      }),
+      status: 'andamento'
     });
     // Acumular taxa pendente no perfil
     await firebase.firestore().collection('usuarios').doc(uid).update({
