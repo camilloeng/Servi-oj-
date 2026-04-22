@@ -334,10 +334,79 @@
   let arquivos = [];
   let authUser = null;
 
-  // Aguardar autenticação
-  firebase.auth().onAuthStateChanged(function(user) {
+  // Função para comprimir imagem antes de salvar
+  function comprimirImagem(file, maxWidth=800, quality=0.7) {
+    return new Promise(res => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let w = img.width, h = img.height;
+          if (w > maxWidth) { h = h * maxWidth / w; w = maxWidth; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          res(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Aguardar autenticação e carregar modo edição se necessário
+  firebase.auth().onAuthStateChanged(async function(user) {
     if (!user) { window.location.href = 'login.html'; return; }
     authUser = user;
+
+    // Modo edição
+    if (pedidoEditarId) {
+      try {
+        const snap = await firebase.firestore().collection('pedidos').doc(pedidoEditarId).get();
+        if (snap.exists()) {
+          const d = snap.data();
+          document.getElementById('tituloInput').value = d.titulo || '';
+          document.getElementById('descInput').value = d.descricao || '';
+          document.getElementById('enderecoInput').value = d.endereco || '';
+          if (d.valor) document.getElementById('valorInput').value = d.valor;
+          if (d.orcamento === 'aproximado') selValor('aproximado', document.querySelectorAll('.valor-btn')[1]);
+          // Categorias
+          if (d.categorias) {
+            d.categorias.forEach(cat => {
+              document.querySelectorAll('.cat-pill').forEach(p => {
+                if (p.getAttribute('onclick') && p.getAttribute('onclick').includes("'"+cat+"'")) {
+                  p.classList.add('sel');
+                  if (!catsSel.includes(cat)) catsSel.push(cat);
+                }
+              });
+            });
+          }
+          // Urgência
+          document.querySelectorAll('.urg-btn').forEach(b => {
+            if (d.urgencia && b.getAttribute('onclick') && b.getAttribute('onclick').includes("'"+d.urgencia+"'")) {
+              document.querySelectorAll('.urg-btn').forEach(x=>x.classList.remove('sel'));
+              b.classList.add('sel'); urgSel = d.urgencia;
+            }
+          });
+          // Fotos existentes
+          if (d.fotos && d.fotos.length > 0) {
+            const prev = document.getElementById('filesPreview');
+            d.fotos.forEach(f => {
+              const thumb = document.createElement('div');
+              thumb.className = 'file-thumb';
+              thumb.style.cssText = 'background-image:url('+f+');background-size:cover;background-position:center';
+              prev.appendChild(thumb);
+            });
+            arquivos = d.fotos; // manter fotos existentes
+            document.getElementById('uploadArea').style.display = 'none';
+            document.getElementById('addMoreBtn').style.display = 'block';
+            document.getElementById('fotoCount').textContent = d.fotos.length + '/10 fotos';
+          }
+          document.getElementById('btnPublicar').innerHTML = '💾 Salvar alterações';
+          atualizarPreview();
+        }
+      } catch(e) { console.error('Erro ao carregar pedido:', e); }
+    }
   });
 
   function filtrarCats(busca) {
@@ -395,60 +464,6 @@
     document.getElementById('prevAnexos').textContent = arquivos.length > 0 ? arquivos.length+' arquivo(s)' : 'Nenhum';
   }
 
-  // Verificar modo edição
-  const urlParams = new URLSearchParams(window.location.search);
-  const pedidoEditarId = urlParams.get('editar');
-  if (pedidoEditarId) {
-    firebase.auth().onAuthStateChanged(async function(user) {
-      if (!user) return;
-      try {
-        const snap = await firebase.firestore().collection('pedidos').doc(pedidoEditarId).get();
-        if (snap.exists()) {
-          const d = snap.data();
-          // Preencher campos
-          document.getElementById('tituloInput').value = d.titulo || '';
-          document.getElementById('descInput').value = d.descricao || '';
-          document.getElementById('enderecoInput').value = d.endereco || '';
-          if (d.valor) document.getElementById('valorInput').value = d.valor;
-          // Categorias
-          if (d.categorias) {
-            d.categorias.forEach(cat => {
-              const pill = Array.from(document.querySelectorAll('.cat-pill')).find(p => p.textContent.trim().includes(cat.replace(/^.+? /,'')));
-              if (pill) toggleCat(pill, cat);
-            });
-          }
-          // Urgência
-          if (d.urgencia) {
-            document.querySelectorAll('.urg-btn').forEach(b => { if(b.textContent.includes(d.urgencia.replace(/^.+? /,''))) selUrg(b, d.urgencia); });
-          }
-          // Modo orçamento
-          if (d.orcamento === 'aproximado') {
-            const btn = document.querySelectorAll('.valor-btn')[1];
-            selValor('aproximado', btn);
-          }
-          // Mostrar fotos existentes
-          if (d.fotos && d.fotos.length > 0) {
-            const prev = document.getElementById('filesPreview');
-            d.fotos.forEach(f => {
-              const thumb = document.createElement('div');
-              thumb.className = 'file-thumb';
-              thumb.style.backgroundImage = 'url('+f+')';
-              thumb.style.backgroundSize = 'cover';
-              thumb.style.backgroundPosition = 'center';
-              thumb.innerHTML = '<span class="icon" style="display:none"></span><span style="display:none"></span>';
-              prev.appendChild(thumb);
-            });
-            document.getElementById('uploadArea').style.display = 'none';
-            document.getElementById('addMoreBtn').style.display = 'block';
-          }
-          // Mudar botão para Salvar edição
-          document.getElementById('btnPublicar').innerHTML = '💾 Salvar alterações';
-          atualizarPreview();
-        }
-      } catch(e) {}
-    });
-  }
-
   function triggerUpload() {
     const input = document.getElementById('fileInput');
     input.value = ''; // reset para permitir selecionar os mesmos arquivos
@@ -459,35 +474,28 @@
   function dragLeave() { document.getElementById('uploadArea').style.borderColor=''; }
   function dragDrop(e) { e.preventDefault(); dragLeave(); adicionarArquivos(e.dataTransfer.files); }
 
-  function adicionarArquivos(files) {
+  async function adicionarArquivos(files) {
     const prev = document.getElementById('filesPreview');
-    Array.from(files).forEach(f => {
-      if (arquivos.length >= 10) { alert('Máximo de 10 fotos atingido!'); return; }
-      arquivos.push(f);
+    for (const f of Array.from(files)) {
+      if (arquivos.length >= 10) { alert('Máximo de 10 fotos!'); break; }
       const isImg = f.type.startsWith('image/');
-      const isVid = f.type.startsWith('video/');
-      const icon = isImg ? '🖼️' : isVid ? '🎬' : '📄';
-      const nome = f.name.length > 10 ? f.name.substring(0,10)+'...' : f.name;
+      // Comprimir imagem antes de salvar
+      const dataUrl = isImg ? await comprimirImagem(f) : await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(f);});
+      arquivos.push(dataUrl);
       const thumb = document.createElement('div');
       thumb.className = 'file-thumb';
-      const idx = arquivos.length - 1;
-
       if (isImg) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          thumb.style.backgroundImage = 'url('+e.target.result+')';
-          thumb.style.backgroundSize = 'cover';
-          thumb.style.backgroundPosition = 'center';
-          thumb.querySelector('.icon').style.display = 'none';
-        };
-        reader.readAsDataURL(f);
+        thumb.style.cssText = 'background-image:url('+dataUrl+');background-size:cover;background-position:center';
+      } else {
+        thumb.innerHTML = '📄<span>'+(f.name.length>10?f.name.substring(0,10)+'...':f.name)+'</span>';
       }
-
-      thumb.innerHTML = '<span class="icon">'+icon+'</span><span>'+nome+'</span><div class="remove" onclick="removerArquivo(this,'+idx+')">✕</div>';
+      const idx = arquivos.length - 1;
+      const rm = document.createElement('div');
+      rm.className = 'remove'; rm.textContent = '✕';
+      rm.onclick = function(){ removerArquivo(this, idx); };
+      thumb.appendChild(rm);
       prev.appendChild(thumb);
-    });
-
-    // Mostrar/ocultar area e botão de adicionar mais
+    }
     document.getElementById('uploadArea').style.display = arquivos.length > 0 ? 'none' : '';
     document.getElementById('addMoreBtn').style.display = arquivos.length > 0 ? 'block' : 'none';
     document.getElementById('fotoCount').textContent = arquivos.length + '/10 fotos';
@@ -547,7 +555,8 @@
       clienteNome: nome,
       status: 'aberto',
       criadoEm: new Date().toISOString(),
-      interessados: []
+      interessados: [],
+      fotos: arquivos.filter(a => typeof a === 'string') // só base64 strings
     };
 
     firebase.firestore().collection('pedidos').add(pedido)
