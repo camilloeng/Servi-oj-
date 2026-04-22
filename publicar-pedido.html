@@ -333,6 +333,21 @@
   let valorTipo = 'aberto';
   let arquivos = [];
   let authUser = null;
+
+  const IMGBB_KEY = '327d0067238019843e43362c2f7096c7';
+  async function uploadImgBB(file) {
+    const formData = new FormData();
+    if (typeof file === 'string') {
+      formData.append('image', file.split(',')[1] || file);
+    } else {
+      formData.append('image', file);
+    }
+    const res = await fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_KEY, {method:'POST',body:formData});
+    const data = await res.json();
+    if (data.success) return data.data.url;
+    throw new Error(data.error?.message || 'Upload falhou');
+  }
+
   const pedidoEditarId = new URLSearchParams(window.location.search).get('editar');
 
   // Função para comprimir imagem antes de salvar
@@ -483,28 +498,34 @@
 
   async function adicionarArquivos(files) {
     const prev = document.getElementById('filesPreview');
+    const addBtn = document.getElementById('addMoreBtn');
     for (const f of Array.from(files)) {
       if (arquivos.length >= 10) { alert('Máximo de 10 fotos!'); break; }
-      const isImg = f.type.startsWith('image/');
-      // Comprimir imagem antes de salvar
-      const dataUrl = isImg ? await comprimirImagem(f) : await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(f);});
-      arquivos.push(dataUrl);
+      // Preview local imediato
+      const localUrl = await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(f);});
       const thumb = document.createElement('div');
       thumb.className = 'file-thumb';
-      if (isImg) {
-        thumb.style.cssText = 'background-image:url('+dataUrl+');background-size:cover;background-position:center';
-      } else {
-        thumb.innerHTML = '📄<span>'+(f.name.length>10?f.name.substring(0,10)+'...':f.name)+'</span>';
-      }
-      const idx = arquivos.length - 1;
-      const rm = document.createElement('div');
-      rm.className = 'remove'; rm.textContent = '✕';
-      rm.onclick = function(){ removerArquivo(this, idx); };
-      thumb.appendChild(rm);
+      thumb.style.cssText = 'background-image:url('+localUrl+');background-size:cover;background-position:center;opacity:0.5';
+      thumb.innerHTML = '<span style="font-size:0.6rem;color:#fff;text-align:center;padding:2px">Enviando...</span>';
       prev.appendChild(thumb);
+      try {
+        // Upload para ImgBB
+        const url = await uploadImgBB(localUrl);
+        arquivos.push(url);
+        thumb.style.opacity = '1';
+        thumb.innerHTML = '';
+        const rm = document.createElement('div');
+        rm.className = 'remove'; rm.textContent = '✕';
+        const idx = arquivos.length - 1;
+        rm.onclick = function(){ removerArquivo(this, idx); };
+        thumb.appendChild(rm);
+      } catch(e) {
+        thumb.remove();
+        alert('Erro ao enviar foto: ' + e.message);
+      }
     }
     document.getElementById('uploadArea').style.display = arquivos.length > 0 ? 'none' : '';
-    document.getElementById('addMoreBtn').style.display = arquivos.length > 0 ? 'block' : 'none';
+    addBtn.style.display = arquivos.length > 0 ? 'block' : 'none';
     document.getElementById('fotoCount').textContent = arquivos.length + '/10 fotos';
     atualizarPreview();
   }
@@ -550,7 +571,7 @@
     if (pedidoEditarId) {
       firebase.firestore().collection('pedidos').doc(pedidoEditarId).update({
         ...dados,
-        fotos: arquivos.filter(a => typeof a === 'string').slice(0,5)
+        fotos: arquivos.slice(0,10)
       })
         .then(function() { localStorage.removeItem('sj_pedido_editar_data'); window.location.href='meus-pedidos-cliente.html'; })
         .catch(function(e) { reset('💾 Salvar alterações'); alert('Erro: '+e.message); });
@@ -560,7 +581,7 @@
     firebase.firestore().collection('pedidos').add({
       ...dados, clienteId: user.uid, status: 'aberto',
       criadoEm: new Date().toISOString(), interessados: [],
-      fotos: arquivos.filter(a => typeof a === 'string').slice(0,5)
+      fotos: arquivos.slice(0,10)
     })
     .then(function() { reset('🚀 Publicar pedido'); document.getElementById('modalOverlay').classList.add('vis'); })
     .catch(function(e) { reset('🚀 Publicar pedido'); alert('Erro: '+e.message); });
