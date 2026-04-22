@@ -507,7 +507,12 @@
     if (!titulo) { alert('Digite o título do pedido!'); return; }
     if (!desc || desc.length < 20) { alert('Descreva o serviço com pelo menos 20 caracteres!'); return; }
     if (!endereco) { alert('Digite o endereço do serviço!'); return; }
-    if (!authUser) { alert('Aguarde a conexão ou faça login novamente.'); return; }
+    if (!authUser) { 
+      // Tentar pegar usuário atual diretamente
+      const currentUser = firebase.auth().currentUser;
+      if (currentUser) { authUser = currentUser; }
+      else { alert('Sessão não encontrada. Faça login novamente.'); window.location.href='login.html'; return; }
+    }
 
     const btn = document.getElementById('btnPublicar');
     btn.disabled = true; btn.textContent = 'Publicando...';
