@@ -336,7 +336,7 @@
   const pedidoEditarId = new URLSearchParams(window.location.search).get('editar');
 
   // Função para comprimir imagem antes de salvar
-  function comprimirImagem(file, maxWidth=800, quality=0.7) {
+  function comprimirImagem(file, maxWidth=400, quality=0.4) {
     return new Promise(res => {
       const reader = new FileReader();
       reader.onload = e => {
@@ -371,23 +371,28 @@
         document.getElementById('enderecoInput').value = d.endereco || '';
         if (d.valor) document.getElementById('valorInput').value = d.valor;
         if (d.orcamento === 'aproximado') selValor('aproximado', document.querySelectorAll('.valor-btn')[1]);
-        // Categorias
+        // Categorias - match por texto sem emoji
         if (d.categorias) {
           d.categorias.forEach(cat => {
+            const catTexto = cat.replace(/^\S+\s/, '').toLowerCase().trim();
             document.querySelectorAll('.cat-pill').forEach(p => {
-              if (p.getAttribute('onclick') && p.getAttribute('onclick').includes("'"+cat+"'")) {
+              const pillTexto = p.textContent.replace(/^\S+\s/, '').toLowerCase().trim();
+              if (pillTexto === catTexto || p.textContent.trim() === cat.trim()) {
                 p.classList.add('sel');
-                if (!catsSel.includes(cat)) catsSel.push(cat);
+                const catReal = p.getAttribute('onclick').match(/'([^']+)'/)?.[1] || cat;
+                if (!catsSel.includes(catReal)) catsSel.push(catReal);
               }
             });
           });
         }
-        // Urgência
+        // Urgência - match por texto
         if (d.urgencia) {
           document.querySelectorAll('.urg-btn').forEach(b => {
-            if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'"+d.urgencia+"'")) {
+            const urgTexto = d.urgencia.replace(/^\S+\s/, '').toLowerCase();
+            if (b.textContent.toLowerCase().includes(urgTexto) || b.getAttribute('onclick').includes(d.urgencia)) {
               document.querySelectorAll('.urg-btn').forEach(x=>x.classList.remove('sel'));
-              b.classList.add('sel'); urgSel = d.urgencia;
+              b.classList.add('sel');
+              urgSel = d.urgencia;
             }
           });
         }
@@ -537,7 +542,8 @@
 
     firebase.firestore().collection('pedidos').add({
       ...dados, clienteId: user.uid, status: 'aberto',
-      criadoEm: new Date().toISOString(), interessados: []
+      criadoEm: new Date().toISOString(), interessados: [],
+      fotos: arquivos.filter(a => typeof a === 'string').slice(0,5)
     })
     .then(function() { reset('🚀 Publicar pedido'); document.getElementById('modalOverlay').classList.add('vis'); })
     .catch(function(e) { reset('🚀 Publicar pedido'); alert('Erro: '+e.message); });
