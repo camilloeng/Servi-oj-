@@ -340,23 +340,35 @@
       await initFirebase();
       const { signInWithEmailAndPassword, getDoc, doc } = window._fbAuth;
       const cred = await signInWithEmailAndPassword(auth, email, senha);
+      const uid = cred.user.uid;
 
-      // Buscar dados do Firestore
-      const snap = await getDoc(doc(db, "usuarios", cred.user.uid));
-      const dados = snap.exists() ? snap.data() : {};
+      // Buscar dados do Firestore — checar UID normal e UID_prof
+      let snap = await getDoc(doc(db, "usuarios", uid));
+      let dados = snap.exists() ? snap.data() : {};
+      let docId = uid;
+
+      // Se selecionou profissional, checar se tem perfil _prof
+      if (tipoSel === 'profissional') {
+        const snapProf = await getDoc(doc(db, "usuarios", uid + '_prof'));
+        if (snapProf.exists()) {
+          dados = snapProf.data();
+          docId = uid + '_prof';
+        }
+      }
+
       const nome = dados.nome || email.split('@')[0];
       const tipo = dados.tipo || tipoSel || 'cliente';
 
-      // VALIDAR: tipo selecionado deve bater com o tipo da conta
+      // VALIDAR: tipo selecionado deve bater
       if (tipoSel && tipo !== tipoSel) {
-        await firebase.auth().signOut();
+        await cred.user.auth.signOut();
         btn.classList.remove('loading');
         mostrarErroLogin('Esta conta está cadastrada como ' + (tipo === 'profissional' ? 'profissional' : 'cliente') + '. Volte e selecione a opção correta.');
         return;
       }
 
       localStorage.setItem('sj_tipo', tipo);
-      localStorage.setItem('sj_uid', cred.user.uid);
+      localStorage.setItem('sj_uid', docId);
       localStorage.setItem('sj_nome', nome);
 
       if (tipo === 'profissional') {
