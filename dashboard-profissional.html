@@ -17,6 +17,16 @@
   .av{width:36px;height:36px;border-radius:50%;background:rgba(0,201,111,0.2);border:2px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
   .nav-name{font-size:0.85rem;font-weight:600;color:var(--branco)}
   .nav-sub{font-size:0.72rem;color:var(--cinza)}
+  
+  .notif-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background 0.2s}
+  .notif-item:hover{background:rgba(255,255,255,0.03)}
+  .notif-item:last-child{border-bottom:none}
+  .notif-item.nova{border-left:3px solid #00C96F;background:rgba(0,201,111,0.03)}
+  .notif-item.lida{opacity:0.55}
+  .ni-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .ni-txt{font-size:11px;color:#F5F7F2;line-height:1.5;margin-bottom:2px}
+  .ni-tempo{font-size:10px;color:#8A9BB5}
+  .ni-dot{width:7px;height:7px;border-radius:50%;background:#00C96F;margin-top:4px;flex-shrink:0}
   .btn-sair{background:none;border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.78rem;padding:6px 12px;cursor:pointer;transition:all 0.2s}
   .btn-sair:hover{border-color:rgba(255,92,92,0.4);color:var(--erro)}
   .layout{display:grid;grid-template-columns:220px 1fr;gap:16px;max-width:1200px;margin:0 auto;padding:24px 24px 60px}
@@ -141,6 +151,18 @@
       <div class="nav-name" id="nomeNav">Profissional</div>
       <div class="nav-sub">Conta profissional</div>
     </div>
+    <div style="position:relative" id="notifWrap">
+  <button id="notifBtn" onclick="toggleNotif()" style="position:relative;width:36px;height:36px;border-radius:50%;background:#0F1C35;border:1px solid rgba(255,255,255,0.09);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">
+    🔔<span id="notifBadge" style="display:none;position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;border-radius:50%;background:#FF6B35;color:#fff;font-size:9px;font-weight:700;align-items:center;justify-content:center;border:2px solid #132240;padding:0 2px"></span>
+  </button>
+  <div id="notifDropdown" style="display:none;position:absolute;right:0;top:46px;width:310px;background:#132240;border:1px solid rgba(255,255,255,0.09);border-radius:14px;overflow:hidden;z-index:100;box-shadow:0 8px 32px rgba(0,0,0,0.4)">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.09)">
+      <span style="font-weight:700;font-size:13px;color:#F5F7F2">🔔 Notificações</span>
+      <span onclick="marcarTodasLidas()" style="font-size:11px;color:#8A9BB5;cursor:pointer;text-decoration:underline">Marcar lidas</span>
+    </div>
+    <div id="notifLista" style="max-height:340px;overflow-y:auto"></div>
+  </div>
+</div>
     <button class="btn-sair" onclick="sair()">Sair</button>
   </div>
 </nav>
@@ -422,7 +444,11 @@ async function enviarProposta() {
     fecharModal();
     const env = parseInt(document.getElementById('statEnv').textContent)||0;
     document.getElementById('statEnv').textContent = env + 1;
-    alert('✅ Proposta enviada! O cliente será notificado.');
+    // Notificar cliente
+    criarNotificacao(pedidoAtual.clienteId, 'proposta',
+      nome+' se interessou pelo seu pedido "'+pedidoAtual.titulo+'"',
+      'meus-pedidos-cliente.html');
+    alert('✅ Proposta enviada! O cliente foi notificado.');
   } catch(e) { alert('Erro ao enviar proposta.'); }
 }
 
@@ -443,7 +469,63 @@ firebase.auth().onAuthStateChanged(function(user) {
     return;
   }
   init();
+  const uid = localStorage.getItem('sj_uid') || user.uid;
+  setTimeout(function(){ carregarNotificacoes(uid); }, 1000);
 });
+
+  let notifAberto=false, notifIds=[], notifUid=null;
+
+  function toggleNotif(){
+    notifAberto=!notifAberto;
+    document.getElementById('notifDropdown').style.display=notifAberto?'block':'none';
+    if(notifAberto) marcarTodasLidas();
+  }
+  document.addEventListener('click',function(e){
+    const w=document.getElementById('notifWrap');
+    if(w&&!w.contains(e.target)){notifAberto=false;document.getElementById('notifDropdown').style.display='none';}
+  });
+  function tempoRelativo(d){
+    const diff=Date.now()-new Date(d).getTime(),min=Math.floor(diff/60000);
+    if(min<1)return'agora';if(min<60)return min+'min atrás';
+    const h=Math.floor(min/60);if(h<24)return h+'h atrás';
+    return Math.floor(h/24)+'d atrás';
+  }
+  async function carregarNotificacoes(uid){
+    notifUid=uid;
+    try{
+      const snap=await firebase.firestore().collection('notificacoes')
+        .where('para','==',uid).limit(20).get();
+      const notifs=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.criadoEm||'').localeCompare(a.criadoEm||''));
+      notifIds=snap.docs.map(d=>d.id);
+      const novas=notifs.filter(n=>!n.lida).length;
+      const badge=document.getElementById('notifBadge');
+      if(novas>0){badge.style.display='flex';badge.textContent=novas>9?'9+':novas;}
+      else badge.style.display='none';
+      const lista=document.getElementById('notifLista');
+      if(!notifs.length){lista.innerHTML='<div style="padding:24px;text-align:center;color:#8A9BB5;font-size:12px">Sem notificações</div>';return;}
+      const icones={proposta:'💬',aceite:'✅',avaliacao:'⭐',sistema:'📢'};
+      const cores={proposta:'rgba(0,201,111,0.15)',aceite:'rgba(255,184,48,0.15)',avaliacao:'rgba(255,107,53,0.15)',sistema:'rgba(138,155,181,0.1)'};
+      lista.innerHTML=notifs.map(n=>`<div class="notif-item ${n.lida?'lida':'nova'}" onclick="abrirNotif('${n.link||''}')">
+        <div class="ni-icon" style="background:${cores[n.tipo]||cores.sistema}">${icones[n.tipo]||'📢'}</div>
+        <div style="flex:1"><div class="ni-txt">${n.mensagem}</div><div class="ni-tempo">${tempoRelativo(n.criadoEm)}</div></div>
+        ${!n.lida?'<div class="ni-dot"></div>':''}
+      </div>`).join('');
+    }catch(e){console.log('notif:',e);}
+  }
+  async function marcarTodasLidas(){
+    if(!notifIds.length)return;
+    document.getElementById('notifBadge').style.display='none';
+    try{
+      const batch=firebase.firestore().batch();
+      notifIds.forEach(id=>batch.update(firebase.firestore().collection('notificacoes').doc(id),{lida:true}));
+      await batch.commit();
+    }catch(e){}
+  }
+  function abrirNotif(link){if(link)window.location.href=link;toggleNotif();}
+  async function criarNotificacao(para,tipo,mensagem,link){
+    try{await firebase.firestore().collection('notificacoes').add({para,tipo,mensagem,link:link||'',lida:false,criadoEm:new Date().toISOString()});}
+    catch(e){}
+  }
 </script>
 <script>if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(e=>{});}</script>
 </body>
