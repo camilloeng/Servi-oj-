@@ -455,9 +455,20 @@ async function validarEtapa1(){
   try{
     const methods=await firebase.auth().fetchSignInMethodsForEmail(email);
     if(methods&&methods.length>0){
-      const eg=document.getElementById('erroGeral1');eg.textContent='⚠️ Este email já está cadastrado! Faça login ou use outro email.';eg.className='erro-geral vis';
-      marcarCampo('emailProf',true);mostrarErro('erroEmailProf',true);
-      btn.textContent='Próximo →';btn.disabled=false;window.scrollTo({top:0,behavior:'smooth'});return;
+      // Verificar se é conta de cliente — se for, permite criar perfil profissional
+      try {
+        const snapCheck = await firebase.firestore().collection('usuarios').where('email','==',email).where('tipo','==','profissional').get();
+        if(!snapCheck.empty){
+          const eg=document.getElementById('erroGeral1');eg.textContent='⚠️ Este email já tem cadastro de profissional! Faça login.';eg.className='erro-geral vis';
+          marcarCampo('emailProf',true);mostrarErro('erroEmailProf',true);
+          btn.textContent='Próximo →';btn.disabled=false;window.scrollTo({top:0,behavior:'smooth'});return;
+        }
+        // É cliente — permite continuar (vai criar conta profissional separada)
+      } catch(e) {
+        const eg=document.getElementById('erroGeral1');eg.textContent='⚠️ Este email já está cadastrado! Faça login ou use outro email.';eg.className='erro-geral vis';
+        marcarCampo('emailProf',true);mostrarErro('erroEmailProf',true);
+        btn.textContent='Próximo →';btn.disabled=false;window.scrollTo({top:0,behavior:'smooth'});return;
+      }
     }
   }catch(e){}
   btn.textContent='Próximo →';btn.disabled=false;irPara(2);
