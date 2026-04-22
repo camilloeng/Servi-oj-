@@ -333,6 +333,7 @@
   let valorTipo = 'aberto';
   let arquivos = [];
   let authUser = null;
+  const pedidoEditarId = new URLSearchParams(window.location.search).get('editar');
 
   // Função para comprimir imagem antes de salvar
   function comprimirImagem(file, maxWidth=800, quality=0.7) {
