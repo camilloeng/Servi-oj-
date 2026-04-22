@@ -270,8 +270,32 @@ function calcVencimento() {
 async function init() {
   if (!uid) { window.location.href = 'login.html'; return; }
   try {
-    const snap = await firebase.firestore().collection('usuarios').doc(uid).get();
-    if (!snap.exists()) { window.location.href = 'login.html'; return; }
+    // Tentar o UID salvo, depois sem _prof, depois com _prof
+    let snap = await firebase.firestore().collection('usuarios').doc(uid).get();
+    let dadosUid = uid;
+
+    if (!snap.exists() || snap.data().tipo !== 'profissional') {
+      // Tentar uid_prof
+      const uidBase = uid.replace('_prof', '');
+      const snapProf = await firebase.firestore().collection('usuarios').doc(uidBase + '_prof').get();
+      if (snapProf.exists()) {
+        snap = snapProf;
+        dadosUid = uidBase + '_prof';
+        localStorage.setItem('sj_uid', dadosUid);
+      } else {
+        // Tentar uid base (profissional direto)
+        const snapBase = await firebase.firestore().collection('usuarios').doc(uidBase).get();
+        if (snapBase.exists() && snapBase.data().tipo === 'profissional') {
+          snap = snapBase;
+          dadosUid = uidBase;
+          localStorage.setItem('sj_uid', dadosUid);
+        } else {
+          document.getElementById('loading').innerHTML = '<p style="color:var(--erro)">Perfil profissional não encontrado. <a href="cadastro-profissional.html" style="color:var(--verde)">Cadastre-se como profissional →</a></p>';
+          return;
+        }
+      }
+    }
+
     const dados = snap.data();
     categoriasAprovadas = dados.categoriasAprovadas || [];
     bloqueado = dados.bloqueado || false;
