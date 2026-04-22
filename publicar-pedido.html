@@ -152,6 +152,10 @@
         </div>
       </div>
       <div class="cats-hint">Múltipla seleção permitida <span>MULTI-SELEÇÃO</span></div>
+      <div class="input-wrap" style="margin-bottom:12px">
+        <span class="input-icon">🔍</span>
+        <input type="text" id="buscaCat" placeholder="Buscar profissão..." oninput="filtrarCats(this.value)" style="padding-left:38px">
+      </div>
       <div class="cats-scroll" id="catsContainer">
         <div class="cat-pill" onclick="toggleCat(this,'⚡ Elétrica')">⚡ Elétrica</div>
         <div class="cat-pill" onclick="toggleCat(this,'🔧 Encanamento')">🔧 Encanamento</div>
@@ -217,7 +221,7 @@
           <div class="card-header-sub">Ajuda o profissional a entender melhor (opcional)</div>
         </div>
       </div>
-      <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dragDrop(event)">
+      <div class="upload-area" id="uploadArea" onclick="triggerUpload()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dragDrop(event)">
         <div class="upload-icon">📁</div>
         <h3>Arraste arquivos ou clique para selecionar</h3>
         <p>Fotos (JPG, PNG) ou vídeos (MP4)</p>
@@ -225,6 +229,10 @@
       </div>
       <input type="file" id="fileInput" multiple accept="image/*,video/*,.pdf" style="display:none" onchange="adicionarArquivos(this.files)">
       <div class="files-preview" id="filesPreview"></div>
+      <div id="addMoreBtn" style="display:none;margin-top:8px">
+        <button type="button" onclick="triggerUpload()" style="background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.3);border-radius:8px;padding:7px 14px;color:#00C96F;font-size:0.78rem;font-weight:600;cursor:pointer">+ Adicionar mais fotos</button>
+        <span style="font-size:0.72rem;color:#8A9BB5;margin-left:8px" id="fotoCount">0/10 fotos</span>
+      </div>
     </div>
 
     <!-- CARD 4: VALOR E URGÊNCIA -->
@@ -332,6 +340,15 @@
     authUser = user;
   });
 
+  function filtrarCats(busca) {
+    const pills = document.querySelectorAll('.cat-pill');
+    const termo = busca.toLowerCase().trim();
+    pills.forEach(p => {
+      const texto = p.textContent.toLowerCase();
+      p.style.display = termo === '' || texto.includes(termo) ? '' : 'none';
+    });
+  }
+
   function toggleCat(el, nome) {
     const idx = catsSel.indexOf(nome);
     if (idx === -1) { catsSel.push(nome); el.classList.add('sel'); }
@@ -378,6 +395,12 @@
     document.getElementById('prevAnexos').textContent = arquivos.length > 0 ? arquivos.length+' arquivo(s)' : 'Nenhum';
   }
 
+  function triggerUpload() {
+    const input = document.getElementById('fileInput');
+    input.value = ''; // reset para permitir selecionar os mesmos arquivos
+    input.click();
+  }
+
   function dragOver(e) { e.preventDefault(); document.getElementById('uploadArea').style.borderColor='rgba(0,201,111,0.4)'; }
   function dragLeave() { document.getElementById('uploadArea').style.borderColor=''; }
   function dragDrop(e) { e.preventDefault(); dragLeave(); adicionarArquivos(e.dataTransfer.files); }
@@ -385,7 +408,7 @@
   function adicionarArquivos(files) {
     const prev = document.getElementById('filesPreview');
     Array.from(files).forEach(f => {
-      if (arquivos.length >= 10) return;
+      if (arquivos.length >= 10) { alert('Máximo de 10 fotos atingido!'); return; }
       arquivos.push(f);
       const isImg = f.type.startsWith('image/');
       const isVid = f.type.startsWith('video/');
@@ -394,17 +417,35 @@
       const thumb = document.createElement('div');
       thumb.className = 'file-thumb';
       const idx = arquivos.length - 1;
-      thumb.innerHTML = icon+'<span>'+nome+'</span><div class="remove" onclick="removerArquivo(this,'+idx+')">✕</div>';
+
+      if (isImg) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          thumb.style.backgroundImage = 'url('+e.target.result+')';
+          thumb.style.backgroundSize = 'cover';
+          thumb.style.backgroundPosition = 'center';
+          thumb.querySelector('.icon').style.display = 'none';
+        };
+        reader.readAsDataURL(f);
+      }
+
+      thumb.innerHTML = '<span class="icon">'+icon+'</span><span>'+nome+'</span><div class="remove" onclick="removerArquivo(this,'+idx+')">✕</div>';
       prev.appendChild(thumb);
     });
+
+    // Mostrar/ocultar area e botão de adicionar mais
     document.getElementById('uploadArea').style.display = arquivos.length > 0 ? 'none' : '';
+    document.getElementById('addMoreBtn').style.display = arquivos.length > 0 ? 'block' : 'none';
+    document.getElementById('fotoCount').textContent = arquivos.length + '/10 fotos';
     atualizarPreview();
   }
 
   function removerArquivo(el, idx) {
     el.parentElement.remove();
-    arquivos.splice(idx,1);
-    if (arquivos.length === 0) document.getElementById('uploadArea').style.display = '';
+    arquivos.splice(idx, 1);
+    document.getElementById('uploadArea').style.display = arquivos.length === 0 ? '' : 'none';
+    document.getElementById('addMoreBtn').style.display = arquivos.length > 0 ? 'block' : 'none';
+    document.getElementById('fotoCount').textContent = arquivos.length + '/10 fotos';
     atualizarPreview();
   }
 
