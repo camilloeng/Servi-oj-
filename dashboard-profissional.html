@@ -270,30 +270,26 @@ function calcVencimento() {
 async function init() {
   if (!uid) { window.location.href = 'login.html'; return; }
   try {
-    // Tentar o UID salvo, depois sem _prof, depois com _prof
-    let snap = await firebase.firestore().collection('usuarios').doc(uid).get();
-    let dadosUid = uid;
+    // Tentar todos os possíveis IDs do documento
+    const uidBase = uid.replace('_prof','');
+    const possiveisIds = [uid, uidBase+'_prof', uidBase];
+    let snap = null, dadosUid = uid;
 
-    if (!snap.exists() || snap.data().tipo !== 'profissional') {
-      // Tentar uid_prof
-      const uidBase = uid.replace('_prof', '');
-      const snapProf = await firebase.firestore().collection('usuarios').doc(uidBase + '_prof').get();
-      if (snapProf.exists()) {
-        snap = snapProf;
-        dadosUid = uidBase + '_prof';
-        localStorage.setItem('sj_uid', dadosUid);
-      } else {
-        // Tentar uid base (profissional direto)
-        const snapBase = await firebase.firestore().collection('usuarios').doc(uidBase).get();
-        if (snapBase.exists() && snapBase.data().tipo === 'profissional') {
-          snap = snapBase;
-          dadosUid = uidBase;
-          localStorage.setItem('sj_uid', dadosUid);
-        } else {
-          document.getElementById('loading').innerHTML = '<p style="color:var(--erro)">Perfil profissional não encontrado. <a href="cadastro-profissional.html" style="color:var(--verde)">Cadastre-se como profissional →</a></p>';
-          return;
+    for (const id of possiveisIds) {
+      try {
+        const s = await firebase.firestore().collection('usuarios').doc(id).get();
+        if (s.exists() && s.data().tipo === 'profissional') {
+          snap = s; dadosUid = id;
+          localStorage.setItem('sj_uid', id);
+          break;
         }
-      }
+      } catch(e2) {}
+    }
+
+    if (!snap) {
+      document.getElementById('loading').innerHTML = '<p style="color:var(--erro)">Perfil profissional não encontrado. <a href="cadastro-profissional.html" style="color:var(--verde)">Cadastrar como profissional →</a></p>';
+      document.getElementById('catsLista').innerHTML = '<div style="color:var(--cinza);font-size:0.78rem">Não encontrado</div>';
+      return;
     }
 
     const dados = snap.data();
@@ -305,7 +301,7 @@ async function init() {
       document.getElementById('cidadeCard').textContent = dados.endereco.cidade + ' — Verificado ✓';
     }
 
-    // Mostrar categorias na sidebar
+    // Categorias na sidebar
     const lista = document.getElementById('catsLista');
     if (categoriasAprovadas.length > 0) {
       lista.innerHTML = categoriasAprovadas.map(c =>
@@ -317,7 +313,7 @@ async function init() {
       lista.innerHTML = '<div style="color:var(--cinza);font-size:0.78rem">Nenhuma aprovação ainda</div>';
     }
 
-    // Filtros por categoria
+    // Filtros
     const pills = document.getElementById('filtroPills');
     categoriasAprovadas.forEach(cat => {
       const p = document.createElement('div');
@@ -326,22 +322,14 @@ async function init() {
       pills.appendChild(p);
     });
 
-    // Taxa acumulada
+    // Taxa
     if (taxaAcum > 0) {
       document.getElementById('taxaBox').style.display = 'block';
       document.getElementById('taxaValor').textContent = 'R$ ' + taxaAcum.toFixed(2).replace('.',',');
       document.getElementById('taxaVenc').textContent = calcVencimento();
     }
 
-    // Verificar bloqueio automático
-    if (dados.taxaVencimento) {
-      const venc = new Date(dados.taxaVencimento);
-      if (new Date() > venc && taxaAcum > 0) {
-        bloqueado = true;
-        await firebase.firestore().collection('usuarios').doc(uid).update({ bloqueado: true });
-      }
-    }
-
+    // Bloqueio
     if (bloqueado) {
       document.getElementById('bloqueadoBox').classList.add('vis');
       document.getElementById('loading').style.display = 'none';
@@ -350,8 +338,8 @@ async function init() {
 
     await carregarPedidos();
   } catch(e) {
-    console.error(e);
-    document.getElementById('loading').innerHTML = '<p style="color:var(--erro)">Erro ao carregar dados.</p>';
+    document.getElementById('loading').innerHTML = '<p style="color:var(--erro)">Erro: ' + e.message + '</p>';
+    document.getElementById('catsLista').innerHTML = '<div style="color:var(--cinza);font-size:0.78rem">Erro ao carregar</div>';
   }
 }
 
