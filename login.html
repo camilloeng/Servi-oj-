@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ServiçoJá Conecta — Bem-vindo</title>
+<title>ServiçoJá — Bem-vindo</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -118,7 +118,7 @@
 <!-- LADO ESQUERDO -->
 <div class="left-panel">
   <div class="grid-bg"></div>
-  <a href="#" class="left-logo">Serviço<span>Já</span> Conecta</a>
+  <a href="#" class="left-logo">Serviço<span>Já</span></a>
   <div class="left-content">
     <div class="left-badge"><div class="badge-dot"></div> Disponível em São Paulo</div>
     <h1 class="left-title">O profissional certo,<br>na hora <em>certa</em></h1>
@@ -158,7 +158,7 @@
 
   <!-- TELA 1: ESCOLHER TIPO -->
   <div class="tela ativa" id="telaTipo">
-    <div class="tipo-title">Bem-vindo ao ServiçoJá Conecta! 👋</div>
+    <div class="tipo-title">Bem-vindo ao ServiçoJá! 👋</div>
     <div class="tipo-sub">Selecione como deseja usar o app para começar.</div>
     <div class="tipo-cards">
       <div class="tipo-card" onclick="selTipo(this,'cliente')">
@@ -383,6 +383,12 @@
       if (e.code === 'auth/user-not-found') msg = 'Email não encontrado. Cadastre-se!';
       if (e.code === 'auth/wrong-password') msg = 'Senha incorreta.';
       if (e.code === 'auth/invalid-credential') msg = 'Email ou senha incorretos. Verifique e tente novamente.';
+      if (e.code === 'auth/account-exists-with-different-credential') msg = 'Este email está vinculado ao Google. Use o botão "Continuar com Google".';
+      // Verificar se é conta Google
+      try {
+        const methods = await firebase.auth().fetchSignInMethodsForEmail(email);
+        if (methods.includes('google.com')) msg = 'Este email usa login pelo Google. Clique em "Continuar com Google".';
+      } catch(e2) {}
       if (e.code === 'auth/too-many-requests') msg = 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
       if (e.code === 'auth/network-request-failed') msg = 'Sem conexão. Verifique sua internet.';
       mostrarErroLogin(msg);
