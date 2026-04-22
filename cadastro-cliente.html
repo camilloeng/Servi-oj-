@@ -122,6 +122,16 @@
 
     <!-- DADOS PESSOAIS -->
     <div class="section-label">Dados pessoais</div>
+    <!-- Foto de perfil opcional -->
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px">
+      <div id="fotoClienteCircle" onclick="document.getElementById('fotoClienteInput').click()" style="width:68px;height:68px;border-radius:50%;background:var(--azul-input);border:2px dashed rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:1.8rem;cursor:pointer;flex-shrink:0;position:relative">📷</div>
+      <div>
+        <p style="font-size:0.85rem;font-weight:600;margin-bottom:2px;color:var(--branco)">Foto de perfil <span style="color:var(--cinza);font-weight:400">(opcional)</span></p>
+        <span style="font-size:0.75rem;color:var(--cinza)">Aparece nos seus pedidos</span><br>
+        <button type="button" onclick="document.getElementById('fotoClienteInput').click()" style="margin-top:6px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde);border-radius:8px;padding:5px 12px;font-size:0.75rem;font-weight:600;cursor:pointer">Escolher foto</button>
+      </div>
+    </div>
+    <input type="file" id="fotoClienteInput" accept="image/*" style="display:none" onchange="previewFotoCliente(this)">
 
     <div class="field">
       <label>Nome completo <span class="req">*</span></label>
@@ -354,6 +364,9 @@
     // Limpar erros anteriores
     document.getElementById('erroGeral').className = 'erro-geral';
 
+    const IMGBB_KEY = '327d0067238019843e43362c2f7096c7';
+    let fotoClienteUrl = window._fotoClienteUrl || null;
+
     const nome = document.getElementById('nomeInput').value.trim();
     const email = document.getElementById('emailInput').value.trim();
     const telefone = document.getElementById('telefoneInput').value.trim();
@@ -503,6 +516,7 @@
           email: email,
           telefone: telefone,
           tipo: 'cliente',
+          fotoPerfil: fotoClienteUrl || null,
           endereco: {
             cep: cep,
             rua: rua,
@@ -543,6 +557,7 @@
           nome: nome,
           email: email,
           tipo: 'cliente',
+          fotoPerfil: fotoClienteUrl || null,
           criadoEm: new Date().toISOString()
         }, { merge: true }).then(function() {
           localStorage.setItem('sj_tipo', 'cliente');
