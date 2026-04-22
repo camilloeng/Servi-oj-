@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiçoJá — Meu Perfil</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{--verde:#00C96F;--verde-escuro:#009E57;--azul:#0A1628;--azul-medio:#132240;--azul-input:#0F1C35;--branco:#F5F7F2;--cinza:#8A9BB5;--laranja:#FF6B35;--amarelo:#FFB830;--erro:#FF5C5C;--borda:rgba(255,255,255,0.09)}
+  body{font-family:'DM Sans',sans-serif;background:var(--azul);color:var(--branco);min-height:100vh}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--borda)}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--branco);text-decoration:none}
+  .logo span{color:var(--verde)}
+  .btn-voltar{background:none;border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.78rem;padding:6px 14px;cursor:pointer}
+  .btn-voltar:hover{color:var(--branco);border-color:rgba(255,255,255,0.2)}
+  .page{max-width:800px;margin:0 auto;padding:32px 24px 60px}
+  .perfil-header{display:flex;align-items:center;gap:24px;background:var(--azul-medio);border:1px solid var(--borda);border-radius:20px;padding:28px;margin-bottom:20px}
+  .perfil-av{width:80px;height:80px;border-radius:50%;background:rgba(0,201,111,0.15);border:3px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0}
+  .perfil-info h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;margin-bottom:4px}
+  .perfil-info p{color:var(--cinza);font-size:0.85rem;margin-bottom:8px}
+  .rating{color:var(--amarelo);font-size:0.85rem}
+  .card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+  .info-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--borda);font-size:0.85rem}
+  .info-row:last-child{border-bottom:none}
+  .info-lbl{color:var(--cinza);font-size:0.78rem}
+  .info-val{color:var(--branco);font-weight:500}
+  .cat-aprovada{display:inline-flex;align-items:center;gap:5px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde);font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:100px;margin:3px}
+  .cat-pendente{display:inline-flex;align-items:center;gap:5px;background:rgba(138,155,181,0.1);border:1px solid rgba(138,155,181,0.2);color:var(--cinza);font-size:0.75rem;padding:5px 12px;border-radius:100px;margin:3px}
+  .btn-teste{display:inline-flex;align-items:center;gap:6px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.3);color:var(--verde);font-size:0.8rem;font-weight:700;padding:8px 16px;border-radius:10px;cursor:pointer;margin-top:12px}
+  .btn-sair{width:100%;background:rgba(255,92,92,0.08);border:1px solid rgba(255,92,92,0.25);border-radius:12px;padding:13px;color:var(--erro);font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;transition:all 0.2s}
+  .btn-sair:hover{background:rgba(255,92,92,0.15)}
+  .spinner{width:36px;height:36px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;margin:40px auto}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+  if(!window._fbInitialized){
+    firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",authDomain:"servicoja-e1f49.firebaseapp.com",projectId:"servicoja-e1f49",storageBucket:"servicoja-e1f49.firebasestorage.app",messagingSenderId:"874413426529",appId:"1:874413426529:web:9891d44afd9ef1750e6720"});
+    window._fbInitialized=true;
+  }
+</script>
+</head>
+<body>
+<nav>
+  <a href="login.html" class="logo">Serviço<span>Já</span></a>
+  <button class="btn-voltar" onclick="history.back()">← Voltar ao dashboard</button>
+</nav>
+
+<div class="page" id="pageContent">
+  <div class="spinner"></div>
+</div>
+
+<script>
+const uid = localStorage.getItem('sj_uid');
+const nome = localStorage.getItem('sj_nome') || 'Profissional';
+const categoriasAprovadas = JSON.parse(localStorage.getItem('sj_categoriasAprovadas') || '[]');
+const todasCats = JSON.parse(localStorage.getItem('sj_categorias') || '[]');
+
+firebase.auth().onAuthStateChanged(function(user){
+  if(!user){ window.location.href='login.html'; return; }
+
+  firebase.firestore().collection('usuarios').doc(uid).get()
+    .then(function(snap){
+      const d = snap.exists() ? snap.data() : {};
+      renderPerfil(d);
+    })
+    .catch(function(){
+      // Se falhar o Firestore, usar localStorage
+      renderPerfil({});
+    });
+});
+
+function renderPerfil(d) {
+  const end = d.endereco || {};
+  const page = document.getElementById('pageContent');
+  page.innerHTML = `
+    <div class="perfil-header">
+      <div class="perfil-av">👷</div>
+      <div class="perfil-info">
+        <h1>${d.nome || nome}</h1>
+        <p>📍 ${end.cidade || '—'}, ${end.estado || '—'}</p>
+        <div class="rating">★★★★★ <span style="color:var(--cinza)">— avaliações</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">👤 Dados pessoais</div>
+      <div class="info-row"><span class="info-lbl">Nome</span><span class="info-val">${d.nome || nome}</span></div>
+      <div class="info-row"><span class="info-lbl">E-mail</span><span class="info-val">${d.email || '—'}</span></div>
+      <div class="info-row"><span class="info-lbl">WhatsApp</span><span class="info-val">${d.telefone || '—'}</span></div>
+      <div class="info-row"><span class="info-lbl">Documento</span><span class="info-val">${d.documento ? '••• registrado' : '—'}</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📍 Endereço</div>
+      <div class="info-row"><span class="info-lbl">Rua</span><span class="info-val">${end.rua || '—'}, ${end.numero || ''}</span></div>
+      <div class="info-row"><span class="info-lbl">Bairro</span><span class="info-val">${end.bairro || '—'}</span></div>
+      <div class="info-row"><span class="info-lbl">Cidade</span><span class="info-val">${end.cidade || '—'} — ${end.estado || '—'}</span></div>
+      <div class="info-row"><span class="info-lbl">CEP</span><span class="info-val">${end.cep || '—'}</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🛠️ Minhas profissões</div>
+      <div style="flex-wrap:wrap;display:flex;gap:4px;margin-bottom:8px">
+        ${categoriasAprovadas.map(c => `<span class="cat-aprovada">✅ ${c}</span>`).join('')}
+        ${todasCats.filter(c => !categoriasAprovadas.includes(c)).map(c => `<span class="cat-pendente">⏳ ${c}</span>`).join('')}
+      </div>
+      <div style="margin-top:8px">
+        <button class="btn-teste" onclick="window.location.href='cadastro-profissional.html?teste=1'">+ Adicionar nova profissão</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📝 Sobre mim</div>
+      <p style="color:var(--cinza);font-size:0.85rem;line-height:1.7">${d.sobre || '—'}</p>
+    </div>
+
+    <button class="btn-sair" onclick="sair()">🚪 Sair da conta</button>
+  `;
+}
+
+function sair(){
+  firebase.auth().signOut().then(function(){
+    localStorage.clear();
+    window.location.href='login.html';
+  });
+}
+</script>
+</body>
+</html>
