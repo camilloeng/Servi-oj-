@@ -360,7 +360,8 @@
   }
 
   function editarPedido(pedidoId) {
-    localStorage.setItem('sj_editar_pedido', pedidoId);
+    const pedido = todosPedidos.find(p => p.id === pedidoId);
+    if (pedido) localStorage.setItem('sj_pedido_editar_data', JSON.stringify(pedido));
     window.location.href = 'publicar-pedido.html?editar=' + pedidoId;
   }
 
