@@ -63,7 +63,6 @@ const todasCats = JSON.parse(localStorage.getItem('sj_categorias') || '[]');
 firebase.auth().onAuthStateChanged(async function(user){
   if(!user){ window.location.href='login.html'; return; }
 
-  // Tentar uid do localStorage, depois _prof, depois uid do Auth
   const uidBase = uid ? uid.replace('_prof','') : user.uid;
   const possiveisIds = [uidBase+'_prof', uidBase, user.uid+'_prof', user.uid].filter((v,i,a)=>v && a.indexOf(v)===i);
   let dados = {};
@@ -75,7 +74,18 @@ firebase.auth().onAuthStateChanged(async function(user){
         dados = snap.data();
         break;
       }
-    } catch(e) {}
+    } catch(e) {
+      document.getElementById('pageContent').innerHTML += '<p style="color:orange;font-size:12px">Erro doc '+id+': '+e.message+'</p>';
+    }
+  }
+
+  // Se não achou no Firestore, usar localStorage
+  if (!dados.nome) {
+    dados = {
+      nome: localStorage.getItem('sj_nome') || '—',
+      email: '—', telefone: '—', documento: '—', sobre: '—',
+      endereco: {}, tipo: 'profissional'
+    };
   }
 
   renderPerfil(dados);
