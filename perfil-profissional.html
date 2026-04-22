@@ -60,18 +60,24 @@ const nome = localStorage.getItem('sj_nome') || 'Profissional';
 const categoriasAprovadas = JSON.parse(localStorage.getItem('sj_categoriasAprovadas') || '[]');
 const todasCats = JSON.parse(localStorage.getItem('sj_categorias') || '[]');
 
-firebase.auth().onAuthStateChanged(function(user){
+firebase.auth().onAuthStateChanged(async function(user){
   if(!user){ window.location.href='login.html'; return; }
 
-  firebase.firestore().collection('usuarios').doc(uid).get()
-    .then(function(snap){
-      const d = snap.exists() ? snap.data() : {};
-      renderPerfil(d);
-    })
-    .catch(function(){
-      // Se falhar o Firestore, usar localStorage
-      renderPerfil({});
-    });
+  // Tentar uid do localStorage, depois _prof, depois uid do Auth
+  const possiveisIds = [uid, uid+'_prof', user.uid, user.uid+'_prof'].filter((v,i,a)=>a.indexOf(v)===i);
+  let dados = {};
+
+  for (const id of possiveisIds) {
+    try {
+      const snap = await firebase.firestore().collection('usuarios').doc(id).get();
+      if (snap.exists() && snap.data().tipo === 'profissional') {
+        dados = snap.data();
+        break;
+      }
+    } catch(e) {}
+  }
+
+  renderPerfil(dados);
 });
 
 function renderPerfil(d) {
