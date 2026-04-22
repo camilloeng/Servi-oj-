@@ -282,7 +282,10 @@
   function fecharOverlay(id) { document.getElementById(id).classList.remove('vis'); }
   document.querySelectorAll('.overlay').forEach(ov => ov.addEventListener('click', e => { if(e.target===ov) ov.classList.remove('vis'); }));
 
-  carregarPedidos();
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (!user) { window.location.href = 'login.html'; return; }
+    carregarPedidos();
+  });
 </script>
 
 <script>if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(e=>{});}</script>
