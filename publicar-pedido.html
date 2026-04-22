@@ -6,171 +6,121 @@
 <title>ServiçoJá — Publicar Pedido</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-  :root {
-    --verde: #00C96F; --verde-escuro: #009E57;
-    --azul: #0A1628; --azul-medio: #132240; --azul-input: #0F1C35;
-    --branco: #F5F7F2; --cinza: #8A9BB5;
-    --laranja: #FF6B35; --borda: rgba(255,255,255,0.09);
-  }
-  body { font-family: 'DM Sans', sans-serif; background: var(--azul); color: var(--branco); min-height: 100vh; }
-  body::before { content: ''; position: fixed; top: -200px; right: -200px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(0,201,111,0.10) 0%, transparent 70%); pointer-events: none; z-index: 0; }
-  body::after { content: ''; position: fixed; bottom: -150px; left: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,107,53,0.07) 0%, transparent 70%); pointer-events: none; z-index: 0; }
-  nav { position: relative; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 20px 32px; border-bottom: 1px solid var(--borda); }
-  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; text-decoration: none; color: var(--branco); }
-  .logo span { color: var(--verde); }
-  .nav-user { display: flex; align-items: center; gap: 10px; }
-  .avatar { width: 34px; height: 34px; border-radius: 50%; background: rgba(0,201,111,0.2); border: 1.5px solid rgba(0,201,111,0.3); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
-  .nav-user span { font-size: 0.85rem; color: var(--cinza); }
-  .nav-user strong { color: var(--branco); font-size: 0.85rem; }
-  .btn-voltar { background: none; border: 1px solid var(--borda); border-radius: 8px; color: var(--cinza); font-size: 0.82rem; padding: 7px 14px; cursor: pointer; transition: all 0.2s; }
-  .btn-voltar:hover { border-color: rgba(255,255,255,0.25); color: var(--branco); }
-  .page { position: relative; z-index: 5; max-width: 1100px; margin: 0 auto; padding: 36px 24px 60px; display: grid; grid-template-columns: 1fr 360px; gap: 24px; }
-  .page-header { margin-bottom: 24px; }
-  .page-header h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem; letter-spacing: -0.5px; margin-bottom: 4px; }
-  .page-header p { color: var(--cinza); font-size: 0.88rem; }
-  .card { background: var(--azul-medio); border: 1px solid var(--borda); border-radius: 20px; padding: 28px 32px; margin-bottom: 16px; animation: fadeUp 0.4s ease both; }
-  .card:nth-child(2) { animation-delay: 0.05s; }
-  .card:nth-child(3) { animation-delay: 0.1s; }
-  .card:nth-child(4) { animation-delay: 0.15s; }
-  .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-  .card-num { width: 28px; height: 28px; border-radius: 8px; background: rgba(0,201,111,0.15); border: 1px solid rgba(0,201,111,0.25); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.78rem; color: var(--verde); flex-shrink: 0; }
-  .card-header-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; }
-  .card-header-sub { font-size: 0.78rem; color: var(--cinza); margin-top: 1px; }
-  .field { margin-bottom: 14px; }
-  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--cinza); margin-bottom: 5px; }
-  label .req { color: var(--verde); }
-  .input-wrap { position: relative; display: flex; align-items: center; }
-  .input-icon { position: absolute; left: 13px; color: var(--cinza); font-size: 0.9rem; pointer-events: none; }
-  input, select, textarea { width: 100%; background: var(--azul-input); border: 1.5px solid var(--borda); border-radius: 12px; color: var(--branco); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; padding: 12px 12px 12px 38px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-  textarea { padding-left: 14px; resize: vertical; min-height: 120px; line-height: 1.6; }
-  input:focus, select:focus, textarea:focus { border-color: rgba(0,201,111,0.45); box-shadow: 0 0 0 3px rgba(0,201,111,0.08); }
-  input::placeholder, textarea::placeholder { color: rgba(138,155,181,0.45); }
-  .no-icon { padding-left: 14px !important; }
-  select { cursor: pointer; -webkit-appearance: none; padding-right: 32px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A9BB5' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
-  select option { background: var(--azul-medio); }
-  .char-count { font-size: 0.72rem; color: var(--cinza); text-align: right; margin-top: 4px; }
-  .hint { font-size: 0.72rem; color: var(--cinza); margin-top: 4px; }
-
-  /* CATEGORIAS MULTI-SELECT */
-  .cats-hint { font-size: 0.78rem; color: var(--cinza); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-  .cats-hint span { background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.2); color: var(--verde); font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 100px; }
-  .cats-scroll { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
-  .cat-pill { background: var(--azul-input); border: 1.5px solid var(--borda); border-radius: 100px; padding: 8px 14px; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; white-space: nowrap; user-select: none; }
-  .cat-pill:hover { border-color: rgba(0,201,111,0.3); background: rgba(0,201,111,0.05); }
-  .cat-pill.sel { background: rgba(0,201,111,0.15); border-color: rgba(0,201,111,0.5); color: var(--verde); font-weight: 600; }
-  .cat-pill.sel::before { content: '✓ '; font-size: 0.75rem; }
-  .cats-selecionadas { margin-top: 10px; min-height: 28px; }
-  .cat-badges { display: flex; flex-wrap: wrap; gap: 6px; }
-  .cat-badge { background: rgba(0,201,111,0.12); border: 1px solid rgba(0,201,111,0.3); color: var(--verde); font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 100px; }
-  .erro-cats { font-size: 0.78rem; color: #FF5C5C; margin-top: 6px; display: none; }
-  .erro-cats.vis { display: block; }
-
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{--verde:#00C96F;--verde-escuro:#009E57;--azul:#0A1628;--azul-medio:#132240;--azul-input:#0F1C35;--branco:#F5F7F2;--cinza:#8A9BB5;--laranja:#FF6B35;--borda:rgba(255,255,255,0.09)}
+  body{font-family:'DM Sans',sans-serif;background:var(--azul);color:var(--branco);min-height:100vh}
+  body::before{content:'';position:fixed;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(0,201,111,0.10) 0%,transparent 70%);pointer-events:none;z-index:0}
+  nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--borda)}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;text-decoration:none;color:var(--branco)}
+  .logo span{color:var(--verde)}
+  .nav-user{display:flex;align-items:center;gap:10px}
+  .avatar{width:34px;height:34px;border-radius:50%;background:rgba(0,201,111,0.2);border:1.5px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:0.85rem}
+  .btn-voltar{background:none;border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.82rem;padding:7px 14px;cursor:pointer;transition:all 0.2s}
+  .btn-voltar:hover{border-color:rgba(255,255,255,0.25);color:var(--branco)}
+  .page{position:relative;z-index:5;max-width:1100px;margin:0 auto;padding:36px 24px 60px;display:grid;grid-template-columns:1fr 360px;gap:24px}
+  .page-header{margin-bottom:24px}
+  .page-header h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;letter-spacing:-0.5px;margin-bottom:4px}
+  .page-header p{color:var(--cinza);font-size:0.88rem}
+  .card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:20px;padding:28px 32px;margin-bottom:16px}
+  .card-header{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+  .card-num{width:28px;height:28px;border-radius:8px;background:rgba(0,201,111,0.15);border:1px solid rgba(0,201,111,0.25);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:0.78rem;color:var(--verde);flex-shrink:0}
+  .card-header-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem}
+  .card-header-sub{font-size:0.78rem;color:var(--cinza);margin-top:1px}
+  .field{margin-bottom:14px}
+  label{display:block;font-size:0.78rem;font-weight:600;color:var(--cinza);margin-bottom:5px}
+  label .req{color:var(--verde)}
+  .input-wrap{position:relative;display:flex;align-items:center}
+  .input-icon{position:absolute;left:13px;color:var(--cinza);font-size:0.9rem;pointer-events:none}
+  input,select,textarea{width:100%;background:var(--azul-input);border:1.5px solid var(--borda);border-radius:12px;color:var(--branco);font-family:'DM Sans',sans-serif;font-size:0.88rem;padding:12px 12px 12px 38px;outline:none;transition:border-color 0.2s}
+  textarea{padding-left:14px;resize:vertical;min-height:120px;line-height:1.6}
+  input:focus,select:focus,textarea:focus{border-color:rgba(0,201,111,0.45);box-shadow:0 0 0 3px rgba(0,201,111,0.08)}
+  input::placeholder,textarea::placeholder{color:rgba(138,155,181,0.45)}
+  .no-icon{padding-left:14px!important}
+  select{cursor:pointer;-webkit-appearance:none;padding-right:32px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A9BB5' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+  select option{background:var(--azul-medio)}
+  .char-count{font-size:0.72rem;color:var(--cinza);text-align:right;margin-top:4px}
+  .hint{font-size:0.72rem;color:var(--cinza);margin-top:4px}
+  .cats-hint{font-size:0.78rem;color:var(--cinza);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+  .cats-hint span{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.2);color:var(--verde);font-size:0.7rem;font-weight:700;padding:2px 8px;border-radius:100px}
+  .cats-scroll{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  .cat-pill{background:var(--azul-input);border:1.5px solid var(--borda);border-radius:100px;padding:8px 14px;font-size:0.82rem;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px;white-space:nowrap;user-select:none}
+  .cat-pill:hover{border-color:rgba(0,201,111,0.3);background:rgba(0,201,111,0.05)}
+  .cat-pill.sel{background:rgba(0,201,111,0.15);border-color:rgba(0,201,111,0.5);color:var(--verde);font-weight:600}
+  .cat-pill.sel::before{content:'✓ ';font-size:0.75rem}
+  .cats-selecionadas{margin-top:10px;min-height:28px}
+  .cat-badges{display:flex;flex-wrap:wrap;gap:6px}
+  .cat-badge{background:rgba(0,201,111,0.12);border:1px solid rgba(0,201,111,0.3);color:var(--verde);font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:100px}
+  .erro-cats{font-size:0.78rem;color:#FF5C5C;margin-top:6px;display:none}
+  .erro-cats.vis{display:block}
   /* UPLOAD */
-  .upload-area { border: 2px dashed rgba(255,255,255,0.1); border-radius: 16px; padding: 28px 20px; text-align: center; cursor: pointer; transition: all 0.25s; margin-bottom: 14px; background: var(--azul-input); }
-  .upload-area:hover { border-color: rgba(0,201,111,0.4); background: rgba(0,201,111,0.04); }
-  .upload-icon { font-size: 2rem; margin-bottom: 8px; }
-  .upload-area h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
-  .upload-area p { color: var(--cinza); font-size: 0.78rem; }
-  .upload-area .btn-upload { display: inline-block; margin-top: 12px; background: rgba(0,201,111,0.12); border: 1px solid rgba(0,201,111,0.3); color: var(--verde); border-radius: 8px; padding: 7px 16px; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
-  .files-preview { display: flex; flex-wrap: wrap; gap: 10px; }
-  .file-thumb { width: 80px; height: 80px; border-radius: 10px; background: var(--azul-input); border: 1px solid var(--borda); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 1.4rem; position: relative; overflow: hidden; cursor: pointer; }
-  .file-thumb span { font-size: 0.65rem; color: var(--cinza); text-align: center; padding: 0 4px; }
-  .file-thumb .remove { position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; border-radius: 50%; background: rgba(255,92,92,0.85); color: white; font-size: 0.6rem; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 700; opacity: 0; transition: opacity 0.2s; }
-  .file-thumb:hover .remove { opacity: 1; }
-  .add-more { width: 80px; height: 80px; border-radius: 10px; border: 2px dashed rgba(255,255,255,0.12); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 1.2rem; color: var(--cinza); cursor: pointer; }
-  .add-more span { font-size: 0.65rem; }
-  .add-more:hover { border-color: rgba(0,201,111,0.4); color: var(--verde); }
-
+  .upload-area{border:2px dashed rgba(255,255,255,0.1);border-radius:16px;padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.25s;background:var(--azul-input)}
+  .upload-area:hover{border-color:rgba(0,201,111,0.4);background:rgba(0,201,111,0.04)}
+  .upload-icon{font-size:2rem;margin-bottom:8px}
+  .upload-area h3{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:4px;color:var(--branco)}
+  .upload-area p{color:var(--cinza);font-size:0.78rem}
+  .btn-upload{display:inline-block;margin-top:12px;background:rgba(0,201,111,0.12);border:1px solid rgba(0,201,111,0.3);color:var(--verde);border-radius:8px;padding:7px 16px;font-size:0.8rem;font-weight:600;cursor:pointer}
+  .files-preview{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+  .file-thumb{width:80px;height:80px;border-radius:10px;background:var(--azul-input);border:1px solid var(--borda);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:1.4rem;position:relative;overflow:hidden}
+  .file-thumb span{font-size:0.65rem;color:var(--cinza);text-align:center;padding:0 4px}
+  .file-thumb .remove{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;background:rgba(255,92,92,0.85);color:white;font-size:0.6rem;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;opacity:0;transition:opacity 0.2s}
+  .file-thumb:hover .remove{opacity:1}
   /* VALOR */
-  .valor-opcoes { display: flex; gap: 10px; margin-bottom: 14px; }
-  .valor-btn { flex: 1; padding: 12px; border-radius: 12px; border: 1.5px solid var(--borda); background: var(--azul-input); color: var(--cinza); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; }
-  .valor-btn .vb-icon { font-size: 1.2rem; display: block; margin-bottom: 4px; }
-  .valor-btn:hover { border-color: rgba(0,201,111,0.3); }
-  .valor-btn.sel { background: rgba(0,201,111,0.12); border-color: rgba(0,201,111,0.45); color: var(--verde); }
-  .valor-input-wrap { display: none; }
-  .valor-input-wrap.vis { display: block; animation: fadeUp 0.3s ease both; }
-  .prefix { position: absolute; left: 13px; color: var(--cinza); font-size: 0.88rem; font-weight: 600; pointer-events: none; }
-
+  .valor-opcoes{display:flex;gap:10px;margin-bottom:14px}
+  .valor-btn{flex:1;padding:12px;border-radius:12px;border:1.5px solid var(--borda);background:var(--azul-input);color:var(--cinza);font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:center}
+  .valor-btn .vb-icon{font-size:1.2rem;display:block;margin-bottom:4px}
+  .valor-btn.sel{background:rgba(0,201,111,0.12);border-color:rgba(0,201,111,0.45);color:var(--verde)}
+  .valor-input-wrap{display:none}
+  .valor-input-wrap.vis{display:block}
+  .prefix{position:absolute;left:13px;color:var(--cinza);font-size:0.88rem;font-weight:600;pointer-events:none}
   /* URGÊNCIA */
-  .urgencia-opts { display: flex; gap: 8px; flex-wrap: wrap; }
-  .urg-btn { flex: 1; min-width: 100px; padding: 10px 12px; border-radius: 10px; border: 1.5px solid var(--borda); background: var(--azul-input); color: var(--cinza); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; }
-  .urg-btn:hover { border-color: rgba(0,201,111,0.3); }
-  .urg-btn.sel { background: rgba(0,201,111,0.12); border-color: rgba(0,201,111,0.45); color: var(--verde); }
-  .urg-btn.urgente.sel { background: rgba(255,107,53,0.12); border-color: rgba(255,107,53,0.45); color: var(--laranja); }
-
-  .data-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--azul-input); border: 1px solid var(--borda); border-radius: 8px; padding: 8px 12px; font-size: 0.8rem; color: var(--cinza); }
-  .data-badge strong { color: var(--branco); }
-
+  .urgencia-opts{display:flex;gap:8px;flex-wrap:wrap}
+  .urg-btn{flex:1;min-width:100px;padding:10px 12px;border-radius:10px;border:1.5px solid var(--borda);background:var(--azul-input);color:var(--cinza);font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:center}
+  .urg-btn.sel{background:rgba(0,201,111,0.12);border-color:rgba(0,201,111,0.45);color:var(--verde)}
+  .urg-btn.urgente.sel{background:rgba(255,107,53,0.12);border-color:rgba(255,107,53,0.45);color:var(--laranja)}
   /* LATERAL */
-  .side-card { background: var(--azul-medio); border: 1px solid var(--borda); border-radius: 20px; padding: 24px; margin-bottom: 14px; animation: fadeUp 0.4s 0.2s ease both; position: sticky; top: 24px; }
-  .side-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
-  .preview-empty { text-align: center; padding: 20px 10px; color: var(--cinza); font-size: 0.82rem; line-height: 1.6; }
-  .preview-empty .pe-icon { font-size: 2rem; margin-bottom: 8px; opacity: 0.4; }
-  .preview-content { display: none; }
-  .preview-content.vis { display: block; }
-  .prev-cats { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
-  .prev-cat { display: inline-flex; align-items: center; gap: 5px; background: rgba(0,201,111,0.12); border: 1px solid rgba(0,201,111,0.25); color: var(--verde); font-size: 0.68rem; font-weight: 700; padding: 3px 8px; border-radius: 100px; }
-  .prev-titulo { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; line-height: 1.4; }
-  .prev-desc { color: var(--cinza); font-size: 0.8rem; line-height: 1.6; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  .prev-info { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--borda); padding-top: 12px; }
-  .prev-info-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; }
-  .prev-info-row .lbl { color: var(--cinza); }
-  .prev-info-row .val { font-weight: 600; color: var(--branco); }
-  .prev-info-row .val.verde { color: var(--verde); }
-  .prev-info-row .val.laranja { color: var(--laranja); }
-  .dica-item { display: flex; align-items: flex-start; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--borda); font-size: 0.78rem; line-height: 1.5; }
-  .dica-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .dica-item .di { flex-shrink: 0; }
-  .dica-item p { color: var(--cinza); }
-  .dica-item strong { color: var(--branco); display: block; margin-bottom: 1px; }
-  .btn-publicar { width: 100%; background: var(--verde); border: none; border-radius: 14px; padding: 16px; color: var(--azul); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.2s; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .btn-publicar:hover { background: var(--verde-escuro); transform: scale(1.01); }
-  .btn-rascunho { width: 100%; background: transparent; border: 1.5px solid var(--borda); border-radius: 14px; padding: 13px; color: var(--cinza); font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; margin-top: 8px; }
-  .btn-rascunho:hover { border-color: rgba(255,255,255,0.25); color: var(--branco); }
-  .modal-overlay { position: fixed; inset: 0; background: rgba(10,22,40,0.92); display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; padding: 20px; }
-  .modal-overlay.vis { opacity: 1; pointer-events: all; }
-  .modal { background: var(--azul-medio); border: 1px solid var(--borda); border-radius: 24px; padding: 40px 36px; max-width: 420px; width: 100%; text-align: center; transform: translateY(20px); transition: transform 0.3s; }
-  .modal-overlay.vis .modal { transform: translateY(0); }
-  .modal-icon { font-size: 3.5rem; margin-bottom: 16px; }
-  .modal h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; margin-bottom: 8px; }
-  .modal p { color: var(--cinza); font-size: 0.88rem; line-height: 1.6; margin-bottom: 24px; }
-  .modal-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 24px; }
-  .modal-stat { background: var(--azul-input); border: 1px solid var(--borda); border-radius: 12px; padding: 12px 8px; text-align: center; }
-  .modal-stat .ms-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--verde); }
-  .modal-stat .ms-lbl { font-size: 0.68rem; color: var(--cinza); margin-top: 2px; }
-  .btn-modal { width: 100%; background: var(--verde); border: none; border-radius: 14px; padding: 14px; color: var(--azul); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
-  .btn-modal:hover { background: var(--verde-escuro); }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-  @media (max-width: 768px) {
-    .page { grid-template-columns: 1fr; }
-    .side-col { order: -1; }
-    .side-card { position: static; }
-    nav { padding: 18px 20px; }
-    .card { padding: 22px 18px; }
-    .valor-opcoes { flex-direction: column; }
-  }
+  .side-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:20px;padding:24px;margin-bottom:14px;position:sticky;top:24px}
+  .side-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;margin-bottom:16px;display:flex;align-items:center;gap:6px}
+  .preview-empty{text-align:center;padding:20px 10px;color:var(--cinza);font-size:0.82rem;line-height:1.6}
+  .preview-empty .pe-icon{font-size:2rem;margin-bottom:8px;opacity:0.4}
+  .preview-content{display:none}
+  .preview-content.vis{display:block}
+  .prev-cats{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+  .prev-cat{display:inline-flex;align-items:center;gap:5px;background:rgba(0,201,111,0.12);border:1px solid rgba(0,201,111,0.25);color:var(--verde);font-size:0.68rem;font-weight:700;padding:3px 8px;border-radius:100px}
+  .prev-titulo{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:6px;line-height:1.4;color:var(--branco)}
+  .prev-desc{color:var(--cinza);font-size:0.8rem;line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .prev-info{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--borda);padding-top:12px}
+  .prev-info-row{display:flex;align-items:center;justify-content:space-between;font-size:0.78rem}
+  .prev-info-row .lbl{color:var(--cinza)}
+  .prev-info-row .val{font-weight:600;color:var(--branco)}
+  .dica-item{display:flex;align-items:flex-start;gap:8px;padding:10px 0;border-bottom:1px solid var(--borda);font-size:0.78rem;line-height:1.5}
+  .dica-item:last-child{border-bottom:none;padding-bottom:0}
+  .dica-item p{color:var(--cinza)}
+  .dica-item strong{color:var(--branco);display:block;margin-bottom:1px}
+  .btn-publicar{width:100%;background:var(--verde);border:none;border-radius:14px;padding:16px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;transition:all 0.2s;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn-publicar:hover{background:var(--verde-escuro);transform:scale(1.01)}
+  .btn-publicar:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+  .btn-rascunho{width:100%;background:transparent;border:1.5px solid var(--borda);border-radius:14px;padding:13px;color:var(--cinza);font-family:'Syne',sans-serif;font-weight:600;font-size:0.88rem;cursor:pointer;margin-top:8px}
+  .modal-overlay{position:fixed;inset:0;background:rgba(10,22,40,0.92);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity 0.3s;padding:20px}
+  .modal-overlay.vis{opacity:1;pointer-events:all}
+  .modal{background:var(--azul-medio);border:1px solid var(--borda);border-radius:24px;padding:40px 36px;max-width:420px;width:100%;text-align:center;transform:translateY(20px);transition:transform 0.3s}
+  .modal-overlay.vis .modal{transform:translateY(0)}
+  .modal-icon{font-size:3.5rem;margin-bottom:16px}
+  .modal h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;margin-bottom:8px;color:var(--branco)}
+  .modal p{color:var(--cinza);font-size:0.88rem;line-height:1.6;margin-bottom:24px}
+  .btn-modal{width:100%;background:var(--verde);border:none;border-radius:14px;padding:14px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;cursor:pointer}
+  @media(max-width:768px){.page{grid-template-columns:1fr}.side-col{order:-1}.side-card{position:static}nav{padding:18px 20px}.card{padding:22px 18px}.valor-opcoes{flex-direction:column}}
 </style>
 <meta name="theme-color" content="#00C96F">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-  if (!window._fbInitialized) {
-    firebase.initializeApp({
-      apiKey: "AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
-      authDomain: "servicoja-e1f49.firebaseapp.com",
-      projectId: "servicoja-e1f49",
-      storageBucket: "servicoja-e1f49.firebasestorage.app",
-      messagingSenderId: "874413426529",
-      appId: "1:874413426529:web:9891d44afd9ef1750e6720"
-    });
-    window._fbInitialized = true;
+  if(!window._fbInitialized){
+    firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",authDomain:"servicoja-e1f49.firebaseapp.com",projectId:"servicoja-e1f49",storageBucket:"servicoja-e1f49.firebasestorage.app",messagingSenderId:"874413426529",appId:"1:874413426529:web:9891d44afd9ef1750e6720"});
+    window._fbInitialized=true;
   }
 </script>
 </head>
@@ -181,32 +131,27 @@
   <div class="nav-user">
     <button class="btn-voltar" onclick="window.location.href='meus-pedidos-cliente.html'">← Voltar</button>
     <div class="avatar">👤</div>
-    <div><span>Olá, </span><strong id="nomeNav">Cliente</strong></div>
+    <strong id="nomeNav" style="font-size:0.85rem">Cliente</strong>
   </div>
 </nav>
 
 <div class="page">
   <div class="main-col">
-
     <div class="page-header">
       <h1>Publicar pedido de serviço</h1>
       <p>Descreva o que você precisa e receba orçamentos de profissionais qualificados.</p>
     </div>
 
-    <!-- CARD 1: CATEGORIAS MULTI-SELECT -->
+    <!-- CARD 1: CATEGORIAS -->
     <div class="card">
       <div class="card-header">
         <div class="card-num">1</div>
         <div>
           <div class="card-header-title">Categoria do serviço</div>
-          <div class="card-header-sub">Selecione uma ou mais categorias — seu pedido aparecerá para todos os profissionais selecionados</div>
+          <div class="card-header-sub">Selecione uma ou mais categorias</div>
         </div>
       </div>
-
-      <div class="cats-hint">
-        Você pode selecionar múltiplas categorias <span>MULTI-SELEÇÃO</span>
-      </div>
-
+      <div class="cats-hint">Múltipla seleção permitida <span>MULTI-SELEÇÃO</span></div>
       <div class="cats-scroll" id="catsContainer">
         <div class="cat-pill" onclick="toggleCat(this,'⚡ Elétrica')">⚡ Elétrica</div>
         <div class="cat-pill" onclick="toggleCat(this,'🔧 Encanamento')">🔧 Encanamento</div>
@@ -229,17 +174,13 @@
         <div class="cat-pill" onclick="toggleCat(this,'🔥 Aquecedor / Gás')">🔥 Aquecedor / Gás</div>
         <div class="cat-pill" onclick="toggleCat(this,'🌐 Antena / Internet')">🌐 Antena / Internet</div>
         <div class="cat-pill" onclick="toggleCat(this,'📦 Mudança / Frete')">📦 Mudança / Frete</div>
-        <div class="cat-pill" onclick="toggleCat(this,'🎨 Decoração')">🎨 Decoração</div>
-        <div class="cat-pill" onclick="toggleCat(this,'🏗️ Telhado / Telhas')">🏗️ Telhado / Telhas</div>
         <div class="cat-pill" onclick="toggleCat(this,'🪴 Paisagismo')">🪴 Paisagismo</div>
         <div class="cat-pill" onclick="toggleCat(this,'🧱 Alvenaria')">🧱 Alvenaria</div>
         <div class="cat-pill" onclick="toggleCat(this,'🚗 Portão / Interfone')">🚗 Portão / Interfone</div>
-        <div class="cat-pill" onclick="toggleCat(this,'🏋️ Montagem móveis')">🏋️ Montagem móveis</div>
         <div class="cat-pill" onclick="toggleCat(this,'🐾 Pet sitter')">🐾 Pet sitter</div>
         <div class="cat-pill" onclick="toggleCat(this,'👶 Babá / Cuidador')">👶 Babá / Cuidador</div>
         <div class="cat-pill" onclick="toggleCat(this,'🍳 Cozinheiro(a)')">🍳 Cozinheiro(a)</div>
       </div>
-
       <div class="cats-selecionadas" id="catsSelecionadas"></div>
       <div class="erro-cats" id="erroCats">Selecione pelo menos uma categoria</div>
     </div>
@@ -253,7 +194,6 @@
           <div class="card-header-sub">Quanto mais detalhar, melhores orçamentos você recebe</div>
         </div>
       </div>
-
       <div class="field">
         <label>Título do pedido <span class="req">*</span></label>
         <div class="input-wrap">
@@ -261,16 +201,10 @@
           <input type="text" id="tituloInput" placeholder="Ex: Instalação de tomadas no quarto" maxlength="80" oninput="atualizarPreview()">
         </div>
       </div>
-
       <div class="field">
         <label>Descrição detalhada <span class="req">*</span></label>
-        <textarea id="descInput" class="no-icon" placeholder="Descreva o problema ou serviço. Ex: Preciso instalar 3 tomadas novas no quarto principal. O cômodo tem cerca de 15m²..." maxlength="1000" oninput="atualizarDesc(this)"></textarea>
+        <textarea id="descInput" class="no-icon" placeholder="Descreva o problema ou serviço em detalhes..." maxlength="1000" oninput="atualizarDesc(this)"></textarea>
         <div class="char-count"><span id="charCount">0</span>/1000 caracteres</div>
-      </div>
-
-      <div class="field">
-        <label>Data de postagem</label>
-        <div class="data-badge">📅 <strong id="dataPostagem"></strong></div>
       </div>
     </div>
 
@@ -279,17 +213,14 @@
       <div class="card-header">
         <div class="card-num">3</div>
         <div>
-          <div class="card-header-title">Fotos, vídeos ou projeto</div>
-          <div class="card-header-sub">Ajuda o profissional a entender melhor o serviço (opcional)</div>
+          <div class="card-header-title">Fotos do serviço</div>
+          <div class="card-header-sub">Ajuda o profissional a entender melhor (opcional)</div>
         </div>
       </div>
-      <div class="upload-area" id="uploadArea"
-        ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dragDrop(event)"
-        onclick="document.getElementById('fileInput').click()">
+      <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dragDrop(event)">
         <div class="upload-icon">📁</div>
-        <h3>Arraste arquivos aqui ou clique para selecionar</h3>
-        <p>Fotos (JPG, PNG), vídeos (MP4) ou projetos (PDF)</p>
-        <p style="margin-top:4px">Até 10 arquivos</p>
+        <h3>Arraste arquivos ou clique para selecionar</h3>
+        <p>Fotos (JPG, PNG) ou vídeos (MP4)</p>
         <div class="btn-upload">Selecionar arquivos</div>
       </div>
       <input type="file" id="fileInput" multiple accept="image/*,video/*,.pdf" style="display:none" onchange="adicionarArquivos(this.files)">
@@ -305,31 +236,26 @@
           <div class="card-header-sub">Informe seu orçamento e quando precisa do serviço</div>
         </div>
       </div>
-
       <div class="field">
         <label>Orçamento <span class="req">*</span></label>
         <div class="valor-opcoes">
-          <div class="valor-btn sel" onclick="selValor('aberto', this)">
-            <span class="vb-icon">💬</span>
-            Deixar em aberto
+          <div class="valor-btn sel" onclick="selValor('aberto',this)">
+            <span class="vb-icon">💬</span>Deixar em aberto
             <div style="font-size:0.7rem;color:var(--cinza);font-weight:400;margin-top:2px">Recebo cotações livres</div>
           </div>
-          <div class="valor-btn" onclick="selValor('aproximado', this)">
-            <span class="vb-icon">💰</span>
-            Valor aproximado
+          <div class="valor-btn" onclick="selValor('aproximado',this)">
+            <span class="vb-icon">💰</span>Valor aproximado
             <div style="font-size:0.7rem;color:var(--cinza);font-weight:400;margin-top:2px">Indico meu limite</div>
           </div>
         </div>
         <div class="valor-input-wrap" id="valorInputWrap">
-          <label>Valor aproximado que você topa pagar</label>
+          <label>Valor aproximado (R$)</label>
           <div class="input-wrap">
             <span class="prefix">R$</span>
             <input type="number" style="padding-left:38px" placeholder="0,00" id="valorInput" oninput="atualizarPreview()">
           </div>
-          <p class="hint">Os profissionais verão esse valor como referência.</p>
         </div>
       </div>
-
       <div class="field" style="margin-top:6px">
         <label>Urgência <span class="req">*</span></label>
         <div class="urgencia-opts">
@@ -338,7 +264,6 @@
           <div class="urg-btn" onclick="selUrg(this,'🗓️ Sem pressa')">🗓️ Sem pressa<div style="font-size:0.68rem;opacity:0.7;margin-top:2px">Posso aguardar</div></div>
         </div>
       </div>
-
       <div class="field" style="margin-top:14px">
         <label>Endereço do serviço <span class="req">*</span></label>
         <div class="input-wrap">
@@ -348,44 +273,37 @@
         <p class="hint">Endereço completo só é revelado ao profissional após você aceitar a proposta.</p>
       </div>
     </div>
-
   </div>
 
   <!-- COLUNA LATERAL -->
   <div class="side-col">
-
     <div class="side-card">
-      <div class="side-title">👁️ Pré-visualização do pedido</div>
+      <div class="side-title">👁️ Pré-visualização</div>
       <div class="preview-empty" id="previewEmpty">
         <div class="pe-icon">📋</div>
-        <p>Preencha as informações ao lado para ver como seu pedido vai aparecer para os profissionais.</p>
+        <p>Preencha as informações ao lado para ver como seu pedido vai aparecer.</p>
       </div>
       <div class="preview-content" id="previewContent">
         <div class="prev-cats" id="prevCats"></div>
         <div class="prev-titulo" id="prevTitulo">—</div>
         <div class="prev-desc" id="prevDesc">—</div>
         <div class="prev-info">
-          <div class="prev-info-row"><span class="lbl">📅 Postado em</span><span class="val" id="prevData">—</span></div>
-          <div class="prev-info-row"><span class="lbl">💰 Orçamento</span><span class="val verde" id="prevValor">Em aberto</span></div>
-          <div class="prev-info-row"><span class="lbl">⏱️ Urgência</span><span class="val laranja" id="prevUrg">📅 Esta semana</span></div>
+          <div class="prev-info-row"><span class="lbl">💰 Orçamento</span><span class="val" id="prevValor">Em aberto</span></div>
+          <div class="prev-info-row"><span class="lbl">⏱️ Urgência</span><span class="val" id="prevUrg">📅 Esta semana</span></div>
           <div class="prev-info-row"><span class="lbl">📎 Anexos</span><span class="val" id="prevAnexos">Nenhum</span></div>
         </div>
       </div>
     </div>
-
-    <div class="side-card" style="animation-delay:0.3s">
-      <div class="side-title">💡 Dicas para um bom pedido</div>
-      <div class="dica-item"><span class="di">📸</span><p><strong>Adicione fotos</strong>Pedidos com imagens recebem até 3x mais orçamentos.</p></div>
-      <div class="dica-item"><span class="di">📝</span><p><strong>Seja específico</strong>Descreva o tamanho do espaço e o problema exato.</p></div>
-      <div class="dica-item"><span class="di">🏷️</span><p><strong>Múltiplas categorias</strong>Um serviço de telhado pode envolver pedreiro e carpinteiro — selecione os dois!</p></div>
-      <div class="dica-item"><span class="di">📍</span><p><strong>Localização</strong>Endereço completo só aparece após aceitar uma proposta.</p></div>
+    <div class="side-card">
+      <div class="side-title">💡 Dicas</div>
+      <div class="dica-item"><span>📸</span><p><strong>Adicione fotos</strong>Pedidos com imagens recebem até 3x mais orçamentos.</p></div>
+      <div class="dica-item"><span>📝</span><p><strong>Seja específico</strong>Descreva o tamanho do espaço e o problema exato.</p></div>
+      <div class="dica-item"><span>📍</span><p><strong>Localização</strong>Endereço só aparece após aceitar uma proposta.</p></div>
     </div>
-
-    <div class="side-card" style="animation-delay:0.35s; padding: 20px 24px;">
-      <button class="btn-publicar" onclick="publicar()">🚀 Publicar pedido</button>
+    <div class="side-card" style="padding:20px 24px">
+      <button class="btn-publicar" id="btnPublicar" onclick="publicar()">🚀 Publicar pedido</button>
       <button class="btn-rascunho">💾 Salvar como rascunho</button>
     </div>
-
   </div>
 </div>
 
@@ -394,79 +312,55 @@
   <div class="modal">
     <div class="modal-icon">🎉</div>
     <h2>Pedido publicado!</h2>
-    <p>Seu pedido foi publicado com sucesso. Profissionais qualificados da sua região já podem ver e enviar orçamentos.</p>
-    <div class="modal-stats">
-      <div class="modal-stat"><div class="ms-num">~47</div><div class="ms-lbl">Profissionais na área</div></div>
-      <div class="modal-stat"><div class="ms-num">&lt;2h</div><div class="ms-lbl">Primeiro orçamento</div></div>
-      <div class="modal-stat"><div class="ms-num">100%</div><div class="ms-lbl">Gratuito</div></div>
-    </div>
-    <button class="btn-modal" onclick="irParaPedidos()">Ver meus pedidos →</button>
+    <p>Seu pedido foi publicado com sucesso. Profissionais qualificados já podem ver e enviar orçamentos.</p>
+    <button class="btn-modal" onclick="window.location.href='meus-pedidos-cliente.html'">Ver meus pedidos →</button>
   </div>
 </div>
 
 <script>
-  // Nome do usuário
   document.getElementById('nomeNav').textContent = localStorage.getItem('sj_nome') || 'Cliente';
 
-  // Data atual
-  const agora = new Date();
-  const dataStr = agora.toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
-  const horaStr = agora.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
-  document.getElementById('dataPostagem').textContent = dataStr + ' às ' + horaStr;
-
-  // ESTADO
-  let catsSel = []; // MÚLTIPLAS CATEGORIAS
+  let catsSel = [];
   let urgSel = '📅 Esta semana';
   let valorTipo = 'aberto';
   let arquivos = [];
+  let authUser = null;
 
-  // TOGGLE CATEGORIA (MULTI-SELECT)
+  // Aguardar autenticação
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (!user) { window.location.href = 'login.html'; return; }
+    authUser = user;
+  });
+
   function toggleCat(el, nome) {
     const idx = catsSel.indexOf(nome);
-    if (idx === -1) {
-      catsSel.push(nome);
-      el.classList.add('sel');
-    } else {
-      catsSel.splice(idx, 1);
-      el.classList.remove('sel');
-    }
-    // Atualizar badges de selecionadas
+    if (idx === -1) { catsSel.push(nome); el.classList.add('sel'); }
+    else { catsSel.splice(idx,1); el.classList.remove('sel'); }
     const container = document.getElementById('catsSelecionadas');
-    if (catsSel.length > 0) {
-      container.innerHTML = '<div class="cat-badges">' +
-        catsSel.map(c => '<span class="cat-badge">' + c + '</span>').join('') +
-        '</div>';
-    } else {
-      container.innerHTML = '';
-    }
+    container.innerHTML = catsSel.length > 0
+      ? '<div class="cat-badges">' + catsSel.map(c => '<span class="cat-badge">'+c+'</span>').join('') + '</div>'
+      : '';
     document.getElementById('erroCats').classList.remove('vis');
     atualizarPreview();
   }
 
-  // VALOR
   function selValor(tipo, el) {
     document.querySelectorAll('.valor-btn').forEach(b => b.classList.remove('sel'));
-    el.classList.add('sel');
-    valorTipo = tipo;
+    el.classList.add('sel'); valorTipo = tipo;
     document.getElementById('valorInputWrap').classList.toggle('vis', tipo === 'aproximado');
     atualizarPreview();
   }
 
-  // URGÊNCIA
   function selUrg(el, nome) {
     document.querySelectorAll('.urg-btn').forEach(b => b.classList.remove('sel'));
-    el.classList.add('sel');
-    urgSel = nome;
-    atualizarPreview();
+    el.classList.add('sel'); urgSel = nome; atualizarPreview();
   }
 
-  // CONTADOR
   function atualizarDesc(el) {
     document.getElementById('charCount').textContent = el.value.length;
     atualizarPreview();
   }
 
-  // PREVIEW
   function atualizarPreview() {
     const titulo = document.getElementById('tituloInput').value;
     const desc = document.getElementById('descInput').value;
@@ -474,25 +368,19 @@
     const temConteudo = titulo || desc || catsSel.length > 0;
     document.getElementById('previewEmpty').style.display = temConteudo ? 'none' : 'block';
     document.getElementById('previewContent').classList.toggle('vis', !!temConteudo);
-    // Badges de categoria
-    const prevCats = document.getElementById('prevCats');
-    if (catsSel.length > 0) {
-      prevCats.innerHTML = catsSel.map(c => '<span class="prev-cat">' + c + '</span>').join('');
-    } else {
-      prevCats.innerHTML = '<span class="prev-cat" style="opacity:0.4">Nenhuma categoria</span>';
-    }
+    document.getElementById('prevCats').innerHTML = catsSel.length > 0
+      ? catsSel.map(c => '<span class="prev-cat">'+c+'</span>').join('')
+      : '<span class="prev-cat" style="opacity:0.4">Nenhuma categoria</span>';
     document.getElementById('prevTitulo').textContent = titulo || 'Sem título ainda...';
     document.getElementById('prevDesc').textContent = desc || 'Adicione uma descrição...';
-    document.getElementById('prevData').textContent = agora.toLocaleDateString('pt-BR') + ' ' + horaStr;
-    document.getElementById('prevValor').textContent = valorTipo === 'aberto' ? 'Em aberto' : (valor ? 'R$ ' + parseFloat(valor).toLocaleString('pt-BR') : 'A definir');
+    document.getElementById('prevValor').textContent = valorTipo === 'aberto' ? 'Em aberto' : (valor ? 'R$ '+parseFloat(valor).toLocaleString('pt-BR') : 'A definir');
     document.getElementById('prevUrg').textContent = urgSel;
-    document.getElementById('prevAnexos').textContent = arquivos.length > 0 ? arquivos.length + ' arquivo(s)' : 'Nenhum';
+    document.getElementById('prevAnexos').textContent = arquivos.length > 0 ? arquivos.length+' arquivo(s)' : 'Nenhum';
   }
 
-  // UPLOAD
-  function dragOver(e) { e.preventDefault(); document.getElementById('uploadArea').classList.add('drag'); }
-  function dragLeave() { document.getElementById('uploadArea').classList.remove('drag'); }
-  function dragDrop(e) { e.preventDefault(); document.getElementById('uploadArea').classList.remove('drag'); adicionarArquivos(e.dataTransfer.files); }
+  function dragOver(e) { e.preventDefault(); document.getElementById('uploadArea').style.borderColor='rgba(0,201,111,0.4)'; }
+  function dragLeave() { document.getElementById('uploadArea').style.borderColor=''; }
+  function dragDrop(e) { e.preventDefault(); dragLeave(); adicionarArquivos(e.dataTransfer.files); }
 
   function adicionarArquivos(files) {
     const prev = document.getElementById('filesPreview');
@@ -505,52 +393,47 @@
       const nome = f.name.length > 10 ? f.name.substring(0,10)+'...' : f.name;
       const thumb = document.createElement('div');
       thumb.className = 'file-thumb';
-      thumb.innerHTML = icon + '<span>' + nome + '</span><div class="remove" onclick="removerArquivo(this)">✕</div>';
+      const idx = arquivos.length - 1;
+      thumb.innerHTML = icon+'<span>'+nome+'</span><div class="remove" onclick="removerArquivo(this,'+idx+')">✕</div>';
       prev.appendChild(thumb);
     });
     document.getElementById('uploadArea').style.display = arquivos.length > 0 ? 'none' : '';
     atualizarPreview();
   }
 
-  function removerArquivo(el) {
+  function removerArquivo(el, idx) {
     el.parentElement.remove();
-    arquivos.pop();
+    arquivos.splice(idx,1);
     if (arquivos.length === 0) document.getElementById('uploadArea').style.display = '';
     atualizarPreview();
   }
 
-  // PUBLICAR
   function publicar() {
     const titulo = document.getElementById('tituloInput').value.trim();
     const desc = document.getElementById('descInput').value.trim();
     const endereco = document.getElementById('enderecoInput').value.trim();
 
-    // Validações
-    if (catsSel.length === 0) {
-      document.getElementById('erroCats').classList.add('vis');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
+    if (catsSel.length === 0) { document.getElementById('erroCats').classList.add('vis'); window.scrollTo({top:0,behavior:'smooth'}); return; }
     if (!titulo) { alert('Digite o título do pedido!'); return; }
     if (!desc || desc.length < 20) { alert('Descreva o serviço com pelo menos 20 caracteres!'); return; }
     if (!endereco) { alert('Digite o endereço do serviço!'); return; }
+    if (!authUser) { alert('Aguarde a conexão ou faça login novamente.'); return; }
 
-    // Usar onAuthStateChanged para garantir sessão ativa
+    const btn = document.getElementById('btnPublicar');
+    btn.disabled = true; btn.textContent = 'Publicando...';
+
     const nome = localStorage.getItem('sj_nome') || 'Cliente';
-    const _titulo=titulo, _desc=desc, _endereco=endereco;
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (!user) { window.location.href='login.html'; return; }
     const valor = valorTipo === 'aproximado' ? document.getElementById('valorInput').value : null;
 
     const pedido = {
       titulo: titulo,
       descricao: desc,
-      categorias: catsSel, // MÚLTIPLAS CATEGORIAS
+      categorias: catsSel,
       urgencia: urgSel,
       orcamento: valorTipo,
       valor: valor ? parseFloat(valor) : null,
       endereco: endereco,
-      clienteId: user.uid,
+      clienteId: authUser.uid,
       clienteNome: nome,
       status: 'aberto',
       criadoEm: new Date().toISOString(),
@@ -562,20 +445,11 @@
         document.getElementById('modalOverlay').classList.add('vis');
       })
       .catch(function(e) {
+        btn.disabled = false; btn.textContent = '🚀 Publicar pedido';
         alert('Erro ao publicar: ' + e.message);
       });
   }
-
-  function irParaPedidos() {
-    window.location.href = 'meus-pedidos-cliente.html';
-  }
 </script>
-
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(e => {});
-  }
-</script>
-
+<script>if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(e=>{});}</script>
 </body>
 </html>
