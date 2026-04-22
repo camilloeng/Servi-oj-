@@ -268,79 +268,36 @@ function calcVencimento() {
 }
 
 async function init() {
-  if (!uid) { window.location.href = 'login.html'; return; }
-  try {
-    // Tentar todos os possíveis IDs do documento
-    const uidBase = uid.replace('_prof','');
-    const possiveisIds = [uid, uidBase+'_prof', uidBase];
-    let snap = null, dadosUid = uid;
+  // Usar dados do localStorage — não depende do Firestore para perfil
+  const nome = localStorage.getItem('sj_nome') || 'Profissional';
+  categoriasAprovadas = JSON.parse(localStorage.getItem('sj_categoriasAprovadas') || '[]');
+  const todasCats = JSON.parse(localStorage.getItem('sj_categorias') || '[]');
 
-    for (const id of possiveisIds) {
-      try {
-        const s = await firebase.firestore().collection('usuarios').doc(id).get();
-        if (s.exists() && s.data().tipo === 'profissional') {
-          snap = s; dadosUid = id;
-          localStorage.setItem('sj_uid', id);
-          break;
-        }
-      } catch(e2) {}
-    }
+  document.getElementById('nomeNav').textContent = nome;
+  document.getElementById('nomeCard').textContent = nome;
 
-    if (!snap) {
-      document.getElementById('loading').innerHTML = '<p style="color:var(--erro)">Perfil profissional não encontrado. <a href="cadastro-profissional.html" style="color:var(--verde)">Cadastrar como profissional →</a></p>';
-      document.getElementById('catsLista').innerHTML = '<div style="color:var(--cinza);font-size:0.78rem">Não encontrado</div>';
-      return;
-    }
-
-    const dados = snap.data();
-    categoriasAprovadas = dados.categoriasAprovadas || [];
-    bloqueado = dados.bloqueado || false;
-    const taxaAcum = dados.taxaAcumulada || 0;
-
-    if (dados.endereco && dados.endereco.cidade) {
-      document.getElementById('cidadeCard').textContent = dados.endereco.cidade + ' — Verificado ✓';
-    }
-
-    // Categorias na sidebar
-    const lista = document.getElementById('catsLista');
-    if (categoriasAprovadas.length > 0) {
-      lista.innerHTML = categoriasAprovadas.map(c =>
-        `<div class="cat-row"><span>${c}</span><span class="cat-ok">✓ Aprovado</span></div>`
-      ).join('') + (dados.categorias||[]).filter(c => !categoriasAprovadas.includes(c)).map(c =>
-        `<div class="cat-row"><span style="color:var(--cinza)">${c}</span><span class="cat-pend">Pendente</span></div>`
-      ).join('');
-    } else {
-      lista.innerHTML = '<div style="color:var(--cinza);font-size:0.78rem">Nenhuma aprovação ainda</div>';
-    }
-
-    // Filtros
-    const pills = document.getElementById('filtroPills');
-    categoriasAprovadas.forEach(cat => {
-      const p = document.createElement('div');
-      p.className = 'fpill'; p.setAttribute('data-cat', cat);
-      p.textContent = cat; p.onclick = function(){ selFiltro(this); };
-      pills.appendChild(p);
-    });
-
-    // Taxa
-    if (taxaAcum > 0) {
-      document.getElementById('taxaBox').style.display = 'block';
-      document.getElementById('taxaValor').textContent = 'R$ ' + taxaAcum.toFixed(2).replace('.',',');
-      document.getElementById('taxaVenc').textContent = calcVencimento();
-    }
-
-    // Bloqueio
-    if (bloqueado) {
-      document.getElementById('bloqueadoBox').classList.add('vis');
-      document.getElementById('loading').style.display = 'none';
-      return;
-    }
-
-    await carregarPedidos();
-  } catch(e) {
-    document.getElementById('loading').innerHTML = '<p style="color:var(--erro)">Erro: ' + e.message + '</p>';
-    document.getElementById('catsLista').innerHTML = '<div style="color:var(--cinza);font-size:0.78rem">Erro ao carregar</div>';
+  // Categorias na sidebar
+  const lista = document.getElementById('catsLista');
+  if (categoriasAprovadas.length > 0) {
+    lista.innerHTML = categoriasAprovadas.map(c =>
+      `<div class="cat-row"><span>${c}</span><span class="cat-ok">✓ Aprovado</span></div>`
+    ).join('') + todasCats.filter(c => !categoriasAprovadas.includes(c)).map(c =>
+      `<div class="cat-row"><span style="color:var(--cinza)">${c}</span><span class="cat-pend">Pendente</span></div>`
+    ).join('');
+  } else {
+    lista.innerHTML = '<div style="color:var(--cinza);font-size:0.78rem">Nenhuma aprovação ainda.<br>Faça o teste de IA!</div>';
   }
+
+  // Filtros por categoria
+  const pills = document.getElementById('filtroPills');
+  categoriasAprovadas.forEach(cat => {
+    const p = document.createElement('div');
+    p.className = 'fpill'; p.setAttribute('data-cat', cat);
+    p.textContent = cat; p.onclick = function(){ selFiltro(this); };
+    pills.appendChild(p);
+  });
+
+  await carregarPedidos();
 }
 
 async function carregarPedidos() {
