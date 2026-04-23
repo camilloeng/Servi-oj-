@@ -6,125 +6,124 @@
 <title>ServiçoJá Conecta — Dashboard Profissional</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-  :root{--verde:#00C96F;--verde-escuro:#009E57;--azul:#0A1628;--azul-medio:#132240;--azul-input:#0F1C35;--branco:#F5F7F2;--cinza:#8A9BB5;--laranja:#FF6B35;--amarelo:#FFB830;--erro:#FF5C5C;--borda:rgba(255,255,255,0.09)}
-  body{font-family:'DM Sans',sans-serif;background:var(--azul);color:var(--branco);min-height:100vh}
-  a{color:inherit;text-decoration:none}
-  nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--borda)}
-  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--branco)}
-  .logo span{color:var(--verde)}
-  .nav-r{display:flex;align-items:center;gap:12px}
-  .av{width:36px;height:36px;border-radius:50%;background:rgba(0,201,111,0.2);border:2px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
-  .nav-name{font-size:0.85rem;font-weight:600;color:var(--branco)}
-  .nav-sub{font-size:0.72rem;color:var(--cinza)}
-  
-  .notif-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background 0.2s}
-  .notif-item:hover{background:rgba(255,255,255,0.03)}
-  .notif-item:last-child{border-bottom:none}
-  .notif-item.nova{border-left:3px solid #00C96F;background:rgba(0,201,111,0.03)}
-  .notif-item.lida{opacity:0.55}
-  .ni-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-  .ni-txt{font-size:11px;color:#F5F7F2;line-height:1.5;margin-bottom:2px}
-  .ni-tempo{font-size:10px;color:#8A9BB5}
-  .ni-dot{width:7px;height:7px;border-radius:50%;background:#00C96F;margin-top:4px;flex-shrink:0}
-  .btn-sair{background:none;border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.78rem;padding:6px 12px;cursor:pointer;transition:all 0.2s}
-  .btn-sair:hover{border-color:rgba(255,92,92,0.4);color:var(--erro)}
-  .layout{display:grid;grid-template-columns:220px 1fr;gap:16px;max-width:1200px;margin:0 auto;padding:24px 24px 60px}
-  /* SIDEBAR */
-  .sidebar{display:flex;flex-direction:column;gap:10px}
-  .prof-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:16px;text-align:center}
-  .prof-av{width:56px;height:56px;border-radius:50%;background:rgba(0,201,111,0.15);border:2px solid rgba(0,201,111,0.3);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem}
-  .prof-name{font-weight:700;font-size:0.9rem;color:var(--branco);margin-bottom:2px}
-  .prof-sub{font-size:0.72rem;color:var(--cinza);margin-bottom:8px}
-  .rating{display:flex;align-items:center;justify-content:center;gap:4px;font-size:0.78rem;color:var(--amarelo)}
-  .bloco{background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:14px}
-  .bloco-title{font-size:0.68rem;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
-  .cat-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--borda);font-size:0.78rem;color:var(--branco)}
-  .cat-row:last-child{border-bottom:none}
-  .cat-ok{color:var(--verde);font-size:0.68rem;font-weight:700}
-  .cat-pend{color:var(--cinza);font-size:0.68rem}
-  .nav-menu{background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:6px;display:flex;flex-direction:column;gap:2px}
-  .nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:0.78rem;cursor:pointer;color:var(--cinza);transition:all 0.2s}
-  .nav-item:hover{color:var(--branco);background:rgba(255,255,255,0.04)}
-  .nav-item.ativo{background:rgba(0,201,111,0.1);color:var(--verde);font-weight:600}
-  .btn-teste{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.3);border-radius:10px;padding:10px;color:var(--verde);font-size:0.78rem;font-weight:700;cursor:pointer;width:100%;text-align:center;transition:all 0.2s}
-  .btn-teste:hover{background:rgba(0,201,111,0.18)}
-  /* TAXA BOX — compacta */
-  .taxa-box{background:var(--azul-medio);border:1px solid rgba(255,107,53,0.4);border-radius:12px;padding:11px 13px}
-  .taxa-box .bloco-title{margin-bottom:6px}
-  .taxa-valor{font-weight:800;font-size:1.1rem;color:var(--laranja);margin-bottom:3px}
-  .taxa-venc{font-size:0.7rem;color:var(--cinza);margin-bottom:8px}
-  .taxa-venc strong{color:var(--amarelo)}
-  .btn-pagar{background:var(--laranja);border:none;border-radius:7px;padding:7px;color:var(--branco);font-size:0.72rem;font-weight:700;cursor:pointer;width:100%;margin-bottom:5px}
-  .taxa-hist{font-size:0.68rem;color:var(--cinza);text-align:center;cursor:pointer;text-decoration:underline}
-  /* BLOQUEADO */
-  .bloqueado-box{background:rgba(255,92,92,0.07);border:2px solid rgba(255,92,92,0.4);border-radius:12px;padding:12px;text-align:center;display:none}
-  .bloqueado-box.vis{display:block}
-  .bloq-icon{font-size:1.4rem;margin-bottom:4px}
-  .bloq-title{font-weight:800;font-size:0.82rem;color:var(--erro);margin-bottom:4px}
-  .bloq-sub{font-size:0.7rem;color:var(--cinza);line-height:1.5;margin-bottom:8px}
-  .btn-regularizar{background:var(--erro);border:none;border-radius:7px;padding:7px;color:var(--branco);font-size:0.72rem;font-weight:700;cursor:pointer;width:100%}
-  /* MAIN */
-  .main{display:flex;flex-direction:column;gap:14px}
-  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-  .stat{background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:14px 16px}
-  .stat-n{font-weight:800;font-size:1.5rem;margin-bottom:2px}
-  .stat-l{font-size:0.72rem;color:var(--cinza)}
-  .section-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-  .section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--branco)}
-  .filtros{display:flex;gap:6px;flex-wrap:wrap}
-  .fpill{background:var(--azul-input);border:1.5px solid var(--borda);border-radius:100px;padding:5px 12px;font-size:0.75rem;color:var(--cinza);cursor:pointer;transition:all 0.2s;white-space:nowrap}
-  .fpill:hover{border-color:rgba(0,201,111,0.3)}
-  .fpill.ativo{background:rgba(0,201,111,0.12);border-color:rgba(0,201,111,0.45);color:var(--verde);font-weight:600}
-  /* PEDIDO CARD */
-  .pedido-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:16px 20px;transition:border-color 0.2s;animation:fadeUp 0.4s ease both}
-  .pedido-card:hover{border-color:rgba(0,201,111,0.25)}
-  .p-cats{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
-  .pcat{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.2);color:var(--verde);font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:100px}
-  .p-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;color:var(--branco);margin-bottom:5px;line-height:1.3}
-  .p-desc{color:var(--cinza);font-size:0.8rem;line-height:1.6;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .p-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid var(--borda);padding-top:10px}
-  .p-meta{display:flex;flex-wrap:wrap;gap:10px}
-  .pm{font-size:0.75rem;color:var(--cinza)}
-  .pm strong{color:var(--branco)}
-  .p-actions{display:flex;align-items:center;gap:8px}
-  .taxa-badge{background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.25);border-radius:7px;padding:4px 10px;font-size:0.72rem;color:var(--laranja);font-weight:700;white-space:nowrap}
-  .btn-prop{background:transparent;border:1.5px solid var(--verde);border-radius:9px;padding:7px 16px;color:var(--verde);font-weight:700;font-size:0.8rem;cursor:pointer;transition:all 0.2s}
-  .btn-prop:hover{background:var(--verde);color:var(--azul)}
-  /* URGÊNCIA */
-  .urg{display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:700;padding:3px 8px;border-radius:100px}
-  .urg-urgente{background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.3);color:var(--laranja)}
-  .urg-semana{background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.25);color:var(--amarelo)}
-  .urg-pressa{background:rgba(138,155,181,0.1);border:1px solid rgba(138,155,181,0.2);color:var(--cinza)}
-  /* MODAL */
-  .overlay{position:fixed;inset:0;background:rgba(10,22,40,0.92);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s}
-  .overlay.vis{opacity:1;pointer-events:all}
-  .modal{background:var(--azul-medio);border:1px solid var(--borda);border-radius:22px;width:100%;max-width:430px;padding:28px;transform:translateY(20px);transition:transform 0.3s}
-  .overlay.vis .modal{transform:translateY(0)}
-  .modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--branco);margin-bottom:4px}
-  .modal-sub{color:var(--cinza);font-size:0.8rem;margin-bottom:18px;line-height:1.5}
-  .mfield{margin-bottom:12px}
-  .mfield label{display:block;font-size:0.74rem;font-weight:600;color:var(--cinza);margin-bottom:4px}
-  .mfield input,.mfield textarea{width:100%;background:var(--azul-input);border:1.5px solid var(--borda);border-radius:10px;color:var(--branco);font-family:'DM Sans',sans-serif;font-size:0.85rem;padding:10px 13px;outline:none;transition:border-color 0.2s}
-  .mfield textarea{resize:vertical;min-height:80px;line-height:1.5}
-  .mfield input:focus,.mfield textarea:focus{border-color:rgba(0,201,111,0.45)}
-  .mfield input::placeholder,.mfield textarea::placeholder{color:rgba(138,155,181,0.4)}
-  .taxa-info{background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:9px;padding:10px 13px;font-size:0.76rem;color:var(--cinza);margin-bottom:16px;line-height:1.6}
-  .taxa-info strong{color:var(--laranja)}
-  .modal-btns{display:flex;gap:8px}
-  .btn-cancel{flex:1;background:transparent;border:1.5px solid var(--borda);border-radius:10px;padding:11px;color:var(--cinza);font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer}
-  .btn-send{flex:2;background:var(--verde);border:none;border-radius:10px;padding:11px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer}
-  .btn-send:hover{background:var(--verde-escuro)}
-  /* LOADING/VAZIO */
-  .loading-wrap{text-align:center;padding:60px 20px;color:var(--cinza)}
-  .spinner{width:38px;height:38px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px}
-  .vazio{text-align:center;padding:60px 20px;display:none}
-  .vazio.vis{display:block}
-  .vazio-icon{font-size:2.5rem;opacity:0.3;margin-bottom:10px}
-  .vazio p{color:var(--cinza);font-size:0.85rem;line-height:1.6}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-  @media(max-width:768px){.layout{grid-template-columns:1fr}.sidebar{order:2}.stats{grid-template-columns:1fr 1fr}}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--verde:#00C96F;--verde-escuro:#009E57;--azul:#0A1628;--azul-medio:#132240;--azul-input:#0F1C35;--branco:#F5F7F2;--cinza:#8A9BB5;--laranja:#FF6B35;--amarelo:#FFB830;--erro:#FF5C5C;--borda:rgba(255,255,255,0.09)}
+body{font-family:'DM Sans',sans-serif;background:var(--azul);color:var(--branco);min-height:100vh}
+a{color:inherit;text-decoration:none}
+nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--borda)}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--branco)}
+.logo span{color:var(--verde)}
+.nav-r{display:flex;align-items:center;gap:12px}
+.av{width:36px;height:36px;border-radius:50%;background:rgba(0,201,111,0.2);border:2px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.nav-name{font-size:0.85rem;font-weight:600;color:var(--branco)}
+.nav-sub{font-size:0.72rem;color:var(--cinza)}
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background 0.2s}
+.notif-item:hover{background:rgba(255,255,255,0.03)}
+.notif-item:last-child{border-bottom:none}
+.notif-item.nova{border-left:3px solid #00C96F;background:rgba(0,201,111,0.03)}
+.notif-item.lida{opacity:0.55}
+.ni-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ni-txt{font-size:11px;color:#F5F7F2;line-height:1.5;margin-bottom:2px}
+.ni-tempo{font-size:10px;color:#8A9BB5}
+.ni-dot{width:7px;height:7px;border-radius:50%;background:#00C96F;margin-top:4px;flex-shrink:0}
+.btn-sair{background:none;border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.78rem;padding:6px 12px;cursor:pointer;transition:all 0.2s}
+.btn-sair:hover{border-color:rgba(255,92,92,0.4);color:var(--erro)}
+.layout{display:grid;grid-template-columns:220px 1fr;gap:16px;max-width:1200px;margin:0 auto;padding:24px 24px 60px}
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:10px}
+.prof-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:16px;text-align:center}
+.prof-av{width:56px;height:56px;border-radius:50%;background:rgba(0,201,111,0.15);border:2px solid rgba(0,201,111,0.3);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem}
+.prof-name{font-weight:700;font-size:0.9rem;color:var(--branco);margin-bottom:2px}
+.prof-sub{font-size:0.72rem;color:var(--cinza);margin-bottom:8px}
+.rating{display:flex;align-items:center;justify-content:center;gap:4px;font-size:0.78rem;color:var(--amarelo)}
+.bloco{background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:14px}
+.bloco-title{font-size:0.68rem;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.cat-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--borda);font-size:0.78rem;color:var(--branco)}
+.cat-row:last-child{border-bottom:none}
+.cat-ok{color:var(--verde);font-size:0.68rem;font-weight:700}
+.cat-pend{color:var(--cinza);font-size:0.68rem}
+.nav-menu{background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:6px;display:flex;flex-direction:column;gap:2px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:0.78rem;cursor:pointer;color:var(--cinza);transition:all 0.2s}
+.nav-item:hover{color:var(--branco);background:rgba(255,255,255,0.04)}
+.nav-item.ativo{background:rgba(0,201,111,0.1);color:var(--verde);font-weight:600}
+.btn-teste{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.3);border-radius:10px;padding:10px;color:var(--verde);font-size:0.78rem;font-weight:700;cursor:pointer;width:100%;text-align:center;transition:all 0.2s}
+.btn-teste:hover{background:rgba(0,201,111,0.18)}
+/* TAXA BOX */
+.taxa-box{background:var(--azul-medio);border:1px solid rgba(255,107,53,0.4);border-radius:12px;padding:11px 13px}
+.taxa-box .bloco-title{margin-bottom:6px}
+.taxa-valor{font-weight:800;font-size:1.1rem;color:var(--laranja);margin-bottom:3px}
+.taxa-venc{font-size:0.7rem;color:var(--cinza);margin-bottom:8px}
+.taxa-venc strong{color:var(--amarelo)}
+.btn-pagar{background:var(--laranja);border:none;border-radius:7px;padding:7px;color:var(--branco);font-size:0.72rem;font-weight:700;cursor:pointer;width:100%;margin-bottom:5px}
+.taxa-hist{font-size:0.68rem;color:var(--cinza);text-align:center;cursor:pointer;text-decoration:underline}
+/* BLOQUEADO */
+.bloqueado-box{background:rgba(255,92,92,0.07);border:2px solid rgba(255,92,92,0.4);border-radius:12px;padding:12px;text-align:center;display:none}
+.bloqueado-box.vis{display:block}
+.bloq-icon{font-size:1.4rem;margin-bottom:4px}
+.bloq-title{font-weight:800;font-size:0.82rem;color:var(--erro);margin-bottom:4px}
+.bloq-sub{font-size:0.7rem;color:var(--cinza);line-height:1.5;margin-bottom:8px}
+.btn-regularizar{background:var(--erro);border:none;border-radius:7px;padding:7px;color:var(--branco);font-size:0.72rem;font-weight:700;cursor:pointer;width:100%}
+/* MAIN */
+.main{display:flex;flex-direction:column;gap:14px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:14px 16px}
+.stat-n{font-weight:800;font-size:1.5rem;margin-bottom:2px}
+.stat-l{font-size:0.72rem;color:var(--cinza)}
+.section-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--branco)}
+.filtros{display:flex;gap:6px;flex-wrap:wrap}
+.fpill{background:var(--azul-input);border:1.5px solid var(--borda);border-radius:100px;padding:5px 12px;font-size:0.75rem;color:var(--cinza);cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.fpill:hover{border-color:rgba(0,201,111,0.3)}
+.fpill.ativo{background:rgba(0,201,111,0.12);border-color:rgba(0,201,111,0.45);color:var(--verde);font-weight:600}
+/* PEDIDO CARD */
+.pedido-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:16px 20px;transition:border-color 0.2s;animation:fadeUp 0.4s ease both}
+.pedido-card:hover{border-color:rgba(0,201,111,0.25)}
+.p-cats{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.pcat{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.2);color:var(--verde);font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:100px}
+.p-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;color:var(--branco);margin-bottom:5px;line-height:1.3}
+.p-desc{color:var(--cinza);font-size:0.8rem;line-height:1.6;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.p-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid var(--borda);padding-top:10px}
+.p-meta{display:flex;flex-wrap:wrap;gap:10px}
+.pm{font-size:0.75rem;color:var(--cinza)}
+.pm strong{color:var(--branco)}
+.p-actions{display:flex;align-items:center;gap:8px}
+.taxa-badge{background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.25);border-radius:7px;padding:4px 10px;font-size:0.72rem;color:var(--laranja);font-weight:700;white-space:nowrap}
+.btn-prop{background:transparent;border:1.5px solid var(--verde);border-radius:9px;padding:7px 16px;color:var(--verde);font-weight:700;font-size:0.8rem;cursor:pointer;transition:all 0.2s}
+.btn-prop:hover{background:var(--verde);color:var(--azul)}
+/* URGÊNCIA */
+.urg{display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:700;padding:3px 8px;border-radius:100px}
+.urg-urgente{background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.3);color:var(--laranja)}
+.urg-semana{background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.25);color:var(--amarelo)}
+.urg-pressa{background:rgba(138,155,181,0.1);border:1px solid rgba(138,155,181,0.2);color:var(--cinza)}
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(10,22,40,0.92);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s}
+.overlay.vis{opacity:1;pointer-events:all}
+.modal{background:var(--azul-medio);border:1px solid var(--borda);border-radius:22px;width:100%;max-width:430px;padding:28px;transform:translateY(20px);transition:transform 0.3s}
+.overlay.vis .modal{transform:translateY(0)}
+.modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--branco);margin-bottom:4px}
+.modal-sub{color:var(--cinza);font-size:0.8rem;margin-bottom:18px;line-height:1.5}
+.mfield{margin-bottom:12px}
+.mfield label{display:block;font-size:0.74rem;font-weight:600;color:var(--cinza);margin-bottom:4px}
+.mfield input,.mfield textarea{width:100%;background:var(--azul-input);border:1.5px solid var(--borda);border-radius:10px;color:var(--branco);font-family:'DM Sans',sans-serif;font-size:0.85rem;padding:10px 13px;outline:none;transition:border-color 0.2s}
+.mfield textarea{resize:vertical;min-height:80px;line-height:1.5}
+.mfield input:focus,.mfield textarea:focus{border-color:rgba(0,201,111,0.45)}
+.mfield input::placeholder,.mfield textarea::placeholder{color:rgba(138,155,181,0.4)}
+.taxa-info{background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:9px;padding:10px 13px;font-size:0.76rem;color:var(--cinza);margin-bottom:16px;line-height:1.6}
+.taxa-info strong{color:var(--laranja)}
+.modal-btns{display:flex;gap:8px}
+.btn-cancel{flex:1;background:transparent;border:1.5px solid var(--borda);border-radius:10px;padding:11px;color:var(--cinza);font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer}
+.btn-send{flex:2;background:var(--verde);border:none;border-radius:10px;padding:11px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer}
+.btn-send:hover{background:var(--verde-escuro)}
+/* LOADING/VAZIO */
+.loading-wrap{text-align:center;padding:60px 20px;color:var(--cinza)}
+.spinner{width:38px;height:38px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px}
+.vazio{text-align:center;padding:60px 20px;display:none}
+.vazio.vis{display:block}
+.vazio-icon{font-size:2.5rem;opacity:0.3;margin-bottom:10px}
+.vazio p{color:var(--cinza);font-size:0.85rem;line-height:1.6}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:768px){.layout{grid-template-columns:1fr}.sidebar{order:2}.stats{grid-template-columns:1fr 1fr}}
 </style>
 <meta name="theme-color" content="#00C96F">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -135,10 +134,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-  if(!window._fbInitialized){
-    firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",authDomain:"servicoja-e1f49.firebaseapp.com",projectId:"servicoja-e1f49",storageBucket:"servicoja-e1f49.firebasestorage.app",messagingSenderId:"874413426529",appId:"1:874413426529:web:9891d44afd9ef1750e6720"});
-    window._fbInitialized=true;
-  }
+if(!window._fbInitialized){
+  firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",authDomain:"servicoja-e1f49.firebaseapp.com",projectId:"servicoja-e1f49",storageBucket:"servicoja-e1f49.firebasestorage.app",messagingSenderId:"874413426529",appId:"1:874413426529:web:9891d44afd9ef1750e6720"});
+  window._fbInitialized=true;
+}
 </script>
 </head>
 <body>
@@ -152,17 +151,17 @@
       <div class="nav-sub">Conta profissional</div>
     </div>
     <div style="position:relative" id="notifWrap">
-  <button id="notifBtn" onclick="toggleNotif()" style="position:relative;width:36px;height:36px;border-radius:50%;background:#0F1C35;border:1px solid rgba(255,255,255,0.09);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">
-    🔔<span id="notifBadge" style="display:none;position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;border-radius:50%;background:#FF6B35;color:#fff;font-size:9px;font-weight:700;align-items:center;justify-content:center;border:2px solid #132240;padding:0 2px"></span>
-  </button>
-  <div id="notifDropdown" style="display:none;position:absolute;right:0;top:46px;width:310px;background:#132240;border:1px solid rgba(255,255,255,0.09);border-radius:14px;overflow:hidden;z-index:100;box-shadow:0 8px 32px rgba(0,0,0,0.4)">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.09)">
-      <span style="font-weight:700;font-size:13px;color:#F5F7F2">🔔 Notificações</span>
-      <span onclick="marcarTodasLidas()" style="font-size:11px;color:#8A9BB5;cursor:pointer;text-decoration:underline">Marcar lidas</span>
+      <button id="notifBtn" onclick="toggleNotif()" style="position:relative;width:36px;height:36px;border-radius:50%;background:#0F1C35;border:1px solid rgba(255,255,255,0.09);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">
+        🔔<span id="notifBadge" style="display:none;position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;border-radius:50%;background:#FF6B35;color:#fff;font-size:9px;font-weight:700;align-items:center;justify-content:center;border:2px solid #132240;padding:0 2px"></span>
+      </button>
+      <div id="notifDropdown" style="display:none;position:absolute;right:0;top:46px;width:310px;background:#132240;border:1px solid rgba(255,255,255,0.09);border-radius:14px;overflow:hidden;z-index:100;box-shadow:0 8px 32px rgba(0,0,0,0.4)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.09)">
+          <span style="font-weight:700;font-size:13px;color:#F5F7F2">🔔 Notificações</span>
+          <span onclick="marcarTodasLidas()" style="font-size:11px;color:#8A9BB5;cursor:pointer;text-decoration:underline">Marcar lidas</span>
+        </div>
+        <div id="notifLista" style="max-height:340px;overflow-y:auto"></div>
+      </div>
     </div>
-    <div id="notifLista" style="max-height:340px;overflow-y:auto"></div>
-  </div>
-</div>
     <button class="btn-sair" onclick="sair()">Sair</button>
   </div>
 </nav>
@@ -253,10 +252,11 @@
 </div>
 
 <script>
-const uid = localStorage.getItem('sj_uid');
-const nome = localStorage.getItem('sj_nome') || 'Profissional';
-document.getElementById('nomeNav').textContent = nome;
-document.getElementById('nomeCard').textContent = nome;
+// =====================================================================
+// VARIÁVEIS GLOBAIS — uid é let para poder ser atualizado pelo init()
+// =====================================================================
+let uid = localStorage.getItem('sj_uid');
+const nomeLocal = localStorage.getItem('sj_nome') || 'Profissional';
 
 let categoriasAprovadas = [];
 let todosPedidos = [];
@@ -264,7 +264,65 @@ let filtroAtual = 'todos';
 let pedidoAtual = null;
 let taxasCalc = {};
 let bloqueado = false;
+let modoAtual = 'pedidos';
 
+// =====================================================================
+// INIT — sempre busca do Firestore, não depende só do localStorage
+// =====================================================================
+async function init(user) {
+  // SEMPRE busca do Firestore para garantir dados frescos
+  try {
+    for (const id of [user.uid + '_prof', user.uid]) {
+      const snap = await firebase.firestore().collection('usuarios').doc(id).get();
+      if (snap.exists() && (snap.data().categoriasAprovadas || []).length > 0) {
+        categoriasAprovadas = snap.data().categoriasAprovadas;
+        uid = id; // atualiza uid para o ID correto do documento
+        localStorage.setItem('sj_categoriasAprovadas', JSON.stringify(categoriasAprovadas));
+        localStorage.setItem('sj_uid', id);
+        localStorage.setItem('sj_nome', snap.data().nome || nomeLocal);
+        break;
+      }
+    }
+  } catch(e) {
+    console.warn('Firestore fetch falhou, usando localStorage:', e);
+    categoriasAprovadas = JSON.parse(localStorage.getItem('sj_categoriasAprovadas') || '[]');
+  }
+
+  const nome = localStorage.getItem('sj_nome') || nomeLocal;
+  document.getElementById('nomeNav').textContent = nome;
+  document.getElementById('nomeCard').textContent = nome;
+
+  const todasCats = JSON.parse(localStorage.getItem('sj_categorias') || '[]');
+
+  // Categorias na sidebar
+  const lista = document.getElementById('catsLista');
+  if (categoriasAprovadas.length > 0) {
+    lista.innerHTML = categoriasAprovadas.map(c =>
+      `<div class="cat-row"><span>${c}</span><span class="cat-ok">✓ Aprovado</span></div>`
+    ).join('') + todasCats.filter(c => !categoriasAprovadas.includes(c)).map(c =>
+      `<div class="cat-row"><span style="color:var(--cinza)">${c}</span><span class="cat-pend">Pendente</span></div>`
+    ).join('');
+  } else {
+    lista.innerHTML = '<div style="color:var(--cinza);font-size:0.78rem">Nenhuma aprovação ainda.<br>Faça o teste de IA!</div>';
+  }
+
+  // Filtros por categoria aprovada
+  const pills = document.getElementById('filtroPills');
+  categoriasAprovadas.forEach(cat => {
+    const p = document.createElement('div');
+    p.className = 'fpill';
+    p.setAttribute('data-cat', cat);
+    p.textContent = cat;
+    p.onclick = function(){ selFiltro(this); };
+    pills.appendChild(p);
+  });
+
+  await carregarPedidos();
+}
+
+// =====================================================================
+// UTILITÁRIOS
+// =====================================================================
 function calcularTaxa(p) {
   let pts = 0;
   if ((p.urgencia||'').includes('Urgente')) pts += 30;
@@ -284,90 +342,49 @@ function formatData(iso) {
   return new Date(iso).toLocaleDateString('pt-BR');
 }
 
-function calcVencimento() {
-  const d = new Date();
-  d.setDate(d.getDate() + 10);
-  return d.toLocaleDateString('pt-BR');
-}
-
-async function init() {
-  const nome = localStorage.getItem('sj_nome') || 'Profissional';
-  categoriasAprovadas = JSON.parse(localStorage.getItem('sj_categoriasAprovadas') || '[]');
-  const todasCats = JSON.parse(localStorage.getItem('sj_categorias') || '[]');
-
-  // Se não tem categorias no localStorage, buscar do Firestore
-  if (categoriasAprovadas.length === 0) {
-    try {
-      const user = firebase.auth().currentUser;
-      if (user) {
-        for (const id of [user.uid+'_prof', user.uid]) {
-          const snap = await firebase.firestore().collection('usuarios').doc(id).get();
-          if (snap.exists() && (snap.data().categoriasAprovadas||[]).length > 0) {
-            categoriasAprovadas = snap.data().categoriasAprovadas;
-            localStorage.setItem('sj_categoriasAprovadas', JSON.stringify(categoriasAprovadas));
-            localStorage.setItem('sj_uid', id);
-            break;
-          }
-        }
-      }
-    } catch(e) {}
-  }
-
-  document.getElementById('nomeNav').textContent = nome;
-  document.getElementById('nomeCard').textContent = nome;
-
-  // Categorias na sidebar
-  const lista = document.getElementById('catsLista');
-  if (categoriasAprovadas.length > 0) {
-    lista.innerHTML = categoriasAprovadas.map(c =>
-      `<div class="cat-row"><span>${c}</span><span class="cat-ok">✓ Aprovado</span></div>`
-    ).join('') + todasCats.filter(c => !categoriasAprovadas.includes(c)).map(c =>
-      `<div class="cat-row"><span style="color:var(--cinza)">${c}</span><span class="cat-pend">Pendente</span></div>`
-    ).join('');
-  } else {
-    lista.innerHTML = '<div style="color:var(--cinza);font-size:0.78rem">Nenhuma aprovação ainda.<br>Faça o teste de IA!</div>';
-  }
-
-  // Filtros por categoria
-  const pills = document.getElementById('filtroPills');
-  categoriasAprovadas.forEach(cat => {
-    const p = document.createElement('div');
-    p.className = 'fpill'; p.setAttribute('data-cat', cat);
-    p.textContent = cat; p.onclick = function(){ selFiltro(this); };
-    pills.appendChild(p);
-  });
-
-  await carregarPedidos();
-}
-
+// =====================================================================
+// CARREGAR PEDIDOS DO FIRESTORE
+// =====================================================================
 async function carregarPedidos() {
   if (categoriasAprovadas.length === 0) {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('estadoVazio').classList.add('vis');
     return;
   }
+
   try {
     const snap = await firebase.firestore().collection('pedidos').get();
-    todosPedidos = snap.docs.map(d => ({id:d.id,...d.data()}))
+
+    todosPedidos = snap.docs.map(d => ({id: d.id, ...d.data()}))
       .filter(p => {
+        // Só pedidos abertos
         if (p.status && p.status !== 'aberto') return false;
+
+        // Compara categoria com e sem emoji para máxima compatibilidade
         const cats = Array.isArray(p.categorias) ? p.categorias : [p.categorias];
-        const semEmoji = (s) => s.replace(/\p{Emoji}/gu, '').trim().toLowerCase();
-        return cats.some(c => categoriasAprovadas.some(a => 
-          a === c || semEmoji(a) === semEmoji(c)
-        ));
+        const semEmoji = (s) => (s || '').replace(/\p{Emoji}/gu, '').trim().toLowerCase();
+
+        return cats.some(c =>
+          categoriasAprovadas.some(a =>
+            a === c ||
+            semEmoji(a) === semEmoji(c) ||
+            a.trim() === (c || '').trim()
+          )
+        );
       })
-      .sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
+      .sort((a, b) => (b.criadoEm || '').localeCompare(a.criadoEm || ''));
+
     document.getElementById('statDisp').textContent = todosPedidos.length;
     document.getElementById('loading').style.display = 'none';
     renderPedidos();
   } catch(e) {
-    document.getElementById('loading').innerHTML = '<p style="color:var(--erro)">Erro ao carregar pedidos.</p>';
+    document.getElementById('loading').innerHTML = '<p style="color:var(--erro)">Erro ao carregar pedidos: ' + e.message + '</p>';
   }
 }
 
-let modoAtual = 'pedidos'; // pedidos | propostas | aceitos
-
+// =====================================================================
+// NAVEGAÇÃO E FILTROS
+// =====================================================================
 function selNav(modo, el) {
   document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('ativo'));
   el.classList.add('ativo');
@@ -386,13 +403,19 @@ function selFiltro(el) {
   renderPedidos();
 }
 
+// =====================================================================
+// RENDER PEDIDOS
+// =====================================================================
 function renderPedidos() {
   const lista = document.getElementById('listaPedidos');
-
   let filtrado = [];
+
   if (modoAtual === 'pedidos') {
     filtrado = filtroAtual === 'todos' ? todosPedidos :
-      todosPedidos.filter(p => { const c = Array.isArray(p.categorias)?p.categorias:[p.categorias]; return c.includes(filtroAtual); });
+      todosPedidos.filter(p => {
+        const c = Array.isArray(p.categorias) ? p.categorias : [p.categorias];
+        return c.includes(filtroAtual);
+      });
   } else if (modoAtual === 'propostas') {
     filtrado = todosPedidos.filter(p => {
       const ints = p.interessados || [];
@@ -401,25 +424,36 @@ function renderPedidos() {
   } else if (modoAtual === 'aceitos') {
     filtrado = todosPedidos.filter(p => p.profissionalAceito === uid);
   }
-  if (filtrado.length === 0) { lista.innerHTML = ''; document.getElementById('estadoVazio').classList.add('vis'); return; }
+
+  if (filtrado.length === 0) {
+    lista.innerHTML = '';
+    document.getElementById('estadoVazio').classList.add('vis');
+    return;
+  }
+
   document.getElementById('estadoVazio').classList.remove('vis');
+
   lista.innerHTML = filtrado.map(p => {
-    const cats = Array.isArray(p.categorias) ? p.categorias : [p.categorias||'—'];
+    const cats = Array.isArray(p.categorias) ? p.categorias : [p.categorias || '—'];
     const taxa = calcularTaxa(p);
     taxasCalc[p.id] = taxa;
-    const orc = p.orcamento === 'aproximado' && p.valor ? 'R$ '+parseFloat(p.valor).toLocaleString('pt-BR') : 'Em aberto';
-    let urgClass='urg-pressa', urgLabel=p.urgencia||'🗓️ Sem pressa';
-    if ((p.urgencia||'').includes('Urgente')) urgClass='urg-urgente';
-    else if ((p.urgencia||'').includes('semana')) urgClass='urg-semana';
+    const orc = p.orcamento === 'aproximado' && p.valor
+      ? 'R$ ' + parseFloat(p.valor).toLocaleString('pt-BR')
+      : 'Em aberto';
+
+    let urgClass = 'urg-pressa', urgLabel = p.urgencia || '🗓️ Sem pressa';
+    if ((p.urgencia || '').includes('Urgente')) urgClass = 'urg-urgente';
+    else if ((p.urgencia || '').includes('semana')) urgClass = 'urg-semana';
+
     return `<div class="pedido-card">
-      <div class="p-cats">${cats.map(c=>`<span class="pcat">${c}</span>`).join('')}</div>
-      <div class="p-title">${p.titulo||'Sem título'}</div>
-      <div class="p-desc">${p.descricao||'Sem descrição.'}</div>
+      <div class="p-cats">${cats.map(c => `<span class="pcat">${c}</span>`).join('')}</div>
+      <div class="p-title">${p.titulo || 'Sem título'}</div>
+      <div class="p-desc">${p.descricao || 'Sem descrição.'}</div>
       <div class="p-footer">
         <div class="p-meta">
           <span class="pm">📅 <strong>${formatData(p.criadoEm)}</strong></span>
           <span class="pm">💰 <strong>${orc}</strong></span>
-          <span class="pm">📍 <strong>${(p.endereco||'').split(',').slice(-1)[0]||'—'}</strong></span>
+          <span class="pm">📍 <strong>${(p.endereco || '').split(',').slice(-1)[0] || '—'}</strong></span>
           <span class="urg ${urgClass}">${urgLabel}</span>
         </div>
         <div class="p-actions">
@@ -431,6 +465,9 @@ function renderPedidos() {
   }).join('');
 }
 
+// =====================================================================
+// PROPOSTA
+// =====================================================================
 function abrirProposta(id) {
   pedidoAtual = todosPedidos.find(p => p.id === id);
   if (!pedidoAtual) return;
@@ -441,38 +478,54 @@ function abrirProposta(id) {
   document.getElementById('overlayProposta').classList.add('vis');
 }
 
-function fecharModal() { document.getElementById('overlayProposta').classList.remove('vis'); pedidoAtual = null; }
+function fecharModal() {
+  document.getElementById('overlayProposta').classList.remove('vis');
+  pedidoAtual = null;
+}
 
 async function enviarProposta() {
   const valor = document.getElementById('propValor').value.trim();
   const msg = document.getElementById('propMsg').value.trim();
   if (!msg) { alert('Escreva uma mensagem para o cliente!'); return; }
   if (!pedidoAtual) return;
+
   const taxa = taxasCalc[pedidoAtual.id] || 10;
+  const nome = localStorage.getItem('sj_nome') || 'Profissional';
+
   try {
     await firebase.firestore().collection('pedidos').doc(pedidoAtual.id).update({
       interessados: firebase.firestore.FieldValue.arrayUnion({
-        profissionalId: uid, profissionalNome: nome,
-        valor: valor ? parseFloat(valor) : null, mensagem: msg, taxa: taxa,
+        profissionalId: uid,
+        profissionalNome: nome,
+        valor: valor ? parseFloat(valor) : null,
+        mensagem: msg,
+        taxa: taxa,
         enviadoEm: new Date().toISOString()
-      }),
-      status: 'andamento'
+      })
+      // REMOVIDO: status: 'andamento' — não muda o status do pedido ao enviar proposta
+      // para não bloquear outros profissionais de ver o pedido
     });
-    // Acumular taxa pendente no perfil
-    await firebase.firestore().collection('usuarios').doc(uid).update({
-      taxaAcumulada: firebase.firestore.FieldValue.increment(0), // só acumula quando cliente aceitar
-    });
+
     fecharModal();
-    const env = parseInt(document.getElementById('statEnv').textContent)||0;
+    const env = parseInt(document.getElementById('statEnv').textContent) || 0;
     document.getElementById('statEnv').textContent = env + 1;
-    // Notificar cliente
-    criarNotificacao(pedidoAtual.clienteId, 'proposta',
-      nome+' se interessou pelo seu pedido "'+pedidoAtual.titulo+'"',
-      'meus-pedidos-cliente.html');
+
+    criarNotificacao(
+      pedidoAtual.clienteId,
+      'proposta',
+      nome + ' se interessou pelo seu pedido "' + pedidoAtual.titulo + '"',
+      'meus-pedidos-cliente.html'
+    );
+
     alert('✅ Proposta enviada! O cliente foi notificado.');
-  } catch(e) { alert('Erro ao enviar proposta.'); }
+  } catch(e) {
+    alert('Erro ao enviar proposta: ' + e.message);
+  }
 }
 
+// =====================================================================
+// OUTROS
+// =====================================================================
 function abrirPagamento() {
   alert('Em breve: integração com Pix/cartão para pagamento das taxas. Entre em contato via WhatsApp para regularizar: (11) 99999-9999');
 }
@@ -483,71 +536,105 @@ async function sair() {
   window.location.href = 'login.html';
 }
 
-// Aguardar autenticação do Firebase antes de carregar
+// =====================================================================
+// AUTH STATE — passa user para init()
+// =====================================================================
 firebase.auth().onAuthStateChanged(function(user) {
   if (!user) {
     window.location.href = 'login.html';
     return;
   }
-  init();
-  const uid = localStorage.getItem('sj_uid') || user.uid;
-  setTimeout(function(){ carregarNotificacoes(uid); }, 1000);
+  init(user); // FIX: passa user diretamente, evita race condition com currentUser
+  setTimeout(function(){
+    const uidAtual = localStorage.getItem('sj_uid') || user.uid;
+    carregarNotificacoes(uidAtual);
+  }, 1500);
 });
 
-  let notifAberto=false, notifIds=[], notifUid=null;
+// =====================================================================
+// NOTIFICAÇÕES
+// =====================================================================
+let notifAberto = false, notifIds = [], notifUid = null;
 
-  function toggleNotif(){
-    notifAberto=!notifAberto;
-    document.getElementById('notifDropdown').style.display=notifAberto?'block':'none';
-    if(notifAberto) marcarTodasLidas();
+function toggleNotif() {
+  notifAberto = !notifAberto;
+  document.getElementById('notifDropdown').style.display = notifAberto ? 'block' : 'none';
+  if (notifAberto) marcarTodasLidas();
+}
+
+document.addEventListener('click', function(e) {
+  const w = document.getElementById('notifWrap');
+  if (w && !w.contains(e.target)) {
+    notifAberto = false;
+    document.getElementById('notifDropdown').style.display = 'none';
   }
-  document.addEventListener('click',function(e){
-    const w=document.getElementById('notifWrap');
-    if(w&&!w.contains(e.target)){notifAberto=false;document.getElementById('notifDropdown').style.display='none';}
-  });
-  function tempoRelativo(d){
-    const diff=Date.now()-new Date(d).getTime(),min=Math.floor(diff/60000);
-    if(min<1)return'agora';if(min<60)return min+'min atrás';
-    const h=Math.floor(min/60);if(h<24)return h+'h atrás';
-    return Math.floor(h/24)+'d atrás';
-  }
-  async function carregarNotificacoes(uid){
-    notifUid=uid;
-    try{
-      const snap=await firebase.firestore().collection('notificacoes')
-        .where('para','==',uid).limit(20).get();
-      const notifs=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.criadoEm||'').localeCompare(a.criadoEm||''));
-      notifIds=snap.docs.map(d=>d.id);
-      const novas=notifs.filter(n=>!n.lida).length;
-      const badge=document.getElementById('notifBadge');
-      if(novas>0){badge.style.display='flex';badge.textContent=novas>9?'9+':novas;}
-      else badge.style.display='none';
-      const lista=document.getElementById('notifLista');
-      if(!notifs.length){lista.innerHTML='<div style="padding:24px;text-align:center;color:#8A9BB5;font-size:12px">Sem notificações</div>';return;}
-      const icones={proposta:'💬',aceite:'✅',avaliacao:'⭐',sistema:'📢'};
-      const cores={proposta:'rgba(0,201,111,0.15)',aceite:'rgba(255,184,48,0.15)',avaliacao:'rgba(255,107,53,0.15)',sistema:'rgba(138,155,181,0.1)'};
-      lista.innerHTML=notifs.map(n=>`<div class="notif-item ${n.lida?'lida':'nova'}" onclick="abrirNotif('${n.link||''}')">
-        <div class="ni-icon" style="background:${cores[n.tipo]||cores.sistema}">${icones[n.tipo]||'📢'}</div>
+});
+
+function tempoRelativo(d) {
+  const diff = Date.now() - new Date(d).getTime(), min = Math.floor(diff / 60000);
+  if (min < 1) return 'agora';
+  if (min < 60) return min + 'min atrás';
+  const h = Math.floor(min / 60);
+  if (h < 24) return h + 'h atrás';
+  return Math.floor(h / 24) + 'd atrás';
+}
+
+async function carregarNotificacoes(uid) {
+  notifUid = uid;
+  try {
+    const snap = await firebase.firestore().collection('notificacoes')
+      .where('para', '==', uid).limit(20).get();
+    const notifs = snap.docs.map(d => ({id: d.id, ...d.data()}))
+      .sort((a, b) => (b.criadoEm || '').localeCompare(a.criadoEm || ''));
+    notifIds = snap.docs.map(d => d.id);
+
+    const novas = notifs.filter(n => !n.lida).length;
+    const badge = document.getElementById('notifBadge');
+    if (novas > 0) { badge.style.display = 'flex'; badge.textContent = novas > 9 ? '9+' : novas; }
+    else badge.style.display = 'none';
+
+    const lista = document.getElementById('notifLista');
+    if (!notifs.length) {
+      lista.innerHTML = '<div style="padding:24px;text-align:center;color:#8A9BB5;font-size:12px">Sem notificações</div>';
+      return;
+    }
+
+    const icones = {proposta:'💬', aceite:'✅', avaliacao:'⭐', sistema:'📢'};
+    const cores = {proposta:'rgba(0,201,111,0.15)', aceite:'rgba(255,184,48,0.15)', avaliacao:'rgba(255,107,53,0.15)', sistema:'rgba(138,155,181,0.1)'};
+
+    lista.innerHTML = notifs.map(n =>
+      `<div class="notif-item ${n.lida ? 'lida' : 'nova'}" onclick="abrirNotif('${n.link || ''}')">
+        <div class="ni-icon" style="background:${cores[n.tipo] || cores.sistema}">${icones[n.tipo] || '📢'}</div>
         <div style="flex:1"><div class="ni-txt">${n.mensagem}</div><div class="ni-tempo">${tempoRelativo(n.criadoEm)}</div></div>
-        ${!n.lida?'<div class="ni-dot"></div>':''}
-      </div>`).join('');
-    }catch(e){console.log('notif:',e);}
+        ${!n.lida ? '<div class="ni-dot"></div>' : ''}
+      </div>`
+    ).join('');
+  } catch(e) {
+    console.log('notif:', e);
   }
-  async function marcarTodasLidas(){
-    if(!notifIds.length)return;
-    document.getElementById('notifBadge').style.display='none';
-    try{
-      const batch=firebase.firestore().batch();
-      notifIds.forEach(id=>batch.update(firebase.firestore().collection('notificacoes').doc(id),{lida:true}));
-      await batch.commit();
-    }catch(e){}
-  }
-  function abrirNotif(link){if(link)window.location.href=link;toggleNotif();}
-  async function criarNotificacao(para,tipo,mensagem,link){
-    try{await firebase.firestore().collection('notificacoes').add({para,tipo,mensagem,link:link||'',lida:false,criadoEm:new Date().toISOString()});}
-    catch(e){}
-  }
+}
+
+async function marcarTodasLidas() {
+  if (!notifIds.length) return;
+  document.getElementById('notifBadge').style.display = 'none';
+  try {
+    const batch = firebase.firestore().batch();
+    notifIds.forEach(id => batch.update(firebase.firestore().collection('notificacoes').doc(id), {lida: true}));
+    await batch.commit();
+  } catch(e) {}
+}
+
+function abrirNotif(link) { if (link) window.location.href = link; toggleNotif(); }
+
+async function criarNotificacao(para, tipo, mensagem, link) {
+  try {
+    await firebase.firestore().collection('notificacoes').add({
+      para, tipo, mensagem, link: link || '', lida: false, criadoEm: new Date().toISOString()
+    });
+  } catch(e) {}
+}
 </script>
-<script>if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(e=>{});}</script>
+
+<script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(e=>{}); }</script>
 </body>
 </html>
