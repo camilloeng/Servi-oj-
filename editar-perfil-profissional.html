@@ -105,26 +105,34 @@ if(!window._fbInitialized){firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZo
 
     <!-- ÁREA DE ATUAÇÃO — apenas SP (item 4) -->
     <div class="card">
-      <div class="sec">📍 Área de atuação — São Paulo</div>
+      <div class="sec">📍 Área de atuação — Região Metropolitana de Campinas</div>
       <div class="field"><label>CEP da sua localização</label><div class="iw"><span class="ii">📍</span><input type="text" id="cep" placeholder="00000-000" oninput="buscarCep(this.value)" maxlength="9"></div></div>
       <div class="row2">
-        <div class="field"><label>Cidade (SP)</label>
+        <div class="field"><label>Cidade — Região Metropolitana de Campinas</label>
           <select id="cidade" class="ni">
             <option value="">Selecione a cidade</option>
-            <option>São Paulo</option><option>Guarulhos</option><option>Campinas</option>
-            <option>São Bernardo do Campo</option><option>Santo André</option><option>São José dos Campos</option>
-            <option>Ribeirão Preto</option><option>Osasco</option><option>Sorocaba</option>
-            <option>Mauá</option><option>São José do Rio Preto</option><option>Mogi das Cruzes</option>
-            <option>Santos</option><option>Diadema</option><option>Jundiaí</option>
-            <option>Piracicaba</option><option>Carapicuíba</option><option>Bauru</option>
-            <option>Itaquaquecetuba</option><option>São Vicente</option><option>Franca</option>
-            <option>Guarujá</option><option>Taubaté</option><option>Praia Grande</option>
-            <option>Limeira</option><option>Suzano</option><option>Taboão da Serra</option>
-            <option>Sumaré</option><option>Barueri</option><option>Embu das Artes</option>
-            <option>São Carlos</option><option>Indaiatuba</option><option>Cotia</option>
-            <option>Americana</option><option>Araraquara</option><option>Jacareí</option>
-            <option>Hortolândia</option><option>Itu</option><option>Presidente Prudente</option>
-            <option>Rio Claro</option><option>Outras cidades SP</option>
+            <optgroup label="🏙️ Região Metropolitana de Campinas">
+              <option>Campinas</option>
+              <option>Americana</option>
+              <option>Artur Nogueira</option>
+              <option>Cosmópolis</option>
+              <option>Engenheiro Coelho</option>
+              <option>Holambra</option>
+              <option>Hortolândia</option>
+              <option>Indaiatuba</option>
+              <option>Itatiba</option>
+              <option>Jaguariúna</option>
+              <option>Jundiaí</option>
+              <option>Monte Mor</option>
+              <option>Nova Odessa</option>
+              <option>Paulínia</option>
+              <option>Pedreira</option>
+              <option>Santa Bárbara d'Oeste</option>
+              <option>Santo Antônio de Posse</option>
+              <option>Sumaré</option>
+              <option>Valinhos</option>
+              <option>Vinhedo</option>
+            </optgroup>
           </select>
         </div>
         <div class="field"><label>Estado</label>
@@ -148,7 +156,7 @@ if(!window._fbInitialized){firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZo
           <div class="raio-btn" onclick="selRaio(this,'50')">50 km</div>
           <div class="raio-btn" onclick="selRaio(this,'100')">100 km</div>
         </div>
-        <p style="font-size:0.72rem;color:var(--cinza);margin-top:8px">🗺️ Atendimento restrito ao estado de São Paulo por enquanto.</p>
+        <p style="font-size:0.72rem;color:var(--cinza);margin-top:8px">🗺️ Atendimento na Região Metropolitana de Campinas (RMC) — 20 cidades.</p>
       </div>
     </div>
 
