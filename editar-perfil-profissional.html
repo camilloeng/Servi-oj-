@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiçoJá Conecta — Editar Perfil Profissional</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{--verde:#00C96F;--azul:#0A1628;--azul-medio:#132240;--azul-input:#0F1C35;--branco:#F5F7F2;--cinza:#8A9BB5;--borda:rgba(255,255,255,0.09)}
+  body{font-family:'DM Sans',sans-serif;background:var(--azul);color:var(--branco);min-height:100vh}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--borda)}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--branco);text-decoration:none}.logo span{color:var(--verde)}
+  .btn-v{background:none;border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.78rem;padding:6px 14px;cursor:pointer}
+  .page{max-width:600px;margin:0 auto;padding:32px 24px 60px}
+  h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;margin-bottom:4px}
+  .sub{color:var(--cinza);font-size:0.85rem;margin-bottom:28px}
+  .card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:24px;margin-bottom:16px}
+  .sec{font-size:0.72rem;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
+  .field{margin-bottom:14px}
+  label{display:block;font-size:0.78rem;font-weight:600;color:var(--cinza);margin-bottom:5px}
+  .iw{position:relative;display:flex;align-items:center}
+  .ii{position:absolute;left:13px;color:var(--cinza);font-size:0.9rem}
+  input,select,textarea{width:100%;background:var(--azul-input);border:1.5px solid var(--borda);border-radius:11px;color:var(--branco);font-family:'DM Sans',sans-serif;font-size:0.88rem;padding:12px 12px 12px 38px;outline:none;transition:border-color 0.2s}
+  input:focus,select:focus,textarea:focus{border-color:rgba(0,201,111,0.45)}
+  input::placeholder,textarea::placeholder{color:rgba(138,155,181,0.4)}
+  .ni{padding-left:14px!important}
+  textarea{resize:vertical;min-height:90px;line-height:1.6}
+  select{cursor:pointer;-webkit-appearance:none;padding-right:32px}
+  select option{background:var(--azul-medio)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .foto-wrap{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .foto-c{width:72px;height:72px;border-radius:50%;background:var(--azul-input);border:2px dashed rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:1.8rem;cursor:pointer;overflow:hidden;flex-shrink:0}
+  .foto-c img{width:100%;height:100%;object-fit:cover}
+  .btn-foto{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde);border-radius:8px;padding:6px 14px;font-size:0.78rem;font-weight:600;cursor:pointer}
+  .raio-opts{display:flex;gap:8px;flex-wrap:wrap}
+  .raio-btn{padding:8px 14px;border-radius:9px;border:1.5px solid var(--borda);background:var(--azul-input);color:var(--cinza);font-size:0.8rem;cursor:pointer;transition:all 0.2s}
+  .raio-btn.sel{background:rgba(0,201,111,0.12);border-color:rgba(0,201,111,0.45);color:var(--verde);font-weight:600}
+  .btn-salvar{width:100%;background:var(--verde);border:none;border-radius:13px;padding:15px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;transition:all 0.2s;margin-top:8px}
+  .btn-salvar:disabled{opacity:0.6;cursor:not-allowed}
+  .msg{text-align:center;padding:10px;border-radius:10px;font-size:0.82rem;margin-top:10px;display:none}
+  .msg.ok{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde);display:block}
+  .msg.err{background:rgba(255,92,92,0.08);border:1px solid rgba(255,92,92,0.2);color:#FF5C5C;display:block}
+  .spinner{width:36px;height:36px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;margin:40px auto}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+  if(!window._fbInitialized){firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",authDomain:"servicoja-e1f49.firebaseapp.com",projectId:"servicoja-e1f49",storageBucket:"servicoja-e1f49.firebasestorage.app",messagingSenderId:"874413426529",appId:"1:874413426529:web:9891d44afd9ef1750e6720"});window._fbInitialized=true;}
+</script>
+</head>
+<body>
+<nav>
+  <a href="login.html" class="logo">Serviço<span>Já</span> Conecta</a>
+  <button class="btn-v" onclick="history.back()">← Voltar</button>
+</nav>
+<div class="page">
+  <h1>✏️ Editar perfil profissional</h1>
+  <p class="sub">Atualize seus dados, área de atuação e informações</p>
+  <div id="loading"><div class="spinner"></div></div>
+  <div id="formContent" style="display:none">
+    <div class="card">
+      <div class="sec">Foto de perfil</div>
+      <div class="foto-wrap">
+        <div class="foto-c" id="fotoCircle" onclick="document.getElementById('fotoInput').click()">👷</div>
+        <div>
+          <p style="font-size:0.85rem;font-weight:600;margin-bottom:4px;color:var(--branco)">Foto de perfil <span style="color:var(--cinza);font-weight:400">(opcional)</span></p>
+          <button class="btn-foto" type="button" onclick="document.getElementById('fotoInput').click()">Trocar foto</button>
+        </div>
+      </div>
+      <input type="file" id="fotoInput" accept="image/*" style="display:none" onchange="previewFoto(this)">
+    </div>
+    <div class="card">
+      <div class="sec">Dados pessoais</div>
+      <div class="field"><label>Nome completo</label><div class="iw"><span class="ii">👤</span><input type="text" id="nome" placeholder="Seu nome completo"></div></div>
+      <div class="field"><label>WhatsApp</label><div class="iw"><span class="ii">📱</span><input type="tel" id="telefone" placeholder="(11) 99999-9999"></div></div>
+      <div class="field"><label>Sobre você</label><textarea id="sobre" class="ni" placeholder="Descreva sua experiência, especialidades e diferenciais..."></textarea></div>
+    </div>
+    <div class="card">
+      <div class="sec">📍 Área de atuação</div>
+      <div class="field"><label>CEP da sua localização</label><div class="iw"><span class="ii">📍</span><input type="text" id="cep" placeholder="00000-000" oninput="buscarCep(this.value)" maxlength="9"></div></div>
+      <div class="row2">
+        <div class="field"><label>Cidade</label><input type="text" id="cidade" placeholder="Cidade" class="ni"></div>
+        <div class="field"><label>Estado</label>
+          <select id="estado" class="ni">
+            <option value="">UF</option>
+            <option>AC</option><option>AL</option><option>AM</option><option>AP</option><option>BA</option>
+            <option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option>
+            <option>MG</option><option>MS</option><option>MT</option><option>PA</option><option>PB</option>
+            <option>PE</option><option>PI</option><option>PR</option><option>RJ</option><option>RN</option>
+            <option>RO</option><option>RR</option><option>RS</option><option>SC</option><option>SE</option>
+            <option>SP</option><option>TO</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Rua</label><input type="text" id="rua" placeholder="Rua" class="ni"></div>
+        <div class="field"><label>Número</label><input type="text" id="numero" placeholder="Nº" class="ni"></div>
+      </div>
+      <div class="field"><label>Bairro</label><input type="text" id="bairro" placeholder="Bairro" class="ni"></div>
+      <div class="field">
+        <label>Raio de atendimento</label>
+        <div class="raio-opts" id="raioOpts">
+          <div class="raio-btn" onclick="selRaio(this,'5')">5 km</div>
+          <div class="raio-btn" onclick="selRaio(this,'10')">10 km</div>
+          <div class="raio-btn" onclick="selRaio(this,'20')">20 km</div>
+          <div class="raio-btn" onclick="selRaio(this,'30')">30 km</div>
+          <div class="raio-btn" onclick="selRaio(this,'50')">50 km</div>
+          <div class="raio-btn" onclick="selRaio(this,'100')">100 km</div>
+          <div class="raio-btn" onclick="selRaio(this,'0')">Todo o Brasil</div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-salvar" id="btnSalvar" onclick="salvar()">💾 Salvar alterações</button>
+    <div class="msg" id="msg"></div>
+  </div>
+</div>
+<script>
+const IMGBB_KEY = '327d0067238019843e43362c2f7096c7';
+let profDocId = null, novaFotoUrl = null, raioSel = '10';
+
+firebase.auth().onAuthStateChanged(async function(user){
+  if(!user){window.location.href='login.html';return;}
+  // Buscar documento profissional
+  try{
+    const q = await firebase.firestore().collection('usuarios')
+      .where('email','==',user.email).where('tipo','==','profissional').get();
+    if(!q.empty){profDocId=q.docs[0].id;carregarDados(q.docs[0].data());return;}
+  }catch(e){}
+  for(const id of [user.uid+'_prof',user.uid]){
+    try{
+      const s=await firebase.firestore().collection('usuarios').doc(id).get();
+      if(s.exists()&&s.data().tipo==='profissional'){profDocId=id;carregarDados(s.data());return;}
+    }catch(e){}
+  }
+  document.getElementById('loading').style.display='none';
+  document.getElementById('formContent').style.display='block';
+});
+
+function carregarDados(d){
+  const e=d.endereco||{};
+  document.getElementById('nome').value=d.nome||'';
+  document.getElementById('telefone').value=d.telefone||'';
+  document.getElementById('sobre').value=d.sobre||'';
+  document.getElementById('cep').value=e.cep||'';
+  document.getElementById('rua').value=e.rua||'';
+  document.getElementById('numero').value=e.numero||'';
+  document.getElementById('bairro').value=e.bairro||'';
+  document.getElementById('cidade').value=e.cidade||'';
+  document.getElementById('estado').value=e.estado||'';
+  if(d.raioAtendimento){
+    raioSel=d.raioAtendimento;
+    document.querySelectorAll('.raio-btn').forEach(b=>{
+      if(b.getAttribute('onclick').includes("'"+d.raioAtendimento+"'"))b.classList.add('sel');
+    });
+  }
+  if(d.fotoPerfil)document.getElementById('fotoCircle').innerHTML='<img src="'+d.fotoPerfil+'">';
+  document.getElementById('loading').style.display='none';
+  document.getElementById('formContent').style.display='block';
+}
+
+function selRaio(el,val){
+  document.querySelectorAll('.raio-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');raioSel=val;
+}
+
+function previewFoto(input){
+  if(!input.files[0])return;
+  const r=new FileReader();
+  r.onload=async function(e){
+    document.getElementById('fotoCircle').innerHTML='<img src="'+e.target.result+'">';
+    try{
+      const fd=new FormData();fd.append('image',e.target.result.split(',')[1]);
+      const res=await fetch('https://api.imgbb.com/1/upload?key='+IMGBB_KEY,{method:'POST',body:fd});
+      const data=await res.json();
+      if(data.success)novaFotoUrl=data.data.url;
+    }catch(e2){}
+  };
+  r.readAsDataURL(input.files[0]);
+}
+
+async function buscarCep(cep){
+  const c=cep.replace(/\D/g,'');
+  if(c.length!==8)return;
+  try{
+    const res=await fetch('https://viacep.com.br/ws/'+c+'/json/');
+    const d=await res.json();
+    if(!d.erro){
+      document.getElementById('rua').value=d.logradouro||'';
+      document.getElementById('bairro').value=d.bairro||'';
+      document.getElementById('cidade').value=d.localidade||'';
+      document.getElementById('estado').value=d.uf||'';
+    }
+  }catch(e){}
+}
+
+async function salvar(){
+  if(!profDocId){alert('Perfil não encontrado.');return;}
+  const btn=document.getElementById('btnSalvar');
+  btn.disabled=true;btn.textContent='Salvando...';
+  const dados={
+    nome:document.getElementById('nome').value.trim(),
+    telefone:document.getElementById('telefone').value.trim(),
+    sobre:document.getElementById('sobre').value.trim(),
+    raioAtendimento:raioSel,
+    endereco:{
+      cep:document.getElementById('cep').value.trim(),
+      rua:document.getElementById('rua').value.trim(),
+      numero:document.getElementById('numero').value.trim(),
+      bairro:document.getElementById('bairro').value.trim(),
+      cidade:document.getElementById('cidade').value.trim(),
+      estado:document.getElementById('estado').value
+    }
+  };
+  if(novaFotoUrl)dados.fotoPerfil=novaFotoUrl;
+  try{
+    await firebase.firestore().collection('usuarios').doc(profDocId).update(dados);
+    localStorage.setItem('sj_nome',dados.nome);
+    const msg=document.getElementById('msg');
+    msg.textContent='✅ Perfil atualizado com sucesso!';msg.className='msg ok';
+  }catch(e){
+    const msg=document.getElementById('msg');
+    msg.textContent='❌ Erro: '+e.message;msg.className='msg err';
+  }
+  btn.disabled=false;btn.textContent='💾 Salvar alterações';
+}
+</script>
+</body>
+</html>
