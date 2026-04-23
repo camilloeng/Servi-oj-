@@ -17,19 +17,17 @@ nav{position:relative;z-index:10;display:flex;align-items:center;justify-content
 .av{width:36px;height:36px;border-radius:50%;background:rgba(0,201,111,0.2);border:2px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
 .nav-name{font-size:0.85rem;font-weight:600;color:var(--branco)}
 .nav-sub{font-size:0.72rem;color:var(--cinza)}
+.btn-sair{background:none;border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.78rem;padding:6px 12px;cursor:pointer;transition:all 0.2s}
+.btn-sair:hover{border-color:rgba(255,92,92,0.4);color:var(--erro)}
 .notif-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background 0.2s}
 .notif-item:hover{background:rgba(255,255,255,0.03)}
-.notif-item:last-child{border-bottom:none}
 .notif-item.nova{border-left:3px solid #00C96F;background:rgba(0,201,111,0.03)}
 .notif-item.lida{opacity:0.55}
 .ni-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
 .ni-txt{font-size:11px;color:#F5F7F2;line-height:1.5;margin-bottom:2px}
 .ni-tempo{font-size:10px;color:#8A9BB5}
 .ni-dot{width:7px;height:7px;border-radius:50%;background:#00C96F;margin-top:4px;flex-shrink:0}
-.btn-sair{background:none;border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.78rem;padding:6px 12px;cursor:pointer;transition:all 0.2s}
-.btn-sair:hover{border-color:rgba(255,92,92,0.4);color:var(--erro)}
 .layout{display:grid;grid-template-columns:220px 1fr;gap:16px;max-width:1200px;margin:0 auto;padding:24px 24px 60px}
-/* SIDEBAR */
 .sidebar{display:flex;flex-direction:column;gap:10px}
 .prof-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:16px;text-align:center}
 .prof-av{width:56px;height:56px;border-radius:50%;background:rgba(0,201,111,0.15);border:2px solid rgba(0,201,111,0.3);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem}
@@ -48,7 +46,6 @@ nav{position:relative;z-index:10;display:flex;align-items:center;justify-content
 .nav-item.ativo{background:rgba(0,201,111,0.1);color:var(--verde);font-weight:600}
 .btn-teste{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.3);border-radius:10px;padding:10px;color:var(--verde);font-size:0.78rem;font-weight:700;cursor:pointer;width:100%;text-align:center;transition:all 0.2s}
 .btn-teste:hover{background:rgba(0,201,111,0.18)}
-/* TAXA BOX */
 .taxa-box{background:var(--azul-medio);border:1px solid rgba(255,107,53,0.4);border-radius:12px;padding:11px 13px}
 .taxa-box .bloco-title{margin-bottom:6px}
 .taxa-valor{font-weight:800;font-size:1.1rem;color:var(--laranja);margin-bottom:3px}
@@ -56,14 +53,12 @@ nav{position:relative;z-index:10;display:flex;align-items:center;justify-content
 .taxa-venc strong{color:var(--amarelo)}
 .btn-pagar{background:var(--laranja);border:none;border-radius:7px;padding:7px;color:var(--branco);font-size:0.72rem;font-weight:700;cursor:pointer;width:100%;margin-bottom:5px}
 .taxa-hist{font-size:0.68rem;color:var(--cinza);text-align:center;cursor:pointer;text-decoration:underline}
-/* BLOQUEADO */
 .bloqueado-box{background:rgba(255,92,92,0.07);border:2px solid rgba(255,92,92,0.4);border-radius:12px;padding:12px;text-align:center;display:none}
 .bloqueado-box.vis{display:block}
 .bloq-icon{font-size:1.4rem;margin-bottom:4px}
 .bloq-title{font-weight:800;font-size:0.82rem;color:var(--erro);margin-bottom:4px}
 .bloq-sub{font-size:0.7rem;color:var(--cinza);line-height:1.5;margin-bottom:8px}
 .btn-regularizar{background:var(--erro);border:none;border-radius:7px;padding:7px;color:var(--branco);font-size:0.72rem;font-weight:700;cursor:pointer;width:100%}
-/* MAIN */
 .main{display:flex;flex-direction:column;gap:14px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .stat{background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:14px 16px}
@@ -75,7 +70,6 @@ nav{position:relative;z-index:10;display:flex;align-items:center;justify-content
 .fpill{background:var(--azul-input);border:1.5px solid var(--borda);border-radius:100px;padding:5px 12px;font-size:0.75rem;color:var(--cinza);cursor:pointer;transition:all 0.2s;white-space:nowrap}
 .fpill:hover{border-color:rgba(0,201,111,0.3)}
 .fpill.ativo{background:rgba(0,201,111,0.12);border-color:rgba(0,201,111,0.45);color:var(--verde);font-weight:600}
-/* PEDIDO CARD */
 .pedido-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:16px 20px;transition:border-color 0.2s;animation:fadeUp 0.4s ease both}
 .pedido-card:hover{border-color:rgba(0,201,111,0.25)}
 .p-cats{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
@@ -86,22 +80,27 @@ nav{position:relative;z-index:10;display:flex;align-items:center;justify-content
 .p-meta{display:flex;flex-wrap:wrap;gap:10px}
 .pm{font-size:0.75rem;color:var(--cinza)}
 .pm strong{color:var(--branco)}
-.p-actions{display:flex;align-items:center;gap:8px}
+.p-actions{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
 .taxa-badge{background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.25);border-radius:7px;padding:4px 10px;font-size:0.72rem;color:var(--laranja);font-weight:700;white-space:nowrap}
-.btn-prop{background:transparent;border:1.5px solid var(--verde);border-radius:9px;padding:7px 16px;color:var(--verde);font-weight:700;font-size:0.8rem;cursor:pointer;transition:all 0.2s}
-.btn-prop:hover{background:var(--verde);color:var(--azul)}
-/* URGÊNCIA */
+.btn-interesso{background:transparent;border:1.5px solid var(--verde);border-radius:9px;padding:7px 16px;color:var(--verde);font-weight:700;font-size:0.8rem;cursor:pointer;transition:all 0.2s}
+.btn-interesso:hover:not(:disabled){background:var(--verde);color:var(--azul)}
+.btn-interesso:disabled{opacity:0.7;cursor:default}
+.btn-enviar-proposta{background:var(--verde);border:none;border-radius:9px;padding:8px 16px;color:var(--azul);font-weight:700;font-size:0.8rem;cursor:pointer;transition:all 0.2s;animation:pulse 2s infinite}
+.btn-enviar-proposta:hover{background:var(--verde-escuro);animation:none}
+.status-pill{display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;font-weight:700;padding:5px 11px;border-radius:100px}
+.status-aguardando{background:rgba(138,155,181,0.12);border:1px solid rgba(138,155,181,0.25);color:var(--cinza)}
+.status-solicitado{background:rgba(255,184,48,0.12);border:1px solid rgba(255,184,48,0.3);color:var(--amarelo);animation:pulse 2s infinite}
+.status-enviada{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde)}
 .urg{display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:700;padding:3px 8px;border-radius:100px}
 .urg-urgente{background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.3);color:var(--laranja)}
 .urg-semana{background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.25);color:var(--amarelo)}
 .urg-pressa{background:rgba(138,155,181,0.1);border:1px solid rgba(138,155,181,0.2);color:var(--cinza)}
-/* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(10,22,40,0.92);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s}
 .overlay.vis{opacity:1;pointer-events:all}
 .modal{background:var(--azul-medio);border:1px solid var(--borda);border-radius:22px;width:100%;max-width:430px;padding:28px;transform:translateY(20px);transition:transform 0.3s}
 .overlay.vis .modal{transform:translateY(0)}
 .modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--branco);margin-bottom:4px}
-.modal-sub{color:var(--cinza);font-size:0.8rem;margin-bottom:18px;line-height:1.5}
+.modal-sub{color:var(--cinza);font-size:0.8rem;margin-bottom:14px;line-height:1.5}
 .mfield{margin-bottom:12px}
 .mfield label{display:block;font-size:0.74rem;font-weight:600;color:var(--cinza);margin-bottom:4px}
 .mfield input,.mfield textarea{width:100%;background:var(--azul-input);border:1.5px solid var(--borda);border-radius:10px;color:var(--branco);font-family:'DM Sans',sans-serif;font-size:0.85rem;padding:10px 13px;outline:none;transition:border-color 0.2s}
@@ -114,7 +113,6 @@ nav{position:relative;z-index:10;display:flex;align-items:center;justify-content
 .btn-cancel{flex:1;background:transparent;border:1.5px solid var(--borda);border-radius:10px;padding:11px;color:var(--cinza);font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer}
 .btn-send{flex:2;background:var(--verde);border:none;border-radius:10px;padding:11px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer}
 .btn-send:hover{background:var(--verde-escuro)}
-/* LOADING/VAZIO */
 .loading-wrap{text-align:center;padding:60px 20px;color:var(--cinza)}
 .spinner{width:38px;height:38px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px}
 .vazio{text-align:center;padding:60px 20px;display:none}
@@ -123,6 +121,7 @@ nav{position:relative;z-index:10;display:flex;align-items:center;justify-content
 .vazio p{color:var(--cinza);font-size:0.85rem;line-height:1.6}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
 @media(max-width:768px){.layout{grid-template-columns:1fr}.sidebar{order:2}.stats{grid-template-columns:1fr 1fr}}
 </style>
 <meta name="theme-color" content="#00C96F">
@@ -167,7 +166,6 @@ if(!window._fbInitialized){
 </nav>
 
 <div class="layout">
-  <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="prof-card">
       <div class="prof-av" id="sideAv" style="overflow:hidden;padding:0">👷</div>
@@ -175,23 +173,18 @@ if(!window._fbInitialized){
       <div class="prof-sub" id="cidadeCard">Verificado ✓</div>
       <div class="rating">★★★★★ <span style="color:var(--cinza)">—</span></div>
     </div>
-
     <div class="bloco">
       <div class="bloco-title">Minhas profissões</div>
       <div id="catsLista"><div style="color:var(--cinza);font-size:0.78rem">Carregando...</div></div>
     </div>
-
     <div class="nav-menu">
       <div class="nav-item ativo" id="nav-pedidos" onclick="selNav('pedidos',this)">📋 Pedidos disponíveis</div>
-      <div class="nav-item" id="nav-propostas" onclick="selNav('propostas',this)">📨 Minhas propostas</div>
+      <div class="nav-item" id="nav-propostas" onclick="selNav('propostas',this)">📨 Meus interesses</div>
       <div class="nav-item" id="nav-aceitos" onclick="selNav('aceitos',this)">✅ Trabalhos aceitos</div>
-      <div class="nav-item" id="nav-perfil" onclick="window.location.href='perfil-profissional.html'">👤 Meu perfil</div>
+      <div class="nav-item" onclick="window.location.href='perfil-profissional.html'">👤 Meu perfil</div>
       <div class="nav-item" onclick="window.location.href='editar-perfil-profissional.html'">✏️ Editar perfil</div>
     </div>
-
     <div class="btn-teste" onclick="window.location.href='cadastro-profissional.html?teste=1'">+ Fazer mais testes de profissão</div>
-
-    <!-- TAXA PENDENTE -->
     <div class="taxa-box" id="taxaBox">
       <div class="bloco-title">💰 Taxas pendentes</div>
       <div class="taxa-valor" id="taxaValor">R$ 0,00</div>
@@ -199,8 +192,6 @@ if(!window._fbInitialized){
       <button class="btn-pagar" onclick="abrirPagamento()">Pagar agora</button>
       <div class="taxa-hist">Ver histórico de taxas</div>
     </div>
-
-    <!-- CONTA BLOQUEADA -->
     <div class="bloqueado-box" id="bloqueadoBox">
       <div class="bloq-icon">🔒</div>
       <div class="bloq-title">Conta bloqueada</div>
@@ -209,41 +200,41 @@ if(!window._fbInitialized){
     </div>
   </div>
 
-  <!-- MAIN -->
   <div class="main">
     <div class="stats">
       <div class="stat"><div class="stat-n" style="color:var(--verde)" id="statDisp">0</div><div class="stat-l">Pedidos disponíveis</div></div>
-      <div class="stat"><div class="stat-n" style="color:var(--amarelo)" id="statEnv">0</div><div class="stat-l">Propostas enviadas</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--amarelo)" id="statEnv">0</div><div class="stat-l">Interesses registrados</div></div>
       <div class="stat"><div class="stat-n" style="color:var(--cinza)" id="statAc">0</div><div class="stat-l">Trabalhos aceitos</div></div>
     </div>
-
     <div class="section-header">
       <div class="section-title" id="section-titulo">Pedidos disponíveis</div>
       <div class="filtros" id="filtroPills">
         <div class="fpill ativo" data-cat="todos" onclick="selFiltro(this)">🔍 Todos</div>
       </div>
     </div>
-
     <div class="loading-wrap" id="loading"><div class="spinner"></div><p>Carregando pedidos...</p></div>
     <div id="listaPedidos"></div>
-    <div class="vazio" id="estadoVazio"><div class="vazio-icon">📭</div><p>Nenhum pedido disponível para suas categorias no momento.</p></div>
+    <div class="vazio" id="estadoVazio"><div class="vazio-icon">📭</div><p id="vazioMsg">Nenhum pedido disponível para suas categorias no momento.</p></div>
   </div>
 </div>
 
-<!-- MODAL PROPOSTA -->
+<!-- MODAL — só abre quando o cliente solicitar a proposta -->
 <div class="overlay" id="overlayProposta">
   <div class="modal">
-    <div class="modal-title">💬 Enviar proposta</div>
-    <div class="modal-sub" id="modalTitulo"></div>
+    <div class="modal-title">🚀 Enviar proposta</div>
+    <div class="modal-sub">O cliente quer receber sua proposta para: <strong id="modalTitulo" style="color:var(--branco)"></strong></div>
+    <div style="background:rgba(0,201,111,0.07);border:1px solid rgba(0,201,111,0.2);border-radius:9px;padding:10px 13px;font-size:0.78rem;color:var(--cinza);margin-bottom:14px;line-height:1.6">
+      ✅ O cliente aceitou receber sua proposta. Agora envie os detalhes!
+    </div>
     <div class="mfield">
-      <label>Seu valor para o serviço (R$) <span style="color:var(--cinza);font-size:0.7rem">(opcional — deixe em branco se preferir visita primeiro)</span></label>
+      <label>Seu valor para o serviço (R$) <span style="color:var(--cinza);font-size:0.7rem">(opcional)</span></label>
       <input type="number" id="propValor" placeholder="Ex: 350 (opcional)">
     </div>
     <div class="mfield">
       <label>Mensagem para o cliente *</label>
       <textarea id="propMsg" placeholder="Descreva como realizaria o serviço, sua experiência e prazo..."></textarea>
     </div>
-    <div class="taxa-info">💡 Taxa ServiçoJá: <strong id="taxaModal">—</strong> — A taxa será cobrada somente se o cliente aceitar ouvir sua proposta.</div>
+    <div class="taxa-info">💡 Taxa ServiçoJá: <strong id="taxaModal">—</strong> — cobrada neste momento pois o cliente aceitou sua proposta.</div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
       <button class="btn-send" onclick="enviarProposta()">🚀 Enviar proposta</button>
@@ -252,26 +243,18 @@ if(!window._fbInitialized){
 </div>
 
 <script>
-// =====================================================================
-// VARIÁVEIS GLOBAIS — uid é let para poder ser atualizado pelo init()
-// =====================================================================
 let uid = localStorage.getItem('sj_uid');
 const nomeLocal = localStorage.getItem('sj_nome') || 'Profissional';
-
 let categoriasAprovadas = [];
 let todosPedidos = [];
 let filtroAtual = 'todos';
 let pedidoAtual = null;
 let taxasCalc = {};
-let bloqueado = false;
 let modoAtual = 'pedidos';
 
-// =====================================================================
-// INIT — busca do Firestore com múltiplas estratégias
-// =====================================================================
+// ── INIT ──────────────────────────────────────────────────────────────
 async function init(user) {
   try {
-    // Estratégia 1: IDs diretos (uid_prof e uid)
     for (const id of [user.uid + '_prof', user.uid]) {
       try {
         const snap = await firebase.firestore().collection('usuarios').doc(id).get();
@@ -280,39 +263,27 @@ async function init(user) {
           uid = id;
           localStorage.setItem('sj_categoriasAprovadas', JSON.stringify(categoriasAprovadas));
           localStorage.setItem('sj_uid', id);
-          localStorage.setItem('sj_nome', snap.data().nome || nomeLocal);
+          if (snap.data().nome) localStorage.setItem('sj_nome', snap.data().nome);
           break;
         }
-      } catch(e) { /* regras Firestore bloquearam esse ID, tenta próximo */ }
+      } catch(e) {}
     }
-
-    // Estratégia 2: busca por email + tipo (caso o doc ID não bata com o auth UID)
     if (categoriasAprovadas.length === 0 && user.email) {
       const q = await firebase.firestore().collection('usuarios')
-        .where('email', '==', user.email)
-        .where('tipo', '==', 'profissional')
-        .get();
+        .where('email', '==', user.email).where('tipo', '==', 'profissional').get();
       if (!q.empty) {
         const doc = q.docs[0];
-        const data = doc.data();
-        categoriasAprovadas = data.categoriasAprovadas || [];
+        categoriasAprovadas = doc.data().categoriasAprovadas || [];
         uid = doc.id;
         localStorage.setItem('sj_categoriasAprovadas', JSON.stringify(categoriasAprovadas));
         localStorage.setItem('sj_uid', doc.id);
-        if (data.nome) localStorage.setItem('sj_nome', data.nome);
+        if (doc.data().nome) localStorage.setItem('sj_nome', doc.data().nome);
       }
     }
-
-    // Estratégia 3: busca por aprovado:true (último recurso)
     if (categoriasAprovadas.length === 0) {
       const q2 = await firebase.firestore().collection('usuarios')
-        .where('aprovado', '==', true)
-        .where('tipo', '==', 'profissional')
-        .get();
-      const meuDoc = q2.docs.find(d => {
-        const data = d.data();
-        return data.email === user.email || d.id === user.uid || d.id === user.uid + '_prof';
-      });
+        .where('aprovado', '==', true).where('tipo', '==', 'profissional').get();
+      const meuDoc = q2.docs.find(d => d.data().email === user.email || d.id === user.uid || d.id === user.uid + '_prof');
       if (meuDoc) {
         categoriasAprovadas = meuDoc.data().categoriasAprovadas || [];
         uid = meuDoc.id;
@@ -321,17 +292,14 @@ async function init(user) {
       }
     }
   } catch(e) {
-    console.warn('Firestore fetch falhou, usando localStorage:', e);
+    console.warn('Firestore fallback localStorage:', e);
     categoriasAprovadas = JSON.parse(localStorage.getItem('sj_categoriasAprovadas') || '[]');
   }
 
   const nome = localStorage.getItem('sj_nome') || nomeLocal;
   document.getElementById('nomeNav').textContent = nome;
   document.getElementById('nomeCard').textContent = nome;
-
   const todasCats = JSON.parse(localStorage.getItem('sj_categorias') || '[]');
-
-  // Categorias na sidebar
   const lista = document.getElementById('catsLista');
   if (categoriasAprovadas.length > 0) {
     lista.innerHTML = categoriasAprovadas.map(c =>
@@ -342,97 +310,68 @@ async function init(user) {
   } else {
     lista.innerHTML = '<div style="color:var(--cinza);font-size:0.78rem">Nenhuma aprovação ainda.<br>Faça o teste de IA!</div>';
   }
-
-  // Filtros por categoria aprovada
   const pills = document.getElementById('filtroPills');
   categoriasAprovadas.forEach(cat => {
     const p = document.createElement('div');
-    p.className = 'fpill';
-    p.setAttribute('data-cat', cat);
-    p.textContent = cat;
-    p.onclick = function(){ selFiltro(this); };
+    p.className = 'fpill'; p.setAttribute('data-cat', cat);
+    p.textContent = cat; p.onclick = function(){ selFiltro(this); };
     pills.appendChild(p);
   });
-
   await carregarPedidos();
 }
 
-// =====================================================================
-// UTILITÁRIOS
-// =====================================================================
+// ── UTILS ─────────────────────────────────────────────────────────────
 function calcularTaxa(p) {
   let pts = 0;
   if ((p.urgencia||'').includes('Urgente')) pts += 30;
   else if ((p.urgencia||'').includes('semana')) pts += 15;
   else pts += 5;
   const val = parseFloat(p.valor) || 0;
-  if (val >= 1000) pts += 30; else if (val >= 500) pts += 20; else if (val >= 200) pts += 10; else pts += 10;
+  if (val >= 1000) pts += 30; else if (val >= 500) pts += 20; else pts += 10;
   const desc = (p.descricao||'').length;
   if (desc >= 300) pts += 20; else if (desc >= 150) pts += 10; else pts += 5;
   const nc = Array.isArray(p.categorias) ? p.categorias.length : 1;
   if (nc >= 3) pts += 15; else if (nc >= 2) pts += 8;
   return Math.min(50, Math.max(10, Math.round(10 + (pts / 95) * 40)));
 }
+function formatData(iso) { return iso ? new Date(iso).toLocaleDateString('pt-BR') : '—'; }
+function meuInteresse(pedido) { return (pedido.interessados || []).find(i => i.profissionalId === uid); }
 
-function formatData(iso) {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('pt-BR');
-}
-
-// =====================================================================
-// CARREGAR PEDIDOS DO FIRESTORE
-// =====================================================================
+// ── CARREGAR PEDIDOS ──────────────────────────────────────────────────
 async function carregarPedidos() {
   if (categoriasAprovadas.length === 0) {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('estadoVazio').classList.add('vis');
     return;
   }
-
   try {
     const snap = await firebase.firestore().collection('pedidos').get();
-
     todosPedidos = snap.docs.map(d => ({id: d.id, ...d.data()}))
       .filter(p => {
-        // Só pedidos abertos
         if (p.status && p.status !== 'aberto') return false;
-
-        // Compara categoria com e sem emoji para máxima compatibilidade
         const cats = Array.isArray(p.categorias) ? p.categorias : [p.categorias];
-        const semEmoji = (s) => (s || '').replace(/\p{Emoji}/gu, '').trim().toLowerCase();
-
-        return cats.some(c =>
-          categoriasAprovadas.some(a =>
-            a === c ||
-            semEmoji(a) === semEmoji(c) ||
-            a.trim() === (c || '').trim()
-          )
-        );
+        const semEmoji = s => (s||'').replace(/\p{Emoji}/gu,'').trim().toLowerCase();
+        return cats.some(c => categoriasAprovadas.some(a => a===c || semEmoji(a)===semEmoji(c) || a.trim()===(c||'').trim()));
       })
-      .sort((a, b) => (b.criadoEm || '').localeCompare(a.criadoEm || ''));
-
+      .sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
     document.getElementById('statDisp').textContent = todosPedidos.length;
     document.getElementById('loading').style.display = 'none';
     renderPedidos();
   } catch(e) {
-    document.getElementById('loading').innerHTML = '<p style="color:var(--erro)">Erro ao carregar pedidos: ' + e.message + '</p>';
+    document.getElementById('loading').innerHTML = '<p style="color:var(--erro)">Erro: ' + e.message + '</p>';
   }
 }
 
-// =====================================================================
-// NAVEGAÇÃO E FILTROS
-// =====================================================================
+// ── NAV / FILTRO ──────────────────────────────────────────────────────
 function selNav(modo, el) {
   document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('ativo'));
   el.classList.add('ativo');
   modoAtual = modo;
-  const titulo = document.getElementById('section-titulo');
-  if (modo === 'pedidos') titulo.textContent = 'Pedidos disponíveis';
-  else if (modo === 'propostas') titulo.textContent = 'Minhas propostas enviadas';
-  else titulo.textContent = 'Trabalhos aceitos';
+  document.getElementById('filtroPills').style.display = modo === 'pedidos' ? 'flex' : 'none';
+  const titulos = {pedidos:'Pedidos disponíveis', propostas:'Meus interesses', aceitos:'Trabalhos aceitos'};
+  document.getElementById('section-titulo').textContent = titulos[modo];
   renderPedidos();
 }
-
 function selFiltro(el) {
   document.querySelectorAll('.fpill').forEach(p => p.classList.remove('ativo'));
   el.classList.add('ativo');
@@ -440,85 +379,112 @@ function selFiltro(el) {
   renderPedidos();
 }
 
-// =====================================================================
-// RENDER PEDIDOS
-// =====================================================================
+// ── RENDER ────────────────────────────────────────────────────────────
 function renderPedidos() {
   const lista = document.getElementById('listaPedidos');
-  let filtrado = [];
+  const msgs = {pedidos:'Nenhum pedido disponível para suas categorias.', propostas:'Você ainda não demonstrou interesse em nenhum pedido.', aceitos:'Nenhum trabalho aceito ainda.'};
+  document.getElementById('vazioMsg').textContent = msgs[modoAtual];
 
+  let filtrado = todosPedidos;
   if (modoAtual === 'pedidos') {
-    filtrado = filtroAtual === 'todos' ? todosPedidos :
-      todosPedidos.filter(p => {
-        const c = Array.isArray(p.categorias) ? p.categorias : [p.categorias];
-        return c.includes(filtroAtual);
-      });
+    filtrado = filtroAtual === 'todos' ? todosPedidos
+      : todosPedidos.filter(p => (Array.isArray(p.categorias)?p.categorias:[p.categorias]).includes(filtroAtual));
   } else if (modoAtual === 'propostas') {
-    filtrado = todosPedidos.filter(p => {
-      const ints = p.interessados || [];
-      return ints.some(i => i.profissionalId === uid);
-    });
+    filtrado = todosPedidos.filter(p => meuInteresse(p));
   } else if (modoAtual === 'aceitos') {
     filtrado = todosPedidos.filter(p => p.profissionalAceito === uid);
   }
 
-  if (filtrado.length === 0) {
-    lista.innerHTML = '';
-    document.getElementById('estadoVazio').classList.add('vis');
-    return;
-  }
-
+  if (!filtrado.length) { lista.innerHTML=''; document.getElementById('estadoVazio').classList.add('vis'); return; }
   document.getElementById('estadoVazio').classList.remove('vis');
 
   lista.innerHTML = filtrado.map(p => {
-    const cats = Array.isArray(p.categorias) ? p.categorias : [p.categorias || '—'];
-    const taxa = calcularTaxa(p);
-    taxasCalc[p.id] = taxa;
-    const orc = p.orcamento === 'aproximado' && p.valor
-      ? 'R$ ' + parseFloat(p.valor).toLocaleString('pt-BR')
-      : 'Em aberto';
+    const cats = Array.isArray(p.categorias) ? p.categorias : [p.categorias||'—'];
+    const taxa = calcularTaxa(p); taxasCalc[p.id] = taxa;
+    const orc = p.orcamento==='aproximado'&&p.valor ? 'R$ '+parseFloat(p.valor).toLocaleString('pt-BR') : 'Em aberto';
+    let urgClass='urg-pressa', urgLabel=p.urgencia||'🗓️ Sem pressa';
+    if ((p.urgencia||'').includes('Urgente')) urgClass='urg-urgente';
+    else if ((p.urgencia||'').includes('semana')) urgClass='urg-semana';
 
-    let urgClass = 'urg-pressa', urgLabel = p.urgencia || '🗓️ Sem pressa';
-    if ((p.urgencia || '').includes('Urgente')) urgClass = 'urg-urgente';
-    else if ((p.urgencia || '').includes('semana')) urgClass = 'urg-semana';
+    const interesse = meuInteresse(p);
+    const status = interesse ? interesse.status : null;
+
+    let actionHtml = '';
+    if (modoAtual === 'pedidos') {
+      if (!status) {
+        // Ainda não demonstrou interesse
+        actionHtml = `<div class="taxa-badge">Taxa: R$ ${taxa}</div>
+          <button class="btn-interesso" onclick="registrarInteresse('${p.id}', this)">👋 Me interesso</button>`;
+      } else if (status === 'interessado') {
+        actionHtml = `<button class="btn-interesso" disabled>⏳ Aguardando cliente</button>`;
+      } else if (status === 'solicitado') {
+        actionHtml = `<button class="btn-enviar-proposta" onclick="abrirModalProposta('${p.id}')">🚀 Cliente quer sua proposta!</button>`;
+      } else if (status === 'enviado') {
+        actionHtml = `<button class="btn-interesso" disabled>✅ Proposta enviada</button>`;
+      }
+    } else if (modoAtual === 'propostas') {
+      if (status === 'interessado') {
+        actionHtml = `<span class="status-pill status-aguardando">⏳ Aguardando cliente aceitar</span>`;
+      } else if (status === 'solicitado') {
+        actionHtml = `<span class="status-pill status-solicitado">⚡ Cliente quer proposta!</span>
+          <button class="btn-enviar-proposta" onclick="abrirModalProposta('${p.id}')">🚀 Enviar agora</button>`;
+      } else if (status === 'enviado') {
+        actionHtml = `<span class="status-pill status-enviada">✅ Proposta enviada</span>`;
+      }
+    }
 
     return `<div class="pedido-card">
-      <div class="p-cats">${cats.map(c => `<span class="pcat">${c}</span>`).join('')}</div>
-      <div class="p-title">${p.titulo || 'Sem título'}</div>
-      <div class="p-desc">${p.descricao || 'Sem descrição.'}</div>
+      <div class="p-cats">${cats.map(c=>`<span class="pcat">${c}</span>`).join('')}</div>
+      <div class="p-title">${p.titulo||'Sem título'}</div>
+      <div class="p-desc">${p.descricao||'Sem descrição.'}</div>
       <div class="p-footer">
         <div class="p-meta">
           <span class="pm">📅 <strong>${formatData(p.criadoEm)}</strong></span>
           <span class="pm">💰 <strong>${orc}</strong></span>
-          <span class="pm">📍 <strong>${(p.endereco || '').split(',').slice(-1)[0] || '—'}</strong></span>
+          <span class="pm">📍 <strong>${(p.endereco||'').split(',').slice(-1)[0]||'—'}</strong></span>
           <span class="urg ${urgClass}">${urgLabel}</span>
         </div>
-        <div class="p-actions">
-          <div class="taxa-badge">Taxa: R$ ${taxa}</div>
-          <button class="btn-prop" onclick="abrirProposta('${p.id}')">Me interesso</button>
-        </div>
+        <div class="p-actions">${actionHtml}</div>
       </div>
     </div>`;
   }).join('');
 }
 
-// =====================================================================
-// PROPOSTA
-// =====================================================================
-function abrirProposta(id) {
-  pedidoAtual = todosPedidos.find(p => p.id === id);
+// ── REGISTRAR INTERESSE (sem modal) ───────────────────────────────────
+async function registrarInteresse(pedidoId, btn) {
+  const pedido = todosPedidos.find(p => p.id === pedidoId);
+  if (!pedido) return;
+  btn.disabled = true; btn.textContent = 'Registrando...';
+  const nome = localStorage.getItem('sj_nome') || 'Profissional';
+  const taxa = taxasCalc[pedidoId] || calcularTaxa(pedido);
+  const novoInteresse = { profissionalId: uid, profissionalNome: nome, taxa, status: 'interessado', registradoEm: new Date().toISOString() };
+  const intsAtualizados = [...(pedido.interessados || []).filter(i => i.profissionalId !== uid), novoInteresse];
+  try {
+    await firebase.firestore().collection('pedidos').doc(pedidoId).update({ interessados: intsAtualizados });
+    pedido.interessados = intsAtualizados;
+    btn.textContent = '⏳ Aguardando cliente';
+    const env = parseInt(document.getElementById('statEnv').textContent) || 0;
+    document.getElementById('statEnv').textContent = env + 1;
+    criarNotificacao(pedido.clienteId, 'interesse',
+      nome + ' tem interesse no seu pedido "' + pedido.titulo + '". Veja o perfil dele!',
+      'meus-pedidos-cliente.html');
+  } catch(e) {
+    btn.disabled = false; btn.textContent = '👋 Me interesso';
+    alert('Erro: ' + e.message);
+  }
+}
+
+// ── MODAL PROPOSTA (só quando cliente solicitar) ───────────────────────
+function abrirModalProposta(pedidoId) {
+  pedidoAtual = todosPedidos.find(p => p.id === pedidoId);
   if (!pedidoAtual) return;
-  document.getElementById('modalTitulo').textContent = pedidoAtual.titulo || 'Pedido';
-  document.getElementById('taxaModal').textContent = 'R$ ' + (taxasCalc[id] || '—');
+  document.getElementById('modalTitulo').textContent = pedidoAtual.titulo || '';
+  document.getElementById('taxaModal').textContent = 'R$ ' + (taxasCalc[pedidoId] || '—');
   document.getElementById('propValor').value = '';
   document.getElementById('propMsg').value = '';
   document.getElementById('overlayProposta').classList.add('vis');
 }
-
-function fecharModal() {
-  document.getElementById('overlayProposta').classList.remove('vis');
-  pedidoAtual = null;
-}
+function fecharModal() { document.getElementById('overlayProposta').classList.remove('vis'); pedidoAtual = null; }
 
 async function enviarProposta() {
   const valor = document.getElementById('propValor').value.trim();
@@ -528,150 +494,84 @@ async function enviarProposta() {
 
   const taxa = taxasCalc[pedidoAtual.id] || 10;
   const nome = localStorage.getItem('sj_nome') || 'Profissional';
-
+  const pedidoId = pedidoAtual.id;
+  const pedidoTitulo = pedidoAtual.titulo;
+  const pedidoClienteId = pedidoAtual.clienteId;
+  const intsAtualizados = (pedidoAtual.interessados || []).map(i =>
+    i.profissionalId === uid
+      ? { ...i, status: 'enviado', mensagem: msg, valor: valor ? parseFloat(valor) : null, taxa, enviadoEm: new Date().toISOString() }
+      : i
+  );
   try {
-    await firebase.firestore().collection('pedidos').doc(pedidoAtual.id).update({
-      interessados: firebase.firestore.FieldValue.arrayUnion({
-        profissionalId: uid,
-        profissionalNome: nome,
-        valor: valor ? parseFloat(valor) : null,
-        mensagem: msg,
-        taxa: taxa,
-        enviadoEm: new Date().toISOString()
-      })
-      // REMOVIDO: status: 'andamento' — não muda o status do pedido ao enviar proposta
-      // para não bloquear outros profissionais de ver o pedido
-    });
-
+    await firebase.firestore().collection('pedidos').doc(pedidoId).update({ interessados: intsAtualizados });
+    await firebase.firestore().collection('usuarios').doc(uid).update({ taxaAcumulada: firebase.firestore.FieldValue.increment(taxa) }).catch(()=>{});
+    const p = todosPedidos.find(x => x.id === pedidoId);
+    if (p) p.interessados = intsAtualizados;
     fecharModal();
-    const env = parseInt(document.getElementById('statEnv').textContent) || 0;
-    document.getElementById('statEnv').textContent = env + 1;
-
-    criarNotificacao(
-      pedidoAtual.clienteId,
-      'proposta',
-      nome + ' se interessou pelo seu pedido "' + pedidoAtual.titulo + '"',
-      'meus-pedidos-cliente.html'
-    );
-
-    alert('✅ Proposta enviada! O cliente foi notificado.');
-  } catch(e) {
-    alert('Erro ao enviar proposta: ' + e.message);
-  }
+    renderPedidos();
+    criarNotificacao(pedidoClienteId, 'proposta',
+      nome + ' enviou a proposta para "' + pedidoTitulo + '". Veja os detalhes!',
+      'meus-pedidos-cliente.html');
+    alert('✅ Proposta enviada com sucesso!');
+  } catch(e) { alert('Erro ao enviar: ' + e.message); }
 }
 
-// =====================================================================
-// OUTROS
-// =====================================================================
-function abrirPagamento() {
-  alert('Em breve: integração com Pix/cartão para pagamento das taxas. Entre em contato via WhatsApp para regularizar: (11) 99999-9999');
-}
+function abrirPagamento() { alert('Em breve: integração com Pix/cartão. WhatsApp: (11) 99999-9999'); }
+async function sair() { await firebase.auth().signOut(); localStorage.clear(); window.location.href = 'login.html'; }
 
-async function sair() {
-  await firebase.auth().signOut();
-  localStorage.clear();
-  window.location.href = 'login.html';
-}
-
-// =====================================================================
-// AUTH STATE — passa user para init()
-// =====================================================================
 firebase.auth().onAuthStateChanged(function(user) {
-  if (!user) {
-    window.location.href = 'login.html';
-    return;
-  }
-  init(user); // FIX: passa user diretamente, evita race condition com currentUser
-  setTimeout(function(){
-    const uidAtual = localStorage.getItem('sj_uid') || user.uid;
-    carregarNotificacoes(uidAtual);
-  }, 1500);
+  if (!user) { window.location.href = 'login.html'; return; }
+  init(user);
+  setTimeout(() => carregarNotificacoes(localStorage.getItem('sj_uid') || user.uid), 1500);
 });
 
-// =====================================================================
-// NOTIFICAÇÕES
-// =====================================================================
-let notifAberto = false, notifIds = [], notifUid = null;
-
+// ── NOTIFICAÇÕES ──────────────────────────────────────────────────────
+let notifAberto=false, notifIds=[];
 function toggleNotif() {
-  notifAberto = !notifAberto;
-  document.getElementById('notifDropdown').style.display = notifAberto ? 'block' : 'none';
-  if (notifAberto) marcarTodasLidas();
+  notifAberto=!notifAberto;
+  document.getElementById('notifDropdown').style.display=notifAberto?'block':'none';
+  if(notifAberto) marcarTodasLidas();
 }
-
-document.addEventListener('click', function(e) {
-  const w = document.getElementById('notifWrap');
-  if (w && !w.contains(e.target)) {
-    notifAberto = false;
-    document.getElementById('notifDropdown').style.display = 'none';
-  }
+document.addEventListener('click', e => {
+  const w=document.getElementById('notifWrap');
+  if(w&&!w.contains(e.target)){notifAberto=false;document.getElementById('notifDropdown').style.display='none';}
 });
-
 function tempoRelativo(d) {
-  const diff = Date.now() - new Date(d).getTime(), min = Math.floor(diff / 60000);
-  if (min < 1) return 'agora';
-  if (min < 60) return min + 'min atrás';
-  const h = Math.floor(min / 60);
-  if (h < 24) return h + 'h atrás';
-  return Math.floor(h / 24) + 'd atrás';
+  const diff=Date.now()-new Date(d).getTime(),min=Math.floor(diff/60000);
+  if(min<1)return'agora';if(min<60)return min+'min atrás';
+  const h=Math.floor(min/60);if(h<24)return h+'h atrás';return Math.floor(h/24)+'d atrás';
 }
-
-async function carregarNotificacoes(uid) {
-  notifUid = uid;
+async function carregarNotificacoes(nuid) {
   try {
-    const snap = await firebase.firestore().collection('notificacoes')
-      .where('para', '==', uid).limit(20).get();
-    const notifs = snap.docs.map(d => ({id: d.id, ...d.data()}))
-      .sort((a, b) => (b.criadoEm || '').localeCompare(a.criadoEm || ''));
-    notifIds = snap.docs.map(d => d.id);
-
-    const novas = notifs.filter(n => !n.lida).length;
+    const snap = await firebase.firestore().collection('notificacoes').where('para','==',nuid).limit(20).get();
+    const notifs = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.criadoEm||'').localeCompare(a.criadoEm||''));
+    notifIds = snap.docs.map(d=>d.id);
+    const novas = notifs.filter(n=>!n.lida).length;
     const badge = document.getElementById('notifBadge');
-    if (novas > 0) { badge.style.display = 'flex'; badge.textContent = novas > 9 ? '9+' : novas; }
-    else badge.style.display = 'none';
-
+    if(novas>0){badge.style.display='flex';badge.textContent=novas>9?'9+':novas;}else badge.style.display='none';
     const lista = document.getElementById('notifLista');
-    if (!notifs.length) {
-      lista.innerHTML = '<div style="padding:24px;text-align:center;color:#8A9BB5;font-size:12px">Sem notificações</div>';
-      return;
-    }
-
-    const icones = {proposta:'💬', aceite:'✅', avaliacao:'⭐', sistema:'📢'};
-    const cores = {proposta:'rgba(0,201,111,0.15)', aceite:'rgba(255,184,48,0.15)', avaliacao:'rgba(255,107,53,0.15)', sistema:'rgba(138,155,181,0.1)'};
-
-    lista.innerHTML = notifs.map(n =>
-      `<div class="notif-item ${n.lida ? 'lida' : 'nova'}" onclick="abrirNotif('${n.link || ''}')">
-        <div class="ni-icon" style="background:${cores[n.tipo] || cores.sistema}">${icones[n.tipo] || '📢'}</div>
-        <div style="flex:1"><div class="ni-txt">${n.mensagem}</div><div class="ni-tempo">${tempoRelativo(n.criadoEm)}</div></div>
-        ${!n.lida ? '<div class="ni-dot"></div>' : ''}
-      </div>`
-    ).join('');
-  } catch(e) {
-    console.log('notif:', e);
-  }
+    if(!notifs.length){lista.innerHTML='<div style="padding:24px;text-align:center;color:#8A9BB5;font-size:12px">Sem notificações</div>';return;}
+    const icones={interesse:'👋',proposta:'💬',aceite:'✅',avaliacao:'⭐',sistema:'📢'};
+    const cores={interesse:'rgba(0,201,111,0.15)',proposta:'rgba(0,201,111,0.15)',aceite:'rgba(255,184,48,0.15)',avaliacao:'rgba(255,107,53,0.15)',sistema:'rgba(138,155,181,0.1)'};
+    lista.innerHTML=notifs.map(n=>`<div class="notif-item ${n.lida?'lida':'nova'}" onclick="abrirNotif('${n.link||''}')">
+      <div class="ni-icon" style="background:${cores[n.tipo]||cores.sistema}">${icones[n.tipo]||'📢'}</div>
+      <div style="flex:1"><div class="ni-txt">${n.mensagem}</div><div class="ni-tempo">${tempoRelativo(n.criadoEm)}</div></div>
+      ${!n.lida?'<div class="ni-dot"></div>':''}
+    </div>`).join('');
+  } catch(e){console.log('notif:',e);}
 }
-
 async function marcarTodasLidas() {
-  if (!notifIds.length) return;
-  document.getElementById('notifBadge').style.display = 'none';
-  try {
-    const batch = firebase.firestore().batch();
-    notifIds.forEach(id => batch.update(firebase.firestore().collection('notificacoes').doc(id), {lida: true}));
-    await batch.commit();
-  } catch(e) {}
+  if(!notifIds.length)return;
+  document.getElementById('notifBadge').style.display='none';
+  try{const batch=firebase.firestore().batch();notifIds.forEach(id=>batch.update(firebase.firestore().collection('notificacoes').doc(id),{lida:true}));await batch.commit();}catch(e){}
 }
-
-function abrirNotif(link) { if (link) window.location.href = link; toggleNotif(); }
-
-async function criarNotificacao(para, tipo, mensagem, link) {
-  try {
-    await firebase.firestore().collection('notificacoes').add({
-      para, tipo, mensagem, link: link || '', lida: false, criadoEm: new Date().toISOString()
-    });
-  } catch(e) {}
+function abrirNotif(link){if(link)window.location.href=link;toggleNotif();}
+async function criarNotificacao(para,tipo,mensagem,link){
+  if(!para)return;
+  try{await firebase.firestore().collection('notificacoes').add({para,tipo,mensagem,link:link||'',lida:false,criadoEm:new Date().toISOString()});}catch(e){}
 }
+document.querySelectorAll('.overlay').forEach(ov=>ov.addEventListener('click',e=>{if(e.target===ov)ov.classList.remove('vis');}));
 </script>
-
-<script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(e=>{}); }</script>
+<script>if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(e=>{});}</script>
 </body>
 </html>
