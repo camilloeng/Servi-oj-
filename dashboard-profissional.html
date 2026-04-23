@@ -267,20 +267,57 @@ let bloqueado = false;
 let modoAtual = 'pedidos';
 
 // =====================================================================
-// INIT — sempre busca do Firestore, não depende só do localStorage
+// INIT — busca do Firestore com múltiplas estratégias
 // =====================================================================
 async function init(user) {
-  // SEMPRE busca do Firestore para garantir dados frescos
   try {
+    // Estratégia 1: IDs diretos (uid_prof e uid)
     for (const id of [user.uid + '_prof', user.uid]) {
-      const snap = await firebase.firestore().collection('usuarios').doc(id).get();
-      if (snap.exists() && (snap.data().categoriasAprovadas || []).length > 0) {
-        categoriasAprovadas = snap.data().categoriasAprovadas;
-        uid = id; // atualiza uid para o ID correto do documento
+      try {
+        const snap = await firebase.firestore().collection('usuarios').doc(id).get();
+        if (snap.exists() && (snap.data().categoriasAprovadas || []).length > 0) {
+          categoriasAprovadas = snap.data().categoriasAprovadas;
+          uid = id;
+          localStorage.setItem('sj_categoriasAprovadas', JSON.stringify(categoriasAprovadas));
+          localStorage.setItem('sj_uid', id);
+          localStorage.setItem('sj_nome', snap.data().nome || nomeLocal);
+          break;
+        }
+      } catch(e) { /* regras Firestore bloquearam esse ID, tenta próximo */ }
+    }
+
+    // Estratégia 2: busca por email + tipo (caso o doc ID não bata com o auth UID)
+    if (categoriasAprovadas.length === 0 && user.email) {
+      const q = await firebase.firestore().collection('usuarios')
+        .where('email', '==', user.email)
+        .where('tipo', '==', 'profissional')
+        .get();
+      if (!q.empty) {
+        const doc = q.docs[0];
+        const data = doc.data();
+        categoriasAprovadas = data.categoriasAprovadas || [];
+        uid = doc.id;
         localStorage.setItem('sj_categoriasAprovadas', JSON.stringify(categoriasAprovadas));
-        localStorage.setItem('sj_uid', id);
-        localStorage.setItem('sj_nome', snap.data().nome || nomeLocal);
-        break;
+        localStorage.setItem('sj_uid', doc.id);
+        if (data.nome) localStorage.setItem('sj_nome', data.nome);
+      }
+    }
+
+    // Estratégia 3: busca por aprovado:true (último recurso)
+    if (categoriasAprovadas.length === 0) {
+      const q2 = await firebase.firestore().collection('usuarios')
+        .where('aprovado', '==', true)
+        .where('tipo', '==', 'profissional')
+        .get();
+      const meuDoc = q2.docs.find(d => {
+        const data = d.data();
+        return data.email === user.email || d.id === user.uid || d.id === user.uid + '_prof';
+      });
+      if (meuDoc) {
+        categoriasAprovadas = meuDoc.data().categoriasAprovadas || [];
+        uid = meuDoc.id;
+        localStorage.setItem('sj_categoriasAprovadas', JSON.stringify(categoriasAprovadas));
+        localStorage.setItem('sj_uid', meuDoc.id);
       }
     }
   } catch(e) {
