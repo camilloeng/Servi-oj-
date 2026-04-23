@@ -3,1097 +3,516 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ServiçoJá — Pedidos Disponíveis</title>
+<title>ServiçoJá Conecta — Meus Pedidos</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-  :root {
-    --verde: #00C96F; --verde-escuro: #009E57;
-    --azul: #0A1628; --azul-medio: #132240; --azul-input: #0F1C35;
-    --branco: #F5F7F2; --cinza: #8A9BB5;
-    --laranja: #FF6B35; --amarelo: #FFB830;
-    --borda: rgba(255,255,255,0.09);
-  }
-  body { font-family: 'DM Sans', sans-serif; background: var(--azul); color: var(--branco); min-height: 100vh; }
-  body::before {
-    content: ''; position: fixed; top: -200px; right: -200px;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(0,201,111,0.09) 0%, transparent 70%);
-    pointer-events: none; z-index: 0;
-  }
-
-  /* NAV */
-  nav {
-    position: relative; z-index: 10;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 18px 28px; border-bottom: 1px solid var(--borda);
-  }
-  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; text-decoration: none; color: var(--branco); }
-  .logo span { color: var(--verde); }
-  .nav-right { display: flex; align-items: center; gap: 14px; }
-  .nav-badge {
-    background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3);
-    color: var(--laranja); font-size: 0.75rem; font-weight: 700;
-    padding: 4px 10px; border-radius: 100px;
-  }
-  .avatar-wrap { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-  .avatar {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: linear-gradient(135deg, rgba(0,201,111,0.3), rgba(0,201,111,0.1));
-    border: 2px solid rgba(0,201,111,0.3);
-    display: flex; align-items: center; justify-content: center; font-size: 1rem;
-  }
-  .avatar-name { font-size: 0.85rem; font-weight: 600; }
-  .avatar-role { font-size: 0.72rem; color: var(--cinza); }
-
-  /* LAYOUT */
-  .layout {
-    position: relative; z-index: 5;
-    display: grid; grid-template-columns: 300px 1fr;
-    min-height: calc(100vh - 65px);
-  }
-
-  /* SIDEBAR */
-  .sidebar {
-    border-right: 1px solid var(--borda);
-    padding: 24px 20px;
-    display: flex; flex-direction: column; gap: 20px;
-  }
-
-  .sidebar-title {
-    font-family: 'Syne', sans-serif; font-weight: 800;
-    font-size: 1rem; margin-bottom: 2px;
-  }
-  .sidebar-sub { color: var(--cinza); font-size: 0.78rem; }
-
-  /* RAIO */
-  .raio-card {
-    background: var(--azul-medio); border: 1px solid var(--borda);
-    border-radius: 16px; padding: 16px;
-  }
-  .raio-label {
-    font-family: 'Syne', sans-serif; font-weight: 700;
-    font-size: 0.78rem; color: var(--cinza);
-    text-transform: uppercase; letter-spacing: 0.06em;
-    margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
-  }
-  .raio-valor {
-    font-family: 'Syne', sans-serif; font-weight: 800;
-    font-size: 1.6rem; color: var(--verde); margin-bottom: 8px;
-  }
-  .raio-valor span { font-size: 0.9rem; font-weight: 600; color: var(--cinza); }
-
-  input[type=range] {
-    width: 100%; -webkit-appearance: none; appearance: none;
-    height: 4px; border-radius: 2px;
-    background: linear-gradient(to right, var(--verde) 0%, var(--verde) 40%, rgba(255,255,255,0.1) 40%);
-    outline: none; cursor: pointer; margin-bottom: 8px;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
-    background: var(--verde); border: 3px solid var(--azul);
-    box-shadow: 0 0 0 2px var(--verde);
-    cursor: pointer; transition: transform 0.15s;
-  }
-  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
-
-  .raio-opts { display: flex; justify-content: space-between; }
-  .raio-opt {
-    font-size: 0.7rem; color: var(--cinza); cursor: pointer;
-    padding: 3px 6px; border-radius: 6px; transition: all 0.2s;
-  }
-  .raio-opt:hover { color: var(--verde); }
-  .raio-opt.sel { color: var(--verde); font-weight: 700; }
-
-  /* LOCALIZAÇÃO */
-  .loc-card {
-    background: var(--azul-medio); border: 1px solid var(--borda);
-    border-radius: 16px; padding: 14px 16px;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .loc-icon { font-size: 1.2rem; flex-shrink: 0; }
-  .loc-info { flex: 1; }
-  .loc-info strong { font-size: 0.85rem; font-weight: 600; display: block; }
-  .loc-info span { font-size: 0.72rem; color: var(--cinza); }
-  .loc-btn {
-    background: none; border: 1px solid var(--borda); border-radius: 8px;
-    color: var(--cinza); font-size: 0.72rem; padding: 4px 8px;
-    cursor: pointer; transition: all 0.2s; white-space: nowrap;
-  }
-  .loc-btn:hover { border-color: var(--verde); color: var(--verde); }
-
-  /* FILTROS */
-  .filtros-title {
-    font-family: 'Syne', sans-serif; font-weight: 700;
-    font-size: 0.78rem; color: var(--cinza);
-    text-transform: uppercase; letter-spacing: 0.06em;
-    margin-bottom: 10px;
-  }
-  .filtro-item {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 9px 12px; border-radius: 10px; cursor: pointer;
-    transition: all 0.2s; font-size: 0.85rem; font-weight: 500;
-    color: var(--cinza); margin-bottom: 4px;
-  }
-  .filtro-item:hover { background: rgba(255,255,255,0.04); color: var(--branco); }
-  .filtro-item.ativo { background: rgba(0,201,111,0.1); color: var(--verde); font-weight: 600; }
-  .filtro-count {
-    background: rgba(255,255,255,0.08); border-radius: 100px;
-    padding: 2px 8px; font-size: 0.7rem; font-weight: 700;
-  }
-  .filtro-item.ativo .filtro-count { background: rgba(0,201,111,0.2); color: var(--verde); }
-
-  /* STATS SIDEBAR */
-  .stats-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .stat-mini {
-    background: var(--azul-medio); border: 1px solid var(--borda);
-    border-radius: 12px; padding: 12px; text-align: center;
-  }
-  .stat-mini .num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--verde); }
-  .stat-mini .lbl { font-size: 0.68rem; color: var(--cinza); margin-top: 2px; }
-
-  /* CONTEÚDO PRINCIPAL */
-  .main {
-    padding: 24px 28px;
-    display: flex; flex-direction: column; gap: 16px;
-  }
-
-  .main-header {
-    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-  }
-  .main-header h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; }
-  .main-header p { color: var(--cinza); font-size: 0.82rem; margin-top: 2px; }
-
-  .sort-select {
-    background: var(--azul-medio); border: 1px solid var(--borda);
-    border-radius: 10px; color: var(--branco);
-    font-family: 'DM Sans', sans-serif; font-size: 0.82rem;
-    padding: 8px 28px 8px 12px; outline: none; cursor: pointer;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A9BB5' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 10px center;
-  }
-  select option { background: var(--azul-medio); }
-
-  /* CARDS DE PEDIDO */
-  .pedido-card {
-    background: var(--azul-medio); border: 1px solid var(--borda);
-    border-radius: 18px; padding: 22px 24px;
-    transition: all 0.25s; cursor: pointer;
-    animation: fadeUp 0.4s ease both;
-    position: relative; overflow: hidden;
-  }
-  .pedido-card::before {
-    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-    width: 3px; background: transparent; transition: background 0.25s;
-  }
-  .pedido-card:hover { border-color: rgba(0,201,111,0.2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
-  .pedido-card:hover::before { background: var(--verde); }
-  .pedido-card.urgente::before { background: var(--laranja); }
-  .pedido-card.urgente { border-color: rgba(255,107,53,0.15); }
-
-  .pedido-top {
-    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px;
-  }
-  .pedido-cat {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 100px;
-    background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.2); color: var(--verde);
-  }
-  .pedido-cat.urgente { background: rgba(255,107,53,0.1); border-color: rgba(255,107,53,0.25); color: var(--laranja); }
-
-  .pedido-titulo { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 6px; line-height: 1.3; }
-  .pedido-desc { color: var(--cinza); font-size: 0.82rem; line-height: 1.6; margin-bottom: 14px;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-  }
-
-  .pedido-meta {
-    display: flex; align-items: center; flex-wrap: wrap; gap: 14px;
-  }
-  .meta-item { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--cinza); }
-  .meta-item strong { color: var(--branco); }
-
-  .pedido-bottom {
-    display: flex; align-items: center; justify-content: space-between;
-    border-top: 1px solid var(--borda); padding-top: 14px; margin-top: 14px; gap: 12px;
-  }
-
-  .pedido-fotos { display: flex; align-items: center; gap: 6px; }
-  .foto-mini {
-    width: 36px; height: 36px; border-radius: 8px;
-    background: var(--azul-input); border: 1px solid var(--borda);
-    display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
-  }
-  .foto-count { font-size: 0.72rem; color: var(--cinza); }
-
-  .interesse-btn {
-    background: var(--verde); border: none; border-radius: 10px;
-    padding: 10px 20px; color: var(--azul);
-    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem;
-    cursor: pointer; transition: all 0.2s; white-space: nowrap;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .interesse-btn:hover { background: var(--verde-escuro); transform: scale(1.03); }
-  .interesse-btn.enviado {
-    background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.3);
-    color: var(--verde); cursor: default; transform: none;
-  }
-
-  /* MODAL PERFIL */
-  .overlay {
-    position: fixed; inset: 0; background: rgba(10,22,40,0.92);
-    z-index: 50; display: flex; align-items: center; justify-content: center;
-    padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s;
-  }
-  .overlay.vis { opacity: 1; pointer-events: all; }
-
-  .modal-perfil {
-    background: var(--azul-medio); border: 1px solid var(--borda);
-    border-radius: 24px; width: 100%; max-width: 520px; max-height: 90vh;
-    overflow-y: auto; transform: translateY(20px); transition: transform 0.3s;
-  }
-  .overlay.vis .modal-perfil { transform: translateY(0); }
-
-  .modal-perfil-header {
-    padding: 28px 28px 0; position: relative;
-  }
-  .modal-close {
-    position: absolute; top: 20px; right: 20px;
-    background: rgba(255,255,255,0.06); border: none; border-radius: 50%;
-    width: 32px; height: 32px; color: var(--cinza); font-size: 1rem;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s;
-  }
-  .modal-close:hover { background: rgba(255,255,255,0.12); color: var(--branco); }
-
-  .prof-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
-  .prof-avatar {
-    width: 72px; height: 72px; border-radius: 50%; flex-shrink: 0;
-    background: linear-gradient(135deg, rgba(0,201,111,0.3), rgba(0,78,200,0.2));
-    border: 3px solid rgba(0,201,111,0.3);
-    display: flex; align-items: center; justify-content: center; font-size: 2rem;
-  }
-  .prof-nome { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 3px; }
-  .prof-cats { color: var(--cinza); font-size: 0.8rem; margin-bottom: 6px; }
-  .prof-stars { display: flex; align-items: center; gap: 4px; }
-  .stars { color: var(--amarelo); font-size: 0.9rem; letter-spacing: 1px; }
-  .rating-num { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.88rem; }
-  .rating-count { font-size: 0.75rem; color: var(--cinza); }
-
-  .prof-badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    background: rgba(0,201,111,0.1); border: 1px solid rgba(0,201,111,0.25);
-    color: var(--verde); font-size: 0.72rem; font-weight: 700;
-    padding: 4px 10px; border-radius: 100px; margin-bottom: 14px;
-  }
-
-  .modal-section { padding: 18px 28px; border-top: 1px solid var(--borda); }
-  .modal-sec-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.82rem; color: var(--cinza); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
-
-  .prof-sobre { font-size: 0.85rem; color: var(--cinza); line-height: 1.7; }
-
-  .fotos-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
-  .foto-trabalho {
-    aspect-ratio: 1; border-radius: 10px; background: var(--azul-input);
-    border: 1px solid var(--borda); display: flex; align-items: center; justify-content: center;
-    font-size: 1.6rem;
-  }
-
-  .reviews { display: flex; flex-direction: column; gap: 12px; }
-  .review-item {
-    background: var(--azul-input); border: 1px solid var(--borda);
-    border-radius: 12px; padding: 14px;
-  }
-  .review-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-  .review-nome { font-weight: 600; font-size: 0.82rem; }
-  .review-stars { color: var(--amarelo); font-size: 0.78rem; }
-  .review-text { font-size: 0.8rem; color: var(--cinza); line-height: 1.5; }
-  .review-data { font-size: 0.68rem; color: rgba(138,155,181,0.5); margin-top: 4px; }
-
-  .modal-footer { padding: 20px 28px; border-top: 1px solid var(--borda); display: flex; gap: 10px; }
-  .btn-recusar {
-    flex: 1; background: transparent; border: 1.5px solid var(--borda);
-    border-radius: 12px; padding: 13px; color: var(--cinza);
-    font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.88rem;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .btn-recusar:hover { border-color: rgba(255,92,92,0.4); color: #FF5C5C; }
-  .btn-aceitar {
-    flex: 2; background: var(--verde); border: none;
-    border-radius: 12px; padding: 13px; color: var(--azul);
-    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.92rem;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .btn-aceitar:hover { background: var(--verde-escuro); }
-
-  /* MODAL ORÇAMENTO */
-  .modal-orcamento {
-    background: var(--azul-medio); border: 1px solid var(--borda);
-    border-radius: 24px; width: 100%; max-width: 460px;
-    transform: translateY(20px); transition: transform 0.3s;
-    padding: 32px 28px;
-  }
-  .overlay.vis .modal-orcamento { transform: translateY(0); }
-
-  .orc-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; margin-bottom: 4px; }
-  .orc-sub { color: var(--cinza); font-size: 0.82rem; margin-bottom: 22px; line-height: 1.5; }
-
-  .orc-field { margin-bottom: 14px; }
-  .orc-label { font-size: 0.78rem; font-weight: 600; color: var(--cinza); margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
-  .orc-opcional { font-size: 0.68rem; background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--cinza); }
-
-  .orc-input {
-    width: 100%; background: var(--azul-input); border: 1.5px solid var(--borda);
-    border-radius: 12px; color: var(--branco); font-family: 'DM Sans', sans-serif;
-    font-size: 0.88rem; padding: 12px 14px; outline: none; transition: border-color 0.2s;
-  }
-  .orc-input:focus { border-color: rgba(0,201,111,0.45); }
-  .orc-input::placeholder { color: rgba(138,155,181,0.45); }
-  textarea.orc-input { resize: vertical; min-height: 90px; line-height: 1.6; }
-  .orc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .orc-prefix { position: relative; }
-  .orc-prefix span { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--cinza); font-size: 0.85rem; pointer-events: none; }
-  .orc-prefix input { padding-left: 36px; }
-
-  .orc-aviso {
-    display: flex; align-items: flex-start; gap: 8px;
-    background: rgba(0,201,111,0.06); border: 1px solid rgba(0,201,111,0.15);
-    border-radius: 10px; padding: 10px 12px; margin-bottom: 18px;
-    font-size: 0.75rem; color: var(--cinza); line-height: 1.5;
-  }
-
-  .orc-btns { display: flex; gap: 10px; }
-  .btn-cancelar {
-    flex: 1; background: transparent; border: 1.5px solid var(--borda);
-    border-radius: 12px; padding: 13px; color: var(--cinza);
-    font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s;
-  }
-  .btn-cancelar:hover { border-color: rgba(255,255,255,0.25); color: var(--branco); }
-  .btn-enviar-orc {
-    flex: 2; background: var(--verde); border: none; border-radius: 12px; padding: 13px;
-    color: var(--azul); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.92rem;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .btn-enviar-orc:hover { background: var(--verde-escuro); }
-
-  /* MODAL SUCESSO */
-  .modal-sucesso {
-    background: var(--azul-medio); border: 1px solid var(--borda);
-    border-radius: 24px; width: 100%; max-width: 400px;
-    text-align: center; padding: 40px 32px;
-    transform: translateY(20px); transition: transform 0.3s;
-  }
-  .overlay.vis .modal-sucesso { transform: translateY(0); }
-  .suc-icon { font-size: 3.5rem; margin-bottom: 16px; }
-  .suc-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; margin-bottom: 8px; }
-  .suc-sub { color: var(--cinza); font-size: 0.85rem; line-height: 1.6; margin-bottom: 24px; }
-  .btn-suc { width: 100%; background: var(--verde); border: none; border-radius: 12px; padding: 14px; color: var(--azul); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
-  .btn-suc:hover { background: var(--verde-escuro); }
-
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-
-  @media (max-width: 768px) {
-    .layout { grid-template-columns: 1fr; }
-    .sidebar { border-right: none; border-bottom: 1px solid var(--borda); }
-    .main { padding: 20px 16px; }
-    nav { padding: 16px 18px; }
-    .avatar-name, .avatar-role { display: none; }
-  }
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{--verde:#00C96F;--verde-escuro:#009E57;--azul:#0A1628;--azul-medio:#132240;--azul-input:#0F1C35;--branco:#F5F7F2;--cinza:#8A9BB5;--laranja:#FF6B35;--amarelo:#FFB830;--erro:#FF5C5C;--borda:rgba(255,255,255,0.09)}
+  body{font-family:'DM Sans',sans-serif;background:var(--azul);color:var(--branco);min-height:100vh}
+  body::before{content:'';position:fixed;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(0,201,111,0.09) 0%,transparent 70%);pointer-events:none;z-index:0}
+  nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--borda)}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;text-decoration:none;color:var(--branco)}
+  .logo span{color:var(--verde)}
+  .nav-right{display:flex;align-items:center;gap:14px}
+  .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,rgba(0,201,111,0.3),rgba(0,78,200,0.2));border:2px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem}
+  .avatar-name{font-size:0.85rem;font-weight:600}
+  .avatar-sub{font-size:0.72rem;color:var(--cinza)}
+  .btn-novo{background:var(--verde);border:none;border-radius:10px;padding:9px 18px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer;transition:all 0.2s}
+  .btn-novo:hover{background:var(--verde-escuro)}
+  .page{position:relative;z-index:5;max-width:1100px;margin:0 auto;padding:32px 24px 60px}
+  .page-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:28px}
+  .page-header h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;letter-spacing:-0.5px;margin-bottom:4px}
+  .page-header p{color:var(--cinza);font-size:0.88rem}
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+  .stat-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:18px 20px}
+  .stat-icon{font-size:1.4rem;margin-bottom:8px}
+  .stat-num{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;margin-bottom:2px}
+  .stat-num.verde{color:var(--verde)}.stat-num.laranja{color:var(--laranja)}.stat-num.amarelo{color:var(--amarelo)}
+  .stat-lbl{font-size:0.75rem;color:var(--cinza)}
+  .tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--azul-medio);border:1px solid var(--borda);border-radius:12px;padding:4px;width:fit-content}
+  .tab{padding:8px 18px;border-radius:9px;cursor:pointer;font-size:0.82rem;font-weight:600;color:var(--cinza);transition:all 0.2s;display:flex;align-items:center;gap:6px}
+  .tab:hover{color:var(--branco)}
+  .tab.ativo{background:var(--azul);color:var(--branco)}
+  .tab-badge{background:rgba(255,107,53,0.2);color:var(--laranja);font-size:0.68rem;font-weight:700;padding:1px 6px;border-radius:100px}
+  .tab.ativo .tab-badge{background:rgba(0,201,111,0.2);color:var(--verde)}
+  .pedido-wrap{margin-bottom:16px}
+  .pedido-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:18px;overflow:hidden}
+  .pedido-header{padding:20px 24px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer;transition:background 0.2s}
+  .pedido-header:hover{background:rgba(255,255,255,0.02)}
+  .pedido-status{display:inline-flex;align-items:center;gap:5px;font-size:0.7rem;font-weight:700;padding:4px 10px;border-radius:100px;text-transform:uppercase;letter-spacing:0.04em}
+  .status-aberto{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde)}
+  .status-andamento{background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.25);color:var(--amarelo)}
+  .status-concluido{background:rgba(138,155,181,0.1);border:1px solid rgba(138,155,181,0.2);color:var(--cinza)}
+  .pedido-titulo{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin:6px 0 4px;line-height:1.3}
+  .pedido-meta-row{display:flex;align-items:center;flex-wrap:wrap;gap:12px}
+  .pmeta{font-size:0.78rem;color:var(--cinza);display:flex;align-items:center;gap:4px}
+  .pmeta strong{color:var(--branco)}
+  .pedido-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+  .act-btn{background:none;border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.75rem;padding:6px 10px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+  .act-btn:hover{border-color:rgba(255,255,255,0.25);color:var(--branco)}
+  .act-btn.danger:hover{border-color:rgba(255,92,92,0.4);color:var(--erro)}
+  .expand-icon{color:var(--cinza);font-size:0.8rem;transition:transform 0.3s}
+  .expand-icon.open{transform:rotate(180deg)}
+  .interessados{border-top:1px solid var(--borda);padding:0 24px 20px;display:none}
+  .interessados.open{display:block}
+  .int-header{display:flex;align-items:center;justify-content:space-between;padding:14px 0 12px}
+  .int-titulo{font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem}
+  .int-count{background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.25);color:var(--laranja);font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:100px}
+  .int-count.zero{background:rgba(138,155,181,0.1);border-color:rgba(138,155,181,0.2);color:var(--cinza)}
+  .vazio{text-align:center;padding:60px 20px;display:none}
+  .vazio.vis{display:block}
+  .vazio-icon{font-size:3rem;opacity:0.3;margin-bottom:12px}
+  .vazio p{color:var(--cinza);font-size:0.88rem;margin-bottom:16px}
+  .btn-vazio{background:var(--verde);border:none;border-radius:10px;padding:12px 24px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer}
+  .int-badge{background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.25);color:var(--laranja);font-size:0.7rem;font-weight:700;padding:3px 8px;border-radius:100px}
+  .int-badge.has-int{animation:pulse 2s infinite}
+  .proposta-card{background:var(--azul-input);border:1px solid var(--borda);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+  .prop-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .prop-av{width:36px;height:36px;border-radius:50%;background:rgba(0,201,111,0.15);border:1.5px solid rgba(0,201,111,0.25);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+  .prop-nome{font-weight:700;font-size:0.85rem;color:var(--branco)}
+  .prop-data{font-size:0.7rem;color:var(--cinza)}
+  .prop-valor{margin-left:auto;font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--verde)}
+  .prop-msg{font-size:0.82rem;color:var(--cinza);line-height:1.6;margin-bottom:8px;padding:8px 0;border-top:1px solid var(--borda)}
+  .prop-taxa{font-size:0.72rem;color:var(--cinza);margin-bottom:10px}
+  .prop-taxa strong{color:var(--laranja)}
+  .btn-aceitar{width:100%;background:var(--verde);border:none;border-radius:9px;padding:10px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s}
+  .btn-aceitar:hover{background:var(--verde-escuro)}
+  .prop-aceita-badge{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.3);color:var(--verde);border-radius:9px;padding:10px;text-align:center;font-weight:700;font-size:0.85rem}
+  .dados-prof-card{background:rgba(0,201,111,0.05);border:1px solid rgba(0,201,111,0.2);border-radius:12px;padding:14px 16px;margin-bottom:16px}
+  .dprow{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--borda);font-size:0.82rem}
+  .dprow:last-of-type{border-bottom:none}
+  .dplbl{color:var(--cinza)}
+  .dpval{color:var(--branco);font-weight:600}
+  .btn-concluir{width:100%;background:transparent;border:1.5px solid var(--verde);border-radius:9px;padding:9px;color:var(--verde);font-family:'Syne',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer;margin-top:10px;transition:all 0.2s}
+  .btn-concluir:hover{background:var(--verde);color:var(--azul)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+  .spinner{width:40px;height:40px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
+  .overlay{position:fixed;inset:0;background:rgba(10,22,40,0.92);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s}
+  .overlay.vis{opacity:1;pointer-events:all}
+  .modal-suc{background:var(--azul-medio);border:1px solid var(--borda);border-radius:24px;width:100%;max-width:380px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s}
+  .overlay.vis .modal-suc{transform:translateY(0)}
+  .modal-aval{background:var(--azul-medio);border:1px solid var(--borda);border-radius:24px;width:100%;max-width:420px;padding:32px;transform:translateY(20px);transition:transform 0.3s}
+  .overlay.vis .modal-aval{transform:translateY(0)}
+  .aval-titulo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--branco);margin-bottom:6px}
+  .aval-sub{color:var(--cinza);font-size:0.82rem;margin-bottom:20px;line-height:1.5}
+  .estrelas-wrap{display:flex;justify-content:center;gap:8px;margin-bottom:6px}
+  .estrela-btn{font-size:2rem;cursor:pointer;opacity:0.3;transition:all 0.15s;background:none;border:none;padding:0}
+  .estrela-btn:hover,.estrela-btn.sel{opacity:1}
+  .nota-label{text-align:center;font-size:0.78rem;color:var(--cinza);margin-bottom:18px;min-height:18px}
+  .aval-textarea{width:100%;background:var(--azul-input);border:1.5px solid var(--borda);border-radius:12px;color:var(--branco);font-family:'DM Sans',sans-serif;font-size:0.85rem;padding:12px 14px;outline:none;resize:vertical;min-height:90px;line-height:1.6;margin-bottom:16px}
+  .aval-textarea:focus{border-color:rgba(0,201,111,0.45)}
+  .aval-textarea::placeholder{color:rgba(138,155,181,0.4)}
+  .aval-btns{display:flex;gap:8px}
+  .btn-aval-cancel{flex:1;background:transparent;border:1.5px solid var(--borda);border-radius:10px;padding:12px;color:var(--cinza);font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer}
+  .btn-aval-send{flex:2;background:var(--verde);border:none;border-radius:10px;padding:12px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer}
+  .suc-icon{font-size:3.2rem;margin-bottom:14px}
+  .suc-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:8px}
+  .suc-sub{color:var(--cinza);font-size:0.83rem;line-height:1.6;margin-bottom:22px}
+  .btn-suc{width:100%;background:var(--verde);border:none;border-radius:12px;padding:13px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  @media(max-width:640px){.stats-row{grid-template-columns:1fr 1fr}.page{padding:20px 16px 40px}nav{padding:16px 18px}.avatar-name,.avatar-sub{display:none}}
 </style>
-
-  <!-- PWA -->
-  <meta name="theme-color" content="#00C96F">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="ServiçoJá">
-  <meta name="mobile-web-app-capable" content="yes">
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icon.svg">
-
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script>
-    if (!window._fbInitialized) {
-      firebase.initializeApp({
-        apiKey: "AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
-        authDomain: "servicoja-e1f49.firebaseapp.com",
-        projectId: "servicoja-e1f49",
-        storageBucket: "servicoja-e1f49.firebasestorage.app",
-        messagingSenderId: "874413426529",
-        appId: "1:874413426529:web:9891d44afd9ef1750e6720"
-      });
-      window._fbInitialized = true;
-    }
-  </script>
+<meta name="theme-color" content="#00C96F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+  if(!window._fbInitialized){
+    firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",authDomain:"servicoja-e1f49.firebaseapp.com",projectId:"servicoja-e1f49",storageBucket:"servicoja-e1f49.firebasestorage.app",messagingSenderId:"874413426529",appId:"1:874413426529:web:9891d44afd9ef1750e6720"});
+    window._fbInitialized=true;
+  }
+</script>
 </head>
 <body>
 
 <nav>
-  <a href="#" class="logo">Serviço<span>Já</span></a>
+  <a href="login.html" class="logo">Serviço<span>Já</span> Conecta</a>
   <div class="nav-right">
-    <div class="nav-badge">⚡ 12 novos pedidos</div>
-    <div class="avatar-wrap">
-      <div class="avatar">👷</div>
-      <div>
-        <div class="avatar-name">João Ferreira</div>
-        <div class="avatar-role">Eletricista · SP</div>
-      </div>
+    <div class="avatar" id="navAvCliente" style="overflow:hidden;padding:0">👤</div>
+    <div>
+      <div class="avatar-name" id="nomeUsuario">...</div>
+      <div class="avatar-sub">Cliente</div>
     </div>
+    <div style="position:relative" id="notifWrap">
+  <button id="notifBtn" onclick="toggleNotif()" style="position:relative;width:36px;height:36px;border-radius:50%;background:#0F1C35;border:1px solid rgba(255,255,255,0.09);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">
+    🔔<span id="notifBadge" style="display:none;position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;border-radius:50%;background:#FF6B35;color:#fff;font-size:9px;font-weight:700;align-items:center;justify-content:center;border:2px solid #132240;padding:0 2px"></span>
+  </button>
+  <div id="notifDropdown" style="display:none;position:absolute;right:0;top:46px;width:310px;background:#132240;border:1px solid rgba(255,255,255,0.09);border-radius:14px;overflow:hidden;z-index:100;box-shadow:0 8px 32px rgba(0,0,0,0.4)">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.09)">
+      <span style="font-weight:700;font-size:13px;color:#F5F7F2">🔔 Notificações</span>
+      <span onclick="marcarTodasLidas()" style="font-size:11px;color:#8A9BB5;cursor:pointer;text-decoration:underline">Marcar lidas</span>
+    </div>
+    <div id="notifLista" style="max-height:340px;overflow-y:auto"></div>
+  </div>
+</div>
+    <button onclick="window.location.href='editar-perfil-cliente.html'" style="background:transparent;border:1px solid rgba(255,255,255,0.09);border-radius:9px;padding:8px 14px;color:#8A9BB5;font-size:0.78rem;cursor:pointer;margin-right:8px">✏️ Editar perfil</button><button class="btn-novo" onclick="window.location.href='publicar-pedido.html'">+ Novo pedido</button>
   </div>
 </nav>
 
-<div class="layout">
-
-  <!-- SIDEBAR -->
-  <div class="sidebar">
+<div class="page">
+  <div class="page-header">
     <div>
-      <div class="sidebar-title">Pedidos disponíveis</div>
-      <div class="sidebar-sub">Filtre por distância e categoria</div>
-    </div>
-
-    <!-- LOCALIZAÇÃO -->
-    <div class="loc-card">
-      <div class="loc-icon">📍</div>
-      <div class="loc-info">
-        <strong>Vila Mariana, SP</strong>
-        <span>Localização atual</span>
-      </div>
-      <button class="loc-btn">Atualizar</button>
-    </div>
-
-    <!-- RAIO -->
-    <div class="raio-card">
-      <div class="raio-label">📡 Raio de busca</div>
-      <div class="raio-valor" id="raioValor">10 <span>km</span></div>
-      <input type="range" min="1" max="50" value="10" id="raioSlider" oninput="atualizarRaio(this.value)">
-      <div class="raio-opts">
-        <span class="raio-opt" onclick="setRaio(5)">5km</span>
-        <span class="raio-opt sel" onclick="setRaio(10)">10km</span>
-        <span class="raio-opt" onclick="setRaio(20)">20km</span>
-        <span class="raio-opt" onclick="setRaio(50)">50km</span>
-      </div>
-    </div>
-
-    <!-- FILTROS -->
-    <div>
-      <div class="filtros-title">Minhas categorias</div>
-      <div class="filtro-item ativo" onclick="selFiltro(this)">
-        <span>⚡ Todos os pedidos</span>
-        <span class="filtro-count">24</span>
-      </div>
-      <div class="filtro-item" onclick="selFiltro(this)">
-        <span>⚡ Elétrica</span>
-        <span class="filtro-count">18</span>
-      </div>
-      <div class="filtro-item" onclick="selFiltro(this)">
-        <span>🔌 Instalações</span>
-        <span class="filtro-count">6</span>
-      </div>
-    </div>
-
-    <!-- URGÊNCIA -->
-    <div>
-      <div class="filtros-title">Urgência</div>
-      <div class="filtro-item ativo" onclick="selFiltro(this)">
-        <span>🔄 Todos</span>
-        <span class="filtro-count">24</span>
-      </div>
-      <div class="filtro-item" onclick="selFiltro(this)">
-        <span>🔥 Urgentes</span>
-        <span class="filtro-count">5</span>
-      </div>
-      <div class="filtro-item" onclick="selFiltro(this)">
-        <span>📅 Esta semana</span>
-        <span class="filtro-count">14</span>
-      </div>
-      <div class="filtro-item" onclick="selFiltro(this)">
-        <span>🗓️ Sem pressa</span>
-        <span class="filtro-count">5</span>
-      </div>
-    </div>
-
-    <!-- MINI STATS -->
-    <div class="stats-mini">
-      <div class="stat-mini"><div class="num">8</div><div class="lbl">Interesses enviados</div></div>
-      <div class="stat-mini"><div class="num">3</div><div class="lbl">Aceitos pelo cliente</div></div>
-      <div class="stat-mini"><div class="num">4.9★</div><div class="lbl">Sua avaliação</div></div>
-      <div class="stat-mini"><div class="num">R$2.4k</div><div class="lbl">Este mês</div></div>
+      <h1>Meus pedidos</h1>
+      <p>Acompanhe seus pedidos e veja os profissionais interessados</p>
     </div>
   </div>
 
-  <!-- MAIN -->
-  <div class="main">
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-num verde" id="statAtivos">0</div><div class="stat-lbl">Pedidos ativos</div></div>
+    <div class="stat-card"><div class="stat-icon">👷</div><div class="stat-num laranja" id="statAguardando">0</div><div class="stat-lbl">Aguardando resposta</div></div>
+    <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-num" style="color:var(--cinza)" id="statConcluidos">0</div><div class="stat-lbl">Serviços concluídos</div></div>
+    <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-num amarelo">—</div><div class="stat-lbl">Sua reputação</div></div>
+  </div>
 
-    <div class="main-header">
-      <div>
-        <h2>24 pedidos encontrados</h2>
-        <p>Dentro de 10km · São Paulo, SP · Categoria: Elétrica</p>
-      </div>
-      <select class="sort-select">
-        <option>Mais recentes</option>
-        <option>Mais próximos</option>
-        <option>Maior valor</option>
-        <option>Mais urgentes</option>
-      </select>
-    </div>
+  <div class="tabs">
+    <div class="tab ativo" data-filtro="todos" onclick="selTab(this)">📋 Todos <span class="tab-badge" id="badgeTodos">0</span></div>
+    <div class="tab" data-filtro="aberto" onclick="selTab(this)">🟢 Abertos</div>
+    <div class="tab" data-filtro="andamento" onclick="selTab(this)">🔄 Em andamento</div>
+    <div class="tab" data-filtro="concluido" onclick="selTab(this)">✅ Concluídos</div>
+  </div>
 
-    <!-- PEDIDO 1 - URGENTE -->
-    <div class="pedido-card urgente" style="animation-delay:0s">
-      <div class="pedido-top">
-        <div>
-          <div class="pedido-cat urgente">🔥 Urgente · ⚡ Elétrica</div>
-        </div>
-        <div style="font-size:0.75rem;color:var(--cinza);white-space:nowrap">há 15 min</div>
-      </div>
-      <div class="pedido-titulo">Disjuntor caiu e não volta — preciso urgente</div>
-      <div class="pedido-desc">O disjuntor geral da casa caiu e não consigo religar. Tentei resetar mas volta a desligar. Tenho uma criança pequena em casa e preciso resolver hoje.</div>
-      <div class="pedido-meta">
-        <div class="meta-item">📍 <strong>2,3 km</strong> · Moema</div>
-        <div class="meta-item">💰 <strong>Em aberto</strong></div>
-        <div class="meta-item">👁️ <strong>7</strong> viram</div>
-        <div class="meta-item" style="color:var(--verde)">✅ <strong>2</strong> aceitos pelo cliente</div>
-        <div class="meta-item" style="color:var(--amarelo)">💳 Taxa: <strong>R$ 35,00</strong></div>
-      </div>
-      <div class="pedido-bottom">
-        <div class="pedido-fotos">
-          <div class="foto-mini">🖼️</div>
-          <div class="foto-mini">🖼️</div>
-          <span class="foto-count">2 fotos</span>
-        </div>
-        <button class="interesse-btn" onclick="registrarInteresse(this)">👋 Tenho interesse</button>
-      </div>
-    </div>
+  <!-- LOADING -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>Carregando seus pedidos...</p>
+  </div>
 
-    <!-- PEDIDO 2 -->
-    <div class="pedido-card" style="animation-delay:0.05s">
-      <div class="pedido-top">
-        <div><div class="pedido-cat">⚡ Elétrica</div></div>
-        <div style="font-size:0.75rem;color:var(--cinza);white-space:nowrap">há 1h</div>
-      </div>
-      <div class="pedido-titulo">Instalação de 4 tomadas novas no escritório</div>
-      <div class="pedido-desc">Reforma do escritório em andamento. Preciso instalar 4 tomadas duplas com aterramento no padrão NBR 14136. A fiação já foi passada pelo pedreiro.</div>
-      <div class="pedido-meta">
-        <div class="meta-item">📍 <strong>4,1 km</strong> · Brooklin</div>
-        <div class="meta-item">💰 <strong>R$ 400</strong> aprox.</div>
-        <div class="meta-item">👁️ <strong>12</strong> viram</div>
-        <div class="meta-item" style="color:var(--verde)">✅ <strong>1</strong> aceito pelo cliente</div>
-        <div class="meta-item" style="color:var(--amarelo)">💳 Taxa: <strong>R$ 25,00</strong></div>
-      </div>
-      <div class="pedido-bottom">
-        <div class="pedido-fotos">
-          <div class="foto-mini">📄</div>
-          <span class="foto-count">1 projeto PDF</span>
-        </div>
-        <button class="interesse-btn" onclick="registrarInteresse(this)">👋 Tenho interesse</button>
-      </div>
-    </div>
+  <!-- LISTA -->
+  <div id="listaPedidos"></div>
 
-    <!-- PEDIDO 3 -->
-    <div class="pedido-card" style="animation-delay:0.1s">
-      <div class="pedido-top">
-        <div><div class="pedido-cat">⚡ Elétrica</div></div>
-        <div style="font-size:0.75rem;color:var(--cinza);white-space:nowrap">há 3h</div>
-      </div>
-      <div class="pedido-titulo">Instalação de ar-condicionado split 12.000 BTUs</div>
-      <div class="pedido-desc">Comprei um ar-condicionado split LG 12.000 BTUs e preciso de instalação completa: suporte, tubulação, elétrica e configuração. Apartamento no 8º andar.</div>
-      <div class="pedido-meta">
-        <div class="meta-item">📍 <strong>5,8 km</strong> · Ibirapuera</div>
-        <div class="meta-item">💰 <strong>R$ 300</strong> aprox.</div>
-        <div class="meta-item">👁️ <strong>21</strong> viram</div>
-        <div class="meta-item" style="color:var(--verde)">✅ <strong>3</strong> aceitos pelo cliente</div>
-        <div class="meta-item" style="color:var(--amarelo)">💳 Taxa: <strong>R$ 30,00</strong></div>
-      </div>
-      <div class="pedido-bottom">
-        <div class="pedido-fotos">
-          <div class="foto-mini">🖼️</div>
-          <div class="foto-mini">🎬</div>
-          <span class="foto-count">1 foto · 1 vídeo</span>
-        </div>
-        <button class="interesse-btn enviado">✅ Interesse enviado</button>
-      </div>
-    </div>
-
-    <!-- PEDIDO 4 -->
-    <div class="pedido-card" style="animation-delay:0.15s">
-      <div class="pedido-top">
-        <div><div class="pedido-cat">⚡ Elétrica</div></div>
-        <div style="font-size:0.75rem;color:var(--cinza);white-space:nowrap">há 5h</div>
-      </div>
-      <div class="pedido-titulo">Quadro de distribuição antigo — troca completa</div>
-      <div class="pedido-desc">Quadro elétrico de 1985, fios antigos e sem DR. Quero trocar tudo por quadro novo com disjuntores modernos e DR. Casa de 3 quartos, aproximadamente 120m².</div>
-      <div class="pedido-meta">
-        <div class="meta-item">📍 <strong>7,2 km</strong> · Santo André</div>
-        <div class="meta-item">💰 <strong>Em aberto</strong></div>
-        <div class="meta-item">👁️ <strong>9</strong> viram</div>
-        <div class="meta-item" style="color:var(--cinza)">✅ <strong>0</strong> aceitos ainda</div>
-        <div class="meta-item" style="color:var(--amarelo)">💳 Taxa: <strong>R$ 50,00</strong></div>
-      </div>
-      <div class="pedido-bottom">
-        <div class="pedido-fotos">
-          <div class="foto-mini">🖼️</div>
-          <div class="foto-mini">🖼️</div>
-          <div class="foto-mini">🖼️</div>
-          <span class="foto-count">3 fotos</span>
-        </div>
-        <button class="interesse-btn" onclick="registrarInteresse(this)">👋 Tenho interesse</button>
-      </div>
-    </div>
-
-    <!-- PEDIDO 5 -->
-    <div class="pedido-card" style="animation-delay:0.2s">
-      <div class="pedido-top">
-        <div><div class="pedido-cat">⚡ Elétrica</div></div>
-        <div style="font-size:0.75rem;color:var(--cinza);white-space:nowrap">há 8h</div>
-      </div>
-      <div class="pedido-titulo">Ponto de luz na garagem e tomada 220V</div>
-      <div class="pedido-desc">Preciso instalar um ponto de luz com sensor de presença na garagem e uma tomada 220V para carregar carro elétrico. Garagem coberta com 30m².</div>
-      <div class="pedido-meta">
-        <div class="meta-item">📍 <strong>9,4 km</strong> · ABC</div>
-        <div class="meta-item">💰 <strong>R$ 500</strong> aprox.</div>
-        <div class="meta-item">👁️ <strong>4</strong> viram</div>
-        <div class="meta-item" style="color:var(--cinza)">✅ <strong>0</strong> aceitos ainda</div>
-        <div class="meta-item" style="color:var(--amarelo)">💳 Taxa: <strong>R$ 20,00</strong></div>
-      </div>
-      <div class="pedido-bottom">
-        <div class="pedido-fotos">
-          <span class="foto-count" style="color:var(--cinza)">Sem anexos</span>
-        </div>
-        <button class="interesse-btn" onclick="registrarInteresse(this)">👋 Tenho interesse</button>
-      </div>
-    </div>
-
+  <!-- VAZIO -->
+  <div class="vazio" id="estadoVazio">
+    <div class="vazio-icon">📋</div>
+    <p>Nenhum pedido encontrado.<br>Publique seu primeiro pedido e receba orçamentos!</p>
+    <button class="btn-vazio" onclick="window.location.href='publicar-pedido.html'">+ Publicar pedido</button>
   </div>
 </div>
 
-<!-- MODAL: CONFIRMAÇÃO DE INTERESSE -->
-<div class="overlay" id="overlayConfirmInteresse">
-  <div style="background:var(--azul-medio);border:1px solid rgba(0,201,111,0.25);border-radius:22px;width:100%;max-width:380px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s">
-    <div style="font-size:3rem;margin-bottom:12px">👋</div>
-    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:8px">Interesse registrado!</div>
-    <div style="color:var(--cinza);font-size:0.83rem;line-height:1.6;margin-bottom:8px">O cliente foi notificado do seu interesse. Se ele aceitar ver seu orçamento, você será avisado por notificação e poderá enviar a proposta.</div>
-    <div style="background:rgba(255,184,48,0.08);border:1px solid rgba(255,184,48,0.2);border-radius:10px;padding:10px 14px;font-size:0.75rem;color:var(--amarelo);margin-bottom:20px;text-align:left">
-      💳 <strong>Lembre-se:</strong> a taxa só é cobrada se o cliente aceitar ver seu orçamento. Se não aceitar, você não paga nada.
+<!-- MODAL AVALIAÇÃO -->
+<div class="overlay" id="overlayAvaliacao">
+  <div class="modal-aval">
+    <div class="aval-titulo">⭐ Avaliar profissional</div>
+    <div class="aval-sub">Como foi o serviço? Sua avaliação ajuda outros clientes a escolherem bons profissionais.</div>
+    <div class="estrelas-wrap">
+      <button class="estrela-btn" onclick="selNota(1)">⭐</button>
+      <button class="estrela-btn" onclick="selNota(2)">⭐</button>
+      <button class="estrela-btn" onclick="selNota(3)">⭐</button>
+      <button class="estrela-btn" onclick="selNota(4)">⭐</button>
+      <button class="estrela-btn" onclick="selNota(5)">⭐</button>
     </div>
-    <button onclick="fecharOverlay('overlayConfirmInteresse')" style="width:100%;background:var(--verde);border:none;border-radius:12px;padding:13px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer">Entendido!</button>
-  </div>
-</div>
-
-<!-- MODAL: PERFIL DO PROFISSIONAL (visto pelo cliente) -->
-<div class="overlay" id="overlayPerfil">
-  <div class="modal-perfil">
-    <div class="modal-perfil-header">
-      <button class="modal-close" onclick="fecharOverlay('overlayPerfil')">✕</button>
-      <div class="prof-header">
-        <div class="prof-avatar">👷</div>
-        <div>
-          <div class="prof-nome">João Ferreira</div>
-          <div class="prof-cats">⚡ Eletricista · 🔌 Instalações</div>
-          <div class="prof-stars">
-            <span class="stars">★★★★★</span>
-            <span class="rating-num">4.9</span>
-            <span class="rating-count">(47 avaliações)</span>
-          </div>
-        </div>
-      </div>
-      <div class="prof-badge">✅ Aprovado pela IA ServiçoJá · 98% no teste</div>
-    </div>
-
-    <div class="modal-section">
-      <div class="modal-sec-title">Sobre o profissional</div>
-      <div class="prof-sobre">Eletricista com 12 anos de experiência em instalações residenciais e comerciais. Especializado em quadros elétricos, instalações de ar-condicionado e projetos de reforma. Trabalho com nota fiscal e garantia de 1 ano em todos os serviços.</div>
-    </div>
-
-    <div class="modal-section">
-      <div class="modal-sec-title">Fotos de trabalhos realizados</div>
-      <div class="fotos-grid">
-        <div class="foto-trabalho">🔌</div>
-        <div class="foto-trabalho">⚡</div>
-        <div class="foto-trabalho">🏠</div>
-        <div class="foto-trabalho">🔧</div>
-        <div class="foto-trabalho">💡</div>
-        <div class="foto-trabalho">🛠️</div>
-      </div>
-    </div>
-
-    <div class="modal-section">
-      <div class="modal-sec-title">Avaliações de clientes</div>
-      <div class="reviews">
-        <div class="review-item">
-          <div class="review-top">
-            <span class="review-nome">Carlos M.</span>
-            <span class="review-stars">★★★★★</span>
-          </div>
-          <div class="review-text">Excelente profissional! Chegou no horário, trabalho impecável e muito cuidadoso com a limpeza. Recomendo muito.</div>
-          <div class="review-data">há 2 semanas</div>
-        </div>
-        <div class="review-item">
-          <div class="review-top">
-            <span class="review-nome">Ana P.</span>
-            <span class="review-stars">★★★★★</span>
-          </div>
-          <div class="review-text">Instalou 6 tomadas novas e trocou o quadro elétrico. Serviço rápido, limpo e com garantia. Ótimo custo-benefício.</div>
-          <div class="review-data">há 1 mês</div>
-        </div>
-        <div class="review-item">
-          <div class="review-top">
-            <span class="review-nome">Roberto S.</span>
-            <span class="review-stars">★★★★☆</span>
-          </div>
-          <div class="review-text">Bom trabalho na instalação do ar-condicionado. Pequeno atraso no início mas avisou com antecedência. Serviço feito corretamente.</div>
-          <div class="review-data">há 2 meses</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn-recusar" onclick="fecharOverlay('overlayPerfil')">✕ Recusar</button>
-      <button class="btn-aceitar" onclick="abrirOrcamento()">✅ Aceitar e ver orçamento</button>
+    <div class="nota-label" id="notaSelecionada"></div>
+    <textarea class="aval-textarea" id="avalComentario" placeholder="Conte como foi o serviço, a pontualidade, qualidade do trabalho..."></textarea>
+    <div class="aval-btns">
+      <button class="btn-aval-cancel" onclick="document.getElementById('overlayAvaliacao').classList.remove('vis')">Cancelar</button>
+      <button class="btn-aval-send" onclick="enviarAvaliacao()">⭐ Enviar avaliação</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL: ENVIAR ORÇAMENTO -->
-<div class="overlay" id="overlayOrcamento">
-  <div class="modal-orcamento">
-    <div class="orc-title">Enviar orçamento</div>
-    <div class="orc-sub">Preencha os detalhes da sua proposta. Todos os campos são opcionais — envie o que fizer sentido para o serviço.</div>
-
-    <div class="orc-aviso">
-      💡 Agora que o cliente aceitou seu perfil, você pode enviar um orçamento prévio. Após combinar pessoalmente, vocês podem ajustar os detalhes.
-    </div>
-
-    <div class="orc-row">
-      <div class="orc-field">
-        <div class="orc-label">💰 Valor estimado <span class="orc-opcional">opcional</span></div>
-        <div class="orc-prefix">
-          <span>R$</span>
-          <input type="number" class="orc-input" placeholder="0,00">
-        </div>
-      </div>
-      <div class="orc-field">
-        <div class="orc-label">📅 Data de início <span class="orc-opcional">opcional</span></div>
-        <input type="date" class="orc-input">
-      </div>
-    </div>
-
-    <div class="orc-field">
-      <div class="orc-label">🏁 Data de conclusão <span class="orc-opcional">opcional</span></div>
-      <input type="date" class="orc-input">
-    </div>
-
-    <div class="orc-field">
-      <div class="orc-label">💬 Mensagem <span class="orc-opcional">opcional</span></div>
-      <textarea class="orc-input" placeholder="Ex: Olá! Analisei seu pedido e posso atender. Precisarei de cerca de 2 horas para o serviço. Trabalho com garantia de 1 ano..."></textarea>
-    </div>
-
-    <div class="orc-btns">
-      <button class="btn-cancelar" onclick="fecharOverlay('overlayOrcamento')">Cancelar</button>
-      <button class="btn-enviar-orc" onclick="enviarOrcamento()">📤 Enviar orçamento</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: SUCESSO -->
+<!-- MODAL SUCESSO -->
 <div class="overlay" id="overlaySucesso">
-  <div class="modal-sucesso">
-    <div class="suc-icon">🎉</div>
-    <div class="suc-title">Orçamento enviado!</div>
-    <div class="suc-sub">Seu orçamento foi enviado para o cliente. Você receberá uma notificação quando ele responder. As informações completas de contato serão liberadas após a confirmação.</div>
-    <button class="btn-suc" onclick="fecharOverlay('overlaySucesso')">Voltar aos pedidos</button>
+  <div class="modal-suc">
+    <div class="suc-icon" id="sucIcon">🎉</div>
+    <div class="suc-title" id="sucTitle">Sucesso!</div>
+    <div class="suc-sub" id="sucSub"></div>
+    <button class="btn-suc" onclick="fecharOverlay('overlaySucesso')">Entendido</button>
   </div>
 </div>
 
 <script>
-  // RAIO
-  function atualizarRaio(val) {
-    document.getElementById('raioValor').innerHTML = `${val} <span>km</span>`;
-    const slider = document.getElementById('raioSlider');
-    const pct = ((val - 1) / 49) * 100;
-    slider.style.background = `linear-gradient(to right, var(--verde) 0%, var(--verde) ${pct}%, rgba(255,255,255,0.1) ${pct}%)`;
-    document.querySelectorAll('.raio-opt').forEach(o => o.classList.remove('sel'));
+  const uid = localStorage.getItem('sj_uid');
+  const nome = localStorage.getItem('sj_nome') || 'Cliente';
+  document.getElementById('nomeUsuario').textContent = nome;
+
+  let todosPedidos = [];
+  let filtroAtual = 'todos';
+
+  // Formatar data
+  function formatarData(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR') + ' às ' + d.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
   }
-  function setRaio(val) {
-    document.getElementById('raioSlider').value = val;
-    atualizarRaio(val);
-    document.querySelectorAll('.raio-opt').forEach(o => {
-      o.classList.toggle('sel', parseInt(o.textContent) === val);
+
+  // Carregar pedidos do Firebase
+  async function carregarPedidos() {
+    if (!uid && !window._authUid) { window.location.href = 'login.html'; return; }
+    const queryUid = window._authUid || uid;
+    try {
+      const snap = await firebase.firestore().collection('pedidos')
+        .where('clienteId', '==', queryUid).get();
+
+      todosPedidos = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+        .sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
+
+      document.getElementById('loading').style.display = 'none';
+      renderPedidos();
+    } catch(e) {
+      document.getElementById('loading').innerHTML = '<p style="color:var(--erro)">Erro ao carregar pedidos: ' + e.message + '</p>';
+    }
+  }
+
+  function renderPedidos() {
+    const lista = document.getElementById('listaPedidos');
+    const filtrado = filtroAtual === 'todos' ? todosPedidos : todosPedidos.filter(p => p.status === filtroAtual);
+
+    // Stats
+    const ativos = todosPedidos.filter(p => p.status === 'aberto' || p.status === 'andamento').length;
+    const abertos = todosPedidos.filter(p => p.status === 'aberto').length;
+    const concluidos = todosPedidos.filter(p => p.status === 'concluido').length;
+    document.getElementById('statAtivos').textContent = ativos;
+    document.getElementById('statAguardando').textContent = abertos;
+    document.getElementById('statConcluidos').textContent = concluidos;
+    document.getElementById('badgeTodos').textContent = todosPedidos.length;
+
+    if (filtrado.length === 0) {
+      lista.innerHTML = '';
+      document.getElementById('estadoVazio').classList.add('vis');
+      return;
+    }
+    document.getElementById('estadoVazio').classList.remove('vis');
+
+    lista.innerHTML = filtrado.map(p => {
+      const cats = Array.isArray(p.categorias) ? p.categorias.join(', ') : (p.categorias || '—');
+      const statusClass = p.status === 'aberto' ? 'status-aberto' : p.status === 'andamento' ? 'status-andamento' : 'status-concluido';
+      const statusLabel = p.status === 'aberto' ? '🟢 Aberto' : p.status === 'andamento' ? '🔄 Em andamento' : '✅ Concluído';
+      const orcamento = p.orcamento === 'aberto' ? 'Em aberto' : (p.valor ? 'R$ ' + p.valor.toLocaleString('pt-BR') : 'Em aberto');
+      const interessados = p.interessados || [];
+      const numInt = interessados.length;
+
+      // Propostas HTML
+      const propostasHTML = interessados.length > 0 ? interessados.map((int, i) => `
+        <div class="proposta-card" id="prop-${p.id}-${i}">
+          <div class="prop-header">
+            <div class="prop-av">👷</div>
+            <div class="prop-info">
+              <div class="prop-nome">${int.profissionalNome || 'Profissional'}</div>
+              <div class="prop-data">📅 ${int.enviadoEm ? new Date(int.enviadoEm).toLocaleDateString('pt-BR') : '—'}</div>
+            </div>
+            <div class="prop-valor">${int.valor ? 'R$ ' + parseFloat(int.valor).toLocaleString('pt-BR') : 'A combinar'}</div>
+          </div>
+          <div class="prop-msg">${int.mensagem || '—'}</div>
+          <div class="prop-taxa">Taxa ServiçoJá: <strong>R$ ${int.taxa || '—'}</strong> — cobrada ao aceitar</div>
+          ${p.status !== 'aceito' ? `<button class="btn-aceitar" onclick="aceitarProposta('${p.id}', ${i})">✅ Aceitar esta proposta</button>` : (p.profissionalAceitoIdx === i ? '<div class="prop-aceita-badge">✅ Proposta aceita</div>' : '')}
+        </div>`).join('') : '<p style="color:var(--cinza);font-size:0.82rem;padding:12px 0">Nenhuma proposta ainda. Aguarde os profissionais se interessarem!</p>';
+
+      // Dados profissional aceito (visível só após aceitar)
+      const profAceito = p.profissionalAceitoIdx !== undefined ? interessados[p.profissionalAceitoIdx] : null;
+      const dadosProfHTML = profAceito ? `
+        <div class="dados-prof-card">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;margin-bottom:12px;color:var(--verde)">👷 Dados do profissional aceito</div>
+          <div class="dprow"><span class="dplbl">Nome</span><span class="dpval">${profAceito.profissionalNome}</span></div>
+          <div class="dprow"><span class="dplbl">Telefone</span><span class="dpval">${profAceito.telefone || 'Ver no perfil'}</span></div>
+          <div class="dprow"><span class="dplbl">Valor acordado</span><span class="dpval" style="color:var(--verde)">${profAceito.valor ? 'R$ '+parseFloat(profAceito.valor).toLocaleString('pt-BR') : 'A combinar'}</span></div>
+          <button class="btn-concluir" onclick="concluirServico('${p.id}')">✅ Marcar como concluído</button>
+        </div>` : '';
+
+      return `
+      <div class="pedido-wrap" data-status="${p.status||'aberto'}" data-id="${p.id}">
+        <div class="pedido-card">
+          <div class="pedido-header" onclick="togglePedido(this)">
+            <div style="flex:1">
+              <div class="pedido-status ${statusClass}">${statusLabel}</div>
+              <div class="pedido-titulo">${p.titulo || 'Sem título'}</div>
+              <div class="pedido-meta-row">
+                <div class="pmeta">📅 <span>${formatarData(p.criadoEm)}</span></div>
+                <div class="pmeta">🏷️ <span>${cats}</span></div>
+                <div class="pmeta">📍 <span>${p.endereco || '—'}</span></div>
+                <div class="pmeta">💰 <span>${orcamento}</span></div>
+                <div class="pmeta">⏱️ <span>${p.urgencia || '—'}</span></div>
+              </div>
+            </div>
+            <div class="pedido-actions">
+              ${p.status === 'aberto' ? `<button class="act-btn danger" onclick="event.stopPropagation();cancelarPedido('${p.id}',this)">🗑️ Cancelar</button>` : ''}
+              <span class="int-badge ${numInt > 0 ? 'has-int' : ''}">${numInt} proposta${numInt !== 1 ? 's' : ''}</span>
+              <span class="expand-icon">▼</span>
+            </div>
+          </div>
+          <div class="interessados">
+            <div class="int-header">
+              <span class="int-titulo">📝 Descrição</span>
+            </div>
+            <p style="font-size:0.83rem;color:var(--cinza);line-height:1.7;margin-bottom:16px">${p.descricao || 'Sem descrição.'}</p>
+            ${(p.fotos && p.fotos.length > 0) ? `
+            <div class="int-header"><span class="int-titulo">📎 Fotos anexadas (${p.fotos.length})</span></div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px" id="fotos-${p.id}">
+              ${p.fotos.map((f,i) => `<div style="width:80px;height:80px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.09);cursor:pointer" onclick="abrirFoto('${p.id}',${i})"><img src="${f}" style="width:100%;height:100%;object-fit:cover" loading="lazy"></div>`).join('')}
+            </div>` : ''}
+            ${p.status === 'aberto' ? `<button onclick="editarPedido('${p.id}')" style="background:rgba(255,255,255,0.06);border:1px solid var(--borda);border-radius:8px;padding:7px 14px;color:var(--cinza);font-size:0.78rem;cursor:pointer;margin-bottom:14px">✏️ Editar pedido</button>` : ''}
+            ${dadosProfHTML}
+            <div class="int-header" style="margin-top:16px">
+              <span class="int-titulo">💬 Propostas recebidas</span>
+              <span class="int-count ${numInt > 0 ? '' : 'zero'}">${numInt} profissional${numInt !== 1 ? 'is' : ''}</span>
+            </div>
+            ${propostasHTML}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function selTab(el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('ativo'));
+    el.classList.add('ativo');
+    filtroAtual = el.getAttribute('data-filtro');
+    renderPedidos();
+  }
+
+  function togglePedido(header) {
+    const intDiv = header.parentElement.querySelector('.interessados');
+    const expIcon = header.querySelector('.expand-icon');
+    const isOpen = intDiv.classList.contains('open');
+    intDiv.classList.toggle('open', !isOpen);
+    expIcon.classList.toggle('open', !isOpen);
+  }
+
+  function abrirFoto(pedidoId, idx) {
+    const pedido = todosPedidos.find(p => p.id === pedidoId);
+    if (!pedido || !pedido.fotos) return;
+    const img = pedido.fotos[idx];
+    const w = window.open('', '_blank');
+    w.document.write('<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="'+img+'" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>');
+  }
+
+  function editarPedido(pedidoId) {
+    const pedido = todosPedidos.find(p => p.id === pedidoId);
+    if (pedido) localStorage.setItem('sj_pedido_editar_data', JSON.stringify(pedido));
+    window.location.href = 'publicar-pedido.html?editar=' + pedidoId;
+  }
+
+  async function aceitarProposta(pedidoId, intIdx) {
+    if (!confirm('Aceitar esta proposta? O profissional será notificado.')) return;
+    try {
+      const pedido = todosPedidos.find(p => p.id === pedidoId);
+      const prof = pedido.interessados[intIdx];
+      await firebase.firestore().collection('pedidos').doc(pedidoId).update({
+        status: 'aceito',
+        profissionalAceitoIdx: intIdx,
+        profissionalAceitoId: prof.profissionalId,
+        profissionalAceitoNome: prof.profissionalNome,
+        taxaDevida: prof.taxa || 0,
+        aceitoEm: new Date().toISOString()
+      });
+      pedido.status = 'aceito';
+      pedido.profissionalAceitoIdx = intIdx;
+      pedido.profissionalAceitoNome = prof.profissionalNome;
+      renderPedidos();
+      // Notificar profissional
+      criarNotificacao(prof.profissionalId, 'aceite',
+        'Sua proposta para "'+pedido.titulo+'" foi aceita! Entre em contato com o cliente.',
+        'dashboard-profissional.html');
+      alert('✅ Proposta aceita! Os dados do profissional agora aparecem no pedido.');
+    } catch(e) { alert('Erro: ' + e.message); }
+  }
+
+  let pedidoParaAvaliar = null;
+
+  function selNota(n) {
+    window._notaAval = n;
+    const labels = ['','😞 Ruim','😐 Regular','🙂 Bom','😊 Muito bom','🤩 Excelente!'];
+    document.getElementById('notaSelecionada').textContent = labels[n];
+    document.querySelectorAll('.estrela-btn').forEach((s,i) => {
+      s.classList.toggle('sel', i < n);
     });
   }
 
-  // FILTROS
-  function selFiltro(el) {
-    el.parentElement.querySelectorAll('.filtro-item').forEach(f => f.classList.remove('ativo'));
-    el.classList.add('ativo');
+  function concluirServico(pedidoId) {
+    pedidoParaAvaliar = todosPedidos.find(p => p.id === pedidoId);
+    // Resetar modal
+    document.querySelectorAll('.estrela-btn').forEach(s => s.classList.remove('sel'));
+    document.getElementById('avalComentario').value = '';
+    document.getElementById('notaSelecionada').textContent = '';
+    window._notaAval = 0;
+    document.getElementById('overlayAvaliacao').classList.add('vis');
   }
 
-  // MODAIS
-  function registrarInteresse(btn) {
-    btn.className = 'interesse-btn enviado';
-    btn.textContent = '✅ Interesse enviado';
-    btn.onclick = null;
-    // Mostra modal de confirmação
-    document.getElementById('overlayConfirmInteresse').classList.add('vis');
+  async function enviarAvaliacao() {
+    const nota = window._notaAval || 0;
+    const comentario = document.getElementById('avalComentario').value.trim();
+    if (nota === 0) { alert('Selecione uma nota!'); return; }
+    if (!comentario) { alert('Escreva um comentário!'); return; }
+    if (!pedidoParaAvaliar) return;
+
+    try {
+      const pedido = pedidoParaAvaliar;
+      const profId = pedido.profissionalAceitoId;
+      const profNome = pedido.profissionalAceitoNome;
+      const clienteNome = localStorage.getItem('sj_nome') || 'Cliente';
+
+      // Salvar avaliação
+      await firebase.firestore().collection('avaliacoes').add({
+        profissionalId: profId,
+        profissionalNome: profNome,
+        clienteNome: clienteNome,
+        pedidoId: pedido.id,
+        nota: nota,
+        comentario: comentario,
+        criadoEm: new Date().toISOString()
+      });
+
+      // Atualizar pedido como concluído
+      await firebase.firestore().collection('pedidos').doc(pedido.id).update({
+        status: 'concluido',
+        concluidoEm: new Date().toISOString(),
+        avaliacao: nota
+      });
+
+      // Recalcular média do profissional
+      const avalSnap = await firebase.firestore().collection('avaliacoes')
+        .where('profissionalId', '==', profId).get();
+      const avals = avalSnap.docs.map(d => d.data());
+      const media = avals.reduce((s,a) => s+(a.nota||0), 0) / avals.length;
+      await firebase.firestore().collection('usuarios').doc(profId).update({
+        avaliacao: parseFloat(media.toFixed(1)),
+        totalAvaliacoes: avals.length
+      });
+
+      pedido.status = 'concluido';
+      document.getElementById('overlayAvaliacao').classList.remove('vis');
+      renderPedidos();
+      // Notificar profissional sobre avaliação
+      criarNotificacao(profId, 'avaliacao',
+        clienteNome+' avaliou seu trabalho com '+nota+' estrelas!',
+        'perfil-profissional.html');
+      alert('✅ Serviço concluído e avaliação enviada! Obrigado!');
+    } catch(e) { alert('Erro: ' + e.message); }
   }
 
-  function fecharOverlay(id) {
-    document.getElementById(id).classList.remove('vis');
+  async function cancelarPedido(id, btn) {
+    if (!confirm('Tem certeza que deseja cancelar este pedido?')) return;
+    try {
+      await firebase.firestore().collection('pedidos').doc(id).delete();
+      todosPedidos = todosPedidos.filter(p => p.id !== id);
+      renderPedidos();
+    } catch(e) {
+      alert('Erro ao cancelar pedido.');
+    }
   }
 
-  // Fechar clicando fora
-  document.querySelectorAll('.overlay').forEach(ov => {
-    ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('vis'); });
+  function mostrarSucesso(icon, title, sub) {
+    document.getElementById('sucIcon').textContent = icon;
+    document.getElementById('sucTitle').textContent = title;
+    document.getElementById('sucSub').textContent = sub;
+    document.getElementById('overlaySucesso').classList.add('vis');
+  }
+
+  function fecharOverlay(id) { document.getElementById(id).classList.remove('vis'); }
+  document.querySelectorAll('.overlay').forEach(ov => ov.addEventListener('click', e => { if(e.target===ov) ov.classList.remove('vis'); }));
+
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (!user) { window.location.href = 'login.html'; return; }
+    // Usar UID real do Firebase Auth, não do localStorage
+    window._authUid = user.uid;
+    carregarPedidos();
+    setTimeout(function(){ carregarNotificacoes(window._authUid || user.uid); }, 1000);
   });
 </script>
 
-<!-- BOTÃO FLUTUANTE DE SUGESTÃO -->
-<div id="sugestaoBtn" onclick="abrirSugestao()" style="
-  position:fixed;bottom:24px;right:24px;z-index:999;
-  background:#132240;border:1px solid rgba(0,201,111,0.3);
-  border-radius:100px;padding:10px 16px;
-  display:flex;align-items:center;gap:7px;
-  cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.35);
-  transition:all 0.2s;font-family:'DM Sans',sans-serif;
-  animation:fadeUpBtn 0.5s 0.8s ease both;opacity:0;
-">
-  <span style="font-size:1rem">💡</span>
-  <span style="font-size:0.75rem;font-weight:600;color:#00C96F">Sugerir melhoria</span>
-</div>
-
-<!-- MODAL SUGESTÃO -->
-<div id="overlaySugestao" style="
-  position:fixed;inset:0;background:rgba(10,22,40,0.92);
-  z-index:1000;display:flex;align-items:center;justify-content:center;
-  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
-">
-  <div id="modalSugestao" style="
-    background:#132240;border:1px solid rgba(255,255,255,0.09);
-    border-radius:22px;width:100%;max-width:440px;padding:28px;
-    transform:translateY(20px);transition:transform 0.3s;
-  ">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-      <div>
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:2px">💡 Sugerir melhoria</div>
-        <div style="font-size:0.75rem;color:#8A9BB5">Sua opinião nos ajuda a melhorar o ServiçoJá</div>
-      </div>
-      <button onclick="fecharSugestao()" style="background:rgba(255,255,255,0.06);border:none;border-radius:50%;width:30px;height:30px;color:#8A9BB5;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s">✕</button>
-    </div>
-
-    <div style="margin-bottom:12px">
-      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Você é:</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="selTipoSug(this,'cliente')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👤 Cliente</button>
-        <button onclick="selTipoSug(this,'profissional')" class="sug-tipo-btn" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.09);background:#0F1C35;color:#8A9BB5;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">👷 Profissional</button>
-      </div>
-    </div>
-
-    <div style="margin-bottom:12px">
-      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Categoria:</div>
-      <select id="sugCategoria" style="width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;font-size:0.83rem;padding:10px 12px;outline:none;cursor:pointer;-webkit-appearance:none">
-        <option value="">Selecione uma categoria</option>
-        <option>🎨 Design e visual</option>
-        <option>⚡ Funcionalidade</option>
-        <option>🐛 Reportar problema</option>
-        <option>💬 Comunicação e chat</option>
-        <option>💳 Pagamentos e taxas</option>
-        <option>🤖 Teste de IA</option>
-        <option>📋 Pedidos e orçamentos</option>
-        <option>💡 Nova funcionalidade</option>
-        <option>🔒 Segurança e privacidade</option>
-        <option>🌟 Outro</option>
-      </select>
-    </div>
-
-    <div style="margin-bottom:18px">
-      <div style="font-size:0.75rem;font-weight:600;color:#8A9BB5;margin-bottom:6px">Sua sugestão:</div>
-      <textarea id="sugTexto" placeholder="Descreva sua ideia ou problema. Seja específico — isso nos ajuda a implementar mais rápido!" style="
-        width:100%;background:#0F1C35;border:1.5px solid rgba(255,255,255,0.09);
-        border-radius:10px;color:#F5F7F2;font-family:'DM Sans',sans-serif;
-        font-size:0.83rem;padding:12px 14px;outline:none;resize:vertical;
-        min-height:100px;line-height:1.6;transition:border-color 0.2s;
-      " oninput="this.style.borderColor='rgba(0,201,111,0.4)'"></textarea>
-    </div>
-
-    <div style="display:flex;gap:8px">
-      <button onclick="fecharSugestao()" style="flex:1;background:transparent;border:1.5px solid rgba(255,255,255,0.09);border-radius:12px;padding:12px;color:#8A9BB5;font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.2s">Cancelar</button>
-      <button onclick="enviarSugestao()" style="flex:2;background:#00C96F;border:none;border-radius:12px;padding:12px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all 0.2s">💡 Enviar sugestão</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL SUCESSO SUGESTÃO -->
-<div id="overlaySugSucesso" style="
-  position:fixed;inset:0;background:rgba(10,22,40,0.92);
-  z-index:1001;display:flex;align-items:center;justify-content:center;
-  padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s;
-">
-  <div style="background:#132240;border:1px solid rgba(0,201,111,0.25);border-radius:22px;width:100%;max-width:360px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s" id="modalSugSuc">
-    <div style="font-size:3rem;margin-bottom:12px">🙏</div>
-    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:8px">Sugestão enviada!</div>
-    <div style="color:#8A9BB5;font-size:0.82rem;line-height:1.6;margin-bottom:22px">Obrigado pelo seu feedback! Nossa equipe lê todas as sugestões. As melhores ideias são implementadas em novas versões do app. 🚀</div>
-    <button onclick="fecharSugSucesso()" style="width:100%;background:#00C96F;border:none;border-radius:12px;padding:13px;color:#0A1628;font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer">Fechar</button>
-  </div>
-</div>
-
-<style>
-  @keyframes fadeUpBtn { from { opacity:0;transform:translateY(12px); } to { opacity:1;transform:translateY(0); } }
-  #sugestaoBtn:hover { background:#1a2d4a; transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.4); }
-  .sug-tipo-btn.sel { background:rgba(0,201,111,0.12) !important; border-color:rgba(0,201,111,0.4) !important; color:#00C96F !important; }
-</style>
-
-<script>
-  var sugTipoAtual = '';
-  function abrirSugestao() {
-    document.getElementById('overlaySugestao').style.opacity='1';
-    document.getElementById('overlaySugestao').style.pointerEvents='all';
-    document.getElementById('modalSugestao').style.transform='translateY(0)';
-  }
-  function fecharSugestao() {
-    document.getElementById('overlaySugestao').style.opacity='0';
-    document.getElementById('overlaySugestao').style.pointerEvents='none';
-    document.getElementById('modalSugestao').style.transform='translateY(20px)';
-  }
-  function selTipoSug(btn, tipo) {
-    sugTipoAtual = tipo;
-    document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
-    btn.classList.add('sel');
-  }
-  function enviarSugestao() {
-    var texto = document.getElementById('sugTexto').value.trim();
-    var cat = document.getElementById('sugCategoria').value;
-    if (!texto) { document.getElementById('sugTexto').style.borderColor='rgba(255,92,92,0.5)'; return; }
-    fecharSugestao();
-    setTimeout(function() {
-      document.getElementById('overlaySugSucesso').style.opacity='1';
-      document.getElementById('overlaySugSucesso').style.pointerEvents='all';
-      document.getElementById('modalSugSuc').style.transform='translateY(0)';
-      document.getElementById('sugTexto').value='';
-      document.getElementById('sugCategoria').value='';
-      sugTipoAtual='';
-      document.querySelectorAll('.sug-tipo-btn').forEach(b => b.classList.remove('sel'));
-    }, 200);
-  }
-  function fecharSugSucesso() {
-    document.getElementById('overlaySugSucesso').style.opacity='0';
-    document.getElementById('overlaySugSucesso').style.pointerEvents='none';
-    document.getElementById('modalSugSuc').style.transform='translateY(20px)';
-  }
-  document.getElementById('overlaySugestao').addEventListener('click', function(e) { if(e.target===this) fecharSugestao(); });
-  document.getElementById('overlaySugSucesso').addEventListener('click', function(e) { if(e.target===this) fecharSugSucesso(); });
-</script>
-
-
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(e => {});
-  }
-</script>
-
-<!-- BARRA DE NAVEGAÇÃO MOBILE -->
-<nav class="bottom-nav" id="bottomNav">
-  <a href="meus-pedidos-cliente.html" class="bn-item" id="bn-pedidos">
-    <span class="bn-icon">📋</span>
-    <span class="bn-label">Pedidos</span>
-  </a>
-  <a href="publicar-pedido.html" class="bn-item bn-center" id="bn-publicar">
-    <span class="bn-icon-center">＋</span>
-  </a>
-  <a href="notificacoes.html" class="bn-item" id="bn-notif">
-    <span class="bn-icon">🔔</span>
-    <span class="bn-label">Alertas</span>
-    <span class="bn-badge">3</span>
-  </a>
-</nav>
-
-<style>
-  body { padding-bottom: 70px; }
-  .bottom-nav {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-    background: #132240; border-top: 1px solid rgba(255,255,255,0.09);
-    display: flex; align-items: center; justify-content: space-around;
-    padding: 8px 16px 12px;
-    padding-bottom: max(12px, env(safe-area-inset-bottom));
-  }
-  .bn-item {
-    display: flex; flex-direction: column; align-items: center; gap: 3px;
-    text-decoration: none; color: #8A9BB5; font-size: 0.62rem; font-weight: 600;
-    min-width: 50px; transition: color 0.2s; position: relative;
-  }
-  .bn-item.ativo { color: #00C96F; }
-  .bn-icon { font-size: 1.2rem; }
-  .bn-label { font-family: 'DM Sans', sans-serif; }
-  .bn-center {
-    width: 48px; height: 48px; border-radius: 14px;
-    background: #00C96F; color: #0A1628 !important;
-    display: flex; align-items: center; justify-content: center;
-    margin-top: -14px; box-shadow: 0 4px 16px rgba(0,201,111,0.4);
-    font-size: 0; min-width: 0;
-  }
-  .bn-icon-center { font-size: 1.8rem; color: #0A1628; font-weight: 300; line-height: 1; }
-  .bn-badge {
-    position: absolute; top: -2px; right: 2px;
-    background: #FF6B35; color: white; font-size: 0.55rem; font-weight: 800;
-    width: 14px; height: 14px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    border: 1.5px solid #132240;
-  }
-</style>
-
-
-
-
-
-<script>
-firebase.auth().onAuthStateChanged(function(user) {
-  if (!user) { window.location.href = 'login.html'; return; }
-  
-  // Atualizar nome na nav
-  var nome = localStorage.getItem('sj_nome') || '';
-  var nomeEl = document.querySelector('.avatar-name');
-  if (nomeEl && nome) nomeEl.textContent = nome;
-  
-  // Carregar pedidos disponíveis em tempo real
-  carregarPedidos(user.uid);
-});
-
-function carregarPedidos(uid) {
-  firebase.firestore().collection('pedidos')
-    .where('status', '==', 'aberto')
-    .orderBy('criadoEm', 'desc')
-    .onSnapshot(function(snap) {
-      var total = snap.docs.length;
-      var h2 = document.querySelector('.main-header h2');
-      if (h2) h2.textContent = total + ' pedidos encontrados';
-    }, function(err) {
-      console.log('Pedidos erro:', err.message);
-    });
-}
-
-// Override registrarInteresse
-window.registrarInteresse = function(btn) {
-  var user = firebase.auth().currentUser;
-  if (!user) { alert('Faça login primeiro!'); return; }
-  
-  var card = btn.closest('.pedido-card');
-  var pedidoId = card ? card.dataset.pedidoId : null;
-  
-  btn.className = 'interesse-btn enviado';
-  btn.textContent = '✅ Interesse enviado';
-  btn.onclick = null;
-  
-  if (pedidoId) {
-    firebase.firestore().collection('pedidos').doc(pedidoId)
-      .collection('interessados').add({
-        profissionalId: user.uid,
-        nome: localStorage.getItem('sj_nome') || '',
-        criadoEm: new Date().toISOString()
-      }).catch(function(e) { console.log(e); });
-  }
-  
-  document.getElementById('overlayConfirmInteresse').classList.add('vis');
-}
-</script>
-
+<script>if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(e=>{});}</script>
 </body>
 </html>
