@@ -218,6 +218,27 @@ if(!window._fbInitialized){
   </div>
 </div>
 
+<!-- MODAL DETALHE DO PEDIDO (item 1) — sem endereço nem contato -->
+<div class="overlay" id="overlayDetalhe">
+  <div class="modal" style="max-width:500px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div class="modal-title" id="detTitulo">—</div>
+      <button onclick="document.getElementById('overlayDetalhe').classList.remove('vis')" style="background:rgba(255,255,255,0.06);border:none;border-radius:50%;width:28px;height:28px;color:var(--cinza);cursor:pointer;font-size:0.85rem;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <div class="p-cats" id="detCats" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px"></div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:0.68rem;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Descrição</div>
+      <div id="detDesc" style="font-size:0.85rem;color:var(--cinza);line-height:1.7;background:var(--azul-input);border:1px solid var(--borda);border-radius:10px;padding:12px 14px"></div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px" id="detMeta"></div>
+    <div id="detFotosSec" style="display:none;margin-bottom:14px">
+      <div style="font-size:0.68rem;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Fotos do serviço</div>
+      <div id="detFotos" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"></div>
+    </div>
+    <div class="taxa-info">💡 Ao clicar em "Me interesso" você entra na lista do cliente. A taxa só é cobrada quando o cliente aceitar receber sua proposta.</div>
+  </div>
+</div>
+
 <!-- MODAL — só abre quando o cliente solicitar a proposta -->
 <div class="overlay" id="overlayProposta">
   <div class="modal">
@@ -435,7 +456,7 @@ function renderPedidos() {
 
     return `<div class="pedido-card">
       <div class="p-cats">${cats.map(c=>`<span class="pcat">${c}</span>`).join('')}</div>
-      <div class="p-title">${p.titulo||'Sem título'}</div>
+      <div class="p-title" style="cursor:pointer" onclick="abrirDetalhe('${p.id}')">${p.titulo||'Sem título'} <span style="font-size:0.7rem;color:var(--cinza);font-weight:400">🔍 ver mais</span></div>
       <div class="p-desc">${p.descricao||'Sem descrição.'}</div>
       <div class="p-footer">
         <div class="p-meta">
@@ -448,6 +469,32 @@ function renderPedidos() {
       </div>
     </div>`;
   }).join('');
+}
+
+// ── DETALHE DO PEDIDO (item 1) ────────────────────────────────────────
+function abrirDetalhe(pedidoId) {
+  const p = todosPedidos.find(x => x.id === pedidoId);
+  if (!p) return;
+  document.getElementById('detTitulo').textContent = p.titulo || 'Sem título';
+  const cats = Array.isArray(p.categorias) ? p.categorias : [p.categorias || '—'];
+  document.getElementById('detCats').innerHTML = cats.map(c => `<span class="pcat">${c}</span>`).join('');
+  document.getElementById('detDesc').textContent = p.descricao || 'Sem descrição.';
+  const orc = p.orcamento === 'aproximado' && p.valor ? 'R$ ' + parseFloat(p.valor).toLocaleString('pt-BR') : 'Em aberto';
+  const urgLabel = p.urgencia || '🗓️ Sem pressa';
+  document.getElementById('detMeta').innerHTML = `
+    <span style="font-size:0.75rem;background:var(--azul-input);border:1px solid var(--borda);border-radius:8px;padding:5px 10px;color:var(--cinza)">📅 ${formatData(p.criadoEm)}</span>
+    <span style="font-size:0.75rem;background:var(--azul-input);border:1px solid var(--borda);border-radius:8px;padding:5px 10px;color:var(--cinza)">💰 ${orc}</span>
+    <span style="font-size:0.75rem;background:var(--azul-input);border:1px solid var(--borda);border-radius:8px;padding:5px 10px;color:var(--cinza)">${urgLabel}</span>`;
+  // Fotos do pedido (sem endereço, sem contato)
+  const fotos = p.fotos || [];
+  const secFotos = document.getElementById('detFotosSec');
+  if (fotos.length > 0) {
+    secFotos.style.display = 'block';
+    document.getElementById('detFotos').innerHTML = fotos.map(f =>
+      `<div style="aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid var(--borda)"><img src="${f}" style="width:100%;height:100%;object-fit:cover"></div>`
+    ).join('');
+  } else { secFotos.style.display = 'none'; }
+  document.getElementById('overlayDetalhe').classList.add('vis');
 }
 
 // ── REGISTRAR INTERESSE (sem modal) ───────────────────────────────────
