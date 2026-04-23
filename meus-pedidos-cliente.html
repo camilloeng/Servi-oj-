@@ -3,153 +3,159 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ServiçoJá Conecta — Meus Pedidos</title>
+<title>ServiçoJá — Meus Pedidos</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-  :root{--verde:#00C96F;--verde-escuro:#009E57;--azul:#0A1628;--azul-medio:#132240;--azul-input:#0F1C35;--branco:#F5F7F2;--cinza:#8A9BB5;--laranja:#FF6B35;--amarelo:#FFB830;--erro:#FF5C5C;--borda:rgba(255,255,255,0.09)}
-  body{font-family:'DM Sans',sans-serif;background:var(--azul);color:var(--branco);min-height:100vh}
-  body::before{content:'';position:fixed;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(0,201,111,0.09) 0%,transparent 70%);pointer-events:none;z-index:0}
-  nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--borda)}
-  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;text-decoration:none;color:var(--branco)}
-  .logo span{color:var(--verde)}
-  .nav-right{display:flex;align-items:center;gap:14px}
-  .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,rgba(0,201,111,0.3),rgba(0,78,200,0.2));border:2px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem}
-  .avatar-name{font-size:0.85rem;font-weight:600}
-  .avatar-sub{font-size:0.72rem;color:var(--cinza)}
-  .btn-novo{background:var(--verde);border:none;border-radius:10px;padding:9px 18px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer;transition:all 0.2s}
-  .btn-novo:hover{background:var(--verde-escuro)}
-  .page{position:relative;z-index:5;max-width:1100px;margin:0 auto;padding:32px 24px 60px}
-  .page-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:28px}
-  .page-header h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;letter-spacing:-0.5px;margin-bottom:4px}
-  .page-header p{color:var(--cinza);font-size:0.88rem}
-  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
-  .stat-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:18px 20px}
-  .stat-icon{font-size:1.4rem;margin-bottom:8px}
-  .stat-num{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;margin-bottom:2px}
-  .stat-num.verde{color:var(--verde)}.stat-num.laranja{color:var(--laranja)}.stat-num.amarelo{color:var(--amarelo)}
-  .stat-lbl{font-size:0.75rem;color:var(--cinza)}
-  .tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--azul-medio);border:1px solid var(--borda);border-radius:12px;padding:4px;width:fit-content}
-  .tab{padding:8px 18px;border-radius:9px;cursor:pointer;font-size:0.82rem;font-weight:600;color:var(--cinza);transition:all 0.2s;display:flex;align-items:center;gap:6px}
-  .tab:hover{color:var(--branco)}
-  .tab.ativo{background:var(--azul);color:var(--branco)}
-  .tab-badge{background:rgba(255,107,53,0.2);color:var(--laranja);font-size:0.68rem;font-weight:700;padding:1px 6px;border-radius:100px}
-  .tab.ativo .tab-badge{background:rgba(0,201,111,0.2);color:var(--verde)}
-  .pedido-wrap{margin-bottom:16px}
-  .pedido-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:18px;overflow:hidden}
-  .pedido-header{padding:20px 24px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer;transition:background 0.2s}
-  .pedido-header:hover{background:rgba(255,255,255,0.02)}
-  .pedido-status{display:inline-flex;align-items:center;gap:5px;font-size:0.7rem;font-weight:700;padding:4px 10px;border-radius:100px;text-transform:uppercase;letter-spacing:0.04em}
-  .status-aberto{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde)}
-  .status-andamento{background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.25);color:var(--amarelo)}
-  .status-concluido{background:rgba(138,155,181,0.1);border:1px solid rgba(138,155,181,0.2);color:var(--cinza)}
-  .pedido-titulo{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin:6px 0 4px;line-height:1.3}
-  .pedido-meta-row{display:flex;align-items:center;flex-wrap:wrap;gap:12px}
-  .pmeta{font-size:0.78rem;color:var(--cinza);display:flex;align-items:center;gap:4px}
-  .pmeta strong{color:var(--branco)}
-  .pedido-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
-  .act-btn{background:none;border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.75rem;padding:6px 10px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
-  .act-btn:hover{border-color:rgba(255,255,255,0.25);color:var(--branco)}
-  .act-btn.danger:hover{border-color:rgba(255,92,92,0.4);color:var(--erro)}
-  .expand-icon{color:var(--cinza);font-size:0.8rem;transition:transform 0.3s}
-  .expand-icon.open{transform:rotate(180deg)}
-  .interessados{border-top:1px solid var(--borda);padding:0 24px 20px;display:none}
-  .interessados.open{display:block}
-  .int-header{display:flex;align-items:center;justify-content:space-between;padding:14px 0 12px}
-  .int-titulo{font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem}
-  .int-count{background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.25);color:var(--laranja);font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:100px}
-  .int-count.zero{background:rgba(138,155,181,0.1);border-color:rgba(138,155,181,0.2);color:var(--cinza)}
-  .vazio{text-align:center;padding:60px 20px;display:none}
-  .vazio.vis{display:block}
-  .vazio-icon{font-size:3rem;opacity:0.3;margin-bottom:12px}
-  .vazio p{color:var(--cinza);font-size:0.88rem;margin-bottom:16px}
-  .btn-vazio{background:var(--verde);border:none;border-radius:10px;padding:12px 24px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer}
-  .int-badge{background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.25);color:var(--laranja);font-size:0.7rem;font-weight:700;padding:3px 8px;border-radius:100px}
-  .int-badge.has-int{animation:pulse 2s infinite}
-  .proposta-card{background:var(--azul-input);border:1px solid var(--borda);border-radius:12px;padding:14px 16px;margin-bottom:10px}
-  .prop-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-  .prop-av{width:36px;height:36px;border-radius:50%;background:rgba(0,201,111,0.15);border:1.5px solid rgba(0,201,111,0.25);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
-  .prop-nome{font-weight:700;font-size:0.85rem;color:var(--branco)}
-  .prop-data{font-size:0.7rem;color:var(--cinza)}
-  .prop-valor{margin-left:auto;font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--verde)}
-  .prop-msg{font-size:0.82rem;color:var(--cinza);line-height:1.6;margin-bottom:8px;padding:8px 0;border-top:1px solid var(--borda)}
-  .prop-taxa{font-size:0.72rem;color:var(--cinza);margin-bottom:10px}
-  .prop-taxa strong{color:var(--laranja)}
-  .btn-aceitar{width:100%;background:var(--verde);border:none;border-radius:9px;padding:10px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s}
-  .btn-aceitar:hover{background:var(--verde-escuro)}
-  .prop-aceita-badge{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.3);color:var(--verde);border-radius:9px;padding:10px;text-align:center;font-weight:700;font-size:0.85rem}
-  .dados-prof-card{background:rgba(0,201,111,0.05);border:1px solid rgba(0,201,111,0.2);border-radius:12px;padding:14px 16px;margin-bottom:16px}
-  .dprow{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--borda);font-size:0.82rem}
-  .dprow:last-of-type{border-bottom:none}
-  .dplbl{color:var(--cinza)}
-  .dpval{color:var(--branco);font-weight:600}
-  .btn-concluir{width:100%;background:transparent;border:1.5px solid var(--verde);border-radius:9px;padding:9px;color:var(--verde);font-family:'Syne',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer;margin-top:10px;transition:all 0.2s}
-  .btn-concluir:hover{background:var(--verde);color:var(--azul)}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
-  .spinner{width:40px;height:40px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
-  .overlay{position:fixed;inset:0;background:rgba(10,22,40,0.92);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s}
-  .overlay.vis{opacity:1;pointer-events:all}
-  .modal-suc{background:var(--azul-medio);border:1px solid var(--borda);border-radius:24px;width:100%;max-width:380px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s}
-  .overlay.vis .modal-suc{transform:translateY(0)}
-  .modal-aval{background:var(--azul-medio);border:1px solid var(--borda);border-radius:24px;width:100%;max-width:420px;padding:32px;transform:translateY(20px);transition:transform 0.3s}
-  .overlay.vis .modal-aval{transform:translateY(0)}
-  .aval-titulo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--branco);margin-bottom:6px}
-  .aval-sub{color:var(--cinza);font-size:0.82rem;margin-bottom:20px;line-height:1.5}
-  .estrelas-wrap{display:flex;justify-content:center;gap:8px;margin-bottom:6px}
-  .estrela-btn{font-size:2rem;cursor:pointer;opacity:0.3;transition:all 0.15s;background:none;border:none;padding:0}
-  .estrela-btn:hover,.estrela-btn.sel{opacity:1}
-  .nota-label{text-align:center;font-size:0.78rem;color:var(--cinza);margin-bottom:18px;min-height:18px}
-  .aval-textarea{width:100%;background:var(--azul-input);border:1.5px solid var(--borda);border-radius:12px;color:var(--branco);font-family:'DM Sans',sans-serif;font-size:0.85rem;padding:12px 14px;outline:none;resize:vertical;min-height:90px;line-height:1.6;margin-bottom:16px}
-  .aval-textarea:focus{border-color:rgba(0,201,111,0.45)}
-  .aval-textarea::placeholder{color:rgba(138,155,181,0.4)}
-  .aval-btns{display:flex;gap:8px}
-  .btn-aval-cancel{flex:1;background:transparent;border:1.5px solid var(--borda);border-radius:10px;padding:12px;color:var(--cinza);font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer}
-  .btn-aval-send{flex:2;background:var(--verde);border:none;border-radius:10px;padding:12px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer}
-  .suc-icon{font-size:3.2rem;margin-bottom:14px}
-  .suc-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:8px}
-  .suc-sub{color:var(--cinza);font-size:0.83rem;line-height:1.6;margin-bottom:22px}
-  .btn-suc{width:100%;background:var(--verde);border:none;border-radius:12px;padding:13px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-  @media(max-width:640px){.stats-row{grid-template-columns:1fr 1fr}.page{padding:20px 16px 40px}nav{padding:16px 18px}.avatar-name,.avatar-sub{display:none}}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--verde:#00C96F;--verde-escuro:#009E57;--azul:#0A1628;--azul-medio:#132240;--azul-input:#0F1C35;--branco:#F5F7F2;--cinza:#8A9BB5;--laranja:#FF6B35;--amarelo:#FFB830;--erro:#FF5C5C;--borda:rgba(255,255,255,0.09)}
+body{font-family:'DM Sans',sans-serif;background:var(--azul);color:var(--branco);min-height:100vh;padding-bottom:80px}
+a{color:inherit;text-decoration:none}
+nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--borda);position:relative;z-index:10}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem}
+.logo span{color:var(--verde)}
+.nav-right{display:flex;align-items:center;gap:14px}
+/* Avatar clicável item 8 */
+.avatar-wrap{display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 10px;border-radius:10px;border:1px solid transparent;transition:all 0.2s}
+.avatar-wrap:hover{border-color:var(--borda);background:rgba(255,255,255,0.03)}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,rgba(0,201,111,0.3),rgba(0,78,200,0.2));border:2px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.avatar-name{font-size:0.85rem;font-weight:600}
+.avatar-sub{font-size:0.72rem;color:var(--cinza)}
+.btn-novo{background:var(--verde);border:none;border-radius:10px;padding:9px 18px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer;transition:all 0.2s}
+.btn-novo:hover{background:var(--verde-escuro)}
+.page{max-width:1000px;margin:0 auto;padding:28px 24px 40px;position:relative;z-index:5}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:24px}
+.page-header h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;letter-spacing:-0.5px;margin-bottom:4px}
+.page-header p{color:var(--cinza);font-size:0.88rem}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:16px 20px}
+.stat-icon{font-size:1.4rem;margin-bottom:8px}
+.stat-num{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;margin-bottom:2px}
+.stat-num.verde{color:var(--verde)}
+.stat-num.laranja{color:var(--laranja)}
+.stat-num.amarelo{color:var(--amarelo)}
+.stat-lbl{font-size:0.75rem;color:var(--cinza)}
+.tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--azul-medio);border:1px solid var(--borda);border-radius:12px;padding:4px;width:fit-content}
+.tab{padding:8px 16px;border-radius:9px;cursor:pointer;font-size:0.82rem;font-weight:600;color:var(--cinza);transition:all 0.2s}
+.tab:hover{color:var(--branco)}
+.tab.ativo{background:var(--azul);color:var(--branco)}
+/* PEDIDO CARD */
+.pedido-wrap{margin-bottom:14px;animation:fadeUp 0.4s ease both}
+.pedido-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:18px;overflow:hidden}
+.pedido-header{padding:18px 22px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer;transition:background 0.2s}
+.pedido-header:hover{background:rgba(255,255,255,0.02)}
+.pedido-status{display:inline-flex;align-items:center;gap:5px;font-size:0.7rem;font-weight:700;padding:4px 10px;border-radius:100px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px}
+.status-aberto{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde)}
+.status-andamento{background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.25);color:var(--amarelo)}
+.status-concluido{background:rgba(138,155,181,0.1);border:1px solid rgba(138,155,181,0.2);color:var(--cinza)}
+.pedido-titulo{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:6px;line-height:1.3}
+.pedido-meta-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.pmeta{font-size:0.78rem;color:var(--cinza)}
+.pmeta strong{color:var(--branco)}
+.pedido-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.act-btn{background:none;border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.75rem;padding:6px 10px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.act-btn:hover{border-color:rgba(255,255,255,0.25);color:var(--branco)}
+.act-btn.danger:hover{border-color:rgba(255,92,92,0.4);color:var(--erro)}
+.expand-icon{color:var(--cinza);font-size:0.8rem;transition:transform 0.3s}
+.expand-icon.open{transform:rotate(180deg)}
+/* INTERESSADOS */
+.interessados{border-top:1px solid var(--borda);padding:0 22px 18px;display:none}
+.interessados.open{display:block;animation:fadeUp 0.3s ease both}
+.int-header{display:flex;align-items:center;justify-content:space-between;padding:14px 0 12px}
+.int-titulo{font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem}
+.int-count{background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.25);color:var(--laranja);font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:100px}
+.int-count.zero{background:rgba(138,155,181,0.1);border-color:rgba(138,155,181,0.2);color:var(--cinza)}
+.prof-lista{display:flex;flex-direction:column;gap:10px}
+.prof-item{background:var(--azul-input);border:1px solid var(--borda);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;transition:border-color 0.2s}
+.prof-item:hover{border-color:rgba(0,201,111,0.2)}
+.prof-item.aceito{border-color:rgba(0,201,111,0.25);background:rgba(0,201,111,0.04)}
+.prof-item.recusado{opacity:0.4}
+.prof-av{width:44px;height:44px;border-radius:50%;flex-shrink:0;background:rgba(0,201,111,0.15);border:2px solid rgba(0,201,111,0.2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;overflow:hidden}
+.prof-av img{width:100%;height:100%;object-fit:cover}
+.prof-info{flex:1;min-width:0}
+.prof-nome{font-weight:700;font-size:0.9rem;margin-bottom:3px}
+.prof-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px}
+.prof-tag{font-size:0.68rem;padding:2px 7px;border-radius:100px;background:rgba(255,255,255,0.05);border:1px solid var(--borda);color:var(--cinza)}
+.prof-msg{font-size:0.78rem;color:var(--cinza);margin-top:5px;font-style:italic;line-height:1.5}
+.prof-btns{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap}
+.btn-ver-perfil{background:none;border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.75rem;padding:7px 10px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.btn-ver-perfil:hover{border-color:rgba(255,255,255,0.25);color:var(--branco)}
+.btn-aceitar-prof{background:var(--verde);border:none;border-radius:8px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.75rem;padding:7px 12px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.btn-aceitar-prof:hover{background:var(--verde-escuro)}
+.btn-recusar-prof{background:none;border:1px solid rgba(255,92,92,0.2);border-radius:8px;color:var(--erro);font-size:0.75rem;padding:7px 10px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.btn-recusar-prof:hover{background:rgba(255,92,92,0.08)}
+.status-tag{font-size:0.72rem;font-weight:700;padding:5px 10px;border-radius:8px}
+.status-aceito-tag{background:rgba(0,201,111,0.12);color:var(--verde);border:1px solid rgba(0,201,111,0.25)}
+.status-recusado-tag{background:rgba(255,92,92,0.08);color:var(--erro);border:1px solid rgba(255,92,92,0.2)}
+.status-solicitado-tag{background:rgba(255,184,48,0.1);color:var(--amarelo);border:1px solid rgba(255,184,48,0.25);animation:pulse 2s infinite}
+/* OVERLAY / MODAL */
+.overlay{position:fixed;inset:0;background:rgba(10,22,40,0.92);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s}
+.overlay.vis{opacity:1;pointer-events:all}
+.modal-box{background:var(--azul-medio);border:1px solid var(--borda);border-radius:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;transform:translateY(20px);transition:transform 0.3s}
+.overlay.vis .modal-box{transform:translateY(0)}
+.modal-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.06);border:none;border-radius:50%;width:30px;height:30px;color:var(--cinza);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.9rem;transition:all 0.2s}
+.modal-close:hover{background:rgba(255,255,255,0.12);color:var(--branco)}
+.modal-head{padding:24px 26px 0;position:relative}
+.mprof-header{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.mprof-av{width:64px;height:64px;border-radius:50%;flex-shrink:0;background:rgba(0,201,111,0.15);border:3px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:1.8rem;overflow:hidden}
+.mprof-av img{width:100%;height:100%;object-fit:cover}
+.mprof-nome{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:2px}
+.mprof-cats{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.mprof-cat-badge{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.2);color:var(--verde);font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:100px}
+.mprof-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde);font-size:0.7rem;font-weight:700;padding:3px 10px;border-radius:100px;margin-bottom:14px}
+.msec{padding:14px 26px;border-top:1px solid var(--borda)}
+.msec-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.78rem;color:var(--cinza);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px}
+.msobre{font-size:0.83rem;color:var(--cinza);line-height:1.7}
+.fotos-g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.foto-t{aspect-ratio:1;border-radius:10px;background:var(--azul-input);border:1px solid var(--borda);overflow:hidden}
+.foto-t img{width:100%;height:100%;object-fit:cover}
+.modal-foot{padding:16px 26px;border-top:1px solid var(--borda);display:flex;gap:10px}
+.mf-recusar{flex:1;background:transparent;border:1.5px solid var(--borda);border-radius:12px;padding:12px;color:var(--cinza);font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.2s}
+.mf-recusar:hover{border-color:rgba(255,92,92,0.4);color:var(--erro)}
+.mf-aceitar{flex:2;background:var(--verde);border:none;border-radius:12px;padding:12px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;transition:all 0.2s}
+.mf-aceitar:hover{background:var(--verde-escuro)}
+/* modal suc */
+.modal-suc{background:var(--azul-medio);border:1px solid var(--borda);border-radius:24px;width:100%;max-width:380px;text-align:center;padding:36px 28px;transform:translateY(20px);transition:transform 0.3s}
+.overlay.vis .modal-suc{transform:translateY(0)}
+.suc-icon{font-size:3.2rem;margin-bottom:14px}
+.suc-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:8px}
+.suc-sub{color:var(--cinza);font-size:0.83rem;line-height:1.6;margin-bottom:22px}
+.btn-suc{width:100%;background:var(--verde);border:none;border-radius:12px;padding:13px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;cursor:pointer}
+/* loading */
+.spinner{width:40px;height:40px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;margin:60px auto}
+.vazio{text-align:center;padding:40px;color:var(--cinza)}
+.vazio-icon{font-size:2.5rem;opacity:0.3;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+@media(max-width:640px){.stats-row{grid-template-columns:1fr 1fr}.avatar-name,.avatar-sub{display:none}.prof-btns{flex-direction:column}}
 </style>
 <meta name="theme-color" content="#00C96F">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-  if(!window._fbInitialized){
-    firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",authDomain:"servicoja-e1f49.firebaseapp.com",projectId:"servicoja-e1f49",storageBucket:"servicoja-e1f49.firebasestorage.app",messagingSenderId:"874413426529",appId:"1:874413426529:web:9891d44afd9ef1750e6720"});
-    window._fbInitialized=true;
-  }
+if(!window._fbInitialized){
+  firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",authDomain:"servicoja-e1f49.firebaseapp.com",projectId:"servicoja-e1f49",storageBucket:"servicoja-e1f49.firebasestorage.app",messagingSenderId:"874413426529",appId:"1:874413426529:web:9891d44afd9ef1750e6720"});
+  window._fbInitialized=true;
+}
 </script>
 </head>
 <body>
 
 <nav>
-  <a href="login.html" class="logo">Serviço<span>Já</span> Conecta</a>
+  <a href="#" class="logo">Serviço<span>Já</span></a>
   <div class="nav-right">
-    <div class="avatar" id="navAvCliente" style="overflow:hidden;padding:0">👤</div>
-    <div>
-      <div class="avatar-name" id="nomeUsuario">...</div>
-      <div class="avatar-sub">Cliente</div>
+    <!-- Item 8: avatar clicável para editar perfil do cliente -->
+    <div class="avatar-wrap" onclick="window.location.href='editar-perfil-cliente.html'" title="Editar meu perfil">
+      <div class="avatar" id="navAvatar">👤</div>
+      <div>
+        <div class="avatar-name" id="navNome">Carregando...</div>
+        <div class="avatar-sub">Cliente · ✏️ Editar perfil</div>
+      </div>
     </div>
-    <div style="position:relative" id="notifWrap">
-  <button id="notifBtn" onclick="toggleNotif()" style="position:relative;width:36px;height:36px;border-radius:50%;background:#0F1C35;border:1px solid rgba(255,255,255,0.09);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">
-    🔔<span id="notifBadge" style="display:none;position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;border-radius:50%;background:#FF6B35;color:#fff;font-size:9px;font-weight:700;align-items:center;justify-content:center;border:2px solid #132240;padding:0 2px"></span>
-  </button>
-  <div id="notifDropdown" style="display:none;position:absolute;right:0;top:46px;width:310px;background:#132240;border:1px solid rgba(255,255,255,0.09);border-radius:14px;overflow:hidden;z-index:100;box-shadow:0 8px 32px rgba(0,0,0,0.4)">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.09)">
-      <span style="font-weight:700;font-size:13px;color:#F5F7F2">🔔 Notificações</span>
-      <span onclick="marcarTodasLidas()" style="font-size:11px;color:#8A9BB5;cursor:pointer;text-decoration:underline">Marcar lidas</span>
-    </div>
-    <div id="notifLista" style="max-height:340px;overflow-y:auto"></div>
-  </div>
-</div>
     <button class="btn-novo" onclick="window.location.href='publicar-pedido.html'">+ Novo pedido</button>
   </div>
 </nav>
@@ -158,361 +164,429 @@
   <div class="page-header">
     <div>
       <h1>Meus pedidos</h1>
-      <p>Acompanhe seus pedidos e veja os profissionais interessados</p>
+      <p>Acompanhe seus pedidos e os profissionais interessados</p>
     </div>
   </div>
 
   <div class="stats-row">
     <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-num verde" id="statAtivos">0</div><div class="stat-lbl">Pedidos ativos</div></div>
-    <div class="stat-card"><div class="stat-icon">👷</div><div class="stat-num laranja" id="statAguardando">0</div><div class="stat-lbl">Aguardando resposta</div></div>
-    <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-num" style="color:var(--cinza)" id="statConcluidos">0</div><div class="stat-lbl">Serviços concluídos</div></div>
-    <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-num amarelo">—</div><div class="stat-lbl">Sua reputação</div></div>
+    <div class="stat-card"><div class="stat-icon">👷</div><div class="stat-num laranja" id="statInteresses">0</div><div class="stat-lbl">Profissionais interessados</div></div>
+    <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-num" style="color:var(--cinza)" id="statConcluidos">0</div><div class="stat-lbl">Concluídos</div></div>
+    <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-num amarelo" id="statNota">—</div><div class="stat-lbl">Sua reputação</div></div>
   </div>
 
   <div class="tabs">
-    <div class="tab ativo" data-filtro="todos" onclick="selTab(this)">📋 Todos <span class="tab-badge" id="badgeTodos">0</span></div>
-    <div class="tab" data-filtro="aberto" onclick="selTab(this)">🟢 Abertos</div>
-    <div class="tab" data-filtro="andamento" onclick="selTab(this)">🔄 Em andamento</div>
-    <div class="tab" data-filtro="concluido" onclick="selTab(this)">✅ Concluídos</div>
+    <div class="tab ativo" data-tab="todos" onclick="selTab(this)">📋 Todos</div>
+    <div class="tab" data-tab="aberto" onclick="selTab(this)">🟢 Abertos</div>
+    <div class="tab" data-tab="andamento" onclick="selTab(this)">🔄 Em andamento</div>
+    <div class="tab" data-tab="concluido" onclick="selTab(this)">✅ Concluídos</div>
   </div>
 
-  <!-- LOADING -->
-  <div class="loading" id="loading">
-    <div class="spinner"></div>
-    <p>Carregando seus pedidos...</p>
-  </div>
-
-  <!-- LISTA -->
+  <div id="loading"><div class="spinner"></div></div>
   <div id="listaPedidos"></div>
+</div>
 
-  <!-- VAZIO -->
-  <div class="vazio" id="estadoVazio">
-    <div class="vazio-icon">📋</div>
-    <p>Nenhum pedido encontrado.<br>Publique seu primeiro pedido e receba orçamentos!</p>
-    <button class="btn-vazio" onclick="window.location.href='publicar-pedido.html'">+ Publicar pedido</button>
+<!-- MODAL: PERFIL DO PROFISSIONAL (sem contato, sem endereço) -->
+<div class="overlay" id="overlayPerfil">
+  <div class="modal-box">
+    <div class="modal-head">
+      <button class="modal-close" onclick="fecharOverlay('overlayPerfil')">✕</button>
+      <div class="mprof-header">
+        <div class="mprof-av" id="mpAv">👷</div>
+        <div>
+          <div class="mprof-nome" id="mpNome">—</div>
+          <div style="font-size:0.72rem;color:var(--cinza);margin-bottom:4px" id="mpLocal">—</div>
+          <div style="color:var(--amarelo);font-size:0.85rem" id="mpStars">—</div>
+          <div class="mprof-cats" id="mpCats"></div>
+        </div>
+      </div>
+      <div class="mprof-badge">✅ Aprovado pela IA ServiçoJá</div>
+    </div>
+
+    <div class="msec" id="mpSobreSec">
+      <div class="msec-title">Sobre o profissional</div>
+      <div class="msobre" id="mpSobre">—</div>
+    </div>
+
+    <div class="msec" id="mpFotosSec" style="display:none">
+      <div class="msec-title">Portfólio de trabalhos</div>
+      <div class="fotos-g" id="mpFotos"></div>
+    </div>
+
+    <div class="msec" id="mpMsgSec" style="display:none">
+      <div class="msec-title">💬 Mensagem do profissional</div>
+      <div style="background:var(--azul-input);border:1px solid var(--borda);border-radius:10px;padding:12px 14px;font-size:0.82rem;color:var(--cinza);line-height:1.6" id="mpMsg"></div>
+      <div style="margin-top:8px;font-size:0.75rem;color:var(--cinza)">💰 Valor proposto: <strong id="mpValor" style="color:var(--branco)">—</strong></div>
+    </div>
+
+    <div class="msec">
+      <div class="msec-title">Taxa ServiçoJá</div>
+      <div style="background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:9px;padding:10px 13px;font-size:0.78rem;color:var(--cinza);line-height:1.6">
+        Taxa: <strong id="mpTaxa" style="color:var(--laranja)">—</strong> — cobrada ao aceitar receber o orçamento.
+      </div>
+    </div>
+
+    <div class="modal-foot" id="mpFooter">
+      <button class="mf-recusar" id="mpBtnRecusar">✕ Recusar</button>
+      <button class="mf-aceitar" id="mpBtnAceitar">✅ Aceitar receber orçamento</button>
+    </div>
   </div>
 </div>
 
-<!-- MODAL AVALIAÇÃO -->
-<div class="overlay" id="overlayAvaliacao">
-  <div class="modal-aval">
-    <div class="aval-titulo">⭐ Avaliar profissional</div>
-    <div class="aval-sub">Como foi o serviço? Sua avaliação ajuda outros clientes a escolherem bons profissionais.</div>
-    <div class="estrelas-wrap">
-      <button class="estrela-btn" onclick="selNota(1)">⭐</button>
-      <button class="estrela-btn" onclick="selNota(2)">⭐</button>
-      <button class="estrela-btn" onclick="selNota(3)">⭐</button>
-      <button class="estrela-btn" onclick="selNota(4)">⭐</button>
-      <button class="estrela-btn" onclick="selNota(5)">⭐</button>
-    </div>
-    <div class="nota-label" id="notaSelecionada"></div>
-    <textarea class="aval-textarea" id="avalComentario" placeholder="Conte como foi o serviço, a pontualidade, qualidade do trabalho..."></textarea>
-    <div class="aval-btns">
-      <button class="btn-aval-cancel" onclick="document.getElementById('overlayAvaliacao').classList.remove('vis')">Cancelar</button>
-      <button class="btn-aval-send" onclick="enviarAvaliacao()">⭐ Enviar avaliação</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL SUCESSO -->
+<!-- MODAL: SUCESSO -->
 <div class="overlay" id="overlaySucesso">
   <div class="modal-suc">
     <div class="suc-icon" id="sucIcon">🎉</div>
-    <div class="suc-title" id="sucTitle">Sucesso!</div>
+    <div class="suc-title" id="sucTitle">Pronto!</div>
     <div class="suc-sub" id="sucSub"></div>
     <button class="btn-suc" onclick="fecharOverlay('overlaySucesso')">Entendido</button>
   </div>
 </div>
 
 <script>
-  const uid = localStorage.getItem('sj_uid');
-  const nome = localStorage.getItem('sj_nome') || 'Cliente';
-  document.getElementById('nomeUsuario').textContent = nome;
+// ── GLOBALS ───────────────────────────────────────────────────────────
+let clienteUid = null;
+let todosPedidos = [];
+let tabAtiva = 'todos';
+let profModalAtual = null; // { profId, pedidoId, taxa }
 
-  let todosPedidos = [];
-  let filtroAtual = 'todos';
+// ── INIT ──────────────────────────────────────────────────────────────
+firebase.auth().onAuthStateChanged(async function(user) {
+  if (!user) { window.location.href = 'login.html'; return; }
+  clienteUid = user.uid;
 
-  // Formatar data
-  function formatarData(iso) {
-    if (!iso) return '—';
-    const d = new Date(iso);
-    return d.toLocaleDateString('pt-BR') + ' às ' + d.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
-  }
+  const nome = localStorage.getItem('sj_nome') || user.displayName || 'Cliente';
+  document.getElementById('navNome').textContent = nome;
 
-  // Carregar pedidos do Firebase
-  async function carregarPedidos() {
-    if (!uid && !window._authUid) { window.location.href = 'login.html'; return; }
-    const queryUid = window._authUid || uid;
-    try {
-      const snap = await firebase.firestore().collection('pedidos')
-        .where('clienteId', '==', queryUid).get();
+  await carregarPedidos(user.uid);
+});
 
-      todosPedidos = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-        .sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
+// ── CARREGAR PEDIDOS ──────────────────────────────────────────────────
+async function carregarPedidos(uid) {
+  try {
+    const snap = await firebase.firestore().collection('pedidos')
+      .where('clienteId', '==', uid).get();
 
-      document.getElementById('loading').style.display = 'none';
-      renderPedidos();
-    } catch(e) {
-      document.getElementById('loading').innerHTML = '<p style="color:var(--erro)">Erro ao carregar pedidos: ' + e.message + '</p>';
-    }
-  }
-
-  function renderPedidos() {
-    const lista = document.getElementById('listaPedidos');
-    const filtrado = filtroAtual === 'todos' ? todosPedidos : todosPedidos.filter(p => p.status === filtroAtual);
+    todosPedidos = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (b.criadoEm || '').localeCompare(a.criadoEm || ''));
 
     // Stats
-    const ativos = todosPedidos.filter(p => p.status === 'aberto' || p.status === 'andamento').length;
-    const abertos = todosPedidos.filter(p => p.status === 'aberto').length;
+    const ativos = todosPedidos.filter(p => p.status === 'aberto').length;
     const concluidos = todosPedidos.filter(p => p.status === 'concluido').length;
+    const totalInteresses = todosPedidos.reduce((s, p) => s + (p.interessados || []).length, 0);
     document.getElementById('statAtivos').textContent = ativos;
-    document.getElementById('statAguardando').textContent = abertos;
     document.getElementById('statConcluidos').textContent = concluidos;
-    document.getElementById('badgeTodos').textContent = todosPedidos.length;
+    document.getElementById('statInteresses').textContent = totalInteresses;
 
-    if (filtrado.length === 0) {
-      lista.innerHTML = '';
-      document.getElementById('estadoVazio').classList.add('vis');
-      return;
-    }
-    document.getElementById('estadoVazio').classList.remove('vis');
+    document.getElementById('loading').style.display = 'none';
+    renderPedidos();
+  } catch(e) {
+    document.getElementById('loading').innerHTML = '<p style="color:var(--erro);text-align:center">Erro: ' + e.message + '</p>';
+  }
+}
 
-    lista.innerHTML = filtrado.map(p => {
-      const cats = Array.isArray(p.categorias) ? p.categorias.join(', ') : (p.categorias || '—');
-      const statusClass = p.status === 'aberto' ? 'status-aberto' : p.status === 'andamento' ? 'status-andamento' : 'status-concluido';
-      const statusLabel = p.status === 'aberto' ? '🟢 Aberto' : p.status === 'andamento' ? '🔄 Em andamento' : '✅ Concluído';
-      const orcamento = p.orcamento === 'aberto' ? 'Em aberto' : (p.valor ? 'R$ ' + p.valor.toLocaleString('pt-BR') : 'Em aberto');
-      const interessados = p.interessados || [];
-      const numInt = interessados.length;
+// ── ABAS ──────────────────────────────────────────────────────────────
+function selTab(el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('ativo'));
+  el.classList.add('ativo');
+  tabAtiva = el.getAttribute('data-tab');
+  renderPedidos();
+}
 
-      // Propostas HTML
-      const propostasHTML = interessados.length > 0 ? interessados.map((int, i) => `
-        <div class="proposta-card" id="prop-${p.id}-${i}">
-          <div class="prop-header">
-            <div class="prop-av">👷</div>
-            <div class="prop-info">
-              <div class="prop-nome">${int.profissionalNome || 'Profissional'}</div>
-              <div class="prop-data">📅 ${int.enviadoEm ? new Date(int.enviadoEm).toLocaleDateString('pt-BR') : '—'}</div>
-            </div>
-            <div class="prop-valor">${int.valor ? 'R$ ' + parseFloat(int.valor).toLocaleString('pt-BR') : 'A combinar'}</div>
-          </div>
-          <div class="prop-msg">${int.mensagem || '—'}</div>
-          <div class="prop-taxa">Taxa ServiçoJá: <strong>R$ ${int.taxa || '—'}</strong> — cobrada ao aceitar</div>
-          ${p.status !== 'aceito' ? `<button class="btn-aceitar" onclick="aceitarProposta('${p.id}', ${i})">✅ Aceitar esta proposta</button>` : (p.profissionalAceitoIdx === i ? '<div class="prop-aceita-badge">✅ Proposta aceita</div>' : '')}
-        </div>`).join('') : '<p style="color:var(--cinza);font-size:0.82rem;padding:12px 0">Nenhuma proposta ainda. Aguarde os profissionais se interessarem!</p>';
+// ── RENDER PEDIDOS ────────────────────────────────────────────────────
+function renderPedidos() {
+  const lista = document.getElementById('listaPedidos');
+  let filtrado = todosPedidos;
+  if (tabAtiva !== 'todos') filtrado = todosPedidos.filter(p => (p.status || 'aberto') === tabAtiva);
 
-      // Dados profissional aceito (visível só após aceitar)
-      const profAceito = p.profissionalAceitoIdx !== undefined ? interessados[p.profissionalAceitoIdx] : null;
-      const dadosProfHTML = profAceito ? `
-        <div class="dados-prof-card">
-          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;margin-bottom:12px;color:var(--verde)">👷 Dados do profissional aceito</div>
-          <div class="dprow"><span class="dplbl">Nome</span><span class="dpval">${profAceito.profissionalNome}</span></div>
-          <div class="dprow"><span class="dplbl">Telefone</span><span class="dpval">${profAceito.telefone || 'Ver no perfil'}</span></div>
-          <div class="dprow"><span class="dplbl">Valor acordado</span><span class="dpval" style="color:var(--verde)">${profAceito.valor ? 'R$ '+parseFloat(profAceito.valor).toLocaleString('pt-BR') : 'A combinar'}</span></div>
-          <button class="btn-concluir" onclick="concluirServico('${p.id}')">✅ Marcar como concluído</button>
-        </div>` : '';
+  if (!filtrado.length) {
+    lista.innerHTML = '<div class="vazio"><div class="vazio-icon">📭</div><p>Nenhum pedido aqui ainda.</p></div>';
+    return;
+  }
 
-      return `
-      <div class="pedido-wrap" data-status="${p.status||'aberto'}" data-id="${p.id}">
-        <div class="pedido-card">
-          <div class="pedido-header" onclick="togglePedido(this)">
-            <div style="flex:1">
-              <div class="pedido-status ${statusClass}">${statusLabel}</div>
-              <div class="pedido-titulo">${p.titulo || 'Sem título'}</div>
-              <div class="pedido-meta-row">
-                <div class="pmeta">📅 <span>${formatarData(p.criadoEm)}</span></div>
-                <div class="pmeta">🏷️ <span>${cats}</span></div>
-                <div class="pmeta">📍 <span>${p.endereco || '—'}</span></div>
-                <div class="pmeta">💰 <span>${orcamento}</span></div>
-                <div class="pmeta">⏱️ <span>${p.urgencia || '—'}</span></div>
-              </div>
-            </div>
-            <div class="pedido-actions">
-              ${p.status === 'aberto' ? `<button class="act-btn danger" onclick="event.stopPropagation();cancelarPedido('${p.id}',this)">🗑️ Cancelar</button>` : ''}
-              <span class="int-badge ${numInt > 0 ? 'has-int' : ''}">${numInt} proposta${numInt !== 1 ? 's' : ''}</span>
-              <span class="expand-icon">▼</span>
+  lista.innerHTML = filtrado.map(p => {
+    const status = p.status || 'aberto';
+    const ints = p.interessados || [];
+    const statusLabel = {aberto:'🟢 Aberto', andamento:'🔄 Em andamento', concluido:'✅ Concluído'}[status] || '🟢 Aberto';
+    const statusClass = 'status-' + (status === 'andamento' ? 'andamento' : status === 'concluido' ? 'concluido' : 'aberto');
+    const orc = p.orcamento === 'aproximado' && p.valor ? 'R$ ' + parseFloat(p.valor).toLocaleString('pt-BR') : 'Em aberto';
+
+    const intsHtml = ints.length === 0
+      ? '<div class="vazio" style="padding:20px"><p>Nenhum profissional demonstrou interesse ainda.</p></div>'
+      : ints.map(i => renderInteressado(i, p)).join('');
+
+    return `<div class="pedido-wrap">
+      <div class="pedido-card">
+        <div class="pedido-header" onclick="togglePedido(this)">
+          <div style="flex:1">
+            <div class="pedido-status ${statusClass}">${statusLabel}</div>
+            <div class="pedido-titulo">${p.titulo || 'Sem título'}</div>
+            <div class="pedido-meta-row">
+              <div class="pmeta">📅 <span>${formatData(p.criadoEm)}</span></div>
+              <div class="pmeta">👷 <strong>${ints.length} profissional(is)</strong></div>
+              <div class="pmeta">📍 <span>${(p.endereco || '').split(',').slice(-1)[0] || '—'}</span></div>
+              <div class="pmeta">💰 <span>${orc}</span></div>
             </div>
           </div>
-          <div class="interessados">
-            <div class="int-header">
-              <span class="int-titulo">📝 Descrição</span>
-            </div>
-            <p style="font-size:0.83rem;color:var(--cinza);line-height:1.7;margin-bottom:16px">${p.descricao || 'Sem descrição.'}</p>
-            ${(p.fotos && p.fotos.length > 0) ? `
-            <div class="int-header"><span class="int-titulo">📎 Fotos anexadas (${p.fotos.length})</span></div>
-            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px" id="fotos-${p.id}">
-              ${p.fotos.map((f,i) => `<div style="width:80px;height:80px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.09);cursor:pointer" onclick="abrirFoto('${p.id}',${i})"><img src="${f}" style="width:100%;height:100%;object-fit:cover" loading="lazy"></div>`).join('')}
-            </div>` : ''}
-            ${p.status === 'aberto' ? `<button onclick="editarPedido('${p.id}')" style="background:rgba(255,255,255,0.06);border:1px solid var(--borda);border-radius:8px;padding:7px 14px;color:var(--cinza);font-size:0.78rem;cursor:pointer;margin-bottom:14px">✏️ Editar pedido</button>` : ''}
-            ${dadosProfHTML}
-            <div class="int-header" style="margin-top:16px">
-              <span class="int-titulo">💬 Propostas recebidas</span>
-              <span class="int-count ${numInt > 0 ? '' : 'zero'}">${numInt} profissional${numInt !== 1 ? 'is' : ''}</span>
-            </div>
-            ${propostasHTML}
+          <div class="pedido-actions">
+            ${status === 'aberto' ? `<button class="act-btn danger" onclick="event.stopPropagation();cancelarPedido('${p.id}',this)">🗑️ Cancelar</button>` : ''}
+            <span class="expand-icon">▼</span>
           </div>
         </div>
-      </div>`;
-    }).join('');
+        <div class="interessados">
+          <div class="int-header">
+            <span class="int-titulo">Profissionais interessados</span>
+            <span class="int-count ${ints.length === 0 ? 'zero' : ''}">${ints.length} ${ints.length === 1 ? 'profissional' : 'profissionais'}</span>
+          </div>
+          <div class="prof-lista">${intsHtml}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderInteressado(i, pedido) {
+  const status = i.status || 'interessado';
+  let btnsHtml = '';
+
+  if (status === 'interessado') {
+    btnsHtml = `
+      <button class="btn-ver-perfil" onclick="abrirPerfil('${i.profissionalId}','${pedido.id}',${i.taxa||10})">Ver perfil</button>
+      <button class="btn-aceitar-prof" onclick="confirmarAceitarProf('${i.profissionalId}','${i.profissionalNome||'Profissional'}','${pedido.id}',${i.taxa||10})">✅ Aceitar orçamento</button>
+      <button class="btn-recusar-prof" onclick="recusarProf('${i.profissionalId}','${pedido.id}',this)">✕</button>`;
+  } else if (status === 'solicitado') {
+    btnsHtml = `<span class="status-tag status-solicitado-tag">⏳ Aguardando orçamento</span>`;
+  } else if (status === 'enviado') {
+    btnsHtml = `
+      <button class="btn-ver-perfil" onclick="abrirPerfil('${i.profissionalId}','${pedido.id}',${i.taxa||10},true)">Ver proposta</button>
+      <span class="status-tag status-aceito-tag">💬 Proposta recebida</span>`;
+  } else if (status === 'aceito') {
+    btnsHtml = `<span class="status-tag status-aceito-tag">✅ Aceito</span>`;
+  } else if (status === 'recusado') {
+    btnsHtml = `<span class="status-tag status-recusado-tag">✕ Recusado</span>`;
   }
 
-  function selTab(el) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('ativo'));
-    el.classList.add('ativo');
-    filtroAtual = el.getAttribute('data-filtro');
-    renderPedidos();
+  const msgHtml = (status === 'enviado' || status === 'aceito') && i.mensagem
+    ? `<div class="prof-msg">"${i.mensagem.substring(0, 80)}${i.mensagem.length > 80 ? '...' : ''}"</div>` : '';
+
+  return `<div class="prof-item ${status === 'aceito' ? 'aceito' : status === 'recusado' ? 'recusado' : ''}">
+    <div class="prof-av">👷</div>
+    <div class="prof-info">
+      <div class="prof-nome">${i.profissionalNome || 'Profissional'}</div>
+      <div class="prof-tags">
+        <span class="prof-tag">✅ Aprovado IA</span>
+        <span class="prof-tag">Taxa: R$ ${i.taxa || 10}</span>
+      </div>
+      ${msgHtml}
+    </div>
+    <div class="prof-btns">${btnsHtml}</div>
+  </div>`;
+}
+
+// ── TOGGLE PEDIDO ─────────────────────────────────────────────────────
+function togglePedido(header) {
+  const intDiv = header.parentElement.querySelector('.interessados');
+  const icon = header.querySelector('.expand-icon');
+  const isOpen = intDiv.classList.contains('open');
+  intDiv.classList.toggle('open', !isOpen);
+  icon.classList.toggle('open', !isOpen);
+}
+
+// ── VER PERFIL DO PROFISSIONAL (item 6) ───────────────────────────────
+async function abrirPerfil(profId, pedidoId, taxa, showMsg) {
+  profModalAtual = { profId, pedidoId, taxa };
+  const pedido = todosPedidos.find(p => p.id === pedidoId);
+  const interesse = (pedido?.interessados || []).find(i => i.profissionalId === profId);
+  const status = interesse?.status || 'interessado';
+
+  // Limpa modal
+  document.getElementById('mpNome').textContent = 'Carregando...';
+  document.getElementById('mpSobre').textContent = '...';
+  document.getElementById('mpCats').innerHTML = '';
+  document.getElementById('mpFotosSec').style.display = 'none';
+  document.getElementById('mpMsgSec').style.display = 'none';
+  document.getElementById('mpTaxa').textContent = 'R$ ' + taxa;
+  document.getElementById('mpStars').textContent = '★★★★★';
+
+  // Footer: só mostra aceitar/recusar se ainda for 'interessado'
+  const footer = document.getElementById('mpFooter');
+  if (status === 'interessado') {
+    footer.style.display = 'flex';
+    document.getElementById('mpBtnAceitar').onclick = () => { fecharOverlay('overlayPerfil'); confirmarAceitarProf(profId, interesse?.profissionalNome || 'Profissional', pedidoId, taxa); };
+    document.getElementById('mpBtnRecusar').onclick = () => { fecharOverlay('overlayPerfil'); recusarProfBtn(profId, pedidoId); };
+  } else {
+    footer.style.display = 'none';
   }
 
-  function togglePedido(header) {
-    const intDiv = header.parentElement.querySelector('.interessados');
-    const expIcon = header.querySelector('.expand-icon');
-    const isOpen = intDiv.classList.contains('open');
-    intDiv.classList.toggle('open', !isOpen);
-    expIcon.classList.toggle('open', !isOpen);
+  // Mostra mensagem da proposta se status = enviado
+  if (showMsg && interesse?.mensagem) {
+    document.getElementById('mpMsgSec').style.display = 'block';
+    document.getElementById('mpMsg').textContent = interesse.mensagem;
+    document.getElementById('mpValor').textContent = interesse.valor ? 'R$ ' + interesse.valor : 'A combinar';
   }
 
-  function abrirFoto(pedidoId, idx) {
-    const pedido = todosPedidos.find(p => p.id === pedidoId);
-    if (!pedido || !pedido.fotos) return;
-    const img = pedido.fotos[idx];
-    const w = window.open('', '_blank');
-    w.document.write('<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="'+img+'" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>');
-  }
+  document.getElementById('overlayPerfil').classList.add('vis');
 
-  function editarPedido(pedidoId) {
-    const pedido = todosPedidos.find(p => p.id === pedidoId);
-    if (pedido) localStorage.setItem('sj_pedido_editar_data', JSON.stringify(pedido));
-    window.location.href = 'publicar-pedido.html?editar=' + pedidoId;
-  }
-
-  async function aceitarProposta(pedidoId, intIdx) {
-    if (!confirm('Aceitar esta proposta? O profissional será notificado.')) return;
-    try {
-      const pedido = todosPedidos.find(p => p.id === pedidoId);
-      const prof = pedido.interessados[intIdx];
-      await firebase.firestore().collection('pedidos').doc(pedidoId).update({
-        status: 'aceito',
-        profissionalAceitoIdx: intIdx,
-        profissionalAceitoId: prof.profissionalId,
-        profissionalAceitoNome: prof.profissionalNome,
-        taxaDevida: prof.taxa || 0,
-        aceitoEm: new Date().toISOString()
-      });
-      pedido.status = 'aceito';
-      pedido.profissionalAceitoIdx = intIdx;
-      pedido.profissionalAceitoNome = prof.profissionalNome;
-      renderPedidos();
-      // Notificar profissional
-      criarNotificacao(prof.profissionalId, 'aceite',
-        'Sua proposta para "'+pedido.titulo+'" foi aceita! Entre em contato com o cliente.',
-        'dashboard-profissional.html');
-      alert('✅ Proposta aceita! Os dados do profissional agora aparecem no pedido.');
-    } catch(e) { alert('Erro: ' + e.message); }
-  }
-
-  let pedidoParaAvaliar = null;
-
-  function selNota(n) {
-    window._notaAval = n;
-    const labels = ['','😞 Ruim','😐 Regular','🙂 Bom','😊 Muito bom','🤩 Excelente!'];
-    document.getElementById('notaSelecionada').textContent = labels[n];
-    document.querySelectorAll('.estrela-btn').forEach((s,i) => {
-      s.classList.toggle('sel', i < n);
-    });
-  }
-
-  function concluirServico(pedidoId) {
-    pedidoParaAvaliar = todosPedidos.find(p => p.id === pedidoId);
-    // Resetar modal
-    document.querySelectorAll('.estrela-btn').forEach(s => s.classList.remove('sel'));
-    document.getElementById('avalComentario').value = '';
-    document.getElementById('notaSelecionada').textContent = '';
-    window._notaAval = 0;
-    document.getElementById('overlayAvaliacao').classList.add('vis');
-  }
-
-  async function enviarAvaliacao() {
-    const nota = window._notaAval || 0;
-    const comentario = document.getElementById('avalComentario').value.trim();
-    if (nota === 0) { alert('Selecione uma nota!'); return; }
-    if (!comentario) { alert('Escreva um comentário!'); return; }
-    if (!pedidoParaAvaliar) return;
-
-    try {
-      const pedido = pedidoParaAvaliar;
-      const profId = pedido.profissionalAceitoId;
-      const profNome = pedido.profissionalAceitoNome;
-      const clienteNome = localStorage.getItem('sj_nome') || 'Cliente';
-
-      // Salvar avaliação
-      await firebase.firestore().collection('avaliacoes').add({
-        profissionalId: profId,
-        profissionalNome: profNome,
-        clienteNome: clienteNome,
-        pedidoId: pedido.id,
-        nota: nota,
-        comentario: comentario,
-        criadoEm: new Date().toISOString()
-      });
-
-      // Atualizar pedido como concluído
-      await firebase.firestore().collection('pedidos').doc(pedido.id).update({
-        status: 'concluido',
-        concluidoEm: new Date().toISOString(),
-        avaliacao: nota
-      });
-
-      // Recalcular média do profissional
-      const avalSnap = await firebase.firestore().collection('avaliacoes')
-        .where('profissionalId', '==', profId).get();
-      const avals = avalSnap.docs.map(d => d.data());
-      const media = avals.reduce((s,a) => s+(a.nota||0), 0) / avals.length;
-      await firebase.firestore().collection('usuarios').doc(profId).update({
-        avaliacao: parseFloat(media.toFixed(1)),
-        totalAvaliacoes: avals.length
-      });
-
-      pedido.status = 'concluido';
-      document.getElementById('overlayAvaliacao').classList.remove('vis');
-      renderPedidos();
-      // Notificar profissional sobre avaliação
-      criarNotificacao(profId, 'avaliacao',
-        clienteNome+' avaliou seu trabalho com '+nota+' estrelas!',
-        'perfil-profissional.html');
-      alert('✅ Serviço concluído e avaliação enviada! Obrigado!');
-    } catch(e) { alert('Erro: ' + e.message); }
-  }
-
-  async function cancelarPedido(id, btn) {
-    if (!confirm('Tem certeza que deseja cancelar este pedido?')) return;
-    try {
-      await firebase.firestore().collection('pedidos').doc(id).delete();
-      todosPedidos = todosPedidos.filter(p => p.id !== id);
-      renderPedidos();
-    } catch(e) {
-      alert('Erro ao cancelar pedido.');
+  // Busca dados reais do Firestore — sem telefone, sem email, sem endereço
+  try {
+    let dados = null;
+    for (const id of [profId + '_prof', profId]) {
+      try {
+        const snap = await firebase.firestore().collection('usuarios').doc(id).get();
+        if (snap.exists()) { dados = snap.data(); break; }
+      } catch(e) {}
     }
+    if (!dados) {
+      const q = await firebase.firestore().collection('usuarios')
+        .where('tipo', '==', 'profissional').get();
+      const doc = q.docs.find(d => d.id === profId || d.id === profId + '_prof');
+      if (doc) dados = doc.data();
+    }
+
+    if (dados) {
+      document.getElementById('mpNome').textContent = dados.nome || '—';
+      document.getElementById('mpLocal').textContent = dados.endereco?.cidade ? '📍 ' + dados.endereco.cidade + ', ' + dados.endereco.estado : '';
+      document.getElementById('mpSobre').textContent = dados.sobre || 'Profissional aprovado na plataforma ServiçoJá.';
+
+      const cats = dados.categoriasAprovadas || [];
+      document.getElementById('mpCats').innerHTML = cats.map(c => `<span class="mprof-cat-badge">${c}</span>`).join('');
+
+      if (dados.fotoPerfil) {
+        document.getElementById('mpAv').innerHTML = `<img src="${dados.fotoPerfil}">`;
+      }
+
+      const portfolio = dados.portfolio || [];
+      if (portfolio.length > 0) {
+        document.getElementById('mpFotosSec').style.display = 'block';
+        document.getElementById('mpFotos').innerHTML = portfolio.slice(0, 6).map(f =>
+          `<div class="foto-t"><img src="${f}" alt="foto"></div>`
+        ).join('');
+      }
+    }
+  } catch(e) {
+    console.log('Erro ao carregar perfil:', e);
   }
+}
 
-  function mostrarSucesso(icon, title, sub) {
-    document.getElementById('sucIcon').textContent = icon;
-    document.getElementById('sucTitle').textContent = title;
-    document.getElementById('sucSub').textContent = sub;
-    document.getElementById('overlaySucesso').classList.add('vis');
+// ── ACEITAR PROFISSIONAL (itens 2 e 3) ───────────────────────────────
+function confirmarAceitarProf(profId, profNome, pedidoId, taxa) {
+  if (!confirm(`Aceitar receber orçamento de ${profNome}?\n\nA taxa de R$ ${taxa} será cobrada agora.`)) return;
+  aceitarProf(profId, profNome, pedidoId, taxa);
+}
+
+async function aceitarProf(profId, profNome, pedidoId, taxa) {
+  const pedido = todosPedidos.find(p => p.id === pedidoId);
+  if (!pedido) return;
+
+  const intsAtualizados = (pedido.interessados || []).map(i =>
+    i.profissionalId === profId ? { ...i, status: 'solicitado' } : i
+  );
+
+  try {
+    // Atualiza pedido: status do interesse → 'solicitado'
+    await firebase.firestore().collection('pedidos').doc(pedidoId).update({
+      interessados: intsAtualizados
+    });
+
+    // Cobra taxa: incrementa taxaAcumulada no doc do profissional (item 3)
+    for (const id of [profId + '_prof', profId]) {
+      try {
+        await firebase.firestore().collection('usuarios').doc(id).update({
+          taxaAcumulada: firebase.firestore.FieldValue.increment(taxa)
+        });
+        break;
+      } catch(e) {}
+    }
+
+    // Notifica o profissional (item 2)
+    const clienteNome = localStorage.getItem('sj_nome') || 'Cliente';
+    await criarNotificacao(
+      profId + '_prof',  // tenta o ID com _prof
+      'solicitado',
+      clienteNome + ' aceitou receber seu orçamento para "' + pedido.titulo + '"! Envie sua proposta agora.',
+      'dashboard-profissional.html'
+    );
+    // Também notifica sem _prof (fallback)
+    await criarNotificacao(
+      profId,
+      'solicitado',
+      clienteNome + ' aceitou receber seu orçamento para "' + pedido.titulo + '"! Envie sua proposta agora.',
+      'dashboard-profissional.html'
+    );
+
+    // Atualiza local
+    pedido.interessados = intsAtualizados;
+    renderPedidos();
+    fecharOverlay('overlayPerfil');
+    mostrarSucesso('🎉', 'Profissional notificado!', profNome + ' foi notificado e poderá enviar o orçamento com valor, prazo e detalhes.');
+
+  } catch(e) {
+    alert('Erro ao aceitar: ' + e.message);
   }
+}
 
-  function fecharOverlay(id) { document.getElementById(id).classList.remove('vis'); }
-  document.querySelectorAll('.overlay').forEach(ov => ov.addEventListener('click', e => { if(e.target===ov) ov.classList.remove('vis'); }));
+// ── RECUSAR ───────────────────────────────────────────────────────────
+async function recusarProf(profId, pedidoId, btn) {
+  if (!confirm('Recusar este profissional?')) return;
+  recusarProfBtn(profId, pedidoId);
+}
 
-  firebase.auth().onAuthStateChanged(function(user) {
-    if (!user) { window.location.href = 'login.html'; return; }
-    // Usar UID real do Firebase Auth, não do localStorage
-    window._authUid = user.uid;
-    carregarPedidos();
-    setTimeout(function(){ carregarNotificacoes(window._authUid || user.uid); }, 1000);
-  });
+async function recusarProfBtn(profId, pedidoId) {
+  const pedido = todosPedidos.find(p => p.id === pedidoId);
+  if (!pedido) return;
+  const intsAtualizados = (pedido.interessados || []).map(i =>
+    i.profissionalId === profId ? { ...i, status: 'recusado' } : i
+  );
+  try {
+    await firebase.firestore().collection('pedidos').doc(pedidoId).update({ interessados: intsAtualizados });
+    pedido.interessados = intsAtualizados;
+    renderPedidos();
+  } catch(e) { alert('Erro: ' + e.message); }
+}
+
+// ── CANCELAR PEDIDO ───────────────────────────────────────────────────
+async function cancelarPedido(pedidoId, btn) {
+  if (!confirm('Cancelar este pedido?')) return;
+  try {
+    await firebase.firestore().collection('pedidos').doc(pedidoId).update({ status: 'cancelado' });
+    todosPedidos = todosPedidos.filter(p => p.id !== pedidoId);
+    renderPedidos();
+  } catch(e) { alert('Erro: ' + e.message); }
+}
+
+// ── NOTIFICAÇÃO ───────────────────────────────────────────────────────
+async function criarNotificacao(para, tipo, mensagem, link) {
+  if (!para) return;
+  try {
+    await firebase.firestore().collection('notificacoes').add({
+      para, tipo, mensagem, link: link || '', lida: false,
+      criadoEm: new Date().toISOString()
+    });
+  } catch(e) { console.log('notif err:', e); }
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────
+function formatData(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' });
+}
+
+function fecharOverlay(id) {
+  document.getElementById(id).classList.remove('vis');
+  if (id === 'overlayPerfil') profModalAtual = null;
+}
+
+function mostrarSucesso(icon, title, sub) {
+  document.getElementById('sucIcon').textContent = icon;
+  document.getElementById('sucTitle').textContent = title;
+  document.getElementById('sucSub').textContent = sub;
+  document.getElementById('overlaySucesso').classList.add('vis');
+}
+
+document.querySelectorAll('.overlay').forEach(ov => {
+  ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('vis'); });
+});
 </script>
-
-<script>if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(e=>{});}</script>
+<script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(e=>{}); }</script>
 </body>
 </html>
