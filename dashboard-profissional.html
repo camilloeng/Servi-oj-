@@ -187,6 +187,7 @@
       <div class="nav-item" id="nav-propostas" onclick="selNav('propostas',this)">📨 Minhas propostas</div>
       <div class="nav-item" id="nav-aceitos" onclick="selNav('aceitos',this)">✅ Trabalhos aceitos</div>
       <div class="nav-item" id="nav-perfil" onclick="window.location.href='perfil-profissional.html'">👤 Meu perfil</div>
+      <div class="nav-item" onclick="window.location.href='editar-perfil-profissional.html'">✏️ Editar perfil</div>
     </div>
 
     <div class="btn-teste" onclick="window.location.href='cadastro-profissional.html?teste=1'">+ Fazer mais testes de profissão</div>
@@ -351,7 +352,10 @@ async function carregarPedidos() {
       .filter(p => {
         if (p.status && p.status !== 'aberto') return false;
         const cats = Array.isArray(p.categorias) ? p.categorias : [p.categorias];
-        return cats.some(c => categoriasAprovadas.includes(c));
+        const semEmoji = (s) => s.replace(/\p{Emoji}/gu, '').trim().toLowerCase();
+        return cats.some(c => categoriasAprovadas.some(a => 
+          a === c || semEmoji(a) === semEmoji(c)
+        ));
       })
       .sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
     document.getElementById('statDisp').textContent = todosPedidos.length;
