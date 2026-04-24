@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ServiçoJá — Meus Pedidos</title>
+<title>ServiçoJá Conecta — Meus Pedidos</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -146,7 +146,7 @@ if(!window._fbInitialized){
 <body>
 
 <nav>
-  <a href="#" class="logo">Serviço<span>Já</span></a>
+  <a href="#" class="logo">Serviço<span>Já</span> Conecta</a>
   <div class="nav-right">
     <!-- Item 8: avatar clicável para editar perfil do cliente -->
     <div class="avatar-wrap" onclick="window.location.href='editar-perfil-cliente.html'" title="Editar meu perfil">
@@ -200,7 +200,7 @@ if(!window._fbInitialized){
           <div class="mprof-cats" id="mpCats"></div>
         </div>
       </div>
-      <div class="mprof-badge">✅ Aprovado pela IA ServiçoJá</div>
+      <div class="mprof-badge">✅ Aprovado pela IA ServiçoJá Conecta</div>
     </div>
 
     <div class="msec" id="mpSobreSec">
@@ -219,10 +219,11 @@ if(!window._fbInitialized){
       <div style="margin-top:8px;font-size:0.75rem;color:var(--cinza)">💰 Valor proposto: <strong id="mpValor" style="color:var(--branco)">—</strong></div>
     </div>
 
-    <div class="msec">
-      <div class="msec-title">Taxa ServiçoJá</div>
-      <div style="background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:9px;padding:10px 13px;font-size:0.78rem;color:var(--cinza);line-height:1.6">
-        Taxa: <strong id="mpTaxa" style="color:var(--laranja)">—</strong> — cobrada ao aceitar receber o orçamento.
+    <!-- Avaliações do profissional -->
+    <div class="msec" id="mpAvalSec">
+      <div class="msec-title">⭐ Avaliações de clientes</div>
+      <div id="mpAvalLista" style="display:flex;flex-direction:column;gap:8px">
+        <div style="color:var(--cinza);font-size:0.8rem">Carregando avaliações...</div>
       </div>
     </div>
 
@@ -375,7 +376,6 @@ function renderInteressado(i, pedido) {
       <div class="prof-nome">${i.profissionalNome || 'Profissional'}</div>
       <div class="prof-tags">
         <span class="prof-tag">✅ Aprovado IA</span>
-        <span class="prof-tag">Taxa: R$ ${i.taxa || 10}</span>
       </div>
       ${msgHtml}
     </div>
@@ -399,16 +399,16 @@ async function abrirPerfil(profId, pedidoId, taxa, showMsg) {
   const interesse = (pedido?.interessados || []).find(i => i.profissionalId === profId);
   const status = interesse?.status || 'interessado';
 
-  // Limpa modal
+  // Reset modal
   document.getElementById('mpNome').textContent = 'Carregando...';
   document.getElementById('mpSobre').textContent = '...';
   document.getElementById('mpCats').innerHTML = '';
   document.getElementById('mpFotosSec').style.display = 'none';
   document.getElementById('mpMsgSec').style.display = 'none';
-  document.getElementById('mpTaxa').textContent = 'R$ ' + taxa;
-  document.getElementById('mpStars').textContent = '★★★★★';
+  document.getElementById('mpStars').textContent = '';
+  document.getElementById('mpAvalLista').innerHTML = '<div style="color:var(--cinza);font-size:0.8rem">Carregando...</div>';
 
-  // Footer: só mostra aceitar/recusar se ainda for 'interessado'
+  // Footer só para status 'interessado'
   const footer = document.getElementById('mpFooter');
   if (status === 'interessado') {
     footer.style.display = 'flex';
@@ -418,7 +418,7 @@ async function abrirPerfil(profId, pedidoId, taxa, showMsg) {
     footer.style.display = 'none';
   }
 
-  // Mostra mensagem da proposta se status = enviado
+  // Proposta recebida
   if (showMsg && interesse?.mensagem) {
     document.getElementById('mpMsgSec').style.display = 'block';
     document.getElementById('mpMsg').textContent = interesse.mensagem;
@@ -427,50 +427,68 @@ async function abrirPerfil(profId, pedidoId, taxa, showMsg) {
 
   document.getElementById('overlayPerfil').classList.add('vis');
 
-  // Busca dados reais do Firestore — sem telefone, sem email, sem endereço
+  // Busca dados reais — sem telefone, sem email, sem endereço completo
   try {
-    let dados = null;
+    let dados = null, docId = profId;
     for (const id of [profId + '_prof', profId]) {
       try {
         const snap = await firebase.firestore().collection('usuarios').doc(id).get();
-        if (snap.exists()) { dados = snap.data(); break; }
+        if (snap.exists()) { dados = snap.data(); docId = id; break; }
       } catch(e) {}
     }
     if (!dados) {
-      const q = await firebase.firestore().collection('usuarios')
-        .where('tipo', '==', 'profissional').get();
+      const q = await firebase.firestore().collection('usuarios').where('tipo','==','profissional').get();
       const doc = q.docs.find(d => d.id === profId || d.id === profId + '_prof');
-      if (doc) dados = doc.data();
+      if (doc) { dados = doc.data(); docId = doc.id; }
     }
 
     if (dados) {
       document.getElementById('mpNome').textContent = dados.nome || '—';
-      document.getElementById('mpLocal').textContent = dados.endereco?.cidade ? '📍 ' + dados.endereco.cidade + ', ' + dados.endereco.estado : '';
-      document.getElementById('mpSobre').textContent = dados.sobre || 'Profissional aprovado na plataforma ServiçoJá.';
-
+      document.getElementById('mpLocal').textContent = dados.endereco?.cidade ? '📍 ' + dados.endereco.cidade + ', ' + (dados.endereco.estado || 'SP') : '';
+      document.getElementById('mpSobre').textContent = dados.sobre || 'Profissional aprovado na plataforma ServiçoJá Conecta.';
       const cats = dados.categoriasAprovadas || [];
       document.getElementById('mpCats').innerHTML = cats.map(c => `<span class="mprof-cat-badge">${c}</span>`).join('');
+      if (dados.fotoPerfil) document.getElementById('mpAv').innerHTML = `<img src="${dados.fotoPerfil}">`;
 
-      if (dados.fotoPerfil) {
-        document.getElementById('mpAv').innerHTML = `<img src="${dados.fotoPerfil}">`;
-      }
-
+      // Fotos portfólio
       const portfolio = dados.portfolio || [];
       if (portfolio.length > 0) {
         document.getElementById('mpFotosSec').style.display = 'block';
         document.getElementById('mpFotos').innerHTML = portfolio.slice(0, 6).map(f =>
-          `<div class="foto-t"><img src="${f}" alt="foto"></div>`
+          `<div class="foto-t"><img src="${f}" alt="foto" onerror="this.parentElement.style.display='none'"></div>`
         ).join('');
       }
     }
-  } catch(e) {
-    console.log('Erro ao carregar perfil:', e);
-  }
+
+    // Busca avaliações reais do Firestore
+    const avalSnap = await firebase.firestore().collection('avaliacoes')
+      .where('profissionalId', '==', docId).get();
+    const avals = avalSnap.docs.map(d => d.data());
+
+    if (avals.length > 0) {
+      const media = (avals.reduce((s,a) => s+(a.nota||0), 0) / avals.length).toFixed(1);
+      const stars = '★'.repeat(Math.round(parseFloat(media))) + '☆'.repeat(5 - Math.round(parseFloat(media)));
+      document.getElementById('mpStars').innerHTML = `<span style="color:var(--amarelo)">${stars}</span> <span style="font-size:0.78rem">${media} · ${avals.length} avaliação(ões)</span>`;
+
+      document.getElementById('mpAvalLista').innerHTML = avals.slice(0,5).map(a => `
+        <div style="background:var(--azul-input);border:1px solid var(--borda);border-radius:10px;padding:11px 13px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+            <span style="font-weight:600;font-size:0.82rem">${a.clienteNome || 'Cliente'}</span>
+            <span style="color:var(--amarelo);font-size:0.8rem">${'★'.repeat(a.nota||0)}</span>
+          </div>
+          ${a.comentario ? `<div style="font-size:0.78rem;color:var(--cinza);line-height:1.5">${a.comentario}</div>` : ''}
+          <div style="font-size:0.68rem;color:rgba(138,155,181,0.5);margin-top:4px">${a.criadoEm ? new Date(a.criadoEm).toLocaleDateString('pt-BR') : ''}</div>
+        </div>`).join('');
+    } else {
+      document.getElementById('mpAvalLista').innerHTML = '<div style="color:var(--cinza);font-size:0.8rem;text-align:center;padding:10px">Ainda sem avaliações.</div>';
+    }
+
+  } catch(e) { console.log('Erro ao carregar perfil:', e); }
 }
 
 // ── ACEITAR PROFISSIONAL (itens 2 e 3) ───────────────────────────────
 function confirmarAceitarProf(profId, profNome, pedidoId, taxa) {
-  if (!confirm(`Aceitar receber orçamento de ${profNome}?\n\nA taxa de R$ ${taxa} será cobrada agora.`)) return;
+  if (!confirm(`Aceitar receber o orçamento de ${profNome}?`)) return;
   aceitarProf(profId, profNome, pedidoId, taxa);
 }
 
