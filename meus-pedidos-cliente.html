@@ -297,8 +297,13 @@ function selTab(el) {
 // ── RENDER PEDIDOS ────────────────────────────────────────────────────
 function renderPedidos() {
   const lista = document.getElementById('listaPedidos');
+  // Normaliza status: null/undefined/''/missing → 'aberto'
+  const normalizar = s => (!s || s === '' || s === 'null') ? 'aberto' : s;
+
   let filtrado = todosPedidos;
-  if (tabAtiva !== 'todos') filtrado = todosPedidos.filter(p => (p.status || 'aberto') === tabAtiva);
+  if (tabAtiva !== 'todos') {
+    filtrado = todosPedidos.filter(p => normalizar(p.status) === tabAtiva);
+  }
 
   if (!filtrado.length) {
     lista.innerHTML = '<div class="vazio"><div class="vazio-icon">📭</div><p>Nenhum pedido aqui ainda.</p></div>';
@@ -306,7 +311,7 @@ function renderPedidos() {
   }
 
   lista.innerHTML = filtrado.map(p => {
-    const status = p.status || 'aberto';
+    const status = (!p.status || p.status === '' || p.status === 'null') ? 'aberto' : p.status;
     const ints = p.interessados || [];
     const statusLabel = {aberto:'🟢 Aberto', andamento:'🔄 Em andamento', concluido:'✅ Concluído'}[status] || '🟢 Aberto';
     const statusClass = 'status-' + (status === 'andamento' ? 'andamento' : status === 'concluido' ? 'concluido' : 'aberto');
@@ -430,34 +435,54 @@ async function abrirPerfil(profId, pedidoId, taxa, showMsg) {
   // Busca dados reais — sem telefone, sem email, sem endereço completo
   try {
     let dados = null, docId = profId;
-    for (const id of [profId + '_prof', profId]) {
+
+    // Remove _prof duplicado se já veio com sufixo
+    const idLimpo = profId.endsWith('_prof') ? profId.replace(/_prof$/, '') : profId;
+
+    // Tenta as variações do ID
+    for (const id of [profId, idLimpo + '_prof', idLimpo]) {
       try {
         const snap = await firebase.firestore().collection('usuarios').doc(id).get();
         if (snap.exists) { dados = snap.data(); docId = id; break; }
       } catch(e) {}
     }
+
+    // Fallback: query por email do profissional (último recurso)
     if (!dados) {
-      const q = await firebase.firestore().collection('usuarios').where('tipo','==','profissional').get();
-      const doc = q.docs.find(d => d.id === profId || d.id === profId + '_prof');
+      const q = await firebase.firestore().collection('usuarios')
+        .where('tipo','==','profissional').get();
+      const doc = q.docs.find(d =>
+        d.id === profId || d.id === idLimpo || d.id === idLimpo + '_prof'
+      );
       if (doc) { dados = doc.data(); docId = doc.id; }
     }
 
     if (dados) {
       document.getElementById('mpNome').textContent = dados.nome || '—';
-      document.getElementById('mpLocal').textContent = dados.endereco?.cidade ? '📍 ' + dados.endereco.cidade + ', ' + (dados.endereco.estado || 'SP') : '';
+      document.getElementById('mpLocal').textContent = dados.endereco?.cidade
+        ? '📍 ' + dados.endereco.cidade + ', ' + (dados.endereco.estado || 'SP') : '';
       document.getElementById('mpSobre').textContent = dados.sobre || 'Profissional aprovado na plataforma ServiçoJá Conecta.';
       const cats = dados.categoriasAprovadas || [];
-      document.getElementById('mpCats').innerHTML = cats.map(c => `<span class="mprof-cat-badge">${c}</span>`).join('');
+      document.getElementById('mpCats').innerHTML = cats.map(c =>
+        `<span class="mprof-cat-badge">${c}</span>`).join('');
       if (dados.fotoPerfil) document.getElementById('mpAv').innerHTML = `<img src="${dados.fotoPerfil}">`;
 
-      // Fotos portfólio
+      // Portfólio — sempre mostra a seção, com mensagem se vazio
       const portfolio = dados.portfolio || [];
+      document.getElementById('mpFotosSec').style.display = 'block';
       if (portfolio.length > 0) {
-        document.getElementById('mpFotosSec').style.display = 'block';
-        document.getElementById('mpFotos').innerHTML = portfolio.slice(0, 6).map(f =>
+        document.getElementById('mpFotos').innerHTML = portfolio.slice(0, 9).map(f =>
           `<div class="foto-t"><img src="${f}" alt="foto" onerror="this.parentElement.style.display='none'"></div>`
         ).join('');
+      } else {
+        document.getElementById('mpFotos').innerHTML =
+          `<div style="grid-column:span 3;text-align:center;padding:16px;color:var(--cinza);font-size:.8rem">
+            Este profissional ainda não adicionou fotos do portfólio.
+          </div>`;
       }
+    } else {
+      document.getElementById('mpNome').textContent = 'Profissional';
+      document.getElementById('mpSobre').textContent = 'Aprovado na plataforma ServiçoJá Conecta.';
     }
 
     // Busca avaliações reais do Firestore
