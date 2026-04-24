@@ -330,6 +330,7 @@ function renderPedidos() {
             </div>
           </div>
           <div class="pedido-actions">
+            ${status === 'aberto' ? `<button class="act-btn" onclick="event.stopPropagation();editarPedido('${p.id}')">✏️ Editar</button>` : ''}
             ${status === 'aberto' ? `<button class="act-btn danger" onclick="event.stopPropagation();cancelarPedido('${p.id}',this)">🗑️ Cancelar</button>` : ''}
             <span class="expand-icon">▼</span>
           </div>
@@ -348,23 +349,22 @@ function renderPedidos() {
 
 function renderInteressado(i, pedido) {
   const status = i.status || 'interessado';
+  // "Ver perfil" aparece em TODOS os status (item 5)
+  const btnPerfil = `<button class="btn-ver-perfil" onclick="abrirPerfil('${i.profissionalId}','${pedido.id}',${i.taxa||10},${status==='enviado'||status==='aceito'})">👤 Ver perfil</button>`;
   let btnsHtml = '';
 
   if (status === 'interessado') {
-    btnsHtml = `
-      <button class="btn-ver-perfil" onclick="abrirPerfil('${i.profissionalId}','${pedido.id}',${i.taxa||10})">Ver perfil</button>
+    btnsHtml = `${btnPerfil}
       <button class="btn-aceitar-prof" onclick="confirmarAceitarProf('${i.profissionalId}','${i.profissionalNome||'Profissional'}','${pedido.id}',${i.taxa||10})">✅ Aceitar orçamento</button>
       <button class="btn-recusar-prof" onclick="recusarProf('${i.profissionalId}','${pedido.id}',this)">✕</button>`;
   } else if (status === 'solicitado') {
-    btnsHtml = `<span class="status-tag status-solicitado-tag">⏳ Aguardando orçamento</span>`;
+    btnsHtml = `${btnPerfil}<span class="status-tag status-solicitado-tag">⏳ Aguardando proposta</span>`;
   } else if (status === 'enviado') {
-    btnsHtml = `
-      <button class="btn-ver-perfil" onclick="abrirPerfil('${i.profissionalId}','${pedido.id}',${i.taxa||10},true)">Ver proposta</button>
-      <span class="status-tag status-aceito-tag">💬 Proposta recebida</span>`;
+    btnsHtml = `${btnPerfil}<span class="status-tag status-aceito-tag">💬 Proposta recebida</span>`;
   } else if (status === 'aceito') {
-    btnsHtml = `<span class="status-tag status-aceito-tag">✅ Aceito</span>`;
+    btnsHtml = `${btnPerfil}<span class="status-tag status-aceito-tag">✅ Aceito</span>`;
   } else if (status === 'recusado') {
-    btnsHtml = `<span class="status-tag status-recusado-tag">✕ Recusado</span>`;
+    btnsHtml = `${btnPerfil}<span class="status-tag status-recusado-tag">✕ Recusado</span>`;
   }
 
   const msgHtml = (status === 'enviado' || status === 'aceito') && i.mensagem
@@ -433,7 +433,7 @@ async function abrirPerfil(profId, pedidoId, taxa, showMsg) {
     for (const id of [profId + '_prof', profId]) {
       try {
         const snap = await firebase.firestore().collection('usuarios').doc(id).get();
-        if (snap.exists()) { dados = snap.data(); docId = id; break; }
+        if (snap.exists) { dados = snap.data(); docId = id; break; }
       } catch(e) {}
     }
     if (!dados) {
@@ -506,14 +506,32 @@ async function aceitarProf(profId, profNome, pedidoId, taxa) {
       interessados: intsAtualizados
     });
 
-    // Cobra taxa: incrementa taxaAcumulada no doc do profissional (item 3)
+    // Cobra taxa: busca o doc real do profissional e incrementa (item 3)
+    let taxaIncrementada = false;
     for (const id of [profId + '_prof', profId]) {
       try {
-        await firebase.firestore().collection('usuarios').doc(id).update({
-          taxaAcumulada: firebase.firestore.FieldValue.increment(taxa)
-        });
-        break;
+        const docSnap = await firebase.firestore().collection('usuarios').doc(id).get();
+        if (docSnap.exists) {
+          await firebase.firestore().collection('usuarios').doc(id).update({
+            taxaAcumulada: firebase.firestore.FieldValue.increment(taxa)
+          });
+          taxaIncrementada = true;
+          break;
+        }
       } catch(e) {}
+    }
+    // Fallback: busca por email/tipo
+    if (!taxaIncrementada) {
+      try {
+        const q = await firebase.firestore().collection('usuarios')
+          .where('tipo','==','profissional').get();
+        const doc = q.docs.find(d => d.id === profId || d.id === profId + '_prof');
+        if (doc) {
+          await firebase.firestore().collection('usuarios').doc(doc.id).update({
+            taxaAcumulada: firebase.firestore.FieldValue.increment(taxa)
+          });
+        }
+      } catch(e) { console.log('taxa fallback err:', e); }
     }
 
     // Notifica o profissional (item 2)
@@ -560,6 +578,11 @@ async function recusarProfBtn(profId, pedidoId) {
     pedido.interessados = intsAtualizados;
     renderPedidos();
   } catch(e) { alert('Erro: ' + e.message); }
+}
+
+// ── EDITAR PEDIDO (item 7) ────────────────────────────────────────────
+function editarPedido(pedidoId) {
+  window.location.href = 'publicar-pedido.html?editar=' + pedidoId;
 }
 
 // ── CANCELAR PEDIDO ───────────────────────────────────────────────────
