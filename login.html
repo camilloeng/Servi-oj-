@@ -352,7 +352,7 @@ async function entrar() {
     localStorage.setItem('sj_tipo', tipo);
     localStorage.setItem('sj_uid', cred.user.uid);
     localStorage.setItem('sj_nome', nome);
-    window.location.href = tipo === 'profissional' ? 'dashboard-profissional.html' : 'meus-pedidos-cliente.html';
+    window.location.href = tipo === 'profissional' ? (window.innerWidth < 768 ? 'dashboard-profissional-mobile.html' : 'dashboard-profissional.html') : 'meus-pedidos-cliente.html';
   } catch(e) {
     btn.classList.remove('loading');
     let msg = 'Email ou senha incorretos.';
@@ -377,7 +377,7 @@ async function entrarGoogle() {
     localStorage.setItem('sj_tipo', tipo);
     localStorage.setItem('sj_uid', cred.user.uid);
     localStorage.setItem('sj_nome', nome);
-    window.location.href = tipo === 'profissional' ? 'dashboard-profissional.html' : 'meus-pedidos-cliente.html';
+    window.location.href = tipo === 'profissional' ? (window.innerWidth < 768 ? 'dashboard-profissional-mobile.html' : 'dashboard-profissional.html') : 'meus-pedidos-cliente.html';
   } catch(e) {
     alert('Erro ao fazer login com Google. Tente novamente.');
   }
