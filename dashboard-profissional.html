@@ -338,16 +338,101 @@ async function init(user) {
     p.textContent = cat; p.onclick = function(){ selFiltro(this); };
     pills.appendChild(p);
   });
-  // Carrega taxa real do Firestore
+  // ── VERIFICAÇÃO DE TAXA E BLOQUEIO ────────────────────────────────
   try {
     const profSnap = await firebase.firestore().collection('usuarios').doc(uid).get();
     if (profSnap.exists) {
-      const taxa = parseFloat(profSnap.data().taxaAcumulada) || 0;
+      const dados = profSnap.data();
+      const taxa = parseFloat(dados.taxaAcumulada) || 0;
+      const hoje = new Date();
+      const dia = hoje.getDate();
+
+      // Atualiza bloco de taxa na sidebar
       document.getElementById('taxaValor').textContent = 'R$ ' + taxa.toLocaleString('pt-BR',{minimumFractionDigits:2});
-      document.getElementById('taxaVenc').textContent = taxa > 0 ? 'Pague até dia 18 deste mês' : '—';
       if (taxa > 0) document.getElementById('taxaBox').style.display = 'block';
+
+      // Calcula próximo vencimento
+      let venc;
+      if (dia <= 1) venc = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+      else if (dia <= 15) venc = new Date(hoje.getFullYear(), hoje.getMonth(), 15);
+      else venc = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 1);
+      const prazoFinal = new Date(venc.getTime() + 3 * 24 * 60 * 60 * 1000); // +3 dias
+      document.getElementById('taxaVenc').textContent = taxa > 0
+        ? 'Pague até ' + prazoFinal.toLocaleDateString('pt-BR') : '—';
+
+      // ── REGRA 1: Bloqueio por inadimplência (passou do prazo) ──────
+      const estaNoGrace = hoje <= prazoFinal;
+      const temTaxaVencida = taxa > 0 && !estaNoGrace;
+
+      // ── REGRA 2: Alerta R$250 ─────────────────────────────────────
+      if (taxa >= 250 && !dados.alerta250Enviado) {
+        await firebase.firestore().collection('usuarios').doc(uid).update({alerta250Enviado: true});
+        await firebase.firestore().collection('notificacoes').add({
+          para: uid, tipo: 'sistema',
+          mensagem: '⚠️ Sua taxa acumulada chegou a R$ ' + taxa.toFixed(2) + '. Ao atingir R$ 300,00 você terá apenas 3 dias para pagar antes de ser bloqueado.',
+          link: 'dashboard-profissional.html', lida: false, criadoEm: new Date().toISOString()
+        });
+      }
+
+      // ── REGRA 3: Alerta R$300 + início contagem de 3 dias ─────────
+      if (taxa >= 300) {
+        if (!dados.alerta300Em) {
+          // Primeiro vez que chega em 300 — registra a data e notifica
+          await firebase.firestore().collection('usuarios').doc(uid).update({
+            alerta300Em: new Date().toISOString(),
+            alerta250Enviado: true
+          });
+          await firebase.firestore().collection('notificacoes').add({
+            para: uid, tipo: 'sistema',
+            mensagem: '🚨 Sua taxa atingiu R$ ' + taxa.toFixed(2) + '! Você tem 3 dias para efetuar o pagamento. Após esse prazo sua conta será bloqueada automaticamente.',
+            link: 'dashboard-profissional.html', lida: false, criadoEm: new Date().toISOString()
+          });
+        } else {
+          // Verifica se passaram 3 dias desde o alerta de R$300
+          const alerta300Date = new Date(dados.alerta300Em);
+          const diasDesdeAlerta = (hoje - alerta300Date) / (1000 * 60 * 60 * 24);
+          if (diasDesdeAlerta >= 3) { /* será bloqueado abaixo */ }
+        }
+      }
+
+      // ── BLOQUEIO EFETIVO ──────────────────────────────────────────
+      const bloquear300 = taxa >= 300 && dados.alerta300Em &&
+        ((hoje - new Date(dados.alerta300Em)) / (1000 * 60 * 60 * 24)) >= 3;
+
+      if (temTaxaVencida || bloquear300 || dados.bloqueado) {
+        // Mostra tela de bloqueio e impede carregamento de pedidos
+        const motivo = bloquear300
+          ? 'Sua taxa atingiu R$ 300,00 e o prazo de 3 dias para pagamento expirou.'
+          : dados.bloqueado
+            ? 'Sua conta foi bloqueada pelo administrador.'
+            : 'Você possui taxas em atraso. O prazo de pagamento expirou.';
+
+        document.getElementById('bloqueadoBox').classList.add('vis');
+        document.getElementById('bloqueadoBox').innerHTML = `
+          <div class="bloq-icon">🔒</div>
+          <div class="bloq-title">Conta bloqueada</div>
+          <div class="bloq-sub">${motivo}<br><br>Regularize seu pagamento para voltar a receber pedidos.</div>
+          <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px;margin-bottom:10px;font-size:.75rem;color:var(--cinza)">
+            Taxa pendente: <strong style="color:var(--erro)">R$ ${taxa.toFixed(2)}</strong>
+          </div>
+          <button class="btn-regularizar" onclick="abrirPagamento()">💳 Pagar agora e regularizar</button>`;
+
+        // Esconde lista de pedidos e filtros
+        document.getElementById('listaPedidos').innerHTML = `
+          <div style="text-align:center;padding:40px 20px;color:var(--cinza)">
+            <div style="font-size:2.5rem;margin-bottom:12px">🔒</div>
+            <div style="font-weight:700;color:var(--erro);margin-bottom:8px">Conta bloqueada por inadimplência</div>
+            <div style="font-size:.82rem;line-height:1.6">Regularize o pagamento no painel à esquerda<br>para voltar a ver e dar interesse em pedidos.</div>
+          </div>`;
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('filtroPills').style.opacity = '0.3';
+        document.getElementById('filtroPills').style.pointerEvents = 'none';
+
+        // Não carrega pedidos se bloqueado
+        return;
+      }
     }
-  } catch(e) {}
+  } catch(e) { console.warn('Erro na verificação de taxa:', e); }
 
   await carregarPedidos();
 }
