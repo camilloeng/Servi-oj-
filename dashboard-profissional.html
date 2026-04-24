@@ -338,6 +338,17 @@ async function init(user) {
     p.textContent = cat; p.onclick = function(){ selFiltro(this); };
     pills.appendChild(p);
   });
+  // Carrega taxa real do Firestore
+  try {
+    const profSnap = await firebase.firestore().collection('usuarios').doc(uid).get();
+    if (profSnap.exists) {
+      const taxa = parseFloat(profSnap.data().taxaAcumulada) || 0;
+      document.getElementById('taxaValor').textContent = 'R$ ' + taxa.toLocaleString('pt-BR',{minimumFractionDigits:2});
+      document.getElementById('taxaVenc').textContent = taxa > 0 ? 'Pague até dia 18 deste mês' : '—';
+      if (taxa > 0) document.getElementById('taxaBox').style.display = 'block';
+    }
+  } catch(e) {}
+
   await carregarPedidos();
 }
 
@@ -582,7 +593,66 @@ async function enviarProposta() {
   } catch(e) { alert('Erro ao enviar: ' + e.message); }
 }
 
-function abrirPagamento() { alert('Em breve: integração com Pix/cartão. WhatsApp: (11) 99999-9999'); }
+async function abrirPagamento() {
+  const taxa = parseFloat(document.getElementById('taxaValor').textContent.replace('R$ ','').replace(',','.')) || 0;
+  if (taxa <= 0) { alert('Você não possui taxas pendentes!'); return; }
+  document.getElementById('pagValor').textContent = 'R$ ' + taxa.toLocaleString('pt-BR',{minimumFractionDigits:2});
+  document.getElementById('pagStatus').textContent = '';
+  document.getElementById('pagStatus').style.display = 'none';
+  document.getElementById('pagComp').value = '';
+  document.getElementById('pagPreview').style.display = 'none';
+  document.getElementById('pagCompUrl').value = '';
+  document.getElementById('overlayPagamento').classList.add('vis');
+}
+
+async function uploadComprovante(input) {
+  if (!input.files[0]) return;
+  const btn = document.getElementById('btnEnviarPag');
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+  try {
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const base64 = e.target.result.split(',')[1];
+      const fd = new FormData(); fd.append('image', base64);
+      const res = await fetch('https://api.imgbb.com/1/upload?key=327d0067238019843e43362c2f7096c7', {method:'POST',body:fd});
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('pagCompUrl').value = data.data.url;
+        document.getElementById('pagPreview').src = data.data.url;
+        document.getElementById('pagPreview').style.display = 'block';
+        btn.textContent = '✅ Enviar comprovante';
+        btn.disabled = false;
+      } else { btn.textContent = '✅ Enviar comprovante'; btn.disabled = false; alert('Erro no upload. Tente novamente.'); }
+    };
+    reader.readAsDataURL(input.files[0]);
+  } catch(e) { btn.textContent = '✅ Enviar comprovante'; btn.disabled = false; alert('Erro: ' + e.message); }
+}
+
+async function enviarComprovante() {
+  const compUrl = document.getElementById('pagCompUrl').value;
+  const taxa = parseFloat(document.getElementById('taxaValor').textContent.replace('R$ ','').replace(',','.')) || 0;
+  if (!compUrl) { alert('Por favor anexe o comprovante de pagamento!'); return; }
+  const btn = document.getElementById('btnEnviarPag');
+  btn.disabled = true; btn.textContent = 'Enviando...';
+  const nome = localStorage.getItem('sj_nome') || 'Profissional';
+  const hoje = new Date();
+  try {
+    await firebase.firestore().collection('pagamentos').add({
+      profissionalId: uid,
+      profissionalNome: nome,
+      valor: taxa,
+      comprovanteUrl: compUrl,
+      status: 'pendente',
+      criadoEm: hoje.toISOString(),
+      mes: hoje.getFullYear() + '-' + String(hoje.getMonth()+1).padStart(2,'0')
+    });
+    const st = document.getElementById('pagStatus');
+    st.textContent = '✅ Comprovante enviado! Aguardando aprovação do admin.';
+    st.style.cssText = 'display:block;background:rgba(0,201,111,.1);border:1px solid rgba(0,201,111,.25);color:var(--verde);border-radius:8px;padding:10px 12px;font-size:.8rem;margin-top:10px;text-align:center';
+    btn.textContent = '✅ Enviado!';
+    setTimeout(() => document.getElementById('overlayPagamento').classList.remove('vis'), 2500);
+  } catch(e) { btn.disabled=false; btn.textContent='✅ Enviar comprovante'; alert('Erro: ' + e.message); }
+}
 async function sair() { await firebase.auth().signOut(); localStorage.clear(); window.location.href = 'login.html'; }
 
 firebase.auth().onAuthStateChanged(function(user) {
@@ -638,6 +708,48 @@ async function criarNotificacao(para,tipo,mensagem,link){
 }
 document.querySelectorAll('.overlay').forEach(ov=>ov.addEventListener('click',e=>{if(e.target===ov)ov.classList.remove('vis');}));
 </script>
+<!-- MODAL PAGAMENTO PIX -->
+<div class="overlay" id="overlayPagamento">
+  <div class="modal" style="max-width:420px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div class="modal-title">💳 Pagar taxa ServiçoJá</div>
+      <button onclick="document.getElementById('overlayPagamento').classList.remove('vis')" style="background:rgba(255,255,255,.06);border:none;border-radius:50%;width:28px;height:28px;color:var(--cinza);cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+
+    <div style="background:rgba(0,201,111,.07);border:1px solid rgba(0,201,111,.2);border-radius:12px;padding:14px 16px;margin-bottom:14px;text-align:center">
+      <div style="font-size:.72rem;color:var(--cinza);margin-bottom:4px">Valor a pagar</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;color:var(--verde)" id="pagValor">—</div>
+    </div>
+
+    <div style="background:var(--azul-input);border:1px solid var(--borda);border-radius:12px;padding:14px 16px;margin-bottom:14px">
+      <div style="font-size:.72rem;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">📱 Chave Pix para pagamento</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:var(--branco);word-break:break-all" id="pixKey">camillouk21@gmail.com</div>
+      <div style="font-size:.72rem;color:var(--cinza);margin-top:4px">Tipo: E-mail · Titular: ServiçoJá Conecta</div>
+      <button onclick="navigator.clipboard.writeText('camillouk21@gmail.com').then(()=>this.textContent='✅ Copiado!').catch(()=>{})" style="margin-top:10px;background:rgba(0,201,111,.1);border:1px solid rgba(0,201,111,.25);border-radius:7px;padding:6px 14px;color:var(--verde);font-size:.75rem;font-weight:700;cursor:pointer;width:100%">📋 Copiar chave Pix</button>
+    </div>
+
+    <div style="font-size:.8rem;color:var(--cinza);margin-bottom:12px;line-height:1.6">
+      1. Faça o pagamento via Pix para a chave acima<br>
+      2. Salve o comprovante<br>
+      3. Anexe o comprovante abaixo e clique em enviar
+    </div>
+
+    <div class="mfield">
+      <label>Comprovante de pagamento *</label>
+      <input type="file" id="pagComp" accept="image/*,application/pdf" style="background:var(--azul-input);border:1.5px dashed rgba(0,201,111,.3);border-radius:10px;padding:10px;color:var(--cinza);width:100%;cursor:pointer" onchange="uploadComprovante(this)">
+      <input type="hidden" id="pagCompUrl">
+      <img id="pagPreview" style="display:none;width:100%;border-radius:8px;margin-top:8px;max-height:120px;object-fit:contain">
+    </div>
+
+    <div id="pagStatus" style="display:none"></div>
+
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn-cancel" onclick="document.getElementById('overlayPagamento').classList.remove('vis')">Cancelar</button>
+      <button class="btn-send" id="btnEnviarPag" onclick="enviarComprovante()">✅ Enviar comprovante</button>
+    </div>
+  </div>
+</div>
+
 <script>if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(e=>{});}</script>
 </body>
 </html>
