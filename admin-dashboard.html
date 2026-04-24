@@ -272,23 +272,38 @@ if(!window._fbInitialized){firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZo
     <!-- ══ FINANCEIRO ══ -->
     <div class="painel" id="financeiro">
       <div class="p-header">
-        <div><div class="p-title">Financeiro</div><div class="p-sub">Taxas acumuladas pelos profissionais</div></div>
+        <div><div class="p-title">Financeiro</div><div class="p-sub">Pagamentos recebidos e taxas pendentes</div></div>
         <div class="hdr-btns">
           <button class="btn-sm laranja" onclick="exportarCSV('financeiro')">📤 Exportar CSV</button>
           <button class="btn-sm laranja" onclick="notificarInadimplentes()">📢 Notificar todos</button>
         </div>
       </div>
+
+      <!-- STATS FINANCEIRO -->
       <div class="stats-grid sg3" style="margin-bottom:18px">
-        <div class="stat-card c-verde"><div class="sc-icon">💰</div><div class="sc-num t-verde" id="finTotal">—</div><div class="sc-lbl">Total acumulado</div></div>
+        <div class="stat-card c-verde"><div class="sc-icon">💰</div><div class="sc-num t-verde" id="finFaturamento">—</div><div class="sc-lbl">Faturamento recebido este mês</div></div>
+        <div class="stat-card c-amarelo"><div class="sc-icon">⏳</div><div class="sc-num t-amarelo" id="finPendentes">—</div><div class="sc-lbl">Comprovantes aguardando aprovação</div></div>
         <div class="stat-card c-erro"><div class="sc-icon">⚠️</div><div class="sc-num t-erro" id="finInadimpl">—</div><div class="sc-lbl">Inadimplentes</div></div>
-        <div class="stat-card c-amarelo"><div class="sc-icon">📊</div><div class="sc-num t-amarelo" id="finMedia">—</div><div class="sc-lbl">Taxa média/profissional</div></div>
       </div>
+
+      <!-- COMPROVANTES PENDENTES -->
+      <div class="table-card" style="margin-bottom:20px">
+        <div class="table-head">
+          <div><div class="th-title">🧾 Comprovantes aguardando aprovação</div><div class="th-sub">Revise e aprove ou rejeite cada pagamento</div></div>
+          <button class="btn-sm verde" onclick="carregarPagamentosPendentes()">🔄 Atualizar</button>
+        </div>
+        <div id="compPendLista" style="padding:14px">
+          <div class="spinner"></div>
+        </div>
+      </div>
+
+      <!-- TAXAS ACUMULADAS (dívidas) -->
       <div class="table-card">
         <div class="table-head">
-          <div><div class="th-title">Profissionais com taxa</div><div class="th-sub">Ordenado por valor</div></div>
+          <div><div class="th-title">Taxas acumuladas (dívidas)</div><div class="th-sub">O que cada profissional ainda deve</div></div>
           <input class="search-input" placeholder="Buscar..." oninput="filtrarTabela('finTb',this.value,[0])">
         </div>
-        <table><thead><tr><th>Profissional</th><th>Cidade</th><th>Taxa acumulada</th><th>Situação</th><th>Ação</th></tr></thead>
+        <table><thead><tr><th>Profissional</th><th>Cidade</th><th>Taxa devida</th><th>Situação</th><th>Ação</th></tr></thead>
         <tbody id="finTb"><tr class="loading-row"><td colspan="5"><div class="spinner"></div></td></tr></tbody></table>
       </div>
     </div>
@@ -489,9 +504,16 @@ async function carregarTudo() {
 
     const totalTaxa = todosProfsCache.reduce((s,p) => s+(parseFloat(p.taxaAcumulada)||0), 0);
     const inadimpl = todosProfsCache.filter(p => (parseFloat(p.taxaAcumulada)||0) > 0).length;
-    document.getElementById('dashFaturamento').textContent = 'R$ ' + totalTaxa.toLocaleString('pt-BR',{minimumFractionDigits:2});
+
+    // Faturamento REAL = pagamentos aprovados neste mês
+    const mesAtual = new Date().getFullYear() + '-' + String(new Date().getMonth()+1).padStart(2,'0');
+    const pagSnap = await db.collection('pagamentos').where('mes','==',mesAtual).where('status','==','aprovado').get();
+    const faturamentoReal = pagSnap.docs.reduce((s,d) => s+(parseFloat(d.data().valor)||0), 0);
+    const pagPendentes = await db.collection('pagamentos').where('status','==','pendente').get();
+
+    document.getElementById('dashFaturamento').textContent = 'R$ ' + faturamentoReal.toLocaleString('pt-BR',{minimumFractionDigits:2});
     document.getElementById('dashInadimpl').textContent = inadimpl;
-    document.getElementById('sbBadgeFin').textContent = inadimpl;
+    document.getElementById('sbBadgeFin').textContent = inadimpl + pagPendentes.size;
 
     document.getElementById('dashAtualizado').textContent = 'Dados reais · Atualizado às ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 
@@ -580,16 +602,20 @@ function renderizarGraficos() {
 
 // ── FINANCEIRO ────────────────────────────────────────────────────────
 async function carregarFinanceiro() {
+  const mesAtual = new Date().getFullYear() + '-' + String(new Date().getMonth()+1).padStart(2,'0');
+  try {
+    const pagAprov = await db.collection('pagamentos').where('mes','==',mesAtual).where('status','==','aprovado').get();
+    const faturamento = pagAprov.docs.reduce((s,d) => s+(parseFloat(d.data().valor)||0), 0);
+    const pagPend = await db.collection('pagamentos').where('status','==','pendente').get();
+    if (document.getElementById('finFaturamento')) document.getElementById('finFaturamento').textContent = 'R$ ' + faturamento.toLocaleString('pt-BR',{minimumFractionDigits:2});
+    if (document.getElementById('finPendentes')) document.getElementById('finPendentes').textContent = pagPend.size;
+  } catch(e) {}
   document.getElementById('finTb').innerHTML = '<tr class="loading-row"><td colspan="5"><div class="spinner"></div></td></tr>';
   try {
     const snap = await db.collection('usuarios').where('tipo','==','profissional').get();
     const profs = snap.docs.map(d => ({id:d.id,...d.data()})).sort((a,b) => (parseFloat(b.taxaAcumulada)||0)-(parseFloat(a.taxaAcumulada)||0));
-    const total = profs.reduce((s,p) => s+(parseFloat(p.taxaAcumulada)||0), 0);
     const inadimpl = profs.filter(p => (parseFloat(p.taxaAcumulada)||0) > 0).length;
-    const media = profs.length ? total/profs.length : 0;
-    document.getElementById('finTotal').textContent = 'R$ ' + total.toLocaleString('pt-BR',{minimumFractionDigits:2});
-    document.getElementById('finInadimpl').textContent = inadimpl;
-    document.getElementById('finMedia').textContent = 'R$ ' + media.toFixed(2);
+    if (document.getElementById('finInadimpl')) document.getElementById('finInadimpl').textContent = inadimpl;
     document.getElementById('finTb').innerHTML = profs.length ? profs.map(p => {
       const taxa = parseFloat(p.taxaAcumulada)||0;
       const sit = taxa > 0 ? '<span class="badge be">⚠️ Pendente</span>' : '<span class="badge bv">✅ Em dia</span>';
@@ -608,7 +634,7 @@ async function carregarFinanceiro() {
 }
 
 async function zerarTaxa(profId, btn) {
-  if (!confirm('Marcar como quitado (zerar taxa)?')) return;
+  if (!confirm('Marcar como quitado manualmente (sem comprovante)?')) return;
   try {
     await db.collection('usuarios').doc(profId).update({ taxaAcumulada: 0 });
     const row = btn.closest('tr');
@@ -616,6 +642,66 @@ async function zerarTaxa(profId, btn) {
     row.querySelector('td:nth-child(3)').style.color = 'var(--verde)';
     row.querySelector('td:nth-child(4)').innerHTML = '<span class="badge bv">✅ Em dia</span>';
     btn.remove();
+  } catch(e) { alert('Erro: ' + e.message); }
+}
+
+// ── PAGAMENTOS PENDENTES ─────────────────────────────────────────────
+async function carregarPagamentosPendentes() {
+  const el = document.getElementById('compPendLista');
+  if (!el) return;
+  el.innerHTML = '<div class="spinner"></div>';
+  try {
+    const snap = await db.collection('pagamentos').where('status','==','pendente').get();
+    if (!snap.size) { el.innerHTML = '<div class="vazio-tab">Nenhum comprovante aguardando aprovação. ✅</div>'; return; }
+    const pags = snap.docs.map(d => ({id:d.id,...d.data()})).sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
+    el.innerHTML = pags.map(p => `
+      <div style="display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid var(--borda)">
+        <a href="${p.comprovanteUrl}" target="_blank">
+          <img src="${p.comprovanteUrl}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--borda);flex-shrink:0" onerror="this.style.display='none'">
+        </a>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:.88rem;margin-bottom:2px">${p.profissionalNome||'—'}</div>
+          <div style="font-size:.75rem;color:var(--cinza);margin-bottom:4px">${formatData(p.criadoEm)} · Mês: ${p.mes||'—'}</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--verde);margin-bottom:8px">R$ ${parseFloat(p.valor||0).toFixed(2)}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="ab success" style="padding:6px 14px" onclick="aprovarPagamento('${p.id}','${p.profissionalId}',${p.valor},this)">✅ Aprovar</button>
+            <button class="ab danger" style="padding:6px 14px" onclick="rejeitarPagamento('${p.id}',this)">✕ Rejeitar</button>
+            <a href="${p.comprovanteUrl}" target="_blank" style="text-decoration:none"><button class="ab" style="padding:6px 14px">🔍 Ver</button></a>
+          </div>
+        </div>
+      </div>`).join('');
+  } catch(e) { el.innerHTML = `<div class="vazio-tab">Erro: ${e.message}</div>`; }
+}
+
+async function aprovarPagamento(pagId, profId, valor, btn) {
+  if (!confirm('Aprovar pagamento de R$ ' + parseFloat(valor).toFixed(2) + '?')) return;
+  btn.disabled = true; btn.textContent = 'Aprovando...';
+  try {
+    await db.collection('pagamentos').doc(pagId).update({status:'aprovado', aprovadoEm: new Date().toISOString()});
+    for (const id of [profId + '_prof', profId]) {
+      try {
+        const s = await db.collection('usuarios').doc(id).get();
+        if (s.exists) { await db.collection('usuarios').doc(id).update({taxaAcumulada: 0}); break; }
+      } catch(e) {}
+    }
+    await db.collection('notificacoes').add({
+      para: profId + '_prof', tipo: 'sistema',
+      mensagem: 'Pagamento de R$ ' + parseFloat(valor).toFixed(2) + ' aprovado! Sua conta está regularizada. ✅',
+      link: 'dashboard-profissional.html', lida: false, criadoEm: new Date().toISOString()
+    }).catch(()=>{});
+    btn.closest('div[style*="border-bottom"]').style.opacity = '0.4';
+    btn.textContent = '✅ Aprovado';
+    carregarFinanceiro();
+  } catch(e) { btn.disabled=false; btn.textContent='✅ Aprovar'; alert('Erro: ' + e.message); }
+}
+
+async function rejeitarPagamento(pagId, btn) {
+  const motivo = prompt('Motivo da rejeição (opcional):') || 'Comprovante inválido';
+  try {
+    await db.collection('pagamentos').doc(pagId).update({status:'rejeitado', motivoRejeicao: motivo, rejeitadoEm: new Date().toISOString()});
+    btn.closest('div[style*="border-bottom"]').style.opacity = '0.4';
+    btn.textContent = '✕ Rejeitado';
+    carregarPagamentosPendentes();
   } catch(e) { alert('Erro: ' + e.message); }
 }
 
