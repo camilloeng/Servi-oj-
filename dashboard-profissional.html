@@ -279,7 +279,7 @@ async function init(user) {
     for (const id of [user.uid + '_prof', user.uid]) {
       try {
         const snap = await firebase.firestore().collection('usuarios').doc(id).get();
-        if (snap.exists() && (snap.data().categoriasAprovadas || []).length > 0) {
+        if (snap.exists && (snap.data().categoriasAprovadas || []).length > 0) {
           categoriasAprovadas = snap.data().categoriasAprovadas;
           uid = id;
           localStorage.setItem('sj_categoriasAprovadas', JSON.stringify(categoriasAprovadas));
@@ -463,7 +463,7 @@ function renderPedidos() {
         <div class="p-meta">
           <span class="pm">📅 <strong>${formatData(p.criadoEm)}</strong></span>
           <span class="pm">💰 <strong>${orc}</strong></span>
-          <span class="pm">📍 <strong>${p.bairro ? p.bairro + ', ' : ''}${p.cidade || (p.endereco||'').split(',').slice(-1)[0] || '—'}</strong></span>
+          <span class="pm">📍 <strong>${(() => { const b = p.bairro || p.endereco?.bairro || ''; const c = p.cidade || p.endereco?.cidade || (p.endereco||'').split(',').slice(-1)[0] || '—'; return (b ? b + ', ' : '') + c; })()}</strong></span>
           <span class="urg ${urgClass}">${urgLabel}</span>
         </div>
         <div class="p-actions">${actionHtml}</div>
@@ -529,7 +529,7 @@ async function abrirWhatsAppCliente(pedidoId) {
   if (!pedido) return;
   try {
     const snap = await firebase.firestore().collection('usuarios').doc(pedido.clienteId).get();
-    const tel = snap.exists() ? (snap.data().telefone || '') : '';
+    const tel = snap.exists ? (snap.data().telefone || '') : '';
     const telLimpo = tel.replace(/\D/g, '');
     const nome = localStorage.getItem('sj_nome') || 'profissional';
     const msg = encodeURIComponent(`Olá! Sou ${nome} cadastrado no ServiçoJá Conecta. Vi seu pedido "${pedido.titulo}" e você aceitou meu contato. Podemos conversar sobre o serviço?`);
