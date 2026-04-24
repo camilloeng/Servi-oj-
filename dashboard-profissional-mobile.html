@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ServiçoJá Conecta — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --verde:#00C96F;--verde-escuro:#009E57;--azul:#0A1628;--azul-medio:#132240;
+  --azul-input:#0F1C35;--branco:#F5F7F2;--cinza:#8A9BB5;--laranja:#FF6B35;
+  --amarelo:#FFB830;--erro:#FF5C5C;--borda:rgba(255,255,255,0.09);
+  --bottom-h:64px;--safe-bottom:env(safe-area-inset-bottom,0px)
+}
+html,body{height:100%;background:var(--azul);color:var(--branco);font-family:'DM Sans',sans-serif;overflow:hidden}
+a{color:inherit;text-decoration:none}
+
+/* ── TOP NAV ── */
+.top-nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  background:var(--azul-medio);
+  border-bottom:1px solid var(--borda);
+  padding:10px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  height:56px
+}
+.tn-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--branco)}
+.tn-logo span{color:var(--verde)}
+.tn-right{display:flex;align-items:center;gap:10px}
+.tn-notif{position:relative;width:34px;height:34px;border-radius:50%;background:var(--azul-input);border:1px solid var(--borda);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer}
+.tn-badge{position:absolute;top:-2px;right:-2px;min-width:16px;height:16px;border-radius:50%;background:var(--laranja);color:white;font-size:9px;font-weight:700;display:none;align-items:center;justify-content:center;border:2px solid var(--azul-medio)}
+.tn-av{width:34px;height:34px;border-radius:50%;background:rgba(0,201,111,0.15);border:2px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem;overflow:hidden;cursor:pointer}
+.tn-av img{width:100%;height:100%;object-fit:cover}
+
+/* ── SCROLL AREA ── */
+.page{
+  position:fixed;top:56px;left:0;right:0;
+  bottom:calc(var(--bottom-h) + var(--safe-bottom));
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:14px 14px 8px
+}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.stat{background:var(--azul-medio);border:1px solid var(--borda);border-radius:12px;padding:12px 10px;text-align:center}
+.stat-n{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;margin-bottom:2px}
+.t-verde{color:var(--verde)}.t-amarelo{color:var(--amarelo)}.t-cinza{color:var(--cinza)}
+.stat-l{font-size:0.62rem;color:var(--cinza)}
+
+/* ── SECTION HEADER ── */
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sec-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem}
+
+/* ── FILTROS ── */
+.filtros{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;scrollbar-width:none}
+.filtros::-webkit-scrollbar{display:none}
+.fpill{background:var(--azul-input);border:1.5px solid var(--borda);border-radius:100px;padding:6px 12px;font-size:0.75rem;color:var(--cinza);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.2s}
+.fpill.ativo{background:rgba(0,201,111,0.12);border-color:rgba(0,201,111,0.45);color:var(--verde);font-weight:600}
+
+/* ── PEDIDO CARD ── */
+.pedido-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:14px;margin-bottom:10px;animation:fadeUp 0.3s ease both}
+.pedido-card:active{transform:scale(0.99)}
+.p-cats{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:7px}
+.pcat{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.2);color:var(--verde);font-size:0.65rem;font-weight:700;padding:2px 8px;border-radius:100px}
+.p-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;margin-bottom:4px;line-height:1.3;cursor:pointer}
+.p-desc{color:var(--cinza);font-size:0.78rem;line-height:1.5;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.p-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.pm{font-size:0.72rem;color:var(--cinza)}
+.pm strong{color:var(--branco)}
+.p-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--borda);padding-top:10px}
+.urg{font-size:0.7rem;font-weight:700;padding:3px 8px;border-radius:100px}
+.urg-urgente{background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.3);color:var(--laranja)}
+.urg-semana{background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.25);color:var(--amarelo)}
+.urg-pressa{background:rgba(138,155,181,0.1);border:1px solid rgba(138,155,181,0.2);color:var(--cinza)}
+.p-actions{display:flex;gap:6px;align-items:center}
+.taxa-badge{background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.25);border-radius:6px;padding:3px 8px;font-size:0.68rem;color:var(--laranja);font-weight:700;white-space:nowrap}
+.btn-int{background:transparent;border:1.5px solid var(--verde);border-radius:8px;padding:7px 14px;color:var(--verde);font-weight:700;font-size:0.78rem;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.btn-int:active{background:var(--verde);color:var(--azul)}
+.btn-int:disabled{opacity:0.6;cursor:default}
+.btn-falar{background:var(--verde);border:none;border-radius:8px;padding:7px 14px;color:var(--azul);font-weight:700;font-size:0.78rem;cursor:pointer;white-space:nowrap;animation:pulse 2s infinite}
+.status-pill{font-size:0.7rem;font-weight:700;padding:5px 10px;border-radius:8px}
+.sp-aguardando{background:rgba(138,155,181,0.12);border:1px solid rgba(138,155,181,0.2);color:var(--cinza)}
+.sp-aceito{background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.25);color:var(--amarelo);animation:pulse 2s infinite}
+.sp-enviado{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde)}
+
+/* ── LOADING / VAZIO ── */
+.spinner{width:36px;height:36px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;margin:40px auto}
+.vazio{text-align:center;padding:40px 20px;color:var(--cinza)}
+.vazio-icon{font-size:2.5rem;opacity:0.3;margin-bottom:10px}
+
+/* ── BLOQUEADO ── */
+.bloq-wrap{background:rgba(255,92,92,0.07);border:2px solid rgba(255,92,92,0.35);border-radius:14px;padding:20px;text-align:center;margin-bottom:14px;display:none}
+.bloq-wrap.vis{display:block}
+.btn-reg{background:var(--erro);border:none;border-radius:9px;padding:10px 20px;color:var(--branco);font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;margin-top:10px;width:100%}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:50;
+  background:var(--azul-medio);
+  border-top:1px solid var(--borda);
+  display:flex;
+  padding-bottom:var(--safe-bottom);
+  height:calc(var(--bottom-h) + var(--safe-bottom))
+}
+.bn-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;
+  font-size:0.6rem;font-weight:600;
+  color:var(--cinza);cursor:pointer;
+  border:none;background:none;
+  padding:8px 4px;position:relative;
+  transition:color 0.2s
+}
+.bn-item.ativo{color:var(--verde)}
+.bn-item.ativo::before{
+  content:'';position:absolute;top:0;left:20%;right:20%;
+  height:2px;background:var(--verde);border-radius:0 0 3px 3px
+}
+.bn-icon{font-size:1.2rem;line-height:1}
+.bn-dot{
+  position:absolute;top:6px;right:calc(50% - 14px);
+  width:7px;height:7px;border-radius:50%;
+  background:var(--laranja);border:2px solid var(--azul-medio);
+  display:none
+}
+
+/* ── NOTIF DROPDOWN ── */
+.notif-dropdown{
+  position:fixed;top:56px;right:12px;width:300px;
+  background:var(--azul-medio);border:1px solid var(--borda);
+  border-radius:14px;overflow:hidden;z-index:100;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);
+  display:none
+}
+.notif-dropdown.vis{display:block;animation:fadeUp 0.2s ease}
+.notif-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--borda)}
+.notif-lista{max-height:320px;overflow-y:auto}
+.ni{display:flex;align-items:flex-start;gap:9px;padding:11px 13px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer}
+.ni:last-child{border-bottom:none}
+.ni.nova{border-left:3px solid var(--verde);background:rgba(0,201,111,0.03)}
+.ni-ic{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.ni-txt{font-size:0.72rem;color:var(--branco);line-height:1.4;margin-bottom:2px}
+.ni-time{font-size:0.65rem;color:var(--cinza)}
+.ni-dot{width:6px;height:6px;border-radius:50%;background:var(--verde);margin-top:4px;flex-shrink:0}
+
+/* ── MODAL DETALHE ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(10,22,40,0.92);
+  z-index:200;display:flex;align-items:flex-end;
+  opacity:0;pointer-events:none;transition:opacity 0.25s
+}
+.modal-overlay.vis{opacity:1;pointer-events:all}
+.modal-sheet{
+  background:var(--azul-medio);border:1px solid var(--borda);
+  border-radius:20px 20px 0 0;width:100%;
+  max-height:85vh;overflow-y:auto;
+  padding:16px 18px 24px;
+  transform:translateY(100%);transition:transform 0.3s ease
+}
+.modal-overlay.vis .modal-sheet{transform:translateY(0)}
+.sheet-handle{width:36px;height:4px;border-radius:2px;background:var(--borda);margin:0 auto 16px}
+.modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:10px}
+.det-sec{margin-bottom:14px}
+.det-label{font-size:0.68rem;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.det-text{font-size:0.82rem;color:var(--cinza);line-height:1.7;background:var(--azul-input);border:1px solid var(--borda);border-radius:10px;padding:10px 12px}
+.fotos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.foto-thumb{aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--azul-input)}
+.foto-thumb img{width:100%;height:100%;object-fit:cover}
+
+/* ── MODAL PAGAMENTO ── */
+.modal-pag{background:var(--azul-medio);border:1px solid var(--borda);border-radius:20px 20px 0 0;width:100%;padding:16px 18px 32px;transform:translateY(100%);transition:transform 0.3s ease}
+.modal-overlay.vis .modal-pag{transform:translateY(0)}
+.pag-val{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;color:var(--verde);text-align:center;padding:14px;background:rgba(0,201,111,0.07);border:1px solid rgba(0,201,111,0.2);border-radius:12px;margin-bottom:12px}
+.pix-box{background:var(--azul-input);border:1px solid var(--borda);border-radius:12px;padding:12px 14px;margin-bottom:14px}
+.pix-key{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;color:var(--branco);word-break:break-all;margin-bottom:4px}
+.btn-copiar{width:100%;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);border-radius:8px;padding:8px;color:var(--verde);font-size:0.8rem;font-weight:700;cursor:pointer;margin-top:8px}
+.btn-enviar-comp{width:100%;background:var(--verde);border:none;border-radius:12px;padding:13px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;margin-top:8px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+</style>
+<meta name="theme-color" content="#00C96F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+if(!window._fbInitialized){
+  firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",authDomain:"servicoja-e1f49.firebaseapp.com",projectId:"servicoja-e1f49",storageBucket:"servicoja-e1f49.firebasestorage.app",messagingSenderId:"874413426529",appId:"1:874413426529:web:9891d44afd9ef1750e6720"});
+  window._fbInitialized=true;
+}
+</script>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <a href="login.html" class="tn-logo">Serviço<span>Já</span></a>
+  <div class="tn-right">
+    <div class="tn-notif" onclick="toggleNotif()">
+      🔔<span class="tn-badge" id="tnBadge"></span>
+    </div>
+    <div class="tn-av" id="tnAv" onclick="window.location.href='editar-perfil-profissional.html'">👷</div>
+  </div>
+</nav>
+
+<!-- NOTIF DROPDOWN -->
+<div class="notif-dropdown" id="notifDropdown">
+  <div class="notif-head">
+    <span style="font-weight:700;font-size:0.85rem">🔔 Notificações</span>
+    <span onclick="marcarLidas()" style="font-size:0.72rem;color:var(--cinza);cursor:pointer;text-decoration:underline">Marcar lidas</span>
+  </div>
+  <div class="notif-lista" id="notifLista">
+    <div style="padding:20px;text-align:center;color:var(--cinza);font-size:0.8rem">Carregando...</div>
+  </div>
+</div>
+
+<!-- SCROLL AREA -->
+<div class="page" id="page">
+
+  <!-- BLOQUEADO -->
+  <div class="bloq-wrap" id="bloqWrap">
+    <div style="font-size:1.8rem;margin-bottom:8px">🔒</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:0.95rem;color:var(--erro);margin-bottom:6px">Conta bloqueada</div>
+    <div style="font-size:0.8rem;color:var(--cinza);line-height:1.6" id="bloqMsg">Regularize seu pagamento para voltar a receber pedidos.</div>
+    <div style="margin-top:10px;background:rgba(255,255,255,0.04);border-radius:8px;padding:8px;font-size:0.78rem;color:var(--cinza)">
+      Taxa pendente: <strong id="bloqTaxaVal" style="color:var(--erro)">—</strong>
+    </div>
+    <button class="btn-reg" onclick="abrirPagamento()">💳 Pagar agora e regularizar</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats" id="statsRow">
+    <div class="stat"><div class="stat-n t-verde" id="stDisp">—</div><div class="stat-l">Disponíveis</div></div>
+    <div class="stat"><div class="stat-n t-amarelo" id="stInt">0</div><div class="stat-l">Interesses</div></div>
+    <div class="stat"><div class="stat-n t-cinza" id="stAc">0</div><div class="stat-l">Aceitos</div></div>
+  </div>
+
+  <!-- HEADER SEÇÃO -->
+  <div class="sec-header">
+    <div class="sec-title" id="secTitulo">Pedidos disponíveis</div>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="filtros" id="filtros">
+    <div class="fpill ativo" data-cat="todos" onclick="selFiltro(this)">🔍 Todos</div>
+  </div>
+
+  <!-- LISTA -->
+  <div id="loading"><div class="spinner"></div></div>
+  <div id="lista"></div>
+  <div id="vazio" style="display:none" class="vazio">
+    <div class="vazio-icon">📭</div>
+    <p id="vazioMsg" style="font-size:0.85rem">Nenhum pedido disponível.</p>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="bn-item ativo" id="bn-pedidos" onclick="selAba('pedidos',this)">
+    <span class="bn-icon">📋</span>Pedidos
+  </button>
+  <button class="bn-item" id="bn-interesses" onclick="selAba('interesses',this)">
+    <span class="bn-icon">📨</span>Interesses
+  </button>
+  <button class="bn-item" id="bn-aceitos" onclick="selAba('aceitos',this)">
+    <span class="bn-icon">✅</span>Aceitos
+  </button>
+  <button class="bn-item" id="bn-taxa" onclick="abrirPagamento()">
+    <span class="bn-icon">💰</span>Taxa
+    <span class="bn-dot" id="bnDot"></span>
+  </button>
+  <button class="bn-item" onclick="window.location.href='editar-perfil-profissional.html'">
+    <span class="bn-icon">👤</span>Perfil
+  </button>
+</nav>
+
+<!-- MODAL DETALHE DO PEDIDO -->
+<div class="modal-overlay" id="overlayDetalhe" onclick="if(event.target===this)fechar('overlayDetalhe')">
+  <div class="modal-sheet">
+    <div class="sheet-handle"></div>
+    <div class="p-cats" id="detCats"></div>
+    <div class="modal-title" id="detTitulo"></div>
+    <div class="det-sec">
+      <div class="det-label">Descrição</div>
+      <div class="det-text" id="detDesc"></div>
+    </div>
+    <div class="det-sec" id="detMetaSec"></div>
+    <div class="det-sec" id="detFotosSec" style="display:none">
+      <div class="det-label">Fotos do serviço</div>
+      <div class="fotos-grid" id="detFotos"></div>
+    </div>
+    <div style="background:rgba(0,201,111,0.06);border:1px solid rgba(0,201,111,0.15);border-radius:10px;padding:10px 12px;font-size:0.75rem;color:var(--cinza)">
+      💡 A taxa só é cobrada quando o cliente aceitar seu contato.
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PAGAMENTO -->
+<div class="modal-overlay" id="overlayPag" onclick="if(event.target===this)fechar('overlayPag')">
+  <div class="modal-pag">
+    <div class="sheet-handle"></div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:14px">💳 Pagar taxa ServiçoJá</div>
+    <div class="pag-val" id="pagValor">—</div>
+    <div class="pix-box">
+      <div style="font-size:0.7rem;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Chave Pix</div>
+      <div class="pix-key">camillouk21@gmail.com</div>
+      <div style="font-size:0.72rem;color:var(--cinza)">Tipo: E-mail · Titular: ServiçoJá Conecta</div>
+      <button class="btn-copiar" onclick="navigator.clipboard.writeText('camillouk21@gmail.com').then(()=>this.textContent='✅ Copiado!').catch(()=>{})">📋 Copiar chave Pix</button>
+    </div>
+    <div style="font-size:0.78rem;color:var(--cinza);line-height:1.7;margin-bottom:10px">
+      1. Faça o pagamento via Pix<br>
+      2. Salve o comprovante<br>
+      3. Tire foto e anexe abaixo
+    </div>
+    <div class="det-label">Comprovante de pagamento</div>
+    <input type="file" id="pagComp" accept="image/*" style="background:var(--azul-input);border:1.5px dashed rgba(0,201,111,0.3);border-radius:10px;padding:10px;color:var(--cinza);width:100%;cursor:pointer;margin-bottom:6px" onchange="uploadComp(this)">
+    <input type="hidden" id="pagCompUrl">
+    <img id="pagPreview" style="display:none;width:100%;border-radius:8px;margin-bottom:8px;max-height:120px;object-fit:contain">
+    <div id="pagMsg" style="display:none;padding:10px;border-radius:8px;font-size:0.78rem;text-align:center;margin-bottom:8px"></div>
+    <button class="btn-enviar-comp" id="btnEnviarComp" onclick="enviarComp()">✅ Enviar comprovante</button>
+  </div>
+</div>
+
+<script>
+// ── GLOBALS ─────────────────────────────────────────────────────────
+let uid = localStorage.getItem('sj_uid');
+let categoriasAprovadas = [];
+let todosPedidos = [];
+let abaAtiva = 'pedidos';
+let filtroAtivo = 'todos';
+let taxaAtual = 0;
+let notifIds = [];
+
+// ── AUTH ─────────────────────────────────────────────────────────────
+firebase.auth().onAuthStateChanged(async user => {
+  if (!user) { window.location.href='login.html'; return; }
+  await init(user);
+  setTimeout(() => carregarNotifs(uid || user.uid), 1200);
+});
+
+// ── INIT ─────────────────────────────────────────────────────────────
+async function init(user) {
+  try {
+    for (const id of [user.uid+'_prof', user.uid]) {
+      try {
+        const s = await firebase.firestore().collection('usuarios').doc(id).get();
+        if (s.exists && (s.data().categoriasAprovadas||[]).length > 0) {
+          categoriasAprovadas = s.data().categoriasAprovadas;
+          uid = id;
+          localStorage.setItem('sj_uid', id);
+          if (s.data().fotoPerfil) document.getElementById('tnAv').innerHTML = `<img src="${s.data().fotoPerfil}">`;
+          break;
+        }
+      } catch(e){}
+    }
+    if (!categoriasAprovadas.length && user.email) {
+      const q = await firebase.firestore().collection('usuarios').where('email','==',user.email).where('tipo','==','profissional').get();
+      if (!q.empty) {
+        const d = q.docs[0];
+        categoriasAprovadas = d.data().categoriasAprovadas||[];
+        uid = d.id;
+        localStorage.setItem('sj_uid', d.id);
+        if (d.data().fotoPerfil) document.getElementById('tnAv').innerHTML = `<img src="${d.data().fotoPerfil}">`;
+      }
+    }
+  } catch(e){ categoriasAprovadas = JSON.parse(localStorage.getItem('sj_categoriasAprovadas')||'[]'); }
+
+  // Filtros de categoria
+  const filtrosEl = document.getElementById('filtros');
+  categoriasAprovadas.forEach(cat => {
+    const p = document.createElement('div');
+    p.className='fpill'; p.setAttribute('data-cat',cat);
+    p.textContent=cat; p.onclick=function(){selFiltro(this)};
+    filtrosEl.appendChild(p);
+  });
+
+  // Verifica taxa e bloqueio
+  await verificarTaxa();
+  await carregarPedidos();
+}
+
+// ── TAXA E BLOQUEIO ───────────────────────────────────────────────────
+async function verificarTaxa() {
+  if (!uid) return;
+  try {
+    const s = await firebase.firestore().collection('usuarios').doc(uid).get();
+    if (!s.exists) return;
+    const dados = s.data();
+    taxaAtual = parseFloat(dados.taxaAcumulada)||0;
+    document.getElementById('pagValor').textContent = 'R$ ' + taxaAtual.toLocaleString('pt-BR',{minimumFractionDigits:2});
+
+    // Ponto laranja no ícone de taxa
+    document.getElementById('bnDot').style.display = taxaAtual > 0 ? 'block' : 'none';
+
+    // Bloqueio por vencimento
+    const hoje = new Date(), dia = hoje.getDate();
+    let venc = dia <= 1 ? new Date(hoje.getFullYear(),hoje.getMonth(),1)
+             : dia <= 15 ? new Date(hoje.getFullYear(),hoje.getMonth(),15)
+             : new Date(hoje.getFullYear(),hoje.getMonth()+1,1);
+    const prazo = new Date(venc.getTime()+3*24*60*60*1000);
+    const temTaxaVencida = taxaAtual > 0 && hoje > prazo;
+
+    // Alertas R$250 e R$300
+    if (taxaAtual >= 250 && !dados.alerta250Enviado) {
+      await firebase.firestore().collection('usuarios').doc(uid).update({alerta250Enviado:true});
+      await criarNotif(uid,'sistema','⚠️ Sua taxa acumulada chegou a R$ '+taxaAtual.toFixed(2)+'. Ao atingir R$ 300 você terá 3 dias para pagar.','dashboard-profissional-mobile.html');
+    }
+    if (taxaAtual >= 300 && !dados.alerta300Em) {
+      await firebase.firestore().collection('usuarios').doc(uid).update({alerta300Em:new Date().toISOString(),alerta250Enviado:true});
+      await criarNotif(uid,'sistema','🚨 Taxa atingiu R$ '+taxaAtual.toFixed(2)+'! Você tem 3 dias para pagar antes do bloqueio.','dashboard-profissional-mobile.html');
+    }
+    const bloquear300 = taxaAtual>=300 && dados.alerta300Em && ((hoje-new Date(dados.alerta300Em))/(1000*60*60*24))>=3;
+
+    if (temTaxaVencida || bloquear300 || dados.bloqueado) {
+      const msg = bloquear300 ? 'Taxa atingiu R$ 300 e o prazo de 3 dias expirou.' : 'Taxas em atraso. O prazo de pagamento expirou.';
+      document.getElementById('bloqMsg').textContent = msg;
+      document.getElementById('bloqTaxaVal').textContent = 'R$ '+taxaAtual.toFixed(2);
+      document.getElementById('bloqWrap').classList.add('vis');
+      document.getElementById('lista').innerHTML = `<div class="vazio"><div class="vazio-icon">🔒</div><p style="font-size:0.85rem;color:var(--erro)">Regularize o pagamento acima para ver pedidos.</p></div>`;
+      document.getElementById('loading').style.display='none';
+      return;
+    }
+  } catch(e){}
+}
+
+// ── CARREGAR PEDIDOS ──────────────────────────────────────────────────
+async function carregarPedidos() {
+  if (!categoriasAprovadas.length) {
+    document.getElementById('loading').style.display='none';
+    mostrarVazio('Nenhuma categoria aprovada ainda. Faça o teste de IA!');
+    return;
+  }
+  try {
+    const snap = await firebase.firestore().collection('pedidos').get();
+    const semEmoji = s => (s||'').replace(/\p{Emoji}/gu,'').trim().toLowerCase();
+    todosPedidos = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(p => {
+        if (p.status && p.status!=='aberto') return false;
+        const cats = Array.isArray(p.categorias)?p.categorias:[p.categorias];
+        return cats.some(c=>categoriasAprovadas.some(a=>a===c||semEmoji(a)===semEmoji(c)||a.trim()===(c||'').trim()));
+      })
+      .sort((a,b)=>(b.criadoEm||'').localeCompare(a.criadoEm||''));
+    document.getElementById('stDisp').textContent = todosPedidos.length;
+    document.getElementById('stInt').textContent = todosPedidos.filter(p=>meuInt(p)).length;
+    document.getElementById('loading').style.display='none';
+    renderLista();
+  } catch(e) {
+    document.getElementById('loading').innerHTML = `<p style="color:var(--erro);text-align:center;padding:20px">Erro: ${e.message}</p>`;
+  }
+}
+
+// ── ABA ───────────────────────────────────────────────────────────────
+function selAba(aba, el) {
+  document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('ativo'));
+  el.classList.add('ativo');
+  abaAtiva = aba;
+  const titulos={pedidos:'Pedidos disponíveis',interesses:'Meus interesses',aceitos:'Trabalhos aceitos'};
+  document.getElementById('secTitulo').textContent=titulos[aba];
+  document.getElementById('filtros').style.display=aba==='pedidos'?'flex':'none';
+  renderLista();
+}
+
+function selFiltro(el) {
+  document.querySelectorAll('.fpill').forEach(p=>p.classList.remove('ativo'));
+  el.classList.add('ativo');
+  filtroAtivo=el.getAttribute('data-cat');
+  renderLista();
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────
+function meuInt(p){return(p.interessados||[]).find(i=>i.profissionalId===uid)}
+
+function renderLista() {
+  let lista=todosPedidos;
+  if (abaAtiva==='interesses') lista=todosPedidos.filter(p=>meuInt(p));
+  else if (abaAtiva==='aceitos') lista=todosPedidos.filter(p=>p.profissionalAceito===uid);
+  else if (filtroAtivo!=='todos') lista=todosPedidos.filter(p=>(Array.isArray(p.categorias)?p.categorias:[p.categorias]).includes(filtroAtivo));
+
+  const msgs={pedidos:'Nenhum pedido disponível.',interesses:'Você ainda não demonstrou interesse.',aceitos:'Nenhum trabalho aceito ainda.'};
+  if (!lista.length){mostrarVazio(msgs[abaAtiva]);return;}
+  document.getElementById('vazio').style.display='none';
+
+  const calcTaxa=p=>{let pt=0;if((p.urgencia||'').includes('Urgente'))pt+=30;else if((p.urgencia||'').includes('semana'))pt+=15;else pt+=5;const v=parseFloat(p.valor)||0;if(v>=1000)pt+=30;else if(v>=500)pt+=20;else pt+=10;const d=(p.descricao||'').length;if(d>=300)pt+=20;else if(d>=150)pt+=10;else pt+=5;return Math.min(50,Math.max(10,Math.round(10+(pt/75)*40)));};
+  const fmtData=iso=>iso?new Date(iso).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}):'—';
+
+  document.getElementById('lista').innerHTML = lista.map(p=>{
+    const cats=Array.isArray(p.categorias)?p.categorias:[p.categorias||'—'];
+    const orc=p.orcamento==='aproximado'&&p.valor?'R$ '+parseFloat(p.valor).toLocaleString('pt-BR'):'Em aberto';
+    const taxa=calcTaxa(p);
+    let urgClass='urg-pressa',urgLabel=p.urgencia||'🗓️ Sem pressa';
+    if((p.urgencia||'').includes('Urgente'))urgClass='urg-urgente';
+    else if((p.urgencia||'').includes('semana'))urgClass='urg-semana';
+    const bairro=(p.bairro||p.endereco?.bairro||'');
+    const cidade=(p.cidade||p.endereco?.cidade||'');
+    const local=(bairro?bairro+', ':'')+cidade||'—';
+    const interesse=meuInt(p);
+    const status=interesse?.status;
+    let acao='';
+    if(abaAtiva==='pedidos'){
+      if(!status) acao=`<div class="taxa-badge">R$ ${taxa}</div><button class="btn-int" onclick="registrarInteresse('${p.id}',this)">👋 Me interesso</button>`;
+      else if(status==='interessado') acao=`<button class="btn-int" disabled>⏳ Aguardando</button>`;
+      else if(status==='solicitado') acao=`<button class="btn-falar" onclick="falarCliente('${p.id}')">📲 Falar com cliente</button>`;
+      else if(status==='enviado') acao=`<span class="status-pill sp-enviado">✅ Proposta enviada</span>`;
+    } else if(abaAtiva==='interesses'){
+      if(status==='interessado') acao=`<span class="status-pill sp-aguardando">⏳ Aguardando cliente</span>`;
+      else if(status==='solicitado') acao=`<button class="btn-falar" onclick="falarCliente('${p.id}')">📲 Falar agora</button>`;
+      else if(status==='enviado') acao=`<span class="status-pill sp-enviado">✅ Enviado</span>`;
+    }
+    return `<div class="pedido-card">
+      <div class="p-cats">${cats.map(c=>`<span class="pcat">${c}</span>`).join('')}</div>
+      <div class="p-title" onclick="abrirDetalhe('${p.id}')">${p.titulo||'Sem título'} <span style="font-size:0.65rem;color:var(--cinza);font-weight:400">ver mais</span></div>
+      <div class="p-desc">${p.descricao||'Sem descrição.'}</div>
+      <div class="p-meta">
+        <span class="pm">📅 ${fmtData(p.criadoEm)}</span>
+        <span class="pm">💰 ${orc}</span>
+        <span class="pm">📍 ${local}</span>
+      </div>
+      <div class="p-footer">
+        <span class="urg ${urgClass}">${urgLabel}</span>
+        <div class="p-actions">${acao}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function mostrarVazio(msg){
+  document.getElementById('lista').innerHTML='';
+  document.getElementById('vazioMsg').textContent=msg;
+  document.getElementById('vazio').style.display='block';
+}
+
+// ── INTERESSE ─────────────────────────────────────────────────────────
+async function registrarInteresse(pedidoId, btn) {
+  const p=todosPedidos.find(x=>x.id===pedidoId); if(!p)return;
+  btn.disabled=true; btn.textContent='...';
+  const nome=localStorage.getItem('sj_nome')||'Profissional';
+  const novoInt={profissionalId:uid,profissionalNome:nome,status:'interessado',registradoEm:new Date().toISOString()};
+  const ints=[...(p.interessados||[]).filter(i=>i.profissionalId!==uid),novoInt];
+  try {
+    await firebase.firestore().collection('pedidos').doc(pedidoId).update({interessados:ints});
+    p.interessados=ints;
+    document.getElementById('stInt').textContent=todosPedidos.filter(x=>meuInt(x)).length;
+    renderLista();
+    criarNotif(p.clienteId,'interesse',nome+' tem interesse no seu pedido "'+p.titulo+'". Veja o perfil dele!','meus-pedidos-cliente.html');
+  } catch(e){btn.disabled=false;btn.textContent='👋 Me interesso';alert('Erro: '+e.message);}
+}
+
+async function falarCliente(pedidoId) {
+  const p=todosPedidos.find(x=>x.id===pedidoId); if(!p)return;
+  try {
+    const s=await firebase.firestore().collection('usuarios').doc(p.clienteId).get();
+    const tel=(s.exists?s.data().telefone:'').replace(/\D/g,'');
+    const nome=localStorage.getItem('sj_nome')||'Profissional';
+    const msg=encodeURIComponent(`Olá! Sou ${nome} cadastrado no ServiçoJá Conecta. Você aceitou meu contato para "${p.titulo}". Podemos conversar?`);
+    if(tel.length>=10) window.open(`https://wa.me/55${tel}?text=${msg}`,'_blank');
+    else alert('Telefone do cliente não disponível.');
+  } catch(e){alert('Erro: '+e.message);}
+}
+
+// ── DETALHE ───────────────────────────────────────────────────────────
+function abrirDetalhe(id) {
+  const p=todosPedidos.find(x=>x.id===id); if(!p)return;
+  const cats=Array.isArray(p.categorias)?p.categorias:[p.categorias||'—'];
+  document.getElementById('detCats').innerHTML=cats.map(c=>`<span class="pcat">${c}</span>`).join('');
+  document.getElementById('detTitulo').textContent=p.titulo||'Sem título';
+  document.getElementById('detDesc').textContent=p.descricao||'Sem descrição.';
+  const orc=p.orcamento==='aproximado'&&p.valor?'R$ '+parseFloat(p.valor).toLocaleString('pt-BR'):'Em aberto';
+  document.getElementById('detMetaSec').innerHTML=`
+    <div style="display:flex;flex-wrap:wrap;gap:7px">
+      <span style="font-size:0.75rem;background:var(--azul-input);border:1px solid var(--borda);border-radius:7px;padding:5px 9px;color:var(--cinza)">📅 ${new Date(p.criadoEm||Date.now()).toLocaleDateString('pt-BR')}</span>
+      <span style="font-size:0.75rem;background:var(--azul-input);border:1px solid var(--borda);border-radius:7px;padding:5px 9px;color:var(--cinza)">💰 ${orc}</span>
+      <span style="font-size:0.75rem;background:var(--azul-input);border:1px solid var(--borda);border-radius:7px;padding:5px 9px;color:var(--cinza)">${p.urgencia||'🗓️ Sem pressa'}</span>
+    </div>`;
+  const fotos=p.fotos||[];
+  if(fotos.length){
+    document.getElementById('detFotosSec').style.display='block';
+    document.getElementById('detFotos').innerHTML=fotos.map(f=>`<div class="foto-thumb"><img src="${f}"></div>`).join('');
+  } else { document.getElementById('detFotosSec').style.display='none'; }
+  document.getElementById('overlayDetalhe').classList.add('vis');
+}
+
+// ── PAGAMENTO ─────────────────────────────────────────────────────────
+function abrirPagamento(){
+  if(taxaAtual<=0){alert('Você não possui taxas pendentes!');return;}
+  document.getElementById('pagValor').textContent='R$ '+taxaAtual.toLocaleString('pt-BR',{minimumFractionDigits:2});
+  document.getElementById('pagMsg').style.display='none';
+  document.getElementById('pagComp').value='';
+  document.getElementById('pagPreview').style.display='none';
+  document.getElementById('pagCompUrl').value='';
+  document.getElementById('btnEnviarComp').textContent='✅ Enviar comprovante';
+  document.getElementById('overlayPag').classList.add('vis');
+}
+
+async function uploadComp(input){
+  if(!input.files[0])return;
+  const btn=document.getElementById('btnEnviarComp');
+  btn.textContent='Enviando foto...'; btn.disabled=true;
+  const r=new FileReader();
+  r.onload=async function(e){
+    const fd=new FormData();fd.append('image',e.target.result.split(',')[1]);
+    try{
+      const res=await fetch('https://api.imgbb.com/1/upload?key=327d0067238019843e43362c2f7096c7',{method:'POST',body:fd});
+      const data=await res.json();
+      if(data.success){
+        document.getElementById('pagCompUrl').value=data.data.url;
+        document.getElementById('pagPreview').src=data.data.url;
+        document.getElementById('pagPreview').style.display='block';
+      }
+    }catch(e){alert('Erro no upload');}
+    btn.textContent='✅ Enviar comprovante'; btn.disabled=false;
+  };
+  r.readAsDataURL(input.files[0]);
+}
+
+async function enviarComp(){
+  const url=document.getElementById('pagCompUrl').value;
+  if(!url){alert('Anexe o comprovante primeiro!');return;}
+  const btn=document.getElementById('btnEnviarComp');
+  btn.disabled=true; btn.textContent='Enviando...';
+  try{
+    await firebase.firestore().collection('pagamentos').add({
+      profissionalId:uid,profissionalNome:localStorage.getItem('sj_nome')||'Profissional',
+      valor:taxaAtual,comprovanteUrl:url,status:'pendente',
+      criadoEm:new Date().toISOString(),
+      mes:new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0')
+    });
+    const msg=document.getElementById('pagMsg');
+    msg.textContent='✅ Comprovante enviado! Aguardando aprovação.';
+    msg.style.cssText='display:block;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde);border-radius:8px;padding:10px;font-size:0.78rem;text-align:center';
+    btn.textContent='✅ Enviado!';
+    setTimeout(()=>fechar('overlayPag'),2500);
+  }catch(e){btn.disabled=false;btn.textContent='✅ Enviar comprovante';alert('Erro: '+e.message);}
+}
+
+// ── NOTIFICAÇÕES ──────────────────────────────────────────────────────
+let notifOpen=false;
+function toggleNotif(){
+  notifOpen=!notifOpen;
+  document.getElementById('notifDropdown').classList.toggle('vis',notifOpen);
+  if(notifOpen)marcarLidas();
+  document.getElementById('notifDropdown').style.display=notifOpen?'block':'none';
+}
+document.addEventListener('click',e=>{
+  if(!document.getElementById('notifDropdown').contains(e.target)&&!e.target.closest('.tn-notif')){
+    notifOpen=false;
+    document.getElementById('notifDropdown').classList.remove('vis');
+    document.getElementById('notifDropdown').style.display='none';
+  }
+});
+
+function tempoRel(d){const diff=Date.now()-new Date(d).getTime(),m=Math.floor(diff/60000);if(m<1)return'agora';if(m<60)return m+'min';const h=Math.floor(m/60);if(h<24)return h+'h';return Math.floor(h/24)+'d';}
+
+async function carregarNotifs(nuid){
+  try{
+    const s=await firebase.firestore().collection('notificacoes').where('para','==',nuid).limit(20).get();
+    const ns=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.criadoEm||'').localeCompare(a.criadoEm||''));
+    notifIds=s.docs.map(d=>d.id);
+    const novas=ns.filter(n=>!n.lida).length;
+    const badge=document.getElementById('tnBadge');
+    if(novas>0){badge.style.display='flex';badge.textContent=novas>9?'9+':novas;}else badge.style.display='none';
+    const ics={interesse:'👋',solicitado:'⚡',proposta:'💬',aceite:'✅',sistema:'📢'};
+    const cors={interesse:'rgba(0,201,111,0.15)',solicitado:'rgba(255,184,48,0.15)',proposta:'rgba(0,201,111,0.15)',aceite:'rgba(255,184,48,0.15)',sistema:'rgba(138,155,181,0.1)'};
+    document.getElementById('notifLista').innerHTML=ns.length?ns.map(n=>`
+      <div class="ni ${n.lida?'':'nova'}" onclick="if('${n.link}')window.location.href='${n.link}'">
+        <div class="ni-ic" style="background:${cors[n.tipo]||cors.sistema}">${ics[n.tipo]||'📢'}</div>
+        <div style="flex:1"><div class="ni-txt">${n.mensagem}</div><div class="ni-time">${tempoRel(n.criadoEm)}</div></div>
+        ${!n.lida?'<div class="ni-dot"></div>':''}
+      </div>`).join(''):`<div style="padding:20px;text-align:center;color:var(--cinza);font-size:0.8rem">Sem notificações</div>`;
+  }catch(e){}
+}
+
+async function marcarLidas(){
+  document.getElementById('tnBadge').style.display='none';
+  if(!notifIds.length)return;
+  try{const b=firebase.firestore().batch();notifIds.forEach(id=>b.update(firebase.firestore().collection('notificacoes').doc(id),{lida:true}));await b.commit();}catch(e){}
+}
+
+async function criarNotif(para,tipo,mensagem,link){
+  if(!para)return;
+  try{await firebase.firestore().collection('notificacoes').add({para,tipo,mensagem,link:link||'',lida:false,criadoEm:new Date().toISOString()});}catch(e){}
+}
+
+function fechar(id){document.getElementById(id).classList.remove('vis');}
+</script>
+<script>if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(e=>{})};</script>
+</body>
+</html>
