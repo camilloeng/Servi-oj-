@@ -681,7 +681,15 @@ async function aprovarPagamento(pagId, profId, valor, btn) {
     for (const id of [profId + '_prof', profId]) {
       try {
         const s = await db.collection('usuarios').doc(id).get();
-        if (s.exists) { await db.collection('usuarios').doc(id).update({taxaAcumulada: 0}); break; }
+        if (s.exists) {
+          await db.collection('usuarios').doc(id).update({
+            taxaAcumulada: 0,
+            alerta250Enviado: false,
+            alerta300Em: null,
+            bloqueado: false
+          });
+          break;
+        }
       } catch(e) {}
     }
     await db.collection('notificacoes').add({
