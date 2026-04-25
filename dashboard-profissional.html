@@ -643,13 +643,11 @@ async function abrirWhatsAppCliente(pedidoId) {
     if (!tel) tel = pedido.clienteTelefone || pedido.telefone || '';
 
     const telLimpo = tel.replace(/\D/g, '');
-    if (telLimpo.length >= 10) {
-      window.open(`https://wa.me/55${telLimpo}?text=${msg}`, '_blank');
-    } else {
-      if (confirm('Telefone do cliente não disponível ainda.\n\nDeseja abrir o WhatsApp e digitar o número manualmente?')) {
-        window.open(`https://wa.me/?text=${msg}`, '_blank');
-      }
-    }
+    // Abre WhatsApp diretamente, com ou sem número
+    const waUrl = telLimpo.length >= 10
+      ? `https://wa.me/55${telLimpo}?text=${msg}`
+      : `https://wa.me/?text=${msg}`;
+    window.open(waUrl, '_blank');
   } catch(e) { alert('Erro ao buscar contato: ' + e.message); }
 }
 
