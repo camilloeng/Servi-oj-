@@ -469,56 +469,84 @@ function formatData(iso) { return iso ? new Date(iso).toLocaleDateString('pt-BR'
 function meuInteresse(pedido) { return (pedido.interessados || []).find(i => i.profissionalId === uid); }
 
 // ── CARREGAR PEDIDOS ──────────────────────────────────────────────────
+// ── Normaliza categoria: remove emoji e normaliza texto ──────────────
+function normCat(s) {
+  if (!s) return '';
+  // Remove emojis com range simples e compatível
+  let r = '';
+  for (let i = 0; i < s.length; i++) {
+    const code = s.codePointAt(i);
+    if (code > 127 && (code < 0x2000 || code > 0xFFFD)) { i++; continue; }
+    r += s[i];
+  }
+  return r.trim().toLowerCase();
+}
+
+function catMatch(pedCat, aprovCat) {
+  if (!pedCat || !aprovCat) return false;
+  const p = normCat(pedCat);
+  const a = normCat(aprovCat);
+  return p === a || a.includes(p) || p.includes(a);
+}
+
 async function carregarPedidos() {
-  // Se não tem categorias aprovadas, tenta buscar novamente
+  if (!uid) uid = localStorage.getItem('sj_uid') || (firebase.auth().currentUser && firebase.auth().currentUser.uid);
+
+  // Busca categorias se ainda vazio
   if (categoriasAprovadas.length === 0) {
-    try {
-      const s = await firebase.firestore().collection('usuarios').doc(uid).get();
-      if (s.exists) categoriasAprovadas = s.data().categoriasAprovadas || [];
-    } catch(e) {}
-    // Se ainda vazio, busca com sufixo _prof
-    if (categoriasAprovadas.length === 0) {
+    const base = uid ? uid.replace('_prof', '') : '';
+    const ids = [...new Set([uid, base, base + '_prof'].filter(Boolean))];
+    for (const id of ids) {
       try {
-        const uidBase = uid.replace('_prof','');
-        const s = await firebase.firestore().collection('usuarios').doc(uidBase+'_prof').get();
-        if (s.exists) categoriasAprovadas = s.data().categoriasAprovadas || [];
+        const s = await firebase.firestore().collection('usuarios').doc(id).get();
+        if (s.exists) {
+          const cats = s.data().categoriasAprovadas || [];
+          if (cats.length > 0) { categoriasAprovadas = cats; uid = id; localStorage.setItem('sj_uid', id); break; }
+        }
       } catch(e) {}
     }
   }
-  if (categoriasAprovadas.length === 0) {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('vazioMsg').textContent = 'Nenhuma categoria aprovada. Faça o teste de IA para começar!';
-    document.getElementById('estadoVazio').classList.add('vis');
-    return;
-  }
+
   try {
     const snap = await firebase.firestore().collection('pedidos').get();
-    todosPedidos = snap.docs.map(d => ({id: d.id, ...d.data()}))
-      .filter(p => {
+    const todos = snap.docs.map(d => ({id: d.id, ...d.data()}));
+
+    if (categoriasAprovadas.length > 0) {
+      // Filtra por categorias aprovadas
+      const filtrados = todos.filter(p => {
         if (p.status && p.status !== 'aberto') return false;
-        // Suporte a 'categorias' (array, novo) e 'categoria' (string, antigo)
-        const rawCats = p.categorias || (p.categoria ? [p.categoria] : []);
-        const cats = Array.isArray(rawCats) ? rawCats : [rawCats];
-        const semEmoji = s => (s||'').replace(/\p{Emoji}/gu,'').trim().toLowerCase();
-        return cats.some(c => categoriasAprovadas.some(a => a===c || semEmoji(a)===semEmoji(c) || a.trim()===(c||'').trim()));
-      })
-      .sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
-    // Conta pedidos disponíveis (sem interesse) e aceitos (cliente aceitou)
-    const pedDisp = todosPedidos.filter(p => { const int = meuInteresse(p); return !int || !int.status; }).length;
-    const pedInt  = todosPedidos.filter(p => { const int = meuInteresse(p); return int && int.status === 'interessado'; }).length;
-    const pedAceitos = todosPedidos.filter(p => { const int = meuInteresse(p); return int && (int.status==='solicitado'||int.status==='enviado'); }).length;
+        const rawCats = Array.isArray(p.categorias) ? p.categorias
+          : (p.categoria ? [p.categoria] : []);
+        if (!rawCats.length) return false;
+        return rawCats.some(c => categoriasAprovadas.some(a => catMatch(c, a)));
+      });
+      // Fallback: se filtro retornou vazio, mostra todos os abertos
+      todosPedidos = filtrados.length > 0
+        ? filtrados
+        : todos.filter(p => !p.status || p.status === 'aberto');
+    } else {
+      todosPedidos = todos.filter(p => !p.status || p.status === 'aberto');
+    }
+
+    todosPedidos.sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
+
+    const pedDisp    = todosPedidos.filter(p => { const i=meuInteresse(p); return !i||!i.status; }).length;
+    const pedInt     = todosPedidos.filter(p => { const i=meuInteresse(p); return i&&i.status==='interessado'; }).length;
+    const pedAceitos = todosPedidos.filter(p => { const i=meuInteresse(p); return i&&(i.status==='solicitado'||i.status==='enviado'); }).length;
+
     document.getElementById('statDisp').textContent = pedDisp;
     document.getElementById('statEnv').textContent  = pedInt;
     document.getElementById('statAc').textContent   = pedAceitos;
     document.getElementById('loading').style.display = 'none';
-    // Re-renderiza na aba atual (pode ter sido trocada enquanto carregava)
+
     if (modoAtual === 'historico') carregarHistorico().then(renderPedidos);
     else renderPedidos();
+
   } catch(e) {
     document.getElementById('loading').style.display = 'none';
-    document.getElementById('loading').innerHTML = '';
+    document.getElementById('vazioMsg').textContent  = 'Erro ao carregar pedidos: ' + e.message;
     document.getElementById('estadoVazio').classList.add('vis');
-    document.getElementById('vazioMsg').textContent = 'Erro ao carregar: ' + e.message;
+    console.error('carregarPedidos error:', e);
   }
 }
 
