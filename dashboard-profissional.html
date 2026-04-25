@@ -475,6 +475,8 @@ async function carregarPedidos() {
     // Garante uid correto
     const authUser = firebase.auth().currentUser;
     if (!authUser) { window.location.href='login.html'; return; }
+    const setMsg = t => { const el=document.getElementById('loadingMsg'); if(el) el.textContent=t; };
+    setMsg('Buscando seu perfil...');
 
     // Busca doc do profissional — tenta uid_prof e uid
     if (categoriasAprovadas.length === 0) {
@@ -504,8 +506,22 @@ async function carregarPedidos() {
       }
     }
 
-    // Busca TODOS os pedidos abertos do Firestore
-    const snap = await firebase.firestore().collection('pedidos').get();
+    setMsg('Buscando pedidos disponíveis...');
+    // Busca pedidos — tenta query filtrada primeiro (rules podem bloquear .get() total)
+    let snap;
+    try {
+      // Tenta buscar todos (pode ser bloqueado por Firestore rules)
+      snap = await firebase.firestore().collection('pedidos')
+        .where('status', 'in', ['aberto', ''])
+        .get();
+    } catch(rulesErr) {
+      // Fallback: busca sem filtro de status
+      try {
+        snap = await firebase.firestore().collection('pedidos').get();
+      } catch(e2) {
+        throw new Error('Firestore bloqueado: ' + e2.message + ' | ' + rulesErr.message);
+      }
+    }
     const todos = snap.docs.map(d => ({id: d.id, ...d.data()}))
       .filter(p => !p.status || p.status === 'aberto')
       .sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
