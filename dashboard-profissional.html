@@ -181,6 +181,7 @@ if(!window._fbInitialized){
       <div class="nav-item ativo" id="nav-pedidos" onclick="selNav('pedidos',this)">📋 Pedidos disponíveis</div>
       <div class="nav-item" id="nav-propostas" onclick="selNav('propostas',this)">📨 Meus interesses</div>
       <div class="nav-item" id="nav-aceitos" onclick="selNav('aceitos',this)">✅ Trabalhos aceitos</div>
+      <div class="nav-item" id="nav-historico" onclick="selNav('historico',this)">📋 Histórico concluídos</div>
       <div class="nav-item" onclick="window.location.href='perfil-profissional.html'">👤 Meu perfil</div>
       <div class="nav-item" onclick="window.location.href='editar-perfil-profissional.html'">✏️ Editar perfil</div>
     </div>
@@ -277,6 +278,7 @@ if(!window._fbInitialized){
 
 <script>
 let uid = localStorage.getItem('sj_uid');
+let todosHistorico = []; // cache de serviços concluídos
 const nomeLocal = localStorage.getItem('sj_nome') || 'Profissional';
 let categoriasAprovadas = [];
 let todosPedidos = [];
@@ -510,9 +512,13 @@ function selNav(modo, el) {
   // Reseta filtro de tempo ao trocar aba
   const diasSel = document.getElementById('diasFiltro');
   if (diasSel && !isPedidos) diasSel.value = '0';
-  const titulos = {pedidos:'Pedidos disponíveis', propostas:'Meus interesses', aceitos:'Trabalhos aceitos'};
+  const titulos = {pedidos:'Pedidos disponíveis', propostas:'Meus interesses', aceitos:'Trabalhos aceitos', historico:'Histórico de serviços concluídos'};
   document.getElementById('section-titulo').textContent = titulos[modo];
-  renderPedidos();
+  // Esconde filtros de categoria e tempo no histórico
+  const filtroPills = document.getElementById('filtroPills');
+  if (filtroPills) filtroPills.style.display = (modo === 'pedidos') ? 'flex' : 'none';
+  if (modo === 'historico') carregarHistorico().then(renderPedidos);
+  else renderPedidos();
 }
 function selFiltro(el) {
   document.querySelectorAll('.fpill').forEach(p => p.classList.remove('ativo'));
@@ -527,7 +533,8 @@ function renderPedidos() {
   const msgs = {
     pedidos:'Nenhum pedido disponível para suas categorias.',
     propostas:'Você ainda não demonstrou interesse em nenhum pedido.',
-    aceitos:'Nenhum trabalho aceito ou aguardando contato ainda.'
+    aceitos:'Nenhum trabalho aceito ou aguardando contato ainda.',
+    historico:'Nenhum serviço concluído ainda.'
   };
   document.getElementById('vazioMsg').textContent = msgs[modoAtual];
 
@@ -568,6 +575,9 @@ function renderPedidos() {
       const int = meuInteresse(p);
       return int && (int.status === 'solicitado' || int.status === 'enviado');
     });
+  } else if (modoAtual === 'historico') {
+    // Serviços concluídos por este profissional
+    filtrado = todosHistorico;
   }
 
   if (!filtrado.length) { lista.innerHTML=''; document.getElementById('estadoVazio').classList.add('vis'); return; }
@@ -586,7 +596,9 @@ function renderPedidos() {
     const status = interesse ? interesse.status : null;
 
     let actionHtml = '';
-    if (modoAtual === 'pedidos') {
+    if (modoAtual === 'historico') {
+      actionHtml = `<span class="status-pill" style="background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde)">✅ Concluído</span>`;
+    } else if (modoAtual === 'pedidos') {
       if (!status) {
         // Ainda não demonstrou interesse
         actionHtml = `<div class="taxa-badge">Taxa: R$ ${taxa}</div>
@@ -605,13 +617,16 @@ function renderPedidos() {
         actionHtml = `<span class="status-pill status-aguardando">⏳ Aguardando cliente aceitar</span>`;
       }
     } else if (modoAtual === 'aceitos') {
-      // Cliente aceitou → falar com cliente
+      // Cliente aceitou → falar com cliente + marcar concluído
       if (status === 'solicitado') {
         actionHtml = `
           <span class="status-pill status-solicitado">⚡ Cliente aceitou!</span>
-          <button class="btn-enviar-proposta" onclick="abrirWhatsAppCliente('${p.id}')">📲 Falar com cliente</button>`;
+          <button class="btn-enviar-proposta" onclick="abrirWhatsAppCliente('${p.id}')">📲 Falar com cliente</button>
+          <button class="btn-interesso" onclick="confirmarConcluir('${p.id}')" style="border-color:rgba(0,201,111,0.5);margin-top:6px;width:100%">✅ Marcar como concluído</button>`;
       } else if (status === 'enviado' || p.profissionalAceito === uid) {
-        actionHtml = `<span class="status-pill status-enviada">✅ Em contato com cliente</span>`;
+        actionHtml = `
+          <span class="status-pill status-enviada">✅ Em contato</span>
+          <button class="btn-interesso" onclick="confirmarConcluir('${p.id}')" style="border-color:rgba(0,201,111,0.5);margin-top:6px;width:100%">✅ Marcar como concluído</button>`;
       }
     }
 
@@ -753,7 +768,63 @@ async function enviarProposta() {
   } catch(e) { alert('Erro ao enviar: ' + e.message); }
 }
 
-async function abrirPagamento() {
+async // ── CONCLUIR SERVIÇO ──────────────────────────────────────────────────
+function confirmarConcluir(pedidoId) {
+  if (!confirm('Marcar este serviço como concluído?\n\nEle sairá da sua lista de aceitos e irá para o histórico.')) return;
+  concluirServico(pedidoId);
+}
+
+async function concluirServico(pedidoId) {
+  const pedido = todosPedidos.find(p => p.id === pedidoId);
+  if (!pedido) return;
+  try {
+    // Salva no histórico do profissional
+    await firebase.firestore().collection('historico').add({
+      profissionalId: uid,
+      pedidoId: pedidoId,
+      titulo: pedido.titulo || '—',
+      categorias: pedido.categorias || [pedido.categoria] || [],
+      clienteNome: pedido.clienteNome || '—',
+      endereco: pedido.endereco || '—',
+      concluidoEm: new Date().toISOString()
+    });
+    // Atualiza status do pedido para concluído
+    await firebase.firestore().collection('pedidos').doc(pedidoId).update({
+      status: 'concluido',
+      profissionalAceito: uid
+    });
+    // Remove do cache local
+    const idx = todosPedidos.findIndex(p => p.id === pedidoId);
+    if (idx !== -1) todosPedidos.splice(idx, 1);
+    // Atualiza contadores
+    document.getElementById('statAc').textContent =
+      todosPedidos.filter(p => { const i=meuInteresse(p); return i&&(i.status==='solicitado'||i.status==='enviado'); }).length;
+    renderPedidos();
+    alert('✅ Serviço marcado como concluído! Veja em "Histórico concluídos".');
+  } catch(e) { alert('Erro: ' + e.message); }
+}
+
+// ── CARREGAR HISTÓRICO ────────────────────────────────────────────────
+async function carregarHistorico() {
+  if (todosHistorico.length > 0) return; // já carregado
+  try {
+    const snap = await firebase.firestore().collection('historico')
+      .where('profissionalId', '==', uid)
+      .limit(50)
+      .get();
+    todosHistorico = snap.docs.map(d => ({id: d.id, ...d.data(),
+      titulo: d.data().titulo,
+      categorias: d.data().categorias,
+      descricao: 'Concluído em ' + (d.data().concluidoEm ? new Date(d.data().concluidoEm).toLocaleDateString("pt-BR") : "—"),
+      criadoEm: d.data().concluidoEm,
+      urgencia: '',
+      orcamento: '',
+      endereco: d.data().endereco
+    })).sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
+  } catch(e) { todosHistorico = []; }
+}
+
+function abrirPagamento() {
   const taxa = parseFloat(document.getElementById('taxaValor').textContent.replace('R$ ','').replace(',','.')) || 0;
   if (taxa <= 0) { alert('Você não possui taxas pendentes!'); return; }
   document.getElementById('pagValor').textContent = 'R$ ' + taxa.toLocaleString('pt-BR',{minimumFractionDigits:2});
