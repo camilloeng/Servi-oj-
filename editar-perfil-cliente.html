@@ -28,7 +28,6 @@
   select{cursor:pointer;-webkit-appearance:none;padding-right:32px}
   select option{background:var(--azul-medio)}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  /* FOTO */
   .foto-wrap{display:flex;align-items:center;gap:16px;margin-bottom:20px}
   .foto-c{width:72px;height:72px;border-radius:50%;background:var(--azul-input);border:2px dashed rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:1.8rem;cursor:pointer;overflow:hidden;flex-shrink:0}
   .foto-c img{width:100%;height:100%;object-fit:cover}
@@ -107,86 +106,93 @@ const IMGBB_KEY = '327d0067238019843e43362c2f7096c7';
 let userUid = null, novaFotoUrl = null;
 
 firebase.auth().onAuthStateChanged(async function(user){
-  if(!user){window.location.href='login.html';return;}
+  if(!user){ window.location.href='login.html'; return; }
   userUid = user.uid;
-  try{
+  try {
     const snap = await firebase.firestore().collection('usuarios').doc(user.uid).get();
-    if(snap.exists()){
-      const d = snap.data(), e = d.endereco||{};
-      document.getElementById('nome').value = d.nome||'';
-      document.getElementById('telefone').value = d.telefone||'';
-      document.getElementById('cep').value = e.cep||'';
-      document.getElementById('rua').value = e.rua||'';
-      document.getElementById('numero').value = e.numero||'';
-      document.getElementById('bairro').value = e.bairro||'';
-      document.getElementById('cidade').value = e.cidade||'';
-      document.getElementById('estado').value = e.estado||'';
+    // FIX: .exists é propriedade, não função
+    if(snap.exists){
+      const d = snap.data();
+      const e = d.endereco || {};
+      document.getElementById('nome').value     = d.nome      || '';
+      document.getElementById('telefone').value = d.telefone  || '';
+      document.getElementById('cep').value      = e.cep       || '';
+      document.getElementById('rua').value      = e.rua       || '';
+      document.getElementById('numero').value   = e.numero    || '';
+      document.getElementById('bairro').value   = e.bairro    || '';
+      // cidade pode estar em e.cidade ou d.cidade (compatibilidade)
+      document.getElementById('cidade').value   = e.cidade    || d.cidade || '';
+      document.getElementById('estado').value   = e.estado    || d.estado || '';
       if(d.fotoPerfil){
-        const c=document.getElementById('fotoCircle');
-        c.innerHTML='<img src="'+d.fotoPerfil+'">';
+        document.getElementById('fotoCircle').innerHTML = '<img src="'+d.fotoPerfil+'">';
       }
     }
-  }catch(e){}
-  document.getElementById('loading').style.display='none';
-  document.getElementById('formContent').style.display='block';
+  } catch(e){ console.warn('Erro ao carregar perfil:', e); }
+  document.getElementById('loading').style.display  = 'none';
+  document.getElementById('formContent').style.display = 'block';
 });
 
 function previewFoto(input){
-  if(!input.files[0])return;
-  const r=new FileReader();
-  r.onload=async function(e){
-    document.getElementById('fotoCircle').innerHTML='<img src="'+e.target.result+'">';
+  if(!input.files[0]) return;
+  const r = new FileReader();
+  r.onload = async function(e){
+    document.getElementById('fotoCircle').innerHTML = '<img src="'+e.target.result+'">';
     try{
-      const fd=new FormData();fd.append('image',e.target.result.split(',')[1]);
-      const res=await fetch('https://api.imgbb.com/1/upload?key='+IMGBB_KEY,{method:'POST',body:fd});
-      const data=await res.json();
-      if(data.success)novaFotoUrl=data.data.url;
-    }catch(e2){}
+      const fd = new FormData();
+      fd.append('image', e.target.result.split(',')[1]);
+      const res  = await fetch('https://api.imgbb.com/1/upload?key='+IMGBB_KEY, {method:'POST',body:fd});
+      const data = await res.json();
+      if(data.success) novaFotoUrl = data.data.url;
+    } catch(e2){}
   };
   r.readAsDataURL(input.files[0]);
 }
 
 async function buscarCep(cep){
-  const c=cep.replace(/\D/g,'');
-  if(c.length!==8)return;
+  const c = cep.replace(/\D/g,'');
+  if(c.length !== 8) return;
   try{
-    const res=await fetch('https://viacep.com.br/ws/'+c+'/json/');
-    const d=await res.json();
+    const res = await fetch('https://viacep.com.br/ws/'+c+'/json/');
+    const d   = await res.json();
     if(!d.erro){
-      document.getElementById('rua').value=d.logradouro||'';
-      document.getElementById('bairro').value=d.bairro||'';
-      document.getElementById('cidade').value=d.localidade||'';
-      document.getElementById('estado').value=d.uf||'';
+      document.getElementById('rua').value    = d.logradouro || '';
+      document.getElementById('bairro').value = d.bairro     || '';
+      document.getElementById('cidade').value = d.localidade || '';
+      document.getElementById('estado').value = d.uf         || '';
     }
-  }catch(e){}
+  } catch(e){}
 }
 
 async function salvar(){
-  const btn=document.getElementById('btnSalvar');
-  btn.disabled=true;btn.textContent='Salvando...';
-  const dados={
-    nome:document.getElementById('nome').value.trim(),
-    telefone:document.getElementById('telefone').value.trim(),
-    endereco:{
-      cep:document.getElementById('cep').value.trim(),
-      rua:document.getElementById('rua').value.trim(),
-      numero:document.getElementById('numero').value.trim(),
-      bairro:document.getElementById('bairro').value.trim(),
-      cidade:document.getElementById('cidade').value.trim(),
-      estado:document.getElementById('estado').value
+  const btn = document.getElementById('btnSalvar');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+  const dados = {
+    nome:     document.getElementById('nome').value.trim(),
+    telefone: document.getElementById('telefone').value.trim(),
+    endereco: {
+      cep:    document.getElementById('cep').value.trim(),
+      rua:    document.getElementById('rua').value.trim(),
+      numero: document.getElementById('numero').value.trim(),
+      bairro: document.getElementById('bairro').value.trim(),
+      cidade: document.getElementById('cidade').value.trim(),
+      estado: document.getElementById('estado').value
     }
   };
-  if(novaFotoUrl)dados.fotoPerfil=novaFotoUrl;
+  if(novaFotoUrl) dados.fotoPerfil = novaFotoUrl;
   try{
-    await firebase.firestore().collection('usuarios').doc(userUid).update(dados);
-    localStorage.setItem('sj_nome',dados.nome);
-    const msg=document.getElementById('msg');
-    msg.textContent='✅ Perfil atualizado com sucesso!';msg.className='msg ok';
-  }catch(e){
-    const msg=document.getElementById('msg');
-    msg.textContent='❌ Erro: '+e.message;msg.className='msg err';
+    // set+merge funciona mesmo se doc não existir
+    await firebase.firestore().collection('usuarios').doc(userUid).set(dados, {merge:true});
+    localStorage.setItem('sj_nome', dados.nome);
+    const msg = document.getElementById('msg');
+    msg.textContent = '✅ Perfil atualizado com sucesso!';
+    msg.className   = 'msg ok';
+    setTimeout(() => history.back(), 1800);
+  } catch(e){
+    const msg = document.getElementById('msg');
+    msg.textContent = '❌ Erro: '+e.message;
+    msg.className   = 'msg err';
   }
-  btn.disabled=false;btn.textContent='💾 Salvar alterações';
+  btn.disabled = false; btn.textContent = '💾 Salvar alterações';
 }
 </script>
 </body>
