@@ -445,6 +445,20 @@ async function verificarTaxa() {
 
 // ── CARREGAR PEDIDOS ──────────────────────────────────────────────────
 async function carregarPedidos() {
+  // Retry buscar categorias se vazio
+  if (!categoriasAprovadas.length) {
+    try {
+      const s = await firebase.firestore().collection('usuarios').doc(uid).get();
+      if (s.exists) categoriasAprovadas = s.data().categoriasAprovadas || [];
+    } catch(e) {}
+    if (!categoriasAprovadas.length) {
+      try {
+        const uidBase = uid.replace('_prof','');
+        const s = await firebase.firestore().collection('usuarios').doc(uidBase+'_prof').get();
+        if (s.exists) categoriasAprovadas = s.data().categoriasAprovadas || [];
+      } catch(e) {}
+    }
+  }
   if (!categoriasAprovadas.length) {
     document.getElementById('loading').style.display='none';
     mostrarVazio('Nenhuma categoria aprovada ainda. Faça o teste de IA!');
