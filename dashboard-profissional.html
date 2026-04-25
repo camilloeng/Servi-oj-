@@ -623,16 +623,29 @@ async function registrarInteresse(pedidoId, btn) {
 async function abrirWhatsAppCliente(pedidoId) {
   const pedido = todosPedidos.find(p => p.id === pedidoId);
   if (!pedido) return;
+  const nome = localStorage.getItem('sj_nome') || 'Profissional';
+  const msg = encodeURIComponent(`Olá! Sou ${nome} cadastrado no ServiçoJá Conecta. Você aceitou meu contato para "${pedido.titulo}". Podemos conversar?`);
+  let tel = '';
   try {
-    const snap = await firebase.firestore().collection('usuarios').doc(pedido.clienteId).get();
-    const tel = snap.exists ? (snap.data().telefone || '') : '';
+    // Tenta direto pelo clienteId
+    if (pedido.clienteId) {
+      for (const id of [pedido.clienteId]) {
+        try {
+          const s = await firebase.firestore().collection('usuarios').doc(id).get();
+          if (s.exists) { tel = s.data().telefone || s.data().whatsapp || s.data().phone || ''; break; }
+        } catch(e) {}
+      }
+    }
+    // Fallback: telefone embutido no pedido
+    if (!tel) tel = pedido.clienteTelefone || pedido.telefone || '';
+
     const telLimpo = tel.replace(/\D/g, '');
-    const nome = localStorage.getItem('sj_nome') || 'profissional';
-    const msg = encodeURIComponent(`Olá! Sou ${nome} cadastrado no ServiçoJá Conecta. Vi seu pedido "${pedido.titulo}" e você aceitou meu contato. Podemos conversar sobre o serviço?`);
     if (telLimpo.length >= 10) {
       window.open(`https://wa.me/55${telLimpo}?text=${msg}`, '_blank');
     } else {
-      alert('Telefone do cliente não disponível no perfil ainda.');
+      if (confirm('Telefone do cliente não disponível ainda.\n\nDeseja abrir o WhatsApp e digitar o número manualmente?')) {
+        window.open(`https://wa.me/?text=${msg}`, '_blank');
+      }
     }
   } catch(e) { alert('Erro ao buscar contato: ' + e.message); }
 }
