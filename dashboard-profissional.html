@@ -447,8 +447,7 @@ async function init(user) {
       }
     }
   } catch(e) { console.warn('Erro na verificação de taxa:', e); }
-
-  await carregarPedidos();
+  // carregarPedidos é chamado pelo auth handler diretamente
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────
@@ -470,65 +469,66 @@ function meuInteresse(pedido) { return (pedido.interessados || []).find(i => i.p
 
 // ── CARREGAR PEDIDOS ──────────────────────────────────────────────────
 // ── Normaliza categoria: remove emoji e normaliza texto ──────────────
-function normCat(s) {
-  if (!s) return '';
-  // Remove emojis com range simples e compatível
-  let r = '';
-  for (let i = 0; i < s.length; i++) {
-    const code = s.codePointAt(i);
-    if (code > 127 && (code < 0x2000 || code > 0xFFFD)) { i++; continue; }
-    r += s[i];
-  }
-  return r.trim().toLowerCase();
-}
-
-function catMatch(pedCat, aprovCat) {
-  if (!pedCat || !aprovCat) return false;
-  const p = normCat(pedCat);
-  const a = normCat(aprovCat);
-  return p === a || a.includes(p) || p.includes(a);
-}
-
+// ── CARREGAR PEDIDOS ──────────────────────────────────────────────────
 async function carregarPedidos() {
-  if (!uid) uid = localStorage.getItem('sj_uid') || (firebase.auth().currentUser && firebase.auth().currentUser.uid);
-
-  // Busca categorias se ainda vazio
-  if (categoriasAprovadas.length === 0) {
-    const base = uid ? uid.replace('_prof', '') : '';
-    const ids = [...new Set([uid, base, base + '_prof'].filter(Boolean))];
-    for (const id of ids) {
-      try {
-        const s = await firebase.firestore().collection('usuarios').doc(id).get();
-        if (s.exists) {
-          const cats = s.data().categoriasAprovadas || [];
-          if (cats.length > 0) { categoriasAprovadas = cats; uid = id; localStorage.setItem('sj_uid', id); break; }
-        }
-      } catch(e) {}
-    }
-  }
-
   try {
-    const snap = await firebase.firestore().collection('pedidos').get();
-    const todos = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    // Garante uid correto
+    const authUser = firebase.auth().currentUser;
+    if (!authUser) { window.location.href='login.html'; return; }
 
+    // Busca doc do profissional — tenta uid_prof e uid
+    if (categoriasAprovadas.length === 0) {
+      const ids = [authUser.uid + '_prof', authUser.uid];
+      for (const id of ids) {
+        try {
+          const s = await firebase.firestore().collection('usuarios').doc(id).get();
+          if (s.exists) {
+            uid = id;
+            localStorage.setItem('sj_uid', id);
+            const cats = s.data().categoriasAprovadas || [];
+            if (cats.length > 0) { categoriasAprovadas = cats; }
+            // Atualiza nome e foto na sidebar
+            if (s.data().nome) {
+              document.getElementById('profNome').textContent = s.data().nome;
+              localStorage.setItem('sj_nome', s.data().nome);
+            }
+            if (s.data().fotoPerfil) document.getElementById('navAv').innerHTML = '<img src="'+s.data().fotoPerfil+'">';
+            // Atualiza categorias na sidebar
+            const catDiv = document.getElementById('profCats');
+            if (catDiv) catDiv.innerHTML = (s.data().categoriasAprovadas||[]).map(cat =>
+              '<div class="prof-cat"><span>' + cat + '</span><span class="aprov-badge">✓ Aprovado</span></div>'
+            ).join('');
+            break;
+          }
+        } catch(e2) { console.warn('uid attempt failed', id, e2); }
+      }
+    }
+
+    // Busca TODOS os pedidos abertos do Firestore
+    const snap = await firebase.firestore().collection('pedidos').get();
+    const todos = snap.docs.map(d => ({id: d.id, ...d.data()}))
+      .filter(p => !p.status || p.status === 'aberto')
+      .sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
+
+    // Filtra por categoria se tiver categorias aprovadas
     if (categoriasAprovadas.length > 0) {
-      // Filtra por categorias aprovadas
+      const norm = s => (s||'').toLowerCase().replace(/[^a-z0-9áéíóúãõâêôàçüñ ]/g, '').trim();
       const filtrados = todos.filter(p => {
-        if (p.status && p.status !== 'aberto') return false;
         const rawCats = Array.isArray(p.categorias) ? p.categorias
           : (p.categoria ? [p.categoria] : []);
-        if (!rawCats.length) return false;
-        return rawCats.some(c => categoriasAprovadas.some(a => catMatch(c, a)));
+        return rawCats.some(c =>
+          categoriasAprovadas.some(a => {
+            const nc = norm(c), na = norm(a);
+            return nc === na || na.includes(nc) || nc.includes(na);
+          })
+        );
       });
-      // Fallback: se filtro retornou vazio, mostra todos os abertos
-      todosPedidos = filtrados.length > 0
-        ? filtrados
-        : todos.filter(p => !p.status || p.status === 'aberto');
+      // Se filtro retornou algo, usa; senão mostra tudo
+      todosPedidos = filtrados.length > 0 ? filtrados : todos;
     } else {
-      todosPedidos = todos.filter(p => !p.status || p.status === 'aberto');
+      // Sem categorias aprovadas — mostra tudo mesmo assim
+      todosPedidos = todos;
     }
-
-    todosPedidos.sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
 
     const pedDisp    = todosPedidos.filter(p => { const i=meuInteresse(p); return !i||!i.status; }).length;
     const pedInt     = todosPedidos.filter(p => { const i=meuInteresse(p); return i&&i.status==='interessado'; }).length;
@@ -544,11 +544,12 @@ async function carregarPedidos() {
 
   } catch(e) {
     document.getElementById('loading').style.display = 'none';
-    document.getElementById('vazioMsg').textContent  = 'Erro ao carregar pedidos: ' + e.message;
+    document.getElementById('vazioMsg').textContent = 'Erro: ' + e.message;
     document.getElementById('estadoVazio').classList.add('vis');
-    console.error('carregarPedidos error:', e);
+    console.error('carregarPedidos:', e);
   }
 }
+
 
 // ── NAV / FILTRO ──────────────────────────────────────────────────────
 function selNav(modo, el) {
@@ -948,8 +949,18 @@ async function sair() { await firebase.auth().signOut(); localStorage.clear(); w
 
 firebase.auth().onAuthStateChanged(function(user) {
   if (!user) { window.location.href = 'login.html'; return; }
-  init(user);
-  setTimeout(() => carregarNotificacoes(localStorage.getItem('sj_uid') || user.uid), 1500);
+  // Seta uid inicial — carregarPedidos usa isso
+  if (!uid) uid = localStorage.getItem('sj_uid') || user.uid;
+  const nomeCache = localStorage.getItem('sj_nome');
+  if (nomeCache) {
+    const el = document.getElementById('profNome');
+    if (el) el.textContent = nomeCache;
+  }
+  // Carrega pedidos IMEDIATAMENTE sem esperar init
+  carregarPedidos();
+  // init roda em paralelo (atualiza nome, foto, categorias)
+  init(user).catch(e => console.warn('init:', e));
+  setTimeout(() => carregarNotificacoes(localStorage.getItem('sj_uid') || user.uid), 2000);
 });
 
 // ── NOTIFICAÇÕES ──────────────────────────────────────────────────────
