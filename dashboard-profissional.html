@@ -225,7 +225,7 @@ if(!window._fbInitialized){
         </div>
       </div>
     </div>
-    <div class="loading-wrap" id="loading"><div class="spinner"></div><p>Carregando pedidos...</p></div>
+    <div class="loading-wrap" id="loading"><div class="spinner"></div><p id="loadingMsg">Conectando...</p></div>
     <div id="listaPedidos"></div>
     <div class="vazio" id="estadoVazio"><div class="vazio-icon">📭</div><p id="vazioMsg">Nenhum pedido disponível para suas categorias no momento.</p></div>
   </div>
@@ -507,21 +507,9 @@ async function carregarPedidos() {
     }
 
     setMsg('Buscando pedidos disponíveis...');
-    // Busca pedidos — tenta query filtrada primeiro (rules podem bloquear .get() total)
-    let snap;
-    try {
-      // Tenta buscar todos (pode ser bloqueado por Firestore rules)
-      snap = await firebase.firestore().collection('pedidos')
-        .where('status', 'in', ['aberto', ''])
-        .get();
-    } catch(rulesErr) {
-      // Fallback: busca sem filtro de status
-      try {
-        snap = await firebase.firestore().collection('pedidos').get();
-      } catch(e2) {
-        throw new Error('Firestore bloqueado: ' + e2.message + ' | ' + rulesErr.message);
-      }
-    }
+    // Busca todos os pedidos — query simples sem índice
+    setMsg('Buscando pedidos disponíveis...');
+    const snap = await firebase.firestore().collection('pedidos').get();
     const todos = snap.docs.map(d => ({id: d.id, ...d.data()}))
       .filter(p => !p.status || p.status === 'aberto')
       .sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
@@ -976,6 +964,13 @@ firebase.auth().onAuthStateChanged(function(user) {
   carregarPedidos();
   // init roda em paralelo (atualiza nome, foto, categorias)
   init(user).catch(e => console.warn('init:', e));
+  // Timeout de segurança: se em 8s ainda carregar, mostra erro visível
+  setTimeout(() => {
+    const ld = document.getElementById('loading');
+    if (ld && ld.style.display !== 'none') {
+      ld.innerHTML = '<div style="color:#FF5C5C;text-align:center;padding:20px"><div style="font-size:2rem;margin-bottom:10px">⚠️</div><div style="font-weight:700;margin-bottom:8px">Timeout ao carregar pedidos</div><div style="font-size:0.8rem;color:#8A9BB5">UID: '+uid+'<br>Auth: '+(firebase.auth().currentUser?firebase.auth().currentUser.uid:"null")+'<br>Cats: '+categoriasAprovadas.length+'</div><button onclick="carregarPedidos()" style="margin-top:12px;background:#00C96F;border:none;border-radius:8px;padding:8px 16px;color:#0A1628;font-weight:700;cursor:pointer">🔄 Tentar novamente</button></div>';
+    }
+  }, 8000);
   setTimeout(() => carregarNotificacoes(localStorage.getItem('sj_uid') || user.uid), 2000);
 });
 
