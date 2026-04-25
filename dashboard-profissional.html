@@ -470,91 +470,6 @@ function meuInteresse(pedido) { return (pedido.interessados || []).find(i => i.p
 // ── CARREGAR PEDIDOS ──────────────────────────────────────────────────
 // ── Normaliza categoria: remove emoji e normaliza texto ──────────────
 // ── CARREGAR PEDIDOS ──────────────────────────────────────────────────
-async function carregarPedidos() {
-  try {
-    // Garante uid correto
-    const authUser = firebase.auth().currentUser;
-    if (!authUser) { window.location.href='login.html'; return; }
-    const setMsg = t => { const el=document.getElementById('loadingMsg'); if(el) el.textContent=t; };
-    setMsg('Buscando seu perfil...');
-
-    // Busca doc do profissional — tenta uid_prof e uid
-    if (categoriasAprovadas.length === 0) {
-      const ids = [authUser.uid + '_prof', authUser.uid];
-      for (const id of ids) {
-        try {
-          const s = await firebase.firestore().collection('usuarios').doc(id).get();
-          if (s.exists) {
-            uid = id;
-            localStorage.setItem('sj_uid', id);
-            const cats = s.data().categoriasAprovadas || [];
-            if (cats.length > 0) { categoriasAprovadas = cats; }
-            // Atualiza nome e foto na sidebar
-            if (s.data().nome) {
-              document.getElementById('profNome').textContent = s.data().nome;
-              localStorage.setItem('sj_nome', s.data().nome);
-            }
-            if (s.data().fotoPerfil) document.getElementById('navAv').innerHTML = '<img src="'+s.data().fotoPerfil+'">';
-            // Atualiza categorias na sidebar
-            const catDiv = document.getElementById('profCats');
-            if (catDiv) catDiv.innerHTML = (s.data().categoriasAprovadas||[]).map(cat =>
-              '<div class="prof-cat"><span>' + cat + '</span><span class="aprov-badge">✓ Aprovado</span></div>'
-            ).join('');
-            break;
-          }
-        } catch(e2) { console.warn('uid attempt failed', id, e2); }
-      }
-    }
-
-    setMsg('Buscando pedidos disponíveis...');
-    // Busca todos os pedidos — query simples sem índice
-    setMsg('Buscando pedidos disponíveis...');
-    const snap = await firebase.firestore().collection('pedidos').get();
-    const todos = snap.docs.map(d => ({id: d.id, ...d.data()}))
-      .filter(p => !p.status || p.status === 'aberto')
-      .sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
-
-    // Filtra por categoria se tiver categorias aprovadas
-    if (categoriasAprovadas.length > 0) {
-      const norm = s => (s||'').toLowerCase().replace(/[^a-z0-9áéíóúãõâêôàçüñ ]/g, '').trim();
-      const filtrados = todos.filter(p => {
-        const rawCats = Array.isArray(p.categorias) ? p.categorias
-          : (p.categoria ? [p.categoria] : []);
-        return rawCats.some(c =>
-          categoriasAprovadas.some(a => {
-            const nc = norm(c), na = norm(a);
-            return nc === na || na.includes(nc) || nc.includes(na);
-          })
-        );
-      });
-      // Se filtro retornou algo, usa; senão mostra tudo
-      todosPedidos = filtrados.length > 0 ? filtrados : todos;
-    } else {
-      // Sem categorias aprovadas — mostra tudo mesmo assim
-      todosPedidos = todos;
-    }
-
-    const pedDisp    = todosPedidos.filter(p => { const i=meuInteresse(p); return !i||!i.status; }).length;
-    const pedInt     = todosPedidos.filter(p => { const i=meuInteresse(p); return i&&i.status==='interessado'; }).length;
-    const pedAceitos = todosPedidos.filter(p => { const i=meuInteresse(p); return i&&(i.status==='solicitado'||i.status==='enviado'); }).length;
-
-    document.getElementById('statDisp').textContent = pedDisp;
-    document.getElementById('statEnv').textContent  = pedInt;
-    document.getElementById('statAc').textContent   = pedAceitos;
-    document.getElementById('loading').style.display = 'none';
-
-    if (modoAtual === 'historico') carregarHistorico().then(renderPedidos);
-    else renderPedidos();
-
-  } catch(e) {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('vazioMsg').textContent = 'Erro: ' + e.message;
-    document.getElementById('estadoVazio').classList.add('vis');
-    console.error('carregarPedidos:', e);
-  }
-}
-
-
 // ── NAV / FILTRO ──────────────────────────────────────────────────────
 function selNav(modo, el) {
   document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('ativo'));
@@ -951,28 +866,95 @@ async function enviarComprovante() {
 }
 async function sair() { await firebase.auth().signOut(); localStorage.clear(); window.location.href = 'login.html'; }
 
-firebase.auth().onAuthStateChanged(function(user) {
+firebase.auth().onAuthStateChanged(async function(user) {
   if (!user) { window.location.href = 'login.html'; return; }
-  // Seta uid inicial — carregarPedidos usa isso
-  if (!uid) uid = localStorage.getItem('sj_uid') || user.uid;
+
+  // Atualiza nome do cache
   const nomeCache = localStorage.getItem('sj_nome');
-  if (nomeCache) {
-    const el = document.getElementById('profNome');
-    if (el) el.textContent = nomeCache;
-  }
-  // Carrega pedidos IMEDIATAMENTE sem esperar init
-  carregarPedidos();
-  // init roda em paralelo (atualiza nome, foto, categorias)
-  init(user).catch(e => console.warn('init:', e));
-  // Timeout de segurança: se em 8s ainda carregar, mostra erro visível
-  setTimeout(() => {
-    const ld = document.getElementById('loading');
-    if (ld && ld.style.display !== 'none') {
-      ld.innerHTML = '<div style="color:#FF5C5C;text-align:center;padding:20px"><div style="font-size:2rem;margin-bottom:10px">⚠️</div><div style="font-weight:700;margin-bottom:8px">Timeout ao carregar pedidos</div><div style="font-size:0.8rem;color:#8A9BB5">UID: '+uid+'<br>Auth: '+(firebase.auth().currentUser?firebase.auth().currentUser.uid:"null")+'<br>Cats: '+categoriasAprovadas.length+'</div><button onclick="carregarPedidos()" style="margin-top:12px;background:#00C96F;border:none;border-radius:8px;padding:8px 16px;color:#0A1628;font-weight:700;cursor:pointer">🔄 Tentar novamente</button></div>';
-    }
-  }, 8000);
-  setTimeout(() => carregarNotificacoes(localStorage.getItem('sj_uid') || user.uid), 2000);
+  if (nomeCache) { const el=document.getElementById('profNome'); if(el) el.textContent=nomeCache; }
+
+  // Busca doc profissional e pedidos
+  await carregarTudo(user);
+
+  // Notificações depois
+  setTimeout(() => carregarNotificacoes(uid || user.uid), 2000);
 });
+
+async function carregarTudo(user) {
+  const setMsg = t => { const el=document.getElementById('loadingMsg'); if(el) el.textContent=t; };
+
+  try {
+    setMsg('🔍 Buscando seu perfil...');
+
+    // Busca doc do profissional
+    const ids = [user.uid + '_prof', user.uid];
+    for (const id of ids) {
+      try {
+        const s = await firebase.firestore().collection('usuarios').doc(id).get();
+        if (s.exists) {
+          uid = id;
+          localStorage.setItem('sj_uid', id);
+          const d = s.data();
+          categoriasAprovadas = d.categoriasAprovadas || [];
+          if (d.nome) { localStorage.setItem('sj_nome', d.nome); const el=document.getElementById('profNome'); if(el) el.textContent=d.nome; }
+          if (d.fotoPerfil) { const av=document.getElementById('navAv'); if(av) av.innerHTML='<img src="'+d.fotoPerfil+'">'; }
+          const catDiv=document.getElementById('profCats');
+          if (catDiv) catDiv.innerHTML=(d.categoriasAprovadas||[]).map(c=>'<div class="prof-cat"><span>'+c+'</span><span class="aprov-badge">✓ Aprovado</span></div>').join('');
+          break;
+        }
+      } catch(e2) { console.warn('Doc não encontrado:', id); }
+    }
+
+    setMsg('📋 Buscando pedidos...');
+
+    // Busca pedidos com timeout de 10s
+    const snap = await Promise.race([
+      firebase.firestore().collection('pedidos').get(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore timeout após 10s')), 10000))
+    ]);
+
+    const todos = snap.docs.map(d => ({id: d.id, ...d.data()}))
+      .filter(p => !p.status || p.status === 'aberto')
+      .sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
+
+    // Filtra por categoria (ou mostra todos se sem categoria)
+    if (categoriasAprovadas.length > 0) {
+      const norm = s => (s||'').toLowerCase().replace(/[^a-záéíóúãõâêôàçüñ\s]/g,'').trim();
+      const fil = todos.filter(p => {
+        const rc = Array.isArray(p.categorias)?p.categorias:(p.categoria?[p.categoria]:[]);
+        return rc.some(c => categoriasAprovadas.some(a => {
+          const nc=norm(c), na=norm(a);
+          return nc===na || na.includes(nc) || nc.includes(na);
+        }));
+      });
+      todosPedidos = fil.length > 0 ? fil : todos;
+    } else {
+      todosPedidos = todos;
+    }
+
+    const pedDisp    = todosPedidos.filter(p => { const i=meuInteresse(p); return !i||!i.status; }).length;
+    const pedInt     = todosPedidos.filter(p => { const i=meuInteresse(p); return i&&i.status==='interessado'; }).length;
+    const pedAceitos = todosPedidos.filter(p => { const i=meuInteresse(p); return i&&(i.status==='solicitado'||i.status==='enviado'); }).length;
+
+    document.getElementById('statDisp').textContent = pedDisp;
+    document.getElementById('statEnv').textContent  = pedInt;
+    document.getElementById('statAc').textContent   = pedAceitos;
+    document.getElementById('loading').style.display = 'none';
+
+    // Verificação de taxa (non-blocking)
+    verificarTaxa().catch(e => console.warn('taxa:', e));
+
+    renderPedidos();
+
+  } catch(e) {
+    document.getElementById('loading').innerHTML =
+      '<div style="text-align:center;padding:30px"><div style="font-size:2rem;margin-bottom:10px">❌</div>' +
+      '<div style="color:#FF5C5C;font-weight:700;margin-bottom:8px">Erro ao carregar</div>' +
+      '<div style="color:#8A9BB5;font-size:0.8rem;margin-bottom:16px">'+e.message+'</div>' +
+      '<button onclick="location.reload()" style="background:#00C96F;border:none;border-radius:8px;padding:8px 16px;color:#0A1628;font-weight:700;cursor:pointer">🔄 Recarregar</button></div>';
+    console.error('carregarTudo:', e);
+  }
+}
 
 // ── NOTIFICAÇÕES ──────────────────────────────────────────────────────
 let notifAberto=false, notifIds=[];
