@@ -466,7 +466,9 @@ async function carregarPedidos() {
     todosPedidos = snap.docs.map(d => ({id: d.id, ...d.data()}))
       .filter(p => {
         if (p.status && p.status !== 'aberto') return false;
-        const cats = Array.isArray(p.categorias) ? p.categorias : [p.categorias];
+        // Suporte a 'categorias' (array, novo) e 'categoria' (string, antigo)
+        const rawCats = p.categorias || (p.categoria ? [p.categoria] : []);
+        const cats = Array.isArray(rawCats) ? rawCats : [rawCats];
         const semEmoji = s => (s||'').replace(/\p{Emoji}/gu,'').trim().toLowerCase();
         return cats.some(c => categoriasAprovadas.some(a => a===c || semEmoji(a)===semEmoji(c) || a.trim()===(c||'').trim()));
       })
@@ -516,7 +518,8 @@ function renderPedidos() {
   document.getElementById('estadoVazio').classList.remove('vis');
 
   lista.innerHTML = filtrado.map(p => {
-    const cats = Array.isArray(p.categorias) ? p.categorias : [p.categorias||'—'];
+    const rawCats2 = p.categorias || (p.categoria ? [p.categoria] : []);
+    const cats = Array.isArray(rawCats2) && rawCats2.length ? rawCats2 : [p.categoria||'—'];
     const taxa = calcularTaxa(p); taxasCalc[p.id] = taxa;
     const orc = p.orcamento==='aproximado'&&p.valor ? 'R$ '+parseFloat(p.valor).toLocaleString('pt-BR') : 'Em aberto';
     let urgClass='urg-pressa', urgLabel=p.urgencia||'🗓️ Sem pressa';
