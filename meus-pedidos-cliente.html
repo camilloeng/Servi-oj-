@@ -180,6 +180,7 @@ if(!window._fbInitialized){
     <div class="tab" data-tab="aberto" onclick="selTab(this)">🟢 Abertos</div>
     <div class="tab" data-tab="andamento" onclick="selTab(this)">🔄 Em andamento</div>
     <div class="tab" data-tab="concluido" onclick="selTab(this)">✅ Concluídos</div>
+    <div class="tab" data-tab="historico" onclick="selTab(this)">📋 Histórico</div>
   </div>
 
   <div id="loading"><div class="spinner"></div></div>
@@ -247,6 +248,7 @@ if(!window._fbInitialized){
 <script>
 // ── GLOBALS ───────────────────────────────────────────────────────────
 let clienteUid = null;
+let todosHistoricoCliente = [];
 let todosPedidos = [];
 let tabAtiva = 'todos';
 let profModalAtual = null; // { profId, pedidoId, taxa }
@@ -291,7 +293,8 @@ function selTab(el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('ativo'));
   el.classList.add('ativo');
   tabAtiva = el.getAttribute('data-tab');
-  renderPedidos();
+  if (tabAtiva === 'historico') carregarHistoricoCliente().then(renderPedidos);
+  else renderPedidos();
 }
 
 // ── RENDER PEDIDOS ────────────────────────────────────────────────────
@@ -301,7 +304,9 @@ function renderPedidos() {
   const normalizar = s => (!s || s === '' || s === 'null') ? 'aberto' : s;
 
   let filtrado = todosPedidos;
-  if (tabAtiva !== 'todos') {
+  if (tabAtiva === 'historico') {
+    filtrado = todosHistoricoCliente;
+  } else if (tabAtiva !== 'todos') {
     filtrado = todosPedidos.filter(p => normalizar(p.status) === tabAtiva);
   }
 
@@ -337,6 +342,7 @@ function renderPedidos() {
           </div>
           <div class="pedido-actions">
             ${status === 'aberto' ? `<button class="act-btn" onclick="event.stopPropagation();editarPedido('${p.id}')">✏️ Editar</button>` : ''}
+            ${status === 'aberto' ? `<button class="act-btn" style="border-color:rgba(0,201,111,0.4);color:var(--verde)" onclick="event.stopPropagation();confirmarConcluirCliente('${p.id}')">✅ Concluído</button>` : ''}
             ${status === 'aberto' ? `<button class="act-btn danger" onclick="event.stopPropagation();cancelarPedido('${p.id}',this)">🗑️ Cancelar</button>` : ''}
             <span class="expand-icon">▼</span>
           </div>
@@ -609,6 +615,51 @@ async function recusarProfBtn(profId, pedidoId) {
 // ── EDITAR PEDIDO (item 7) ────────────────────────────────────────────
 function editarPedido(pedidoId) {
   window.location.href = 'publicar-pedido.html?editar=' + pedidoId;
+}
+
+// ── CONCLUIR PEDIDO (CLIENTE) ────────────────────────────────────────
+function confirmarConcluirCliente(pedidoId) {
+  if (!confirm('Marcar este pedido como concluído?\n\nEle irá para o histórico e sairá da lista de abertos.')) return;
+  concluirPedidoCliente(pedidoId);
+}
+
+async function concluirPedidoCliente(pedidoId) {
+  const pedido = todosPedidos.find(p => p.id === pedidoId);
+  if (!pedido) return;
+  try {
+    await firebase.firestore().collection('pedidos').doc(pedidoId).update({ status: 'concluido' });
+    // Salva no histórico do cliente
+    await firebase.firestore().collection('historicoCliente').add({
+      clienteId: clienteUid,
+      pedidoId,
+      titulo: pedido.titulo || '—',
+      categorias: pedido.categorias || [pedido.categoria] || [],
+      endereco: pedido.endereco || '—',
+      concluidoEm: new Date().toISOString()
+    });
+    pedido.status = 'concluido';
+    renderPedidos();
+    alert('✅ Pedido marcado como concluído! Veja em "Histórico".');
+  } catch(e) { alert('Erro: ' + e.message); }
+}
+
+// ── CARREGAR HISTÓRICO DO CLIENTE ─────────────────────────────────
+async function carregarHistoricoCliente() {
+  if (todosHistoricoCliente.length > 0) return;
+  try {
+    const snap = await firebase.firestore().collection('historicoCliente')
+      .where('clienteId', '==', clienteUid)
+      .limit(50)
+      .get();
+    todosHistoricoCliente = snap.docs.map(d => ({
+      id: d.id, ...d.data(),
+      titulo: d.data().titulo,
+      criadoEm: d.data().concluidoEm,
+      status: 'concluido',
+      interessados: [],
+      descricao: 'Concluído em ' + (d.data().concluidoEm ? new Date(d.data().concluidoEm).toLocaleDateString('pt-BR') : '—')
+    })).sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
+  } catch(e) { todosHistoricoCliente = []; }
 }
 
 // ── CANCELAR PEDIDO ───────────────────────────────────────────────────
