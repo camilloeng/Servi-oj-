@@ -274,7 +274,7 @@ async function carregarPedidos(uid) {
     // Stats
     const ativos = todosPedidos.filter(p => p.status === 'aberto').length;
     const concluidos = todosPedidos.filter(p => p.status === 'concluido').length;
-    const totalInteresses = todosPedidos.reduce((s, p) => s + (p.interessados || []).length, 0);
+    const totalInteresses = todosPedidos.reduce((s, p) => s + (Array.isArray(p.interessados) ? p.interessados.length : 0), 0);
     document.getElementById('statAtivos').textContent = ativos;
     document.getElementById('statConcluidos').textContent = concluidos;
     document.getElementById('statInteresses').textContent = totalInteresses;
@@ -312,7 +312,8 @@ function renderPedidos() {
 
   lista.innerHTML = filtrado.map(p => {
     const status = (!p.status || p.status === '' || p.status === 'null') ? 'aberto' : p.status;
-    const ints = p.interessados || [];
+    // Fix: interessados pode ser número 0 em pedidos antigos — forçar array
+    const ints = Array.isArray(p.interessados) ? p.interessados : [];
     const statusLabel = {aberto:'🟢 Aberto', andamento:'🔄 Em andamento', concluido:'✅ Concluído'}[status] || '🟢 Aberto';
     const statusClass = 'status-' + (status === 'andamento' ? 'andamento' : status === 'concluido' ? 'concluido' : 'aberto');
     const orc = p.orcamento === 'aproximado' && p.valor ? 'R$ ' + parseFloat(p.valor).toLocaleString('pt-BR') : 'Em aberto';
@@ -340,7 +341,7 @@ function renderPedidos() {
             <span class="expand-icon">▼</span>
           </div>
         </div>
-        <div class="interessados">
+        <div class="interessados${ints.length > 0 ? ' open' : ''}">
           <div class="int-header">
             <span class="int-titulo">Profissionais interessados</span>
             <span class="int-count ${ints.length === 0 ? 'zero' : ''}">${ints.length} ${ints.length === 1 ? 'profissional' : 'profissionais'}</span>
@@ -394,7 +395,7 @@ function togglePedido(header) {
   const icon = header.querySelector('.expand-icon');
   const isOpen = intDiv.classList.contains('open');
   intDiv.classList.toggle('open', !isOpen);
-  icon.classList.toggle('open', !isOpen);
+  if (icon) icon.classList.toggle('open', !isOpen);
 }
 
 // ── VER PERFIL DO PROFISSIONAL (item 6) ───────────────────────────────
