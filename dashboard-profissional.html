@@ -489,9 +489,11 @@ async function carregarPedidos() {
       .sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
     // Conta pedidos disponíveis (sem interesse) e aceitos (cliente aceitou)
     const pedDisp = todosPedidos.filter(p => { const int = meuInteresse(p); return !int || !int.status; }).length;
+    const pedInt  = todosPedidos.filter(p => { const int = meuInteresse(p); return int && int.status === 'interessado'; }).length;
     const pedAceitos = todosPedidos.filter(p => { const int = meuInteresse(p); return int && (int.status==='solicitado'||int.status==='enviado'); }).length;
     document.getElementById('statDisp').textContent = pedDisp;
-    document.getElementById('statAc').textContent = pedAceitos;
+    document.getElementById('statEnv').textContent  = pedInt;
+    document.getElementById('statAc').textContent   = pedAceitos;
     document.getElementById('loading').style.display = 'none';
     renderPedidos();
   } catch(e) {
@@ -504,6 +506,8 @@ function selNav(modo, el) {
   document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('ativo'));
   el.classList.add('ativo');
   modoAtual = modo;
+  // Esconde spinner ao trocar aba — renderPedidos cuida do estado vazio
+  document.getElementById('loading').style.display = 'none';
   // Mostra filtros só na aba pedidos disponíveis
   const isPedidos = modo === 'pedidos';
   document.getElementById('filtroPills').style.display = isPedidos ? 'flex' : 'none';
