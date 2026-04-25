@@ -208,8 +208,20 @@ if(!window._fbInitialized){
     </div>
     <div class="section-header">
       <div class="section-title" id="section-titulo">Pedidos disponíveis</div>
-      <div class="filtros" id="filtroPills">
-        <div class="fpill ativo" data-cat="todos" onclick="selFiltro(this)">🔍 Todos</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <!-- Filtro de tempo — só aparece na aba pedidos -->
+        <div id="diasFiltroWrap" style="display:flex;gap:5px">
+          <select id="diasFiltro" onchange="renderPedidos()" style="background:var(--azul-input);border:1.5px solid var(--borda);border-radius:8px;color:var(--cinza);font-family:'DM Sans',sans-serif;font-size:0.75rem;padding:5px 10px;outline:none;cursor:pointer">
+            <option value="0">📅 Qualquer data</option>
+            <option value="1">Hoje</option>
+            <option value="2">Últimos 2 dias</option>
+            <option value="3">Últimos 3 dias</option>
+            <option value="7">Última semana</option>
+          </select>
+        </div>
+        <div class="filtros" id="filtroPills">
+          <div class="fpill ativo" data-cat="todos" onclick="selFiltro(this)">🔍 Todos</div>
+        </div>
       </div>
     </div>
     <div class="loading-wrap" id="loading"><div class="spinner"></div><p>Carregando pedidos...</p></div>
@@ -473,7 +485,11 @@ async function carregarPedidos() {
         return cats.some(c => categoriasAprovadas.some(a => a===c || semEmoji(a)===semEmoji(c) || a.trim()===(c||'').trim()));
       })
       .sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
-    document.getElementById('statDisp').textContent = todosPedidos.length;
+    // Conta pedidos disponíveis (sem interesse) e aceitos (cliente aceitou)
+    const pedDisp = todosPedidos.filter(p => { const int = meuInteresse(p); return !int || !int.status; }).length;
+    const pedAceitos = todosPedidos.filter(p => { const int = meuInteresse(p); return int && (int.status==='solicitado'||int.status==='enviado'); }).length;
+    document.getElementById('statDisp').textContent = pedDisp;
+    document.getElementById('statAc').textContent = pedAceitos;
     document.getElementById('loading').style.display = 'none';
     renderPedidos();
   } catch(e) {
@@ -486,7 +502,14 @@ function selNav(modo, el) {
   document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('ativo'));
   el.classList.add('ativo');
   modoAtual = modo;
-  document.getElementById('filtroPills').style.display = modo === 'pedidos' ? 'flex' : 'none';
+  // Mostra filtros só na aba pedidos disponíveis
+  const isPedidos = modo === 'pedidos';
+  document.getElementById('filtroPills').style.display = isPedidos ? 'flex' : 'none';
+  const diasWrap = document.getElementById('diasFiltroWrap');
+  if (diasWrap) diasWrap.style.display = isPedidos ? 'flex' : 'none';
+  // Reseta filtro de tempo ao trocar aba
+  const diasSel = document.getElementById('diasFiltro');
+  if (diasSel && !isPedidos) diasSel.value = '0';
   const titulos = {pedidos:'Pedidos disponíveis', propostas:'Meus interesses', aceitos:'Trabalhos aceitos'};
   document.getElementById('section-titulo').textContent = titulos[modo];
   renderPedidos();
@@ -501,17 +524,50 @@ function selFiltro(el) {
 // ── RENDER ────────────────────────────────────────────────────────────
 function renderPedidos() {
   const lista = document.getElementById('listaPedidos');
-  const msgs = {pedidos:'Nenhum pedido disponível para suas categorias.', propostas:'Você ainda não demonstrou interesse em nenhum pedido.', aceitos:'Nenhum trabalho aceito ainda.'};
+  const msgs = {
+    pedidos:'Nenhum pedido disponível para suas categorias.',
+    propostas:'Você ainda não demonstrou interesse em nenhum pedido.',
+    aceitos:'Nenhum trabalho aceito ou aguardando contato ainda.'
+  };
   document.getElementById('vazioMsg').textContent = msgs[modoAtual];
 
-  let filtrado = todosPedidos;
+  let filtrado = [];
+
   if (modoAtual === 'pedidos') {
-    filtrado = filtroAtual === 'todos' ? todosPedidos
-      : todosPedidos.filter(p => (Array.isArray(p.categorias)?p.categorias:[p.categorias]).includes(filtroAtual));
+    // Só mostra pedidos onde o prof NÃO tem interesse ainda
+    // (status null) ou tem interesse pendente (aguardando cliente)
+    let base = todosPedidos.filter(p => {
+      const int = meuInteresse(p);
+      const st = int ? int.status : null;
+      // Exclui pedidos onde cliente já aceitou (solicitado/enviado) — esses vão para Aceitos
+      return !st || st === 'interessado';
+    });
+    // Filtro de categoria
+    if (filtroAtual !== 'todos') {
+      base = base.filter(p => (Array.isArray(p.categorias)?p.categorias:[p.categorias]).includes(filtroAtual));
+    }
+    // Filtro de tempo
+    const diasFiltro = parseInt(document.getElementById('diasFiltro')?.value || '0');
+    if (diasFiltro > 0) {
+      const limite = new Date(Date.now() - diasFiltro * 24 * 60 * 60 * 1000);
+      base = base.filter(p => p.criadoEm && new Date(p.criadoEm) >= limite);
+    }
+    filtrado = base;
+
   } else if (modoAtual === 'propostas') {
-    filtrado = todosPedidos.filter(p => meuInteresse(p));
+    // Interesses pendentes (aguardando cliente aceitar)
+    filtrado = todosPedidos.filter(p => {
+      const int = meuInteresse(p);
+      return int && int.status === 'interessado';
+    });
+
   } else if (modoAtual === 'aceitos') {
-    filtrado = todosPedidos.filter(p => p.profissionalAceito === uid);
+    // Cliente aceitou (solicitado) ou proposta já enviada + aceito pelo sistema
+    filtrado = todosPedidos.filter(p => {
+      if (p.profissionalAceito === uid) return true;
+      const int = meuInteresse(p);
+      return int && (int.status === 'solicitado' || int.status === 'enviado');
+    });
   }
 
   if (!filtrado.length) { lista.innerHTML=''; document.getElementById('estadoVazio').classList.add('vis'); return; }
@@ -544,13 +600,18 @@ function renderPedidos() {
         actionHtml = `<button class="btn-interesso" disabled>✅ Proposta enviada</button>`;
       }
     } else if (modoAtual === 'propostas') {
+      // Só aparece interessados aguardando
       if (status === 'interessado') {
         actionHtml = `<span class="status-pill status-aguardando">⏳ Aguardando cliente aceitar</span>`;
-      } else if (status === 'solicitado') {
-        actionHtml = `<span class="status-pill status-solicitado">⚡ Cliente aceitou!</span>
+      }
+    } else if (modoAtual === 'aceitos') {
+      // Cliente aceitou → falar com cliente
+      if (status === 'solicitado') {
+        actionHtml = `
+          <span class="status-pill status-solicitado">⚡ Cliente aceitou!</span>
           <button class="btn-enviar-proposta" onclick="abrirWhatsAppCliente('${p.id}')">📲 Falar com cliente</button>`;
-      } else if (status === 'enviado') {
-        actionHtml = `<span class="status-pill status-enviada">✅ Proposta enviada</span>`;
+      } else if (status === 'enviado' || p.profissionalAceito === uid) {
+        actionHtml = `<span class="status-pill status-enviada">✅ Em contato com cliente</span>`;
       }
     }
 
