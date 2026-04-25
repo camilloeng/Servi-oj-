@@ -130,17 +130,39 @@ if(!window._fbInitialized){firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZo
         <div class="card-num">1</div>
         <div><div class="card-title">Categoria do serviço</div><div class="card-sub">Selecione o tipo de serviço que você precisa</div></div>
       </div>
-      <div class="cats-scroll">
+      <!-- Campo de busca de categorias -->
+      <div class="iw" style="margin-bottom:12px">
+        <span class="ii">🔍</span>
+        <input type="text" id="buscaCat" placeholder="Buscar categoria..." oninput="filtrarCats(this.value)" style="padding-left:37px">
+      </div>
+      <div class="cats-scroll" id="catsScroll">
         <div class="cat-pill" onclick="selCat(this,'⚡ Elétrica')">⚡ Elétrica</div>
         <div class="cat-pill" onclick="selCat(this,'🔧 Encanamento')">🔧 Encanamento</div>
         <div class="cat-pill" onclick="selCat(this,'🎨 Pintura')">🎨 Pintura</div>
         <div class="cat-pill" onclick="selCat(this,'🪚 Carpinteiro')">🪚 Carpinteiro</div>
+        <div class="cat-pill" onclick="selCat(this,'🪚 Marcenaria')">🪚 Marcenaria</div>
         <div class="cat-pill" onclick="selCat(this,'❄️ Ar-condicionado')">❄️ Ar-condicionado</div>
         <div class="cat-pill" onclick="selCat(this,'🧹 Limpeza')">🧹 Limpeza</div>
         <div class="cat-pill" onclick="selCat(this,'🏗️ Reforma')">🏗️ Reforma</div>
         <div class="cat-pill" onclick="selCat(this,'🔩 Serralheria')">🔩 Serralheria</div>
         <div class="cat-pill" onclick="selCat(this,'🛋️ Montagem')">🛋️ Montagem</div>
         <div class="cat-pill" onclick="selCat(this,'🌿 Jardinagem')">🌿 Jardinagem</div>
+        <div class="cat-pill" onclick="selCat(this,'🏠 Construção civil')">🏠 Construção civil</div>
+        <div class="cat-pill" onclick="selCat(this,'🚿 Azulejista')">🚿 Azulejista</div>
+        <div class="cat-pill" onclick="selCat(this,'🪟 Vidraçaria')">🪟 Vidraçaria</div>
+        <div class="cat-pill" onclick="selCat(this,'🔐 Chaveiro')">🔐 Chaveiro</div>
+        <div class="cat-pill" onclick="selCat(this,'📡 Antena e CFTV')">📡 Antena e CFTV</div>
+        <div class="cat-pill" onclick="selCat(this,'🚗 Mecânica')">🚗 Mecânica</div>
+        <div class="cat-pill" onclick="selCat(this,'🖥️ Informática')">🖥️ Informática</div>
+        <div class="cat-pill" onclick="selCat(this,'🐾 Pet sitter')">🐾 Pet sitter</div>
+        <div class="cat-pill" onclick="selCat(this,'👶 Cuidador(a)')">👶 Cuidador(a)</div>
+        <div class="cat-pill" onclick="selCat(this,'📦 Mudança e fretes')">📦 Mudança e fretes</div>
+        <div class="cat-pill" onclick="selCat(this,'🍳 Cozinheiro(a)')">🍳 Cozinheiro(a)</div>
+        <div class="cat-pill" onclick="selCat(this,'🧑‍🏫 Aulas particulares')">🧑‍🏫 Aulas particulares</div>
+        <div class="cat-pill" onclick="selCat(this,'💇 Beleza e estética')">💇 Beleza e estética</div>
+        <div class="cat-pill" onclick="selCat(this,'📸 Fotografia')">📸 Fotografia</div>
+        <div class="cat-pill" onclick="selCat(this,'🎉 Eventos')">🎉 Eventos</div>
+        <div class="cat-pill" onclick="selCat(this,'🔧 Outros serviços')">🔧 Outros serviços</div>
       </div>
     </div>
 
@@ -350,6 +372,14 @@ async function carregarPedido(id) {
   } catch(e) {
     alert('Erro ao carregar pedido: ' + e.message);
   }
+}
+
+// ── BUSCA DE CATEGORIAS ────────────────────────────────────────────
+function filtrarCats(texto) {
+  const t = texto.toLowerCase();
+  document.querySelectorAll('#catsScroll .cat-pill').forEach(p => {
+    p.style.display = p.textContent.toLowerCase().includes(t) ? '' : 'none';
+  });
 }
 
 // ── SELEÇÃO CATEGORIA ──────────────────────────────────────────────
