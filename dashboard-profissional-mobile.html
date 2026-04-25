@@ -246,7 +246,17 @@ if(!window._fbInitialized){
     <div class="sec-title" id="secTitulo">Pedidos disponíveis</div>
   </div>
 
-  <!-- FILTROS -->
+  <!-- FILTRO TEMPO -->
+  <div id="diasFiltroMobWrap" style="margin-bottom:8px">
+    <select id="diasFiltroMob" onchange="renderLista()" style="background:var(--azul-input);border:1.5px solid var(--borda);border-radius:8px;color:var(--cinza);font-family:'DM Sans',sans-serif;font-size:0.75rem;padding:6px 12px;outline:none;cursor:pointer;width:100%">
+      <option value="0">📅 Qualquer data</option>
+      <option value="1">Hoje</option>
+      <option value="2">Últimos 2 dias</option>
+      <option value="3">Últimos 3 dias</option>
+      <option value="7">Última semana</option>
+    </select>
+  </div>
+  <!-- FILTROS CATEGORIA -->
   <div class="filtros" id="filtros">
     <div class="fpill ativo" data-cat="todos" onclick="selFiltro(this)">🔍 Todos</div>
   </div>
@@ -274,6 +284,9 @@ if(!window._fbInitialized){
   <button class="bn-item" id="bn-taxa" onclick="abrirPagamento()">
     <span class="bn-icon">💰</span>Taxa
     <span class="bn-dot" id="bnDot"></span>
+  </button>
+  <button class="bn-item" id="bn-historico" onclick="selAba('historico',this)">
+    <span class="bn-icon">📋</span>Histórico
   </button>
   <button class="bn-item" onclick="window.location.href='editar-perfil-profissional.html'">
     <span class="bn-icon">👤</span>Perfil
@@ -330,6 +343,7 @@ if(!window._fbInitialized){
 <script>
 // ── GLOBALS ─────────────────────────────────────────────────────────
 let uid = localStorage.getItem('sj_uid');
+let todosHistoricoMob = [];
 let categoriasAprovadas = [];
 let todosPedidos = [];
 let abaAtiva = 'pedidos';
@@ -447,7 +461,12 @@ async function carregarPedidos() {
         return cats.some(c=>categoriasAprovadas.some(a=>a===c||semEmoji(a)===semEmoji(c)||a.trim()===(c||'').trim()));
       })
       .sort((a,b)=>(b.criadoEm||'').localeCompare(a.criadoEm||''));
-    document.getElementById('stDisp').textContent = todosPedidos.length;
+    const stDisp=todosPedidos.filter(p=>{const i=meuInt(p);return !i||!i.status;}).length;
+    const stIntN=todosPedidos.filter(p=>{const i=meuInt(p);return i&&i.status==='interessado';}).length;
+    const stAcN=todosPedidos.filter(p=>{const i=meuInt(p);return i&&(i.status==='solicitado'||i.status==='enviado');}).length;
+    document.getElementById('stDisp').textContent=stDisp;
+    document.getElementById('stInt').textContent=stIntN;
+    document.getElementById('stAc').textContent=stAcN;
     document.getElementById('stInt').textContent = todosPedidos.filter(p=>meuInt(p)).length;
     document.getElementById('loading').style.display='none';
     renderLista();
@@ -461,10 +480,13 @@ function selAba(aba, el) {
   document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('ativo'));
   el.classList.add('ativo');
   abaAtiva = aba;
-  const titulos={pedidos:'Pedidos disponíveis',interesses:'Meus interesses',aceitos:'Trabalhos aceitos'};
-  document.getElementById('secTitulo').textContent=titulos[aba];
+  const titulos={pedidos:'Pedidos disponíveis',interesses:'Meus interesses',aceitos:'Trabalhos aceitos',historico:'Histórico concluídos'};
+  document.getElementById('secTitulo').textContent=titulos[aba]||aba;
   document.getElementById('filtros').style.display=aba==='pedidos'?'flex':'none';
-  renderLista();
+  const dw=document.getElementById('diasFiltroMobWrap');
+  if(dw) dw.style.display=aba==='pedidos'?'block':'none';
+  if(aba==='historico') carregarHistoricoMob().then(renderLista);
+  else renderLista();
 }
 
 function selFiltro(el) {
@@ -478,12 +500,29 @@ function selFiltro(el) {
 function meuInt(p){return(p.interessados||[]).find(i=>i.profissionalId===uid)}
 
 function renderLista() {
-  let lista=todosPedidos;
-  if (abaAtiva==='interesses') lista=todosPedidos.filter(p=>meuInt(p));
-  else if (abaAtiva==='aceitos') lista=todosPedidos.filter(p=>p.profissionalAceito===uid);
-  else if (filtroAtivo!=='todos') lista=todosPedidos.filter(p=>(Array.isArray(p.categorias)?p.categorias:[p.categorias]).includes(filtroAtivo));
+  let lista=[];
+  if (abaAtiva==='pedidos') {
+    // Só pedidos onde prof não tem interesse ou está aguardando
+    lista = todosPedidos.filter(p => {
+      const int=meuInt(p); const st=int?int.status:null;
+      return !st || st==='interessado';
+    });
+    // Filtro categoria
+    if (filtroAtivo!=='todos') lista=lista.filter(p=>(Array.isArray(p.categorias)?p.categorias:[p.categoria||'—']).includes(filtroAtivo));
+    // Filtro tempo
+    const dias=parseInt(document.getElementById('diasFiltroMob')?.value||'0');
+    if(dias>0){const lim=new Date(Date.now()-dias*24*60*60*1000);lista=lista.filter(p=>p.criadoEm&&new Date(p.criadoEm)>=lim);}
+  } else if (abaAtiva==='interesses') {
+    // Apenas aguardando cliente aceitar
+    lista=todosPedidos.filter(p=>{const int=meuInt(p);return int&&int.status==='interessado';});
+  } else if (abaAtiva==='aceitos') {
+    // Cliente aceitou (solicitado) ou enviado
+    lista=todosPedidos.filter(p=>{if(p.profissionalAceito===uid)return true;const int=meuInt(p);return int&&(int.status==='solicitado'||int.status==='enviado');});
+  } else if (abaAtiva==='historico') {
+    lista=todosHistoricoMob;
+  }
 
-  const msgs={pedidos:'Nenhum pedido disponível.',interesses:'Você ainda não demonstrou interesse.',aceitos:'Nenhum trabalho aceito ainda.'};
+  const msgs={pedidos:'Nenhum pedido disponível.',interesses:'Você ainda não demonstrou interesse.',aceitos:'Nenhum trabalho aceito ainda.',historico:'Nenhum serviço concluído ainda.'};
   if (!lista.length){mostrarVazio(msgs[abaAtiva]);return;}
   document.getElementById('vazio').style.display='none';
 
@@ -506,12 +545,19 @@ function renderLista() {
     if(abaAtiva==='pedidos'){
       if(!status) acao=`<div class="taxa-badge">R$ ${taxa}</div><button class="btn-int" onclick="registrarInteresse('${p.id}',this)">👋 Me interesso</button>`;
       else if(status==='interessado') acao=`<button class="btn-int" disabled>⏳ Aguardando</button>`;
-      else if(status==='solicitado') acao=`<button class="btn-falar" onclick="falarCliente('${p.id}')">📲 Falar com cliente</button>`;
-      else if(status==='enviado') acao=`<span class="status-pill sp-enviado">✅ Proposta enviada</span>`;
     } else if(abaAtiva==='interesses'){
       if(status==='interessado') acao=`<span class="status-pill sp-aguardando">⏳ Aguardando cliente</span>`;
-      else if(status==='solicitado') acao=`<button class="btn-falar" onclick="falarCliente('${p.id}')">📲 Falar agora</button>`;
-      else if(status==='enviado') acao=`<span class="status-pill sp-enviado">✅ Enviado</span>`;
+    } else if(abaAtiva==='aceitos'){
+      if(status==='solicitado'){
+        acao=`<span class="status-pill sp-aceito">⚡ Cliente aceitou!</span>
+          <button class="btn-falar" onclick="falarCliente('${p.id}')">📲 Falar com cliente</button>
+          <button class="btn-int" onclick="confirmarConcluirMob('${p.id}')" style="margin-top:6px;border-color:rgba(0,201,111,0.5);width:100%">✅ Marcar concluído</button>`;
+      } else if(status==='enviado'||p.profissionalAceito===uid){
+        acao=`<span class="status-pill sp-enviado">✅ Em contato</span>
+          <button class="btn-int" onclick="confirmarConcluirMob('${p.id}')" style="margin-top:6px;border-color:rgba(0,201,111,0.5);width:100%">✅ Marcar concluído</button>`;
+      }
+    } else if(abaAtiva==='historico'){
+      acao=`<span class="status-pill sp-enviado">✅ Concluído</span>`;
     }
     return `<div class="pedido-card">
       <div class="p-cats">${cats.map(c=>`<span class="pcat">${c}</span>`).join('')}</div>
@@ -550,6 +596,48 @@ async function registrarInteresse(pedidoId, btn) {
     renderLista();
     criarNotif(p.clienteId,'interesse',nome+' tem interesse no seu pedido "'+p.titulo+'". Veja o perfil dele!','meus-pedidos-cliente.html');
   } catch(e){btn.disabled=false;btn.textContent='👋 Me interesso';alert('Erro: '+e.message);}
+}
+
+// ── CONCLUIR SERVIÇO (MOBILE) ────────────────────────────────────────
+function confirmarConcluirMob(pedidoId) {
+  if(!confirm('Marcar como concluído? Ele sairá da lista de aceitos e irá para o histórico.')) return;
+  concluirServicoMob(pedidoId);
+}
+
+async function concluirServicoMob(pedidoId) {
+  const p=todosPedidos.find(x=>x.id===pedidoId); if(!p)return;
+  try {
+    await firebase.firestore().collection('historico').add({
+      profissionalId:uid, pedidoId,
+      titulo:p.titulo||'—',
+      categorias:p.categorias||(p.categoria?[p.categoria]:[]),
+      clienteNome:p.clienteNome||'—',
+      endereco:p.endereco||'—',
+      concluidoEm:new Date().toISOString()
+    });
+    await firebase.firestore().collection('pedidos').doc(pedidoId).update({status:'concluido',profissionalAceito:uid});
+    const idx=todosPedidos.findIndex(x=>x.id===pedidoId);
+    if(idx!==-1) todosPedidos.splice(idx,1);
+    renderLista();
+    alert('✅ Serviço concluído! Veja no Histórico.');
+  } catch(e){alert('Erro: '+e.message);}
+}
+
+// ── HISTÓRICO (MOBILE) ────────────────────────────────────────────────
+async function carregarHistoricoMob() {
+  if(todosHistoricoMob.length>0) return;
+  try {
+    const snap=await firebase.firestore().collection('historico')
+      .where('profissionalId','==',uid).limit(50).get();
+    todosHistoricoMob=snap.docs.map(d=>({id:d.id,...d.data(),
+      titulo:d.data().titulo,
+      categorias:d.data().categorias||[],
+      descricao:'Concluído em '+(d.data().concluidoEm?new Date(d.data().concluidoEm).toLocaleDateString('pt-BR'):'—'),
+      criadoEm:d.data().concluidoEm,
+      urgencia:'',orcamento:'',
+      endereco:d.data().endereco
+    })).sort((a,b)=>(b.criadoEm||'').localeCompare(a.criadoEm||''));
+  } catch(e){todosHistoricoMob=[];}
 }
 
 async function falarCliente(pedidoId) {
