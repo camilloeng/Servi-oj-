@@ -346,9 +346,17 @@ async function entrar() {
     const {signInWithEmailAndPassword, getDoc, doc} = window._fbAuth;
     const cred = await signInWithEmailAndPassword(auth, email, senha);
     const snap = await getDoc(doc(db, 'usuarios', cred.user.uid));
-    const dados = snap.exists() ? snap.data() : {};
+    let dados = snap.exists() ? snap.data() : {};
+    // Se doc não tem tipo definido, tenta com sufixo _prof
+    if (!dados.tipo) {
+      try {
+        const snapProf = await getDoc(doc(db, 'usuarios', cred.user.uid + '_prof'));
+        if (snapProf.exists()) dados = snapProf.data();
+      } catch(e2) {}
+    }
     const nome = dados.nome || email.split('@')[0];
-    const tipo = dados.tipo || tipoSel || 'cliente';
+    // tipoSel (escolha do usuário na tela) tem PRIORIDADE sobre o doc do Firestore
+    const tipo = tipoSel || dados.tipo || 'cliente';
     localStorage.setItem('sj_tipo', tipo);
     localStorage.setItem('sj_uid', cred.user.uid);
     localStorage.setItem('sj_nome', nome);
@@ -371,8 +379,15 @@ async function entrarGoogle() {
     const {signInWithPopup, getDoc, doc} = window._fbAuth;
     const cred = await signInWithPopup(auth, googleProvider);
     const snap = await getDoc(doc(db, 'usuarios', cred.user.uid));
-    const dados = snap.exists() ? snap.data() : {};
-    const tipo = dados.tipo || tipoSel || 'cliente';
+    let dados = snap.exists() ? snap.data() : {};
+    if (!dados.tipo) {
+      try {
+        const snapProf = await getDoc(doc(db, 'usuarios', cred.user.uid + '_prof'));
+        if (snapProf.exists()) dados = snapProf.data();
+      } catch(e2) {}
+    }
+    // tipoSel (escolha do usuário na tela) tem PRIORIDADE
+    const tipo = tipoSel || dados.tipo || 'cliente';
     const nome = dados.nome || cred.user.displayName;
     localStorage.setItem('sj_tipo', tipo);
     localStorage.setItem('sj_uid', cred.user.uid);
