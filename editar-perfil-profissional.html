@@ -284,7 +284,7 @@ async function removerFoto(idx) {
 
 async function salvarPortfolio() {
   if (!profDocId) return;
-  try { await firebase.firestore().collection('usuarios').doc(profDocId).update({ portfolio: fotosAtuais }); }
+  try { await firebase.firestore().collection('usuarios').doc(profDocId).set({ portfolio: fotosAtuais }, {merge: true}); }
   catch(e) { alert('Erro ao salvar portfólio: ' + e.message); }
 }
 
@@ -350,7 +350,8 @@ async function salvar() {
   if (novaFotoUrl) dados.fotoPerfil = novaFotoUrl;
 
   try {
-    await firebase.firestore().collection('usuarios').doc(profDocId).update(dados);
+    // Usa set+merge para funcionar mesmo se o doc não existir ainda
+    await firebase.firestore().collection('usuarios').doc(profDocId).set(dados, {merge: true});
     localStorage.setItem('sj_nome', dados.nome);
     const msg = document.getElementById('msg');
     msg.textContent = '✅ Perfil atualizado com sucesso!'; msg.className = 'msg ok';
