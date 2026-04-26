@@ -401,7 +401,7 @@ async function entrar() {
 async function entrarGoogle() {
   try {
     await initFirebase();
-    const {signInWithPopup, getDoc, doc} = window._fbAuth;
+    const {signInWithPopup, signInWithRedirect, getRedirectResult, getDoc, doc} = window._fbAuth;
     // Salva o tipo selecionado para usar após o redirect
     localStorage.setItem('sj_tipo_pendente', tipoSel || 'cliente');
     // Usa redirect em vez de popup (mais confiável em todos os browsers)
