@@ -348,13 +348,13 @@ async function entrar() {
     // Busca doc do usuário — tenta uid direto e uid+'_prof'
     let dados = {}, uidFinal = cred.user.uid;
     const snapBase = await getDoc(doc(db, 'usuarios', cred.user.uid));
-    if (snapBase.exists()) {
+    if (snapBase.exists) {
       dados = snapBase.data();
     }
     // Tenta _prof — profissionais são salvos com sufixo _prof
     try {
       const snapProf = await getDoc(doc(db, 'usuarios', cred.user.uid + '_prof'));
-      if (snapProf.exists()) {
+      if (snapProf.exists) {
         const dpf = snapProf.data();
         // Usa _prof se: tipoSel é profissional, ou doc _prof tem tipo profissional
         if (tipoSel === 'profissional' || dpf.tipo === 'profissional') {
@@ -392,11 +392,11 @@ async function entrarGoogle() {
     let dadosG = {}, uidFinalG = cred.user.uid;
     try {
       const snapG = await getDoc(doc(db, 'usuarios', cred.user.uid));
-      if (snapG.exists()) dadosG = snapG.data();
+      if (snapG.exists) dadosG = snapG.data();
     } catch(e2) {}
     try {
       const snapProfG = await getDoc(doc(db, 'usuarios', cred.user.uid + '_prof'));
-      if (snapProfG.exists()) {
+      if (snapProfG.exists) {
         const dpfG = snapProfG.data();
         if (tipoSel === 'profissional' || dpfG.tipo === 'profissional') {
           dadosG = dpfG; uidFinalG = cred.user.uid + '_prof';
