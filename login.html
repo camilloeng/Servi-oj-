@@ -345,20 +345,31 @@ async function entrar() {
     await initFirebase();
     const {signInWithEmailAndPassword, getDoc, doc} = window._fbAuth;
     const cred = await signInWithEmailAndPassword(auth, email, senha);
-    const snap = await getDoc(doc(db, 'usuarios', cred.user.uid));
-    let dados = snap.exists() ? snap.data() : {};
-    // Se doc não tem tipo definido, tenta com sufixo _prof
-    if (!dados.tipo) {
-      try {
-        const snapProf = await getDoc(doc(db, 'usuarios', cred.user.uid + '_prof'));
-        if (snapProf.exists()) dados = snapProf.data();
-      } catch(e2) {}
+    // Busca doc do usuário — tenta uid direto e uid+'_prof'
+    let dados = {}, uidFinal = cred.user.uid;
+    const snapBase = await getDoc(doc(db, 'usuarios', cred.user.uid));
+    if (snapBase.exists()) {
+      dados = snapBase.data();
     }
+    // Tenta _prof — profissionais são salvos com sufixo _prof
+    try {
+      const snapProf = await getDoc(doc(db, 'usuarios', cred.user.uid + '_prof'));
+      if (snapProf.exists()) {
+        const dpf = snapProf.data();
+        // Usa _prof se: tipoSel é profissional, ou doc _prof tem tipo profissional
+        if (tipoSel === 'profissional' || dpf.tipo === 'profissional') {
+          dados = dpf;
+          uidFinal = cred.user.uid + '_prof';
+        }
+      }
+    } catch(e2) {}
     const nome = dados.nome || email.split('@')[0];
-    // tipoSel (escolha do usuário na tela) tem PRIORIDADE sobre o doc do Firestore
+    // tipoSel tem PRIORIDADE absoluta
     const tipo = tipoSel || dados.tipo || 'cliente';
+    // Se profissional, garante que uid tem _prof
+    if (tipo === 'profissional' && !uidFinal.endsWith('_prof')) uidFinal = cred.user.uid + '_prof';
     localStorage.setItem('sj_tipo', tipo);
-    localStorage.setItem('sj_uid', cred.user.uid);
+    localStorage.setItem('sj_uid', uidFinal);
     localStorage.setItem('sj_nome', nome);
     window.location.href = tipo === 'profissional' ? (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? 'dashboard-profissional-mobile.html' : 'dashboard-profissional.html') : 'meus-pedidos-cliente.html';
   } catch(e) {
@@ -378,19 +389,25 @@ async function entrarGoogle() {
     await initFirebase();
     const {signInWithPopup, getDoc, doc} = window._fbAuth;
     const cred = await signInWithPopup(auth, googleProvider);
-    const snap = await getDoc(doc(db, 'usuarios', cred.user.uid));
-    let dados = snap.exists() ? snap.data() : {};
-    if (!dados.tipo) {
-      try {
-        const snapProf = await getDoc(doc(db, 'usuarios', cred.user.uid + '_prof'));
-        if (snapProf.exists()) dados = snapProf.data();
-      } catch(e2) {}
-    }
-    // tipoSel (escolha do usuário na tela) tem PRIORIDADE
-    const tipo = tipoSel || dados.tipo || 'cliente';
-    const nome = dados.nome || cred.user.displayName;
+    let dadosG = {}, uidFinalG = cred.user.uid;
+    try {
+      const snapG = await getDoc(doc(db, 'usuarios', cred.user.uid));
+      if (snapG.exists()) dadosG = snapG.data();
+    } catch(e2) {}
+    try {
+      const snapProfG = await getDoc(doc(db, 'usuarios', cred.user.uid + '_prof'));
+      if (snapProfG.exists()) {
+        const dpfG = snapProfG.data();
+        if (tipoSel === 'profissional' || dpfG.tipo === 'profissional') {
+          dadosG = dpfG; uidFinalG = cred.user.uid + '_prof';
+        }
+      }
+    } catch(e2) {}
+    const tipo = tipoSel || dadosG.tipo || 'cliente';
+    const nome = dadosG.nome || cred.user.displayName;
+    if (tipo === 'profissional' && !uidFinalG.endsWith('_prof')) uidFinalG = cred.user.uid + '_prof';
     localStorage.setItem('sj_tipo', tipo);
-    localStorage.setItem('sj_uid', cred.user.uid);
+    localStorage.setItem('sj_uid', uidFinalG);
     localStorage.setItem('sj_nome', nome);
     window.location.href = tipo === 'profissional' ? (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? 'dashboard-profissional-mobile.html' : 'dashboard-profissional.html') : 'meus-pedidos-cliente.html';
   } catch(e) {
