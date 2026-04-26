@@ -3,157 +3,128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ServiçoJá — Cadastro do Profissional</title>
+<title>ServiçoJá Conecta — Cadastro Profissional</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-  :root{--verde:#00C96F;--verde-escuro:#009E57;--azul:#0A1628;--azul-medio:#132240;--azul-input:#0F1C35;--branco:#F5F7F2;--cinza:#8A9BB5;--laranja:#FF6B35;--erro:#FF5C5C;--borda:rgba(255,255,255,0.09)}
-  body{font-family:'DM Sans',sans-serif;background:var(--azul);color:var(--branco);min-height:100vh}
-  body::before{content:'';position:fixed;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(0,201,111,0.10) 0%,transparent 70%);pointer-events:none;z-index:0}
-  nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:22px 32px;border-bottom:1px solid var(--borda)}
-  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;text-decoration:none;color:var(--branco)}
-  .logo span{color:var(--verde)}
-  .nav-login{color:var(--cinza);font-size:0.9rem}
-  .nav-login a{color:var(--verde);text-decoration:none;font-weight:600}
-  .steps-bar{position:relative;z-index:5;max-width:700px;margin:32px auto 0;padding:0 20px;display:flex;align-items:center}
-  .step-item{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
-  .step-circle{width:36px;height:36px;border-radius:50%;border:2px solid var(--borda);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;color:var(--cinza);background:var(--azul-medio);transition:all 0.3s}
-  .step-item.active .step-circle{border-color:var(--verde);color:var(--verde);box-shadow:0 0 0 4px rgba(0,201,111,0.12)}
-  .step-item.done .step-circle{background:var(--verde);border-color:var(--verde);color:var(--azul)}
-  .step-label{font-size:0.72rem;color:var(--cinza);text-align:center;white-space:nowrap}
-  .step-item.active .step-label{color:var(--verde);font-weight:600}
-  .step-line{flex:1;height:2px;background:var(--borda);margin:0 4px;margin-bottom:20px;transition:background 0.3s}
-  .step-line.done{background:var(--verde);opacity:0.4}
-  .page{position:relative;z-index:5;padding:32px 20px 60px;display:flex;justify-content:center}
-  .card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:24px;padding:36px 40px;width:100%;max-width:620px;animation:fadeUp 0.5s ease both}
-  .painel{display:none}
-  .painel.ativo{display:block;animation:fadeUp 0.4s ease both}
-  .card-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;margin-bottom:4px;letter-spacing:-0.5px}
-  .card-sub{color:var(--cinza);font-size:0.88rem;margin-bottom:24px;line-height:1.5}
-  .section-label{display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--cinza);margin:22px 0 12px}
-  .section-label::after{content:'';flex:1;height:1px;background:var(--borda)}
-  .field{margin-bottom:12px}
-  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  label{display:block;font-size:0.78rem;font-weight:600;color:var(--cinza);margin-bottom:5px}
-  label .req{color:var(--verde);margin-left:2px}
-  .input-wrap{position:relative;display:flex;align-items:center}
-  .input-icon{position:absolute;left:13px;color:var(--cinza);font-size:0.9rem;pointer-events:none}
-  input,select,textarea{width:100%;background:var(--azul-input);border:1.5px solid var(--borda);border-radius:12px;color:var(--branco);font-family:'DM Sans',sans-serif;font-size:0.88rem;padding:12px 12px 12px 38px;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
-  textarea{padding-left:14px;resize:vertical;min-height:90px}
-  select{cursor:pointer;-webkit-appearance:none;padding-right:32px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A9BB5' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
-  select option{background:var(--azul-medio)}
-  input:focus,select:focus,textarea:focus{border-color:rgba(0,201,111,0.45);box-shadow:0 0 0 3px rgba(0,201,111,0.08)}
-  input::placeholder,textarea::placeholder{color:rgba(138,155,181,0.45)}
-  input.campo-erro{border-color:rgba(255,92,92,0.6)!important}
-  .no-icon{padding-left:14px!important}
-  .hint{font-size:0.72rem;color:var(--cinza);margin-top:4px}
-  .msg-erro{font-size:0.74rem;color:var(--erro);margin-top:4px;display:none}
-  .msg-erro.vis{display:block}
-  .senha-toggle{position:absolute;right:12px;background:none;border:none;color:var(--cinza);cursor:pointer;font-size:0.85rem}
-  .erro-geral{background:rgba(255,92,92,0.08);border:1px solid rgba(255,92,92,0.25);border-radius:12px;padding:12px 16px;font-size:0.82rem;color:var(--erro);margin-bottom:16px;display:none}
-  .erro-geral.vis{display:block}
-  .foto-upload{display:flex;align-items:center;gap:16px;margin-bottom:20px}
-  .foto-circle{width:72px;height:72px;border-radius:50%;background:var(--azul-input);border:2px dashed rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:1.8rem;cursor:pointer;flex-shrink:0}
-  .foto-info p{font-size:0.85rem;font-weight:600;margin-bottom:2px}
-  .foto-info span{font-size:0.75rem;color:var(--cinza)}
-  .btn-foto{margin-top:6px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde);border-radius:8px;padding:6px 14px;font-size:0.78rem;font-weight:600;cursor:pointer}
-  .cats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
-  .cat-item{background:var(--azul-input);border:1.5px solid var(--borda);border-radius:12px;padding:12px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.2s;font-size:0.82rem;font-weight:500}
-  .cat-item:hover{border-color:rgba(0,201,111,0.3)}
-  .cat-item.sel{background:rgba(0,201,111,0.12);border-color:rgba(0,201,111,0.4);color:var(--verde)}
-  .cat-item .cat-check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--cinza);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.6rem}
-  .cat-item.sel .cat-check{background:var(--verde);border-color:var(--verde);color:var(--azul)}
-  .portfolio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
-  .foto-slot{aspect-ratio:1;border-radius:12px;background:var(--azul-input);border:2px dashed rgba(255,255,255,0.1);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:all 0.2s;font-size:1.4rem}
-  .foto-slot span{font-size:0.7rem;color:var(--cinza)}
-  .doc-toggle{display:flex;gap:8px;margin-bottom:12px}
-  .doc-btn{flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--borda);background:var(--azul-input);color:var(--cinza);font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s}
-  .doc-btn.sel{background:rgba(0,201,111,0.12);border-color:rgba(0,201,111,0.4);color:var(--verde)}
-  .nav-btns{display:flex;gap:10px;margin-top:24px}
-  .btn-voltar{flex:1;background:transparent;border:1.5px solid var(--borda);border-radius:14px;padding:14px;color:var(--branco);font-family:'Syne',sans-serif;font-weight:600;font-size:0.9rem;cursor:pointer;transition:all 0.2s}
-  .btn-avancar{flex:2;background:var(--verde);border:none;border-radius:14px;padding:14px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;cursor:pointer;transition:all 0.2s}
-  .btn-avancar:hover{background:var(--verde-escuro);transform:scale(1.01)}
-  .btn-avancar:disabled{opacity:0.6;cursor:not-allowed;transform:none}
-  .prof-sel-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px;max-height:400px;overflow-y:auto}
-  .prof-sel-item{background:var(--azul-input);border:2px solid var(--borda);border-radius:14px;padding:16px;cursor:pointer;text-align:center;transition:all 0.2s}
-  .prof-sel-item:hover{border-color:rgba(0,201,111,0.3)}
-  .prof-sel-item.sel{background:rgba(0,201,111,0.12);border-color:var(--verde)}
-  .prof-sel-item.aprovado-item{opacity:0.6;cursor:default;border-color:rgba(0,201,111,0.4)}
-  .psi-icon{font-size:1.8rem;margin-bottom:6px}
-  .psi-nome{font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem}
-  .psi-status{font-size:0.68rem;margin-top:4px}
-  .psi-status.aprovado{color:var(--verde)}
-  .psi-status.pendente{color:var(--cinza)}
-  .ia-intro{text-align:center;padding:8px 0 20px}
-  .ia-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.25);color:var(--laranja);font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:100px;margin-bottom:16px}
-  .ia-info{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}
-  .ia-info-item{background:var(--azul-input);border:1px solid var(--borda);border-radius:12px;padding:14px;text-align:center}
-  .ia-info-item .num{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--verde)}
-  .ia-info-item .desc{font-size:0.72rem;color:var(--cinza);margin-top:2px}
-  .quiz-wrap{display:none}
-  .quiz-wrap.ativo{display:block;animation:fadeUp 0.4s ease both}
-  .quiz-cat-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.2);color:var(--verde);font-size:0.7rem;font-weight:700;padding:3px 10px;border-radius:100px;margin-bottom:14px}
-  .quiz-progress{display:flex;align-items:center;gap:12px;margin-bottom:20px}
-  .quiz-prog-bar{flex:1;height:6px;background:var(--azul-input);border-radius:3px;overflow:hidden}
-  .quiz-prog-fill{height:100%;background:var(--verde);border-radius:3px;transition:width 0.4s}
-  .quiz-num{font-family:'Syne',sans-serif;font-weight:700;font-size:0.8rem;color:var(--cinza);white-space:nowrap}
-  .quiz-pergunta{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;line-height:1.5;margin-bottom:20px;min-height:60px}
-  .quiz-opcoes{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
-  .quiz-op{background:var(--azul-input);border:1.5px solid var(--borda);border-radius:12px;padding:14px 16px;cursor:pointer;font-size:0.88rem;line-height:1.4;display:flex;align-items:center;gap:10px;transition:all 0.2s}
-  .quiz-op:hover{border-color:rgba(0,201,111,0.35)}
-  .quiz-op.certa{background:rgba(0,201,111,0.15);border-color:var(--verde);color:var(--verde)}
-  .quiz-op.errada{background:rgba(255,92,92,0.1);border-color:var(--erro);color:var(--erro)}
-  .op-letra{width:26px;height:26px;border-radius:7px;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:0.75rem;flex-shrink:0}
-  .btn-proxima{width:100%;background:var(--verde);border:none;border-radius:12px;padding:14px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;cursor:pointer;transition:all 0.2s;display:none}
-  .btn-proxima.vis{display:block}
-  .resultado{display:none;text-align:center;padding:20px 0}
-  .resultado.vis{display:block;animation:fadeUp 0.5s ease both}
-  .res-icon{font-size:3.5rem;margin-bottom:16px}
-  .res-titulo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;margin-bottom:8px}
-  .res-sub{color:var(--cinza);font-size:0.9rem;margin-bottom:20px;line-height:1.6}
-  .res-score{display:inline-flex;align-items:center;gap:6px;background:var(--azul-input);border:1px solid var(--borda);border-radius:12px;padding:12px 24px;margin-bottom:24px;font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem}
-  .res-score.aprovado{border-color:rgba(0,201,111,0.4);color:var(--verde);background:rgba(0,201,111,0.08)}
-  .res-score.reprovado{border-color:rgba(255,92,92,0.4);color:var(--erro);background:rgba(255,92,92,0.08)}
-  .btn-repetir{width:100%;background:transparent;border:1.5px solid var(--borda);border-radius:14px;padding:14px;color:var(--branco);font-family:'Syne',sans-serif;font-weight:600;font-size:0.9rem;cursor:pointer;margin-bottom:10px}
-  .btn-outro-teste{width:100%;background:rgba(0,201,111,0.1);border:1.5px solid rgba(0,201,111,0.3);border-radius:14px;padding:14px;color:var(--verde);font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;margin-bottom:10px}
-  .btn-finalizar{width:100%;background:var(--verde);border:none;border-radius:14px;padding:14px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;cursor:pointer}
-  .loading-ia{text-align:center;padding:40px 20px;display:none}
-  .loading-ia.vis{display:block;animation:fadeUp 0.3s ease both}
-  .spinner{width:48px;height:48px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
-  .loading-ia p{color:var(--cinza);font-size:0.88rem}
-  .loading-ia strong{color:var(--branco);display:block;font-family:'Syne',sans-serif;font-size:1rem;margin-bottom:4px}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-  @media(max-width:560px){.card{padding:24px 18px}.row-2{grid-template-columns:1fr}.cats-grid{grid-template-columns:repeat(2,1fr)}nav{padding:18px 20px}}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--verde:#00C96F;--verde-escuro:#009E57;--azul:#0A1628;--azul-medio:#132240;--azul-input:#0F1C35;--branco:#F5F7F2;--cinza:#8A9BB5;--laranja:#FF6B35;--erro:#FF5C5C;--borda:rgba(255,255,255,0.09)}
+body{font-family:'DM Sans',sans-serif;background:var(--azul);color:var(--branco);min-height:100vh}
+body::before{content:'';position:fixed;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(0,201,111,0.10) 0%,transparent 70%);pointer-events:none;z-index:0}
+nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:22px 32px;border-bottom:1px solid var(--borda)}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;text-decoration:none;color:var(--branco)}.logo span{color:var(--verde)}
+.nav-login{color:var(--cinza);font-size:0.9rem}.nav-login a{color:var(--verde);text-decoration:none;font-weight:600}
+.steps-bar{position:relative;z-index:5;max-width:700px;margin:32px auto 0;padding:0 20px;display:flex;align-items:center}
+.step-item{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
+.step-circle{width:36px;height:36px;border-radius:50%;border:2px solid var(--borda);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;color:var(--cinza);background:var(--azul-medio);transition:all 0.3s;position:relative;z-index:2}
+.step-item.active .step-circle{border-color:var(--verde);color:var(--verde);box-shadow:0 0 0 4px rgba(0,201,111,0.12)}
+.step-item.done .step-circle{background:var(--verde);border-color:var(--verde);color:var(--azul)}
+.step-label{font-size:0.72rem;color:var(--cinza);text-align:center;white-space:nowrap}
+.step-item.active .step-label{color:var(--verde);font-weight:600}
+.step-item.done .step-label{color:var(--verde);opacity:0.6}
+.step-line{flex:1;height:2px;background:var(--borda);margin:0 4px;margin-bottom:20px;transition:background 0.3s}
+.step-line.done{background:var(--verde);opacity:0.4}
+.page{position:relative;z-index:5;padding:32px 20px 60px;display:flex;justify-content:center}
+.card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:24px;padding:36px 40px;width:100%;max-width:620px;animation:fadeUp 0.5s ease both}
+.painel{display:none}.painel.ativo{display:block;animation:fadeUp 0.4s ease both}
+.card-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;margin-bottom:4px;letter-spacing:-0.5px}
+.card-sub{color:var(--cinza);font-size:0.88rem;margin-bottom:24px;line-height:1.5}
+.section-label{display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--cinza);margin:22px 0 12px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--borda)}
+.field{margin-bottom:12px}.row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:0.78rem;font-weight:600;color:var(--cinza);margin-bottom:5px}
+label .req{color:var(--verde);margin-left:2px}
+.input-wrap{position:relative;display:flex;align-items:center}
+.input-icon{position:absolute;left:13px;color:var(--cinza);font-size:0.9rem;pointer-events:none}
+input,select,textarea{width:100%;background:var(--azul-input);border:1.5px solid var(--borda);border-radius:12px;color:var(--branco);font-family:'DM Sans',sans-serif;font-size:0.88rem;padding:12px 12px 12px 38px;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
+textarea{padding-left:14px;resize:vertical;min-height:90px}
+select{cursor:pointer;-webkit-appearance:none;padding-right:32px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A9BB5' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+select option{background:var(--azul-medio)}
+input:focus,select:focus,textarea:focus{border-color:rgba(0,201,111,0.45);box-shadow:0 0 0 3px rgba(0,201,111,0.08)}
+input::placeholder,textarea::placeholder{color:rgba(138,155,181,0.45)}
+.no-icon{padding-left:14px !important}
+.hint{font-size:0.72rem;color:var(--cinza);margin-top:4px}
+.senha-toggle{position:absolute;right:12px;background:none;border:none;color:var(--cinza);cursor:pointer;font-size:0.85rem}
+.foto-upload{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.foto-circle{width:72px;height:72px;border-radius:50%;background:var(--azul-input);border:2px dashed rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:1.8rem;cursor:pointer;flex-shrink:0;overflow:hidden}
+.foto-circle img{width:100%;height:100%;object-fit:cover}
+.foto-info p{font-size:0.85rem;font-weight:600;margin-bottom:2px}
+.foto-info span{font-size:0.75rem;color:var(--cinza)}
+.btn-foto{margin-top:6px;background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde);border-radius:8px;padding:6px 14px;font-size:0.78rem;font-weight:600;cursor:pointer}
+.cats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+.cat-item{background:var(--azul-input);border:1.5px solid var(--borda);border-radius:12px;padding:12px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.2s;font-size:0.82rem;font-weight:500}
+.cat-item:hover{border-color:rgba(0,201,111,0.3)}
+.cat-item.sel{background:rgba(0,201,111,0.12);border-color:rgba(0,201,111,0.4);color:var(--verde)}
+.cat-item .cat-check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--cinza);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.6rem}
+.cat-item.sel .cat-check{background:var(--verde);border-color:var(--verde);color:var(--azul)}
+.doc-toggle{display:flex;gap:8px;margin-bottom:12px}
+.doc-btn{flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--borda);background:var(--azul-input);color:var(--cinza);font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s}
+.doc-btn.sel{background:rgba(0,201,111,0.12);border-color:rgba(0,201,111,0.4);color:var(--verde)}
+.nav-btns{display:flex;gap:10px;margin-top:24px}
+.btn-voltar{flex:1;background:transparent;border:1.5px solid var(--borda);border-radius:14px;padding:14px;color:var(--branco);font-family:'Syne',sans-serif;font-weight:600;font-size:0.9rem;cursor:pointer;transition:all 0.2s}
+.btn-voltar:hover{border-color:rgba(255,255,255,0.3)}
+.btn-avancar{flex:2;background:var(--verde);border:none;border-radius:14px;padding:14px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;cursor:pointer;transition:all 0.2s}
+.btn-avancar:hover{background:var(--verde-escuro);transform:scale(1.01)}
+.ia-intro{text-align:center;padding:8px 0 20px}
+.ia-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.25);color:var(--laranja);font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:6px 14px;border-radius:100px;margin-bottom:16px}
+.ia-info{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}
+.ia-info-item{background:var(--azul-input);border:1px solid var(--borda);border-radius:12px;padding:14px;text-align:center}
+.ia-info-item .num{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--verde)}
+.ia-info-item .desc{font-size:0.72rem;color:var(--cinza);margin-top:2px}
+.tentativas{display:flex;gap:6px;justify-content:center;margin:12px 0 20px}
+.tent{width:32px;height:8px;border-radius:4px;background:rgba(0,201,111,0.2);border:1px solid rgba(0,201,111,0.25)}
+.tent.usada{background:var(--erro);border-color:var(--erro);opacity:0.5}
+.tent.atual{background:var(--verde);border-color:var(--verde)}
+.quiz-wrap{display:none}.quiz-wrap.ativo{display:block;animation:fadeUp 0.4s ease both}
+.quiz-progress{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.quiz-prog-bar{flex:1;height:6px;background:var(--azul-input);border-radius:3px;overflow:hidden}
+.quiz-prog-fill{height:100%;background:var(--verde);border-radius:3px;transition:width 0.4s}
+.quiz-num{font-family:'Syne',sans-serif;font-weight:700;font-size:0.8rem;color:var(--cinza);white-space:nowrap}
+.quiz-pergunta{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;line-height:1.5;margin-bottom:20px;min-height:60px}
+.quiz-opcoes{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.quiz-op{background:var(--azul-input);border:1.5px solid var(--borda);border-radius:12px;padding:14px 16px;cursor:pointer;font-size:0.88rem;line-height:1.4;display:flex;align-items:center;gap:10px;transition:all 0.2s}
+.quiz-op:hover{border-color:rgba(0,201,111,0.35)}
+.quiz-op.certa{background:rgba(0,201,111,0.15);border-color:var(--verde);color:var(--verde)}
+.quiz-op.errada{background:rgba(255,92,92,0.1);border-color:var(--erro);color:var(--erro)}
+.op-letra{width:26px;height:26px;border-radius:7px;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:0.75rem;flex-shrink:0}
+.btn-proxima{width:100%;background:var(--verde);border:none;border-radius:12px;padding:14px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;cursor:pointer;transition:all 0.2s;display:none}
+.btn-proxima.vis{display:block}
+.resultado{display:none;text-align:center;padding:20px 0}.resultado.vis{display:block;animation:fadeUp 0.5s ease both}
+.res-icon{font-size:3.5rem;margin-bottom:16px}
+.res-titulo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;margin-bottom:8px}
+.res-sub{color:var(--cinza);font-size:0.9rem;margin-bottom:20px;line-height:1.6}
+.res-score{display:inline-flex;align-items:center;gap:6px;background:var(--azul-input);border:1px solid var(--borda);border-radius:12px;padding:12px 24px;margin-bottom:24px;font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem}
+.res-score.aprovado{border-color:rgba(0,201,111,0.4);color:var(--verde);background:rgba(0,201,111,0.08)}
+.res-score.reprovado{border-color:rgba(255,92,92,0.4);color:var(--erro);background:rgba(255,92,92,0.08)}
+.tentativas-restantes{display:flex;align-items:center;gap:6px;justify-content:center;font-size:0.82rem;color:var(--cinza);margin-bottom:20px}
+.btn-repetir{width:100%;background:transparent;border:1.5px solid var(--borda);border-radius:14px;padding:14px;color:var(--branco);font-family:'Syne',sans-serif;font-weight:600;font-size:0.9rem;cursor:pointer;transition:all 0.2s;margin-bottom:10px}
+.btn-finalizar{width:100%;background:var(--verde);border:none;border-radius:14px;padding:14px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;cursor:pointer;transition:all 0.2s}
+.btn-finalizar:hover{background:var(--verde-escuro)}
+.loading-ia{text-align:center;padding:40px 20px;display:none}.loading-ia.vis{display:block;animation:fadeUp 0.3s ease both}
+.spinner{width:48px;height:48px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
+.loading-ia p{color:var(--cinza);font-size:0.88rem}
+.loading-ia strong{color:var(--branco);display:block;font-family:'Syne',sans-serif;font-size:1rem;margin-bottom:4px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:560px){.card{padding:24px 18px}.row-2{grid-template-columns:1fr}.cats-grid{grid-template-columns:repeat(2,1fr)}nav{padding:18px 20px}}
 </style>
 <meta name="theme-color" content="#00C96F">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-  if(!window._fbInitialized){
-    firebase.initializeApp({
-      apiKey:"AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
-      authDomain:"servicoja-e1f49.firebaseapp.com",
-      projectId:"servicoja-e1f49",
-      storageBucket:"servicoja-e1f49.firebasestorage.app",
-      messagingSenderId:"874413426529",
-      appId:"1:874413426529:web:9891d44afd9ef1750e6720"
-    });
-    window._fbInitialized=true;
-  }
+if(!window._fbInitialized){firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",authDomain:"servicoja-e1f49.firebaseapp.com",projectId:"servicoja-e1f49",storageBucket:"servicoja-e1f49.firebasestorage.app",messagingSenderId:"874413426529",appId:"1:874413426529:web:9891d44afd9ef1750e6720"});window._fbInitialized=true;}
 </script>
 </head>
 <body>
 <nav>
-  <a href="login.html" class="logo">Serviço<span>Já</span></a>
+  <a href="login.html" class="logo">Serviço<span>Já</span> Conecta</a>
   <span class="nav-login">Já tem conta? <a href="login.html">Entrar</a></span>
 </nav>
-<div class="steps-bar" id="stepsBar">
+
+<div class="steps-bar">
   <div class="step-item active" id="si1"><div class="step-circle">1</div><div class="step-label">Dados pessoais</div></div>
   <div class="step-line" id="sl1"></div>
   <div class="step-item" id="si2"><div class="step-circle">2</div><div class="step-label">Endereço</div></div>
@@ -162,1040 +133,353 @@
   <div class="step-line" id="sl3"></div>
   <div class="step-item" id="si4"><div class="step-circle">4</div><div class="step-label">Teste IA</div></div>
 </div>
+
 <div class="page"><div class="card">
 
-<!-- ETAPA 1 -->
-<div class="painel ativo" id="p1">
-  <h1 class="card-title">Dados pessoais</h1>
-  <p class="card-sub">Suas informações ficam protegidas e só aparecem ao cliente após ele aceitar sua proposta.</p>
-  <div class="erro-geral" id="erroGeral1"></div>
-  <div class="foto-upload" onclick="document.getElementById('fotoInput').click()" style="cursor:pointer">
-    <div class="foto-circle" id="fotoCircle">📷</div>
-    <div class="foto-info"><p>Foto de perfil</p><span>Aparece no seu perfil público</span><br><button class="btn-foto" type="button">Escolher foto</button></div>
-  </div>
-  <input type="file" id="fotoInput" accept="image/*" style="display:none" onchange="previewFoto(this)">
-  <div class="section-label">Informações básicas</div>
-  <div class="field">
-    <label>Nome completo <span class="req">*</span></label>
-    <div class="input-wrap"><span class="input-icon">👤</span><input type="text" id="nomeProf" placeholder="Ex: João Ferreira"></div>
-    <div class="msg-erro" id="erroNomeProf">Digite nome e sobrenome</div>
-  </div>
-  <div class="row-2">
-    <div class="field">
-      <label>E-mail <span class="req">*</span></label>
-      <div class="input-wrap"><span class="input-icon">✉️</span><input type="email" id="emailProf" placeholder="seu@email.com"></div>
-      <div class="msg-erro" id="erroEmailProf">Email inválido ou já cadastrado</div>
+  <!-- ETAPA 1 -->
+  <div class="painel ativo" id="p1">
+    <h1 class="card-title">Dados pessoais</h1>
+    <p class="card-sub">Suas informações ficam protegidas e só aparecem ao cliente após ele aceitar sua proposta.</p>
+    <div class="foto-upload">
+      <div class="foto-circle" id="fotoCircle" onclick="document.getElementById('fotoInputCad').click()">📷</div>
+      <div class="foto-info"><p>Foto de perfil</p><span>Aparece no seu perfil público</span><br><button class="btn-foto" type="button" onclick="document.getElementById('fotoInputCad').click()">Escolher foto</button></div>
     </div>
-    <div class="field">
-      <label>WhatsApp <span class="req">*</span></label>
-      <div class="input-wrap"><span class="input-icon">📱</span><input type="tel" id="telefoneProf" placeholder="(11) 99999-9999"></div>
-      <div class="msg-erro" id="erroTelefoneProf">Digite seu telefone</div>
+    <input type="file" id="fotoInputCad" accept="image/*" style="display:none" onchange="previewFotoCad(this)">
+    <div class="section-label">Informações básicas</div>
+    <div class="field"><label>Nome completo <span class="req">*</span></label><div class="input-wrap"><span class="input-icon">👤</span><input type="text" id="cadNome" placeholder="Ex: João Ferreira"></div></div>
+    <div class="row-2">
+      <div class="field"><label>E-mail <span class="req">*</span></label><div class="input-wrap"><span class="input-icon">✉️</span><input type="email" id="cadEmail" placeholder="seu@email.com"></div></div>
+      <div class="field"><label>WhatsApp <span class="req">*</span></label><div class="input-wrap"><span class="input-icon">📱</span><input type="tel" id="cadTel" placeholder="(11) 99999-9999"></div></div>
     </div>
-  </div>
-  <div class="row-2">
-    <div class="field">
-      <label>Senha <span class="req">*</span></label>
-      <div class="input-wrap"><span class="input-icon">🔒</span><input type="password" id="senhaProf" placeholder="Mínimo 8 caracteres"><button class="senha-toggle" onclick="toggleSenha()" type="button">👁️</button></div>
-      <div class="msg-erro" id="erroSenhaProf">Mínimo 8 caracteres</div>
+    <div class="row-2">
+      <div class="field"><label>Senha <span class="req">*</span></label><div class="input-wrap"><span class="input-icon">🔒</span><input type="password" id="senhaProf" placeholder="Mínimo 8 caracteres"><button class="senha-toggle" onclick="toggleSenha()" type="button">👁️</button></div></div>
+      <div class="field"><label>Confirmar senha <span class="req">*</span></label><div class="input-wrap"><span class="input-icon">🔒</span><input type="password" id="cadConfSenha" placeholder="Repita a senha"></div></div>
     </div>
-    <div class="field">
-      <label>Confirmar senha <span class="req">*</span></label>
-      <div class="input-wrap"><span class="input-icon">🔒</span><input type="password" id="confirmarSenhaProf" placeholder="Repita a senha"></div>
-      <div class="msg-erro" id="erroConfirmarSenhaProf">Senhas não coincidem</div>
+    <div class="section-label">Documento (privado)</div>
+    <div class="doc-toggle">
+      <button class="doc-btn sel" onclick="selDoc('cpf',this)">CPF — Pessoa Física</button>
+      <button class="doc-btn" onclick="selDoc('cnpj',this)">CNPJ — Empresa</button>
     </div>
+    <div class="field"><div class="input-wrap"><span class="input-icon">🪪</span><input type="text" id="docInput" placeholder="000.000.000-00" maxlength="18"></div><p class="hint">Usado apenas para verificação de identidade. Não é exibido publicamente.</p></div>
+    <div class="field"><label>Sobre você <span class="req">*</span></label><textarea id="cadSobre" class="no-icon" placeholder="Conte sobre sua experiência, anos de atuação e diferenciais..."></textarea></div>
+    <div class="nav-btns"><button class="btn-avancar" style="flex:1" onclick="irPara(2)">Próximo →</button></div>
   </div>
-  <div class="section-label">Documento (privado)</div>
-  <div class="doc-toggle">
-    <button class="doc-btn sel" onclick="selDoc('cpf',this)">CPF — Pessoa Física</button>
-    <button class="doc-btn" onclick="selDoc('cnpj',this)">CNPJ — Empresa</button>
-  </div>
-  <div class="field">
-    <div class="input-wrap"><span class="input-icon">🪪</span><input type="text" id="docInput" placeholder="000.000.000-00" maxlength="18"></div>
-    <div class="msg-erro" id="erroDoc">Digite seu CPF ou CNPJ</div>
-    <p class="hint">Usado apenas para verificação de identidade.</p>
-  </div>
-  <div class="field">
-    <label>Sobre você <span class="req">*</span></label>
-    <textarea id="sobreProf" class="no-icon" placeholder="Conte sobre sua experiência e diferenciais..."></textarea>
-    <div class="msg-erro" id="erroSobreProf">Escreva pelo menos 20 caracteres</div>
-  </div>
-  <div class="nav-btns">
-    <button class="btn-avancar" style="flex:1" id="btnAvancar1" onclick="validarEtapa1()">Próximo →</button>
-  </div>
-</div>
 
-<!-- ETAPA 2 -->
-<div class="painel" id="p2">
-  <h1 class="card-title">Seu endereço</h1>
-  <p class="card-sub">Usado para mostrar profissionais próximos ao cliente.</p>
-  <div class="erro-geral" id="erroGeral2"></div>
-  <div class="section-label">Localização</div>
-  <div class="row-2">
-    <div class="field">
-      <label>CEP <span class="req">*</span></label>
-      <div class="input-wrap"><span class="input-icon">📮</span><input type="text" id="cepProf" placeholder="00000-000" maxlength="9" oninput="buscarCEP2(this.value)"></div>
-      <div class="msg-erro" id="erroCepProf">CEP inválido</div>
+  <!-- ETAPA 2 -->
+  <div class="painel" id="p2">
+    <h1 class="card-title">Seu endereço</h1>
+    <p class="card-sub">Usado para mostrar profissionais próximos ao cliente.</p>
+    <div class="row-2">
+      <div class="field"><label>CEP <span class="req">*</span></label><div class="input-wrap"><span class="input-icon">📮</span><input type="text" id="cadCep" placeholder="00000-000" maxlength="9" oninput="buscarCEP2(this.value)"></div><p class="hint">Preenche automaticamente</p></div>
+      <div class="field"><label>Número <span class="req">*</span></label><div class="input-wrap"><span class="input-icon">#</span><input type="text" id="cadNum" placeholder="Ex: 142"></div></div>
     </div>
-    <div class="field">
-      <label>Número <span class="req">*</span></label>
-      <div class="input-wrap"><span class="input-icon">#</span><input type="text" id="numeroProf" placeholder="Ex: 142"></div>
-      <div class="msg-erro" id="erroNumeroProf">Digite o número</div>
+    <div class="field"><label>Rua <span class="req">*</span></label><div class="input-wrap"><span class="input-icon">🏠</span><input type="text" id="rua2" placeholder="Preenchido pelo CEP"></div></div>
+    <div class="row-2">
+      <div class="field"><label>Bairro <span class="req">*</span></label><div class="input-wrap"><span class="input-icon">🗺️</span><input type="text" id="bairro2" placeholder="Preenchido pelo CEP"></div></div>
+      <div class="field"><label>Cidade <span class="req">*</span></label><div class="input-wrap"><span class="input-icon">🏙️</span><input type="text" id="cidade2" placeholder="Preenchido pelo CEP"></div></div>
     </div>
-  </div>
-  <div class="field">
-    <label>Rua <span class="req">*</span></label>
-    <div class="input-wrap"><span class="input-icon">🏠</span><input type="text" id="rua2" placeholder="Preenchido pelo CEP"></div>
-    <div class="msg-erro" id="erroRuaProf">Digite a rua</div>
-  </div>
-  <div class="row-2">
-    <div class="field">
-      <label>Bairro <span class="req">*</span></label>
-      <div class="input-wrap"><span class="input-icon">🗺️</span><input type="text" id="bairro2" placeholder="Preenchido pelo CEP"></div>
-      <div class="msg-erro" id="erroBairroProf">Digite o bairro</div>
-    </div>
-    <div class="field">
-      <label>Complemento</label>
-      <div class="input-wrap"><span class="input-icon">🏢</span><input type="text" id="complementoProf" placeholder="Apto, sala..."></div>
+    <div class="field"><label>Estado</label><div class="input-wrap"><span class="input-icon">📍</span><select id="estado2" style="padding-left:38px"><option value="SP">São Paulo</option><option value="MG">Minas Gerais</option><option value="RJ">Rio de Janeiro</option><option value="PR">Paraná</option><option value="RS">Rio Grande do Sul</option><option value="SC">Santa Catarina</option><option value="GO">Goiás</option><option value="BA">Bahia</option><option value="PE">Pernambuco</option><option value="CE">Ceará</option></select></div></div>
+    <div class="nav-btns">
+      <button class="btn-voltar" onclick="irPara(1)">← Voltar</button>
+      <button class="btn-avancar" onclick="irPara(3)">Próximo →</button>
     </div>
   </div>
-  <div class="row-2">
-    <div class="field">
-      <label>Cidade <span class="req">*</span></label>
-      <div class="input-wrap"><span class="input-icon">🏙️</span><input type="text" id="cidade2" placeholder="Preenchido pelo CEP"></div>
-      <div class="msg-erro" id="erroCidadeProf">Digite a cidade</div>
+
+  <!-- ETAPA 3 -->
+  <div class="painel" id="p3">
+    <h1 class="card-title">Serviços & Portfólio</h1>
+    <p class="card-sub">Selecione o que você faz. Você fará um teste de IA para cada categoria.</p>
+    <div class="section-label">Categorias de serviço</div>
+    <div class="cats-grid">
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>⚡ Elétrica</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>🔧 Encanamento</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>🎨 Pintura</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>🪚 Carpinteiro</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>🪚 Marcenaria</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>❄️ Ar-condicionado</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>🧹 Limpeza</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>🏗️ Reforma</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>🔩 Serralheria</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>🛋️ Montagem</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>🌿 Jardinagem</div>
+      <div class="cat-item" onclick="toggleCat(this)"><div class="cat-check"></div>🏠 Construção civil</div>
     </div>
-    <div class="field">
-      <label>Estado <span class="req">*</span></label>
-      <div class="input-wrap">
-        <span class="input-icon">📍</span>
-        <select id="estado2" style="padding-left:38px">
-          <option value="">Selecione</option>
-          <option value="AC">Acre</option><option value="AL">Alagoas</option><option value="AP">Amapá</option><option value="AM">Amazonas</option><option value="BA">Bahia</option><option value="CE">Ceará</option><option value="DF">Distrito Federal</option><option value="ES">Espírito Santo</option><option value="GO">Goiás</option><option value="MA">Maranhão</option><option value="MT">Mato Grosso</option><option value="MS">Mato Grosso do Sul</option><option value="MG">Minas Gerais</option><option value="PA">Pará</option><option value="PB">Paraíba</option><option value="PR">Paraná</option><option value="PE">Pernambuco</option><option value="PI">Piauí</option><option value="RJ">Rio de Janeiro</option><option value="RN">Rio Grande do Norte</option><option value="RS">Rio Grande do Sul</option><option value="RO">Rondônia</option><option value="RR">Roraima</option><option value="SC">Santa Catarina</option><option value="SP">São Paulo</option><option value="SE">Sergipe</option><option value="TO">Tocantins</option>
-        </select>
+    <div class="nav-btns">
+      <button class="btn-voltar" onclick="irPara(2)">← Voltar</button>
+      <button class="btn-avancar" onclick="finalizarCadastroProfissional()">Iniciar Teste IA →</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 4: TESTE IA -->
+  <div class="painel" id="p4">
+    <div id="iaIntro">
+      <div class="ia-intro">
+        <div class="ia-badge">🤖 Avaliação por Inteligência Artificial</div>
+        <h1 class="card-title" style="text-align:center">Teste de qualificação</h1>
+        <p class="card-sub" style="text-align:center">A IA vai gerar 20 perguntas técnicas sobre os serviços que você selecionou. Você precisa acertar pelo menos 70% para ser aprovado.</p>
       </div>
-      <div class="msg-erro" id="erroEstadoProf">Selecione o estado</div>
+      <div class="ia-info">
+        <div class="ia-info-item"><div class="num">20</div><div class="desc">Perguntas</div></div>
+        <div class="ia-info-item"><div class="num">70%</div><div class="desc">Para aprovar</div></div>
+        <div class="ia-info-item"><div class="num">4x</div><div class="desc">Tentativas/dia</div></div>
+      </div>
+      <p style="font-size:0.82rem;color:var(--cinza);text-align:center;margin-bottom:8px">Tentativas de hoje:</p>
+      <div class="tentativas"><div class="tent atual"></div><div class="tent"></div><div class="tent"></div><div class="tent"></div></div>
+      <div class="nav-btns">
+        <button class="btn-voltar" onclick="irPara(3)">← Voltar</button>
+        <button class="btn-avancar" onclick="comecarQuiz()">Começar teste →</button>
+      </div>
+    </div>
+    <div class="loading-ia" id="loadingIA"><div class="spinner"></div><strong>IA gerando suas perguntas...</strong><p>Preparando 20 questões técnicas personalizadas para você</p></div>
+    <div class="quiz-wrap" id="quizWrap">
+      <div class="quiz-progress"><div class="quiz-prog-bar"><div class="quiz-prog-fill" id="progFill" style="width:5%"></div></div><div class="quiz-num" id="progNum">1 / 20</div></div>
+      <div class="quiz-pergunta" id="pergunta"></div>
+      <div class="quiz-opcoes" id="opcoes"></div>
+      <button class="btn-proxima" id="btnProxima" onclick="proximaPergunta()">Próxima →</button>
+    </div>
+    <div class="resultado" id="resultado">
+      <div class="res-icon" id="resIcon"></div>
+      <div class="res-titulo" id="resTitulo"></div>
+      <div class="res-sub" id="resSub"></div>
+      <div class="res-score" id="resScore"></div>
+      <div class="tentativas-restantes" id="tentRestantes"></div>
+      <button class="btn-repetir" id="btnRepetir" onclick="repetirTeste()">🔄 Repetir teste</button>
+      <button class="btn-finalizar" id="btnFinalizar" onclick="finalizarCadastroCompleto()" style="display:none">✅ Finalizar cadastro</button>
     </div>
   </div>
-  <div class="field">
-    <label>Raio de atendimento</label>
-    <div class="input-wrap">
-      <span class="input-icon">📡</span>
-      <select id="raioProf" style="padding-left:38px">
-        <option value="5">Até 5 km</option><option value="10" selected>Até 10 km</option><option value="20">Até 20 km</option><option value="50">Até 50 km</option><option value="cidade">Toda a cidade</option>
-      </select>
-    </div>
-  </div>
-  <div class="nav-btns">
-    <button class="btn-voltar" onclick="irPara(1)">← Voltar</button>
-    <button class="btn-avancar" onclick="validarEtapa2()">Próximo →</button>
-  </div>
-</div>
-
-<!-- ETAPA 3 -->
-<div class="painel" id="p3">
-  <h1 class="card-title">Serviços & Portfólio</h1>
-  <p class="card-sub">Selecione suas especialidades. Você fará um teste de IA para cada uma.</p>
-  <div class="erro-geral" id="erroGeral3"></div>
-  <div class="section-label">Suas especialidades</div>
-  <div class="cats-grid">
-    <div class="cat-item" onclick="toggleCat(this,'⚡ Elétrica')"><div class="cat-check"></div>⚡ Elétrica</div>
-    <div class="cat-item" onclick="toggleCat(this,'🔧 Encanamento')"><div class="cat-check"></div>🔧 Encanamento</div>
-    <div class="cat-item" onclick="toggleCat(this,'🎨 Pintura')"><div class="cat-check"></div>🎨 Pintura</div>
-    <div class="cat-item" onclick="toggleCat(this,'🪚 Marcenaria')"><div class="cat-check"></div>🪚 Marcenaria</div>
-    <div class="cat-item" onclick="toggleCat(this,'❄️ Ar-condicionado')"><div class="cat-check"></div>❄️ Ar-condicionado</div>
-    <div class="cat-item" onclick="toggleCat(this,'🧹 Limpeza')"><div class="cat-check"></div>🧹 Limpeza</div>
-    <div class="cat-item" onclick="toggleCat(this,'🏗️ Reforma')"><div class="cat-check"></div>🏗️ Reforma</div>
-    <div class="cat-item" onclick="toggleCat(this,'🔩 Serralheria')"><div class="cat-check"></div>🔩 Serralheria</div>
-    <div class="cat-item" onclick="toggleCat(this,'🛋️ Montagem')"><div class="cat-check"></div>🛋️ Montagem</div>
-    <div class="cat-item" onclick="toggleCat(this,'🏠 Pedreiro')"><div class="cat-check"></div>🏠 Pedreiro</div>
-    <div class="cat-item" onclick="toggleCat(this,'🛠️ Carpinteiro')"><div class="cat-check"></div>🛠️ Carpinteiro</div>
-    <div class="cat-item" onclick="toggleCat(this,'🌿 Jardinagem')"><div class="cat-check"></div>🌿 Jardinagem</div>
-    <div class="cat-item" onclick="toggleCat(this,'🚿 Hidráulica')"><div class="cat-check"></div>🚿 Hidráulica</div>
-    <div class="cat-item" onclick="toggleCat(this,'🔑 Chaveiro')"><div class="cat-check"></div>🔑 Chaveiro</div>
-    <div class="cat-item" onclick="toggleCat(this,'🏊 Piscinas')"><div class="cat-check"></div>🏊 Piscinas</div>
-    <div class="cat-item" onclick="toggleCat(this,'🔥 Aquecedor / Gás')"><div class="cat-check"></div>🔥 Aquecedor/Gás</div>
-  </div>
-  <div class="section-label" style="margin-top:22px">Portfólio</div>
-  <div class="portfolio-grid">
-    <div class="foto-slot">➕<span>Adicionar</span></div>
-    <div class="foto-slot">➕<span>Adicionar</span></div>
-    <div class="foto-slot">➕<span>Adicionar</span></div>
-    <div class="foto-slot">➕<span>Adicionar</span></div>
-    <div class="foto-slot">➕<span>Adicionar</span></div>
-    <div class="foto-slot">➕<span>Adicionar</span></div>
-  </div>
-  <div class="nav-btns">
-    <button class="btn-voltar" onclick="irPara(2)">← Voltar</button>
-    <button class="btn-avancar" onclick="validarEtapa3()">Iniciar Teste IA →</button>
-  </div>
-</div>
-
-<!-- ETAPA 4: TESTE IA -->
-<div class="painel" id="p4">
-
-  <!-- SELEÇÃO -->
-  <div id="selProfissao">
-    <h1 class="card-title">Escolha a profissão para testar</h1>
-    <p class="card-sub">Faça um teste por vez. Os outros podem ser feitos depois no dashboard.</p>
-    <div class="prof-sel-grid" id="profSelGrid"></div>
-    <div class="nav-btns">
-      <button class="btn-voltar" onclick="irPara(3)">← Voltar</button>
-      <button class="btn-avancar" id="btnIniciarTeste" onclick="mostrarIntroTeste()" disabled>Fazer teste →</button>
-    </div>
-  </div>
-
-  <!-- INTRO -->
-  <div id="iaIntro" style="display:none">
-    <div class="ia-intro">
-      <div class="ia-badge">🤖 Avaliação por Inteligência Artificial</div>
-      <h1 class="card-title" style="text-align:center">Teste: <span id="nomeTesteAtual"></span></h1>
-      <p class="card-sub" style="text-align:center">20 perguntas técnicas sorteadas aleatoriamente de um banco de 30 questões sobre <strong id="nomeTesteAtual2"></strong>. Você precisa acertar 90% para ser aprovado.</p>
-    </div>
-    <div class="ia-info">
-      <div class="ia-info-item"><div class="num">30</div><div class="desc">Perguntas no banco</div></div>
-      <div class="ia-info-item"><div class="num">20</div><div class="desc">Sorteadas para você</div></div>
-      <div class="ia-info-item"><div class="num">90%</div><div class="desc">Para aprovar</div></div>
-    </div>
-    <div class="nav-btns">
-      <button class="btn-voltar" onclick="voltarSelProfissao()">← Voltar</button>
-      <button class="btn-avancar" onclick="comecarQuiz()">Começar teste →</button>
-    </div>
-  </div>
-
-  <!-- LOADING -->
-  <div class="loading-ia" id="loadingIA">
-    <div class="spinner"></div>
-    <strong>Sorteando 20 questões...</strong>
-    <p>Selecionando aleatoriamente do banco de perguntas sobre <span id="loadingCat"></span></p>
-  </div>
-
-  <!-- QUIZ -->
-  <div class="quiz-wrap" id="quizWrap">
-    <div class="quiz-cat-badge" id="quizCatBadge"></div>
-    <div class="quiz-progress">
-      <div class="quiz-prog-bar"><div class="quiz-prog-fill" id="progFill" style="width:5%"></div></div>
-      <div class="quiz-num" id="progNum">1 / 20</div>
-    </div>
-    <div class="quiz-pergunta" id="pergunta"></div>
-    <div class="quiz-opcoes" id="opcoes"></div>
-    <button class="btn-proxima" id="btnProxima" onclick="proximaPergunta()">Próxima →</button>
-  </div>
-
-  <!-- RESULTADO -->
-  <div class="resultado" id="resultado">
-    <div class="res-icon" id="resIcon"></div>
-    <div class="res-titulo" id="resTitulo"></div>
-    <div class="res-sub" id="resSub"></div>
-    <div class="res-score" id="resScore"></div>
-    <div style="font-size:0.82rem;color:var(--cinza);margin-bottom:20px" id="tentRestantes"></div>
-    <button class="btn-repetir" id="btnRepetir" onclick="repetirTeste()" style="display:none">🔄 Repetir este teste</button>
-    <button class="btn-outro-teste" id="btnOutroTeste" onclick="voltarSelProfissao()" style="display:none">📋 Testar outra profissão</button>
-    <button class="btn-finalizar" id="btnFinalizar" style="display:none" onclick="finalizarCadastro()">✅ Ir para o Dashboard →</button>
-  </div>
-
-</div>
 
 </div></div>
+
 <script>
-let stepAtual=1,categoriasSelecionadas=[],categoriaTesteAtual='',categoriasAprovadas=[],tentativas=1;
-const MAX_TENT=4;
-
-// Se veio do dashboard para fazer mais testes, pular direto para etapa 4
-window.addEventListener('load', function(){
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('teste') === '1') {
-    categoriasAprovadas = JSON.parse(localStorage.getItem('sj_categoriasAprovadas') || '[]');
-    categoriasSelecionadas = JSON.parse(localStorage.getItem('sj_categorias') || '[]');
-    // Mostrar só a etapa 4 sem o resto
-    document.getElementById('stepsBar').style.display = 'none';
-    irPara(4);
-    montarSelecaoProfissao();
-  }
-});
-
-const IMGBB_KEY = '327d0067238019843e43362c2f7096c7';
-let fotoProfUrl = null;
-
-async function previewFoto(input){
-  if(input.files&&input.files[0]){
-    const reader=new FileReader();
-    reader.onload=async function(e){
-      const c=document.getElementById('fotoCircle');
-      c.innerHTML='<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.5);color:#fff;font-size:9px;text-align:center;padding:2px">Enviando...</div>';
-      c.style.position='relative';
-      try {
-        const formData = new FormData();
-        formData.append('image', e.target.result.split(',')[1]);
-        const res = await fetch('https://api.imgbb.com/1/upload?key='+IMGBB_KEY, {method:'POST',body:formData});
-        const data = await res.json();
-        if(data.success){ fotoProfUrl = data.data.url; c.innerHTML='<img src="'+fotoProfUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">'; }
-      } catch(e2){ fotoProfUrl = e.target.result; }
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-function irPara(n){
+// ── NAVEGAÇÃO ─────────────────────────────────────────────────────────
+var stepAtual = 1;
+function irPara(n) {
   document.getElementById('p'+stepAtual).classList.remove('ativo');
   document.getElementById('p'+n).classList.add('ativo');
-  for(let i=1;i<=4;i++){
-    const si=document.getElementById('si'+i);
+  for(var i=1;i<=4;i++){
+    var si=document.getElementById('si'+i);
     si.classList.remove('active','done');
-    if(i<n)si.classList.add('done');
-    if(i===n)si.classList.add('active');
-    if(i<4)document.getElementById('sl'+i).classList.toggle('done',i<n);
+    if(i<n) si.classList.add('done');
+    if(i===n) si.classList.add('active');
+    if(i<4) document.getElementById('sl'+i).classList.toggle('done',i<n);
   }
-  stepAtual=n;window.scrollTo(0,0);
+  stepAtual=n;
+  window.scrollTo(0,0);
 }
+
 function selDoc(tipo,el){document.querySelectorAll('.doc-btn').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');document.getElementById('docInput').placeholder=tipo==='cpf'?'000.000.000-00':'00.000.000/0000-00';}
-function toggleSenha(){const i=document.getElementById('senhaProf');i.type=i.type==='password'?'text':'password';}
-function toggleCat(el,nome){
-  el.classList.toggle('sel');
-  el.querySelector('.cat-check').textContent=el.classList.contains('sel')?'✓':'';
-  if(el.classList.contains('sel')){if(!categoriasSelecionadas.includes(nome))categoriasSelecionadas.push(nome);}
-  else{categoriasSelecionadas=categoriasSelecionadas.filter(c=>c!==nome);}
+function toggleSenha(){var i=document.getElementById('senhaProf');i.type=i.type==='password'?'text':'password';}
+function toggleCat(el){el.classList.toggle('sel');el.querySelector('.cat-check').textContent=el.classList.contains('sel')?'✓':'';}
+
+function previewFotoCad(input){
+  if(!input.files[0])return;
+  var r=new FileReader();
+  r.onload=function(e){document.getElementById('fotoCircle').innerHTML='<img src="'+e.target.result+'">';};
+  r.readAsDataURL(input.files[0]);
 }
-function marcarCampo(id,erro){const el=document.getElementById(id);if(el){if(erro)el.classList.add('campo-erro');else el.classList.remove('campo-erro');}}
-function mostrarErro(id,mostrar){const el=document.getElementById(id);if(el)el.className='msg-erro'+(mostrar?' vis':'');}
+
 async function buscarCEP2(val){
-  const cep=val.replace(/\D/g,'');if(cep.length!==8)return;
-  try{const r=await fetch('https://viacep.com.br/ws/'+cep+'/json/');const d=await r.json();
-    if(!d.erro){document.getElementById('rua2').value=d.logradouro||'';document.getElementById('bairro2').value=d.bairro||'';document.getElementById('cidade2').value=d.localidade||'';
-      const s=document.getElementById('estado2');for(let o of s.options)if(o.value===d.uf){s.value=d.uf;break;}}}catch(e){}
-}
-async function validarEtapa1(){
-  let valido=true;
-  document.getElementById('erroGeral1').className='erro-geral';
-  const nome=document.getElementById('nomeProf').value.trim();
-  if(nome.split(' ').filter(p=>p.length>0).length<2){marcarCampo('nomeProf',true);mostrarErro('erroNomeProf',true);valido=false;}
-  else{marcarCampo('nomeProf',false);mostrarErro('erroNomeProf',false);}
-  const email=document.getElementById('emailProf').value.trim();
-  if(!email||!/\S+@\S+\.\S+/.test(email)){marcarCampo('emailProf',true);mostrarErro('erroEmailProf',true);valido=false;}
-  else{marcarCampo('emailProf',false);mostrarErro('erroEmailProf',false);}
-  const tel=document.getElementById('telefoneProf').value.trim();
-  if(!tel||tel.replace(/\D/g,'').length<10){marcarCampo('telefoneProf',true);mostrarErro('erroTelefoneProf',true);valido=false;}
-  else{marcarCampo('telefoneProf',false);mostrarErro('erroTelefoneProf',false);}
-  const senha=document.getElementById('senhaProf').value;
-  if(!senha||senha.length<8){marcarCampo('senhaProf',true);mostrarErro('erroSenhaProf',true);valido=false;}
-  else{marcarCampo('senhaProf',false);mostrarErro('erroSenhaProf',false);}
-  if(senha!==document.getElementById('confirmarSenhaProf').value){marcarCampo('confirmarSenhaProf',true);mostrarErro('erroConfirmarSenhaProf',true);valido=false;}
-  else{marcarCampo('confirmarSenhaProf',false);mostrarErro('erroConfirmarSenhaProf',false);}
-  const doc=document.getElementById('docInput').value.trim();
-  if(!doc||doc.replace(/\D/g,'').length<11){marcarCampo('docInput',true);mostrarErro('erroDoc',true);valido=false;}
-  else{marcarCampo('docInput',false);mostrarErro('erroDoc',false);}
-  const sobre=document.getElementById('sobreProf').value.trim();
-  if(!sobre||sobre.length<20){marcarCampo('sobreProf',true);mostrarErro('erroSobreProf',true);valido=false;}
-  else{marcarCampo('sobreProf',false);mostrarErro('erroSobreProf',false);}
-  if(!valido){window.scrollTo({top:0,behavior:'smooth'});return;}
-  const btn=document.getElementById('btnAvancar1');btn.textContent='Verificando...';btn.disabled=true;
+  var cep=val.replace(/\D/g,'');
+  if(cep.length!==8)return;
   try{
-    const methods=await firebase.auth().fetchSignInMethodsForEmail(email);
-    if(methods&&methods.length>0){
-      try {
-        const snapCheck = await firebase.firestore().collection('usuarios').where('email','==',email).get();
-        if(!snapCheck.empty){
-          const dados = snapCheck.docs[0].data();
-          if(dados.tipo === 'profissional'){
-            const eg=document.getElementById('erroGeral1');eg.textContent='⚠️ Este email já tem cadastro de profissional! Faça login.';eg.className='erro-geral vis';
-            marcarCampo('emailProf',true);mostrarErro('erroEmailProf',true);
-            btn.textContent='Próximo →';btn.disabled=false;window.scrollTo({top:0,behavior:'smooth'});return;
-          }
-          // É cliente — salva UID existente para usar depois
-          window._clienteExistenteUID = snapCheck.docs[0].id;
-          window._clienteExistente = true;
-        }
-      } catch(e2) {}
-    } else {
-      window._clienteExistente = false;
-      window._clienteExistenteUID = null;
+    var r=await fetch('https://viacep.com.br/ws/'+cep+'/json/');
+    var d=await r.json();
+    if(!d.erro){
+      document.getElementById('rua2').value=d.logradouro||'';
+      document.getElementById('bairro2').value=d.bairro||'';
+      document.getElementById('cidade2').value=d.localidade||'';
+      var s=document.getElementById('estado2');
+      for(var o of s.options)if(o.value===d.uf){s.value=d.uf;break;}
     }
   }catch(e){}
-  btn.textContent='Próximo →';btn.disabled=false;irPara(2);
 }
-function validarEtapa2(){
-  let valido=true;
-  const campos=[['cepProf','erroCepProf',v=>v.replace(/\D/g,'').length===8],['numeroProf','erroNumeroProf',v=>v.length>0],['rua2','erroRuaProf',v=>v.length>0],['bairro2','erroBairroProf',v=>v.length>0],['cidade2','erroCidadeProf',v=>v.length>0],['estado2','erroEstadoProf',v=>v.length>0]];
-  campos.forEach(([id,erroId,validar])=>{
-    const val=document.getElementById(id).value.trim();
-    if(!validar(val)){marcarCampo(id,true);mostrarErro(erroId,true);valido=false;}
-    else{marcarCampo(id,false);mostrarErro(erroId,false);}
-  });
-  if(valido)irPara(3);else window.scrollTo({top:0,behavior:'smooth'});
-}
-function validarEtapa3(){
-  if(categoriasSelecionadas.length===0){const e=document.getElementById('erroGeral3');e.textContent='⚠️ Selecione pelo menos uma especialidade!';e.className='erro-geral vis';return;}
-  salvarProfissional();
-}
-function salvarProfissional(){
-  const nome=document.getElementById('nomeProf').value.trim();
-  const email=document.getElementById('emailProf').value.trim();
-  const senha=document.getElementById('senhaProf').value;
 
-  const dadosProfissional = {
-    nome:nome,email:email,telefone:document.getElementById('telefoneProf').value.trim(),tipo:'profissional',
-    documento:document.getElementById('docInput').value.trim(),sobre:document.getElementById('sobreProf').value.trim(),
-    categorias:categoriasSelecionadas,
-    endereco:{cep:document.getElementById('cepProf').value.trim(),rua:document.getElementById('rua2').value.trim(),numero:document.getElementById('numeroProf').value.trim(),bairro:document.getElementById('bairro2').value.trim(),cidade:document.getElementById('cidade2').value.trim(),estado:document.getElementById('estado2').value,complemento:document.getElementById('complementoProf').value.trim()},
-    raioAtendimento:document.getElementById('raioProf').value,
-    aprovado:false,categoriasAprovadas:[],avaliacao:0,criadoEm:new Date().toISOString(),
-    fotoPerfil: fotoProfUrl || null
+// ── DADOS TEMPORÁRIOS — conta criada APENAS após aprovação no teste ───
+var dadosCadastroTemp = {};
+
+function finalizarCadastroProfissional() {
+  var nome  = (document.getElementById('cadNome')  ||{}).value  ||'';
+  var email = (document.getElementById('cadEmail') ||{}).value  ||'';
+  var tel   = (document.getElementById('cadTel')   ||{}).value  ||'';
+  var senha = (document.getElementById('senhaProf')||{}).value  ||'';
+  var conf  = (document.getElementById('cadConfSenha')||{}).value||'';
+
+  if(!nome.trim())  { alert('Preencha seu nome na etapa 1!'); irPara(1); return; }
+  if(!email.trim()) { alert('Preencha seu email na etapa 1!'); irPara(1); return; }
+  if(!senha || senha.length<6) { alert('A senha precisa ter pelo menos 6 caracteres!'); irPara(1); return; }
+  if(senha !== conf) { alert('As senhas não coincidem!'); irPara(1); return; }
+
+  var cats=[];
+  document.querySelectorAll('.cat-item.sel').forEach(function(c){
+    cats.push(c.textContent.replace('✓','').trim());
+  });
+  if(cats.length===0){alert('Selecione pelo menos uma categoria de serviço!');return;}
+
+  // Guarda dados — NÃO cria conta aqui
+  dadosCadastroTemp = {
+    nome: nome.trim(),
+    email: email.trim(),
+    telefone: tel.trim(),
+    senha: senha,
+    sobre: (document.getElementById('cadSobre')||{}).value||'',
+    documento: (document.getElementById('docInput')||{}).value||'',
+    categorias: cats,
+    rua:    (document.getElementById('rua2')   ||{}).value||'',
+    bairro: (document.getElementById('bairro2')||{}).value||'',
+    cidade: (document.getElementById('cidade2')||{}).value||'',
+    estado: (document.getElementById('estado2')||{}).value||'SP'
   };
 
-  function criarPerfilProfissional(uid) {
-    const docId = uid + '_prof';
-    return firebase.firestore().collection('usuarios').doc(docId).set(dadosProfissional)
-      .then(function(){
-        localStorage.setItem('sj_tipo','profissional');
-        localStorage.setItem('sj_uid', docId);
-        localStorage.setItem('sj_nome', nome);
-        localStorage.setItem('sj_categorias', JSON.stringify(categoriasSelecionadas));
-        localStorage.setItem('sj_categoriasAprovadas', JSON.stringify([]));
-        irPara(4); montarSelecaoProfissao();
-      });
+  irPara(4); // vai para o teste SEM criar conta
+}
+
+// ── CRIA CONTA APENAS APÓS APROVAÇÃO ─────────────────────────────────
+async function finalizarCadastroCompleto() {
+  var btn = document.getElementById('btnFinalizar');
+  btn.disabled = true; btn.textContent = 'Criando sua conta...';
+
+  var d = dadosCadastroTemp;
+  if(!d.email||!d.senha){
+    alert('Dados perdidos. Por favor, volte ao início e preencha novamente.');
+    btn.disabled=false; btn.textContent='✅ Finalizar cadastro';
+    irPara(1); return;
   }
 
-  firebase.auth().createUserWithEmailAndPassword(email, senha)
-    .then(function(cred){ return criarPerfilProfissional(cred.user.uid); })
-    .catch(function(e){
-      if(e.code === 'auth/email-already-in-use'){
-        // Tentar login com email/senha
-        firebase.auth().signInWithEmailAndPassword(email, senha)
-          .then(function(cred){ return criarPerfilProfissional(cred.user.uid); })
-          .catch(function(e2){
-            // Se falhou, pode ser conta Google — tentar usar usuário atual
-            const currentUser = firebase.auth().currentUser;
-            if(currentUser && currentUser.email === email){
-              return criarPerfilProfissional(currentUser.uid);
-            }
-            const eg=document.getElementById('erroGeral3');
-            eg.textContent='⚠️ Este email usa login pelo Google. Saia e entre com Google, depois faça o cadastro profissional.';
-            eg.className='erro-geral vis';
-          });
-      } else {
-        const eg=document.getElementById('erroGeral3');
-        eg.textContent='⚠️ Erro: ' + e.message;
-        eg.className='erro-geral vis';
-      }
+  try {
+    var cred = await firebase.auth().createUserWithEmailAndPassword(d.email, d.senha);
+    var uid = cred.user.uid;
+    await firebase.firestore().collection('usuarios').doc(uid+'_prof').set({
+      nome: d.nome||'Profissional',
+      email: d.email,
+      telefone: d.telefone||'',
+      sobre: d.sobre||'',
+      tipo: 'profissional',
+      documento: d.documento||'',
+      categoriasAprovadas: d.categorias||[],
+      aprovado: true,
+      bloqueado: false,
+      taxaAcumulada: 0,
+      avaliacao: 0,
+      totalAvaliacoes: 0,
+      endereco:{rua:d.rua,bairro:d.bairro,cidade:d.cidade,estado:d.estado},
+      criadoEm: new Date().toISOString()
     });
-}
-function montarSelecaoProfissao(){
-  document.getElementById('selProfissao').style.display='block';
-  document.getElementById('iaIntro').style.display='none';
-  document.getElementById('loadingIA').classList.remove('vis');
-  document.getElementById('quizWrap').classList.remove('ativo');
-  document.getElementById('resultado').classList.remove('vis');
-  const grid=document.getElementById('profSelGrid');grid.innerHTML='';
-  categoriasSelecionadas.forEach(function(cat){
-    const aprovado=categoriasAprovadas.includes(cat);
-    const div=document.createElement('div');
-    div.className='prof-sel-item'+(aprovado?' aprovado-item':'');
-    div.innerHTML='<div class="psi-icon">'+cat.split(' ')[0]+'</div><div class="psi-nome">'+cat.replace(/^[^ ]+ /,'')+'</div><div class="psi-status '+(aprovado?'aprovado':'pendente')+'">'+(aprovado?'✅ Aprovado':'⏳ Pendente')+'</div>';
-    if(!aprovado){div.onclick=function(){document.querySelectorAll('.prof-sel-item').forEach(i=>i.classList.remove('sel'));div.classList.add('sel');categoriaTesteAtual=cat;document.getElementById('btnIniciarTeste').disabled=false;};}
-    grid.appendChild(div);
-  });
-}
-function mostrarIntroTeste(){
-  if(!categoriaTesteAtual)return;
-  document.getElementById('selProfissao').style.display='none';
-  document.getElementById('nomeTesteAtual').textContent=categoriaTesteAtual;
-  document.getElementById('nomeTesteAtual2').textContent=categoriaTesteAtual;
-  document.getElementById('iaIntro').style.display='block';
-}
-function voltarSelProfissao(){
-  document.getElementById('iaIntro').style.display='none';
-  document.getElementById('quizWrap').classList.remove('ativo');
-  document.getElementById('resultado').classList.remove('vis');
-  categoriaTesteAtual='';document.getElementById('btnIniciarTeste').disabled=true;
-  montarSelecaoProfissao();
-}
-</script>
-<script>
-const BANCO_PERGUNTAS = {
-  '⚡ Elétrica': [
-    { p: "Qual a tensão padrão das tomadas residenciais no Brasil?", ops: ["110V apenas","220V apenas","127V ou 220V dependendo da região","380V"], c: 2 },
-    { p: "Bitola mínima de fio para circuitos de iluminação residencial:", ops: ["0,5 mm²","1,5 mm²","2,5 mm²","4,0 mm²"], c: 1 },
-    { p: "O que é o DR (Diferencial-Residual)?", ops: ["Um tipo de fio","Dispositivo que protege contra correntes de fuga","Um medidor de energia","Um tipo de tomada"], c: 1 },
-    { p: "Qual a cor do fio neutro segundo a NBR 5410?", ops: ["Verde","Vermelho","Azul claro","Preto"], c: 2 },
-    { p: "Para chuveiro de 6.800W em 220V, qual disjuntor usar?", ops: ["20A","25A","32A","40A"], c: 2 },
-    { p: "O que significa IP65?", ops: ["Proteção contra poeira e jatos d'água","Apenas resistente à poeira","Submersível","Resistente a explosões"], c: 0 },
-    { p: "Qual norma rege instalações elétricas de baixa tensão?", ops: ["NBR 5410","NBR 14136","NBR 6118","NBR 9050"], c: 0 },
-    { p: "O que é aterramento elétrico?", ops: ["Aumentar tensão","Proteger contra choques e surtos","Reduzir consumo","Melhorar sinal"], c: 1 },
-    { p: "Quantas tomadas por cômodo exige a NBR 5410?", ops: ["1 a cada 5m","1 a cada 4m ou fração","2 por cômodo","Apenas 1"], c: 1 },
-    { p: "O que é um circuito dedicado?", ops: ["Com proteção extra","Exclusivo para um equipamento","De 3 fases","Sem aterramento"], c: 1 },
-    { p: "Instrumento para medir resistência de isolamento:", ops: ["Multímetro","Alicate amperímetro","Megôhmetro","Osciloscópio"], c: 2 },
-    { p: "O que é DPS?", ops: ["Dispositivo de Proteção Secundária","Dispositivo de Proteção contra Surtos","Disjuntor Principal","Derivação de Proteção"], c: 1 },
-    { p: "Fio para ar-condicionado split 12.000 BTUs:", ops: ["1,5 mm²","2,5 mm²","4,0 mm²","6,0 mm²"], c: 1 },
-    { p: "O que é fator de potência?", ops: ["Relação entre potência ativa e aparente","Tensão dividida pela corrente","Resistência do circuito","Frequência"], c: 0 },
-    { p: "Profundidade mínima de eletrodutos em alvenaria:", ops: ["1 cm","2 cm","3 cm","5 cm"], c: 1 },
-    { p: "O que é SPDA?", ops: ["Sistema de Proteção Dinâmica","Sistema de Proteção contra Descargas Atmosféricas","Suporte de Distribuição","Sistema Diferencial"], c: 1 },
-    { p: "Vida útil de instalação elétrica sem manutenção:", ops: ["5-10 anos","10-15 anos","20-30 anos","50 anos"], c: 2 },
-    { p: "Ocupação máxima de conduítes:", ops: ["30%","40%","50%","60%"], c: 2 },
-    { p: "O que é carga instalada?", ops: ["Potência do gerador","Soma das potências de todos os equipamentos","Corrente de curto","Tensão de pico"], c: 1 },
-    { p: "Corrente mínima para tomada de uso geral (TUG):", ops: ["6A","10A","15A","20A"], c: 1 },
-    { p: "Qual a cor do fio fase (fase A) na NBR 5410?", ops: ["Azul","Verde","Preto ou vermelho ou cinza","Amarelo"], c: 2 },
-    { p: "Para que serve o disjuntor?", ops: ["Regular tensão","Proteger o circuito contra sobrecarga e curto","Medir energia","Aterrar o sistema"], c: 1 },
-    { p: "O que é tensão trifásica?", ops: ["Uma fase com neutro","Três fases defasadas 120° entre si","Dois sistemas monofásicos","Uma fase sem neutro"], c: 1 },
-    { p: "Qual equipamento mede a corrente elétrica sem contato?", ops: ["Multímetro","Alicate amperímetro","Megôhmetro","Voltímetro"], c: 1 },
-    { p: "O que é um quadro de distribuição?", ops: ["Medidor de energia","Central de proteção com disjuntores e DR","Tipo de tomada","Caixa de passagem"], c: 1 },
-    { p: "Seção mínima de fio para tomadas de uso geral (TUG):", ops: ["1,0 mm²","1,5 mm²","2,5 mm²","4,0 mm²"], c: 2 },
-    { p: "O que é potência aparente (VA)?", ops: ["Potência ativa","Combinação de potência ativa e reativa","Potência reativa","Potência dissipada"], c: 1 },
-    { p: "Frequência da rede elétrica no Brasil:", ops: ["50 Hz","60 Hz","110 Hz","220 Hz"], c: 1 },
-    { p: "Para que serve o neutro no sistema elétrico?", ops: ["Conduzir corrente de retorno","Aterrar equipamentos","Aumentar tensão","Proteger contra curto"], c: 0 },
-    { p: "O que é curto-circuito?", ops: ["Circuito aberto","Contato direto entre fase e neutro ou terra com alta corrente","Sobrecarga leve","Falta de aterramento"], c: 1 },
-  ],
-  '🔧 Encanamento': [
-    { p: "Material mais usado em tubulações de água fria residencial hoje:", ops: ["Ferro galvanizado","PVC rígido","CPVC","Cobre"], c: 1 },
-    { p: "O que é sifão em encanamento?", ops: ["Um tipo de bomba","Peça que evita odores da rede de esgoto","Um tipo de joelho","Um medidor de pressão"], c: 1 },
-    { p: "Para água quente, qual tubo é mais indicado?", ops: ["PVC rígido","Ferro galvanizado","CPVC ou PPR","Alumínio"], c: 2 },
-    { p: "O que é pressão estática em encanamento?", ops: ["Pressão com água fluindo","Pressão sem fluxo de água","Pressão do gás","Pressão do esgoto"], c: 1 },
-    { p: "Diâmetro mínimo do ramal de descarga do vaso sanitário:", ops: ["50mm","75mm","100mm","150mm"], c: 2 },
-    { p: "O que é registro de gaveta?", ops: ["Válvula que regula vazão","Válvula que só abre ou fecha totalmente","Medidor de pressão","Tipo de joelho"], c: 1 },
-    { p: "Para que serve o respiro na rede de esgoto?", ops: ["Aumentar pressão","Evitar vácuo e mau cheiro","Reduzir barulho","Filtrar água"], c: 1 },
-    { p: "Inclinação mínima recomendada para tubos de esgoto:", ops: ["0,5%","1%","2%","5%"], c: 2 },
-    { p: "O que é conexão T em encanamento?", ops: ["Une dois canos em linha","Muda direção em 90°","Divide fluxo em três saídas","Reduz diâmetro"], c: 2 },
-    { p: "Para vedar roscas de tubulações, usa-se:", ops: ["Silicone","Veda rosca (teflon)","Cola PVC","Massa epóxi"], c: 1 },
-    { p: "O que causa golpe de aríete?", ops: ["Pressão alta","Fechamento brusco de válvulas","Tubos muito finos","Ar na tubulação"], c: 1 },
-    { p: "Qual norma regula instalações hidráulicas prediais?", ops: ["NBR 5410","NBR 5626","NBR 6118","NBR 9050"], c: 1 },
-    { p: "Para que serve a caixa de gordura?", ops: ["Filtrar água","Reter gorduras antes do esgoto","Aumentar pressão","Medir consumo"], c: 1 },
-    { p: "Qual tipo de cola é usada em tubos PVC?", ops: ["Cola quente","Adesivo para PVC","Silicone","Epóxi"], c: 1 },
-    { p: "Medidor de pressão em encanamento:", ops: ["Hidrômetro","Manômetro","Barômetro","Termômetro"], c: 1 },
-    { p: "Altura mínima da caixa d'água acima da laje:", ops: ["0,5m","1m","2m","3m"], c: 0 },
-    { p: "O que é retorno de esgoto?", ops: ["Fluxo normal","Refluxo de esgoto para dentro","Pressão alta","Vazamento"], c: 1 },
-    { p: "Para limpar canos entupidos, usa-se:", ops: ["Ácido forte sempre","Desentupidor ou espiral","Marreta","Fogo"], c: 1 },
-    { p: "O que é registro de pressão?", ops: ["Igual ao registro de gaveta","Válvula que regula e pode fechar parcialmente o fluxo","Medidor","Filtro"], c: 1 },
-    { p: "Frequência de limpeza de caixa d'água:", ops: ["Mensal","Semestral","Anual","A cada 2 anos"], c: 1 },
-    { p: "O que é ramal de distribuição?", ops: ["Tubo principal","Derivação que leva água ao ponto de consumo","Tubo de esgoto","Retorno de água"], c: 1 },
-    { p: "Qual o objetivo da caixa de inspeção?", ops: ["Armazenar água","Permitir acesso para limpeza da rede de esgoto","Filtrar resíduos","Medir vazão"], c: 1 },
-    { p: "O que é pressão dinâmica?", ops: ["Pressão sem fluxo","Pressão com água fluindo","Pressão do reservatório","Pressão atmosférica"], c: 1 },
-    { p: "Para que serve o redutor de pressão?", ops: ["Aumentar pressão","Manter pressão constante e segura","Filtrar água","Medir consumo"], c: 1 },
-    { p: "Qual material é proibido para água potável?", ops: ["PPR","CPVC","Chumbo","PVC"], c: 2 },
-    { p: "O que é barrilete?", ops: ["Tipo de conexão","Tubo principal de distribuição saindo do reservatório","Tipo de bomba","Válvula de retenção"], c: 1 },
-    { p: "Para que serve a válvula de retenção?", ops: ["Regular pressão","Impedir refluxo de água","Filtrar impurezas","Medir vazão"], c: 1 },
-    { p: "O que é esgoto primário?", ops: ["Esgoto com resíduos sólidos","Esgoto de pias e ralos","Água da chuva","Esgoto tratado"], c: 0 },
-    { p: "Teste de estanqueidade verifica:", ops: ["Pressão máxima","Vazamentos na instalação","Qualidade da água","Velocidade do fluxo"], c: 1 },
-    { p: "O que é joelho 45° em encanamento?", ops: ["Muda direção em 90°","Muda direção em 45°","Une dois tubos em linha","Reduz diâmetro"], c: 1 },
-  ],
-  '🎨 Pintura': [
-    { p: "Antes de pintar, qual é o primeiro passo em parede nova?", ops: ["Aplicar tinta diretamente","Lixar e aplicar selador","Molhar a parede","Aplicar verniz"], c: 1 },
-    { p: "Qual tinta é indicada para área externa?", ops: ["Tinta PVA","Tinta acrílica para fachadas","Tinta a óleo","Tinta latex comum"], c: 1 },
-    { p: "O que é massa corrida?", ops: ["Tipo de tinta","Produto para nivelar paredes antes de pintar","Cola para papel de parede","Impermeabilizante"], c: 1 },
-    { p: "Quantas demãos de tinta são recomendadas?", ops: ["1 demão","2 a 3 demãos","5 demãos","Depende só da qualidade"], c: 1 },
-    { p: "Para pintar metal (portão, grade), qual tinta usar?", ops: ["Tinta PVA","Tinta esmalte sintético","Tinta acrílica","Tinta latex"], c: 1 },
-    { p: "O que é fundo preparador?", ops: ["Tinta de acabamento","Produto que melhora aderência","Selador de manchas","Verniz"], c: 1 },
-    { p: "Qual rolo é indicado para superfícies lisas?", ops: ["Rolo de lã grossa","Rolo de espuma ou lã fina","Rolo de feltro","Rolo de borracha"], c: 1 },
-    { p: "Como diluir tinta látex?", ops: ["Com tiner","Com água","Com solvente","Não pode diluir"], c: 1 },
-    { p: "O que causa bolhas na pintura?", ops: ["Tinta de qualidade","Pintura em superfície úmida ou quente","Excesso de demãos","Rolo errado"], c: 1 },
-    { p: "EPI obrigatório ao pintar:", ops: ["Apenas luvas","Máscara, óculos e luvas","Apenas máscara","Sem necessidade"], c: 1 },
-    { p: "Tempo de secagem entre demãos de tinta acrílica:", ops: ["30 minutos","1-2 horas","6 horas","24 horas"], c: 1 },
-    { p: "O que é tinta texturizada?", ops: ["Tinta muito diluída","Tinta com partículas para efeito rugoso","Tinta brilhante","Tinta importada"], c: 1 },
-    { p: "Para remover tinta antiga, usa-se:", ops: ["Água e sabão","Decapante ou lixa","Vinagre","Álcool"], c: 1 },
-    { p: "O que é selador?", ops: ["Tipo de massa","Produto que sela e isola manchas","Tinta de acabamento","Verniz"], c: 1 },
-    { p: "Rendimento médio de 1 litro de tinta acrílica:", ops: ["2-4 m²","8-10 m²","15-20 m²","30 m²"], c: 1 },
-    { p: "Ferramenta para aplicar textura:", ops: ["Rolo comum","Rolo de textura ou desempenadeira","Pincel fino","Pistola"], c: 1 },
-    { p: "Tinta para piscina deve ser:", ops: ["Acrílica comum","Epóxi ou específica para piscina","Latex","PVA"], c: 1 },
-    { p: "O que é primer?", ops: ["Tinta de acabamento","Tinta de fundo para melhorar aderência","Verniz","Massa corrida"], c: 1 },
-    { p: "Diferença entre tinta fosca e semibrilho:", ops: ["Preço","Acabamento e facilidade de limpeza","Cor","Rendimento"], c: 1 },
-    { p: "Como proteger piso ao pintar paredes?", ops: ["Não é necessário","Jornal ou plástico e fita crepe","Apenas pano","Plástico grosso"], c: 1 },
-    { p: "Para que serve a fita crepe na pintura?", ops: ["Decoração","Proteger áreas que não devem ser pintadas","Fixar o rolo","Limpar pincéis"], c: 1 },
-    { p: "O que é tinta epóxi?", ops: ["Tinta acrílica especial","Tinta de alta resistência química para pisos e azulejos","Tinta a óleo","Tinta fosca"], c: 1 },
-    { p: "Qual pincel é usado para retoques e cantos?", ops: ["Rolo largo","Pincel de corte ou chanfrado","Rolo de espuma","Pistola"], c: 1 },
-    { p: "O que causa escorrimento de tinta?", ops: ["Tinta de qualidade","Demão muito grossa ou tinta muito diluída","Rolo errado","Parede fria"], c: 1 },
-    { p: "Tinta para madeira exposta ao sol deve ter:", ops: ["PVA","Proteção UV (verniz ou esmalte)","Apenas cor escura","Mais água"], c: 1 },
-    { p: "O que é lixar entre demãos?", ops: ["Opcional","Necessário para melhor aderência e acabamento","Desnecessário com tinta boa","Só para madeira"], c: 1 },
-    { p: "Para pintar teto, o melhor equipamento é:", ops: ["Pincel pequeno","Rolo com cabo extensível","Pistola sempre","Esponja"], c: 1 },
-    { p: "O que é tinta antimofo?", ops: ["Tinta com perfume","Tinta com fungicida que inibe crescimento de mofo","Tinta impermeável","Tinta epóxi"], c: 1 },
-    { p: "Rendimento do esmalte sintético por litro:", ops: ["3-5 m²","10-12 m²","20 m²","30 m²"], c: 1 },
-    { p: "Qual a função do diluente na tinta a óleo?", ops: ["Colorir","Ajustar viscosidade e facilitar aplicação","Secar mais rápido","Aumentar brilho"], c: 1 },
-  ],
-  '🪚 Marcenaria': [
-    { p: "Madeira mais resistente à umidade para uso externo:", ops: ["Pinho","Eucalipto tratado ou cumaru","MDF","Compensado"], c: 1 },
-    { p: "O que é MDF?", ops: ["Madeira maciça","Medium Density Fiberboard — madeira reconstituída","Tipo de compensado","Madeira de reflorestamento"], c: 1 },
-    { p: "Para unir duas peças de madeira em ângulo reto:", ops: ["Cola branca apenas","Cavilha, prego ou parafuso com cola","Fita dupla face","Grampos apenas"], c: 1 },
-    { p: "O que é contraplacado (compensado)?", ops: ["Madeira maciça","Lâminas de madeira coladas em camadas cruzadas","MDF","OSB"], c: 1 },
-    { p: "Ferramenta para fazer cortes curvos em madeira:", ops: ["Serra circular","Serra tico-tico","Serra de fita","Plaina"], c: 1 },
-    { p: "O que é lixar a favor do fio?", ops: ["Lixa grossa sempre","Lixar na direção das fibras da madeira","Lixar em círculos","Lixar contra as fibras"], c: 1 },
-    { p: "O que é OSB?", ops: ["Tipo de MDF","Painel de tiras de madeira orientadas","Madeira maciça comprimida","Compensado naval"], c: 1 },
-    { p: "Qual parafuso é usado em madeira mole?", ops: ["Parafuso sextavado","Parafuso para madeira (rosca soberba)","Parafuso para metal","Parafuso allen"], c: 1 },
-    { p: "O que é plaina elétrica?", ops: ["Serra elétrica","Ferramenta para alisar e nivelar madeira","Furadeira","Lixadeira"], c: 1 },
-    { p: "Umidade ideal da madeira para marcenaria:", ops: ["5-8%","10-14%","20-25%","30%"], c: 1 },
-    { p: "O que é dobradiça piano?", ops: ["Dobradiça de porta","Dobradiça contínua ao longo de toda a peça","Dobradiça oculta","Dobradiça de tampo"], c: 1 },
-    { p: "Para fixar madeira em alvenaria:", ops: ["Cola branca","Bucha e parafuso ou chumbador","Pregos longos","Fita dupla face"], c: 1 },
-    { p: "O que é meia esquadria?", ops: ["Corte de 45° para unir peças em canto","Tipo de madeira","Medida padrão","Ferramenta"], c: 0 },
-    { p: "O que é lambri?", ops: ["Tipo de parafuso","Revestimento de parede em ripas de madeira","Tipo de cola","Ferramenta"], c: 1 },
-    { p: "Para evitar que parafuso rache a madeira:", ops: ["Usar martelo","Fazer furo-guia antes","Não usar parafuso","Molhar a madeira"], c: 1 },
-    { p: "O que é tampo de MDP?", ops: ["Madeira maciça","Painel de partículas de média densidade","Tipo de compensado","MDF mais denso"], c: 1 },
-    { p: "Qual cola é usada para encaixe de madeira?", ops: ["Cola epóxi apenas","Cola PVA ou cola branca para madeira","Silicone","Super bonder"], c: 1 },
-    { p: "O que é chanfro?", ops: ["Tipo de prego","Corte em ângulo na borda da madeira","Tipo de encaixe","Ferramenta"], c: 1 },
-    { p: "Ferramenta para medir ângulos exatos em madeira:", ops: ["Trena","Esquadro e transferidor","Nível","Prumo"], c: 1 },
-    { p: "O que é castanho (cavilha)?", ops: ["Tipo de parafuso","Pino cilíndrico de madeira para encaixe","Cola especial","Ferramenta"], c: 1 },
-    { p: "Para que serve a lixa de grão 80?", ops: ["Acabamento fino","Remoção de material e correção","Polimento","Apenas limpeza"], c: 1 },
-    { p: "O que é verniz marítimo?", ops: ["Verniz comum","Verniz de alta resistência à água e UV","Tinta para madeira","Impermeabilizante"], c: 1 },
-    { p: "O que é encaixe macho e fêmea?", ops: ["Tipo de parafuso","Sistema de encaixe onde uma parte entra na outra","Tipo de cola","Ferramenta"], c: 1 },
-    { p: "Para que serve a tuppia (tupia)?", ops: ["Serrar madeira","Fresar perfis, molduras e rebaixos na madeira","Lixar superfícies","Pregar pregos"], c: 1 },
-    { p: "O que é madeira de reflorestamento?", ops: ["Madeira nativa","Madeira cultivada com fins comerciais (pinus, eucalipto)","Madeira reciclada","MDF"], c: 1 },
-    { p: "Grãos mais finos de lixa (ex. 220) servem para:", ops: ["Remover muita madeira","Acabamento e polimento fino","Desbaste","Lixar concreto"], c: 1 },
-    { p: "O que é fórmica?", ops: ["Tipo de madeira","Laminado plástico colado sobre MDF ou MDP","Cola especial","Tipo de parafuso"], c: 1 },
-    { p: "Para que serve a grampeadeira?", ops: ["Pregar pregos","Fixar grampos metálicos em madeira e tecido","Lixar","Fresar"], c: 1 },
-    { p: "O que é madeira serrada em bruto?", ops: ["MDF","Madeira sem beneficiamento, direto da serraria","Compensado","Madeira tratada"], c: 1 },
-    { p: "Distância mínima entre parafusos em madeira:", ops: ["1 cm","2-3 vezes o diâmetro do parafuso","10 cm sempre","Não há regra"], c: 1 },
-  ],
-  '❄️ Ar-condicionado': [
-    { p: "BTU é a unidade de medida de:", ops: ["Corrente elétrica","Capacidade de refrigeração","Pressão do gás","Tensão"], c: 1 },
-    { p: "Ar de 12.000 BTUs é indicado para ambientes de:", ops: ["Até 10 m²","10 a 20 m²","20 a 30 m²","Acima de 40 m²"], c: 1 },
-    { p: "O que é o fluido refrigerante R-410A?", ops: ["Óleo lubrificante","Gás refrigerante sem cloro mais ecológico","Gás freon antigo","Nitrogênio"], c: 1 },
-    { p: "Para instalar split de 12.000 BTUs, qual bitola de fio?", ops: ["1,5 mm²","2,5 mm²","4,0 mm²","6,0 mm²"], c: 1 },
-    { p: "O que é evaporadora no split?", ops: ["Unidade externa","Unidade interna que resfria o ar do ambiente","Compressor","Condensador"], c: 1 },
-    { p: "Frequência ideal de limpeza do filtro do ar:", ops: ["Anual","A cada 15 dias","Mensalmente","A cada 6 meses"], c: 1 },
-    { p: "O que causa gotejamento excessivo no ar-condicionado?", ops: ["Gás em excesso","Dreno entupido ou mal instalado","Tensão errada","Filtro limpo"], c: 1 },
-    { p: "O que é inversão de ciclo (heat pump)?", ops: ["Modo de economia","Ar que refrigera e também aquece","Modo automático","Purificação do ar"], c: 1 },
-    { p: "Inclinação mínima do dreno para escoamento:", ops: ["Sem inclinação","1% a 2%","5%","10%"], c: 1 },
-    { p: "O que faz o compressor no ciclo de refrigeração?", ops: ["Resfria o ar","Comprime o gás refrigerante elevando pressão e temperatura","Filtra o ar","Distribui o ar"], c: 1 },
-    { p: "Ferramenta para dobrar tubos de cobre sem amassá-los:", ops: ["Alicate","Curvador de tubo","Martelo","Morsa"], c: 1 },
-    { p: "O que é vácuo na instalação de ar-condicionado?", ops: ["Limpeza do filtro","Remoção de ar e umidade do circuito frigorífico","Recarga de gás","Teste de pressão"], c: 1 },
-    { p: "Qual EPI é essencial ao manusear gás refrigerante?", ops: ["Apenas luvas","Óculos, luvas e máscara específica","Apenas máscara","Sem necessidade"], c: 1 },
-    { p: "O que é condensadora?", ops: ["Unidade interna","Unidade externa que dissipa calor para o ambiente","Compressor separado","Filtro de ar"], c: 1 },
-    { p: "Distância mínima da condensadora em relação à parede:", ops: ["5 cm","15 a 20 cm","50 cm","1 metro"], c: 1 },
-    { p: "O que é COP (Coefficient of Performance)?", ops: ["Tipo de gás","Eficiência energética do equipamento","Capacidade em BTU","Voltagem"], c: 1 },
-    { p: "Para testar vazamento de gás, usa-se:", ops: ["Água com sabão","Detector de gás ou água com sabão na tubulação","Fogo","Manômetro apenas"], c: 1 },
-    { p: "O que significa INVERTER no ar-condicionado?", ops: ["Modo invertido","Tecnologia que varia a rotação do compressor economizando energia","Modo aquecimento","Voltagem variável"], c: 1 },
-    { p: "Altura ideal de instalação da evaporadora na parede:", ops: ["1 metro","2,0 a 2,5 metros do piso","3 metros","Junto ao teto"], c: 1 },
-    { p: "O que é recarga de gás?", ops: ["Limpeza do sistema","Adição de fluido refrigerante no circuito","Troca de filtro","Manutenção elétrica"], c: 1 },
-    { p: "Para que serve o nitrogênio na instalação do ar?", ops: ["Refrigerar o ambiente","Pressurizar e testar o sistema antes da recarga","Lubrificar","Limpar filtros"], c: 1 },
-    { p: "O que é a válvula de expansão?", ops: ["Válvula de segurança","Componente que reduz pressão do líquido refrigerante","Válvula de recarga","Válvula de dreno"], c: 1 },
-    { p: "Tensão mais comum para split residencial até 24.000 BTUs:", ops: ["110V","220V","380V","127V"], c: 1 },
-    { p: "O que causa o ar-condicionado a não gelar?", ops: ["Filtro limpo","Falta de gás ou compressor com defeito","Tensão correta","Dreno limpo"], c: 1 },
-    { p: "Para que serve o manômetro na instalação?", ops: ["Medir corrente","Medir pressão do gás refrigerante","Medir tensão","Medir temperatura"], c: 1 },
-    { p: "O que é higienização do ar-condicionado?", ops: ["Só lavar filtro","Limpeza profunda com produto bactericida na serpentina e partes internas","Trocar o gás","Limpar a condensadora"], c: 1 },
-    { p: "Qual tubo conduz gás na fase líquida (linha de líquido)?", ops: ["Tubo maior (sução)","Tubo menor (líquido)","Qualquer tubo","Tubo de cobre comum"], c: 1 },
-    { p: "O que é serpentina do evaporador?", ops: ["Tubo de dreno","Conjunto de tubos e aletas onde o ar é resfriado","Filtro de ar","Ventilador"], c: 1 },
-    { p: "Bitola do fio para ar de 24.000 BTUs em 220V:", ops: ["1,5 mm²","2,5 mm²","4,0 mm²","6,0 mm²"], c: 2 },
-    { p: "O que é modo DRY no ar-condicionado?", ops: ["Modo de aquecimento","Modo de desumidificação sem refrigeração intensa","Modo turbo","Modo econômico"], c: 1 },
-  ],
-  '🧹 Limpeza': [
-    { p: "Para limpeza de granito, qual produto usar?", ops: ["Vinagre","Produto neutro ou específico para granito","Água sanitária","Limão"], c: 1 },
-    { p: "O que é decapagem de piso?", ops: ["Pintura do piso","Remoção de cera e sujeira acumulada","Polimento","Impermeabilização"], c: 1 },
-    { p: "Para desinfetar banheiros, o produto correto:", ops: ["Apenas água","Desinfetante ou água sanitária diluída","Detergente comum","Álcool puro"], c: 1 },
-    { p: "EPI obrigatório ao usar produtos químicos de limpeza:", ops: ["Apenas avental","Luvas, óculos e máscara","Apenas luvas","Sem necessidade"], c: 1 },
-    { p: "Para limpar vidros sem deixar manchas:", ops: ["Agua pura","Álcool isopropílico ou limpador específico","Água sanitária","Detergente neutro"], c: 1 },
-    { p: "Para remover gordura de fogão:", ops: ["Água fria","Desengordurante concentrado","Sabão em pó","Água morna"], c: 1 },
-    { p: "Frequência de limpeza de caixa d'água:", ops: ["Mensal","Semestral","Anual","A cada 2 anos"], c: 1 },
-    { p: "Para polir piso de mármore:", ops: ["Cera comum","Cristalizador específico para mármore","Água sanitária","Vinagre"], c: 1 },
-    { p: "O que é limpeza pós-obra?", ops: ["Limpeza diária","Limpeza pesada após construção ou reforma","Limpeza superficial","Manutenção"], c: 1 },
-    { p: "Produto para limpar inox sem riscar:", ops: ["Esponja de aço","Pano macio com produto específico para inox","Palha de aço","Lixa"], c: 1 },
-    { p: "Como diluir água sanitária para limpeza geral:", ops: ["Pura","1 parte em 9 de água","50% em água","Não dilui"], c: 1 },
-    { p: "Qual produto remove ferrugem de metais?", ops: ["Água sanitária","Removedor de ferrugem (ácido oxálico)","Detergente","Álcool"], c: 1 },
-    { p: "Para limpeza de sofá de tecido:", ops: ["Molhar bastante","Aspirar e usar produto específico a seco ou a vapor","Lavar na máquina","Esfregar com sabão"], c: 1 },
-    { p: "Para limpar banheiro com mofo:", ops: ["Água fria","Água sanitária ou produto anti-mofo","Detergente","Vinagre apenas"], c: 1 },
-    { p: "O que é higienização de estofado?", ops: ["Limpeza superficial","Limpeza profunda removendo ácaros e bactérias","Apenas aspirar","Perfumar"], c: 1 },
-    { p: "Técnica correta para varrer sem levantar poeira:", ops: ["Varrer rápido","Varrer devagar com vassoura úmida ou aspirador","Com ventilador ligado","Sem técnica"], c: 1 },
-    { p: "Para limpar carpete com manchas:", ops: ["Esfregar seco","Aspirar e usar removedor de manchas específico","Molhar bastante","Só aspirar"], c: 1 },
-    { p: "Para limpar ar-condicionado, o que é essencial:", ops: ["Só lavar filtro","Lavar filtro e higienizar serpentina","Apenas ligar em modo limpeza","Secar com pano"], c: 1 },
-    { p: "O que é limpeza com vapor?", ops: ["Limpeza com água quente","Limpeza usando vapor sob pressão que elimina bactérias","Limpeza com vapor químico","Aspiração"], c: 1 },
-    { p: "Para remover cheiro de mofo de ambientes:", ops: ["Apenas abrir janelas","Limpar com anti-mofo e ventilar bem","Usar perfume","Pintar sobre o mofo"], c: 1 },
-    { p: "Produto para limpar porcelanato polido:", ops: ["Água sanitária direta","Produto neutro e pano macio","Ácido muriático","Água com vinagre"], c: 1 },
-    { p: "O que é dedetização?", ops: ["Limpeza de vidros","Controle de pragas com produtos químicos","Limpeza de caixas d'água","Higienização de estofados"], c: 1 },
-    { p: "Para limpeza de fachada com pressão, usa-se:", ops: ["Mangueira comum","Lavadora de alta pressão com produto adequado","Apenas água","Vassoura"], c: 1 },
-    { p: "Como descartar produtos de limpeza corretamente:", ops: ["No lixo comum","Seguir orientações do fabricante","Na pia sempre","Jogar fora embalagem cheia"], c: 1 },
-    { p: "Para limpar piso de madeira:", ops: ["Água em abundância","Pano levemente úmido com produto específico para madeira","Água sanitária","Detergente comum"], c: 1 },
-    { p: "O que é limpeza terminal?", ops: ["Limpeza rápida","Limpeza profunda e completa de todos os ambientes","Limpeza de manutenção","Limpeza de vidros"], c: 1 },
-    { p: "Para remover adesivo de superfície:", ops: ["Arrancar com força","Acetona ou álcool com cuidado","Água quente apenas","Lixa"], c: 1 },
-    { p: "Produto correto para limpeza de piscina:", ops: ["Água sanitária comum","Cloro e algicida específicos para piscina","Sabão em pó","Detergente"], c: 1 },
-    { p: "Para limpeza de calhas:", ops: ["Não precisa limpeza","Remover folhas e lavar com água e escova","Apenas água de chuva limpa","Soprador apenas"], c: 1 },
-    { p: "O que é microrremoção de cera?", ops: ["Aplicação de cera nova","Remoção da camada antiga de cera antes de reaplicar","Polimento","Decapagem química"], c: 1 },
-  ],
-  '🏗️ Reforma': [
-    { p: "Antes de iniciar uma reforma, qual documento é necessário?", ops: ["Apenas acordo verbal","Contrato escrito e ART ou RRT se estrutural","Nota fiscal","Apenas orçamento"], c: 1 },
-    { p: "O que é ART em reformas?", ops: ["Autorização de Reforma Técnica","Anotação de Responsabilidade Técnica do engenheiro","Alvará de Reforma Temporária","Atestado de Reforma Total"], c: 1 },
-    { p: "Para demolir uma parede, primeiro deve-se:", ops: ["Usar marreta diretamente","Verificar se é parede estrutural e desligar instalações","Retirar o reboco","Molhar a parede"], c: 1 },
-    { p: "O que é parede estrutural?", ops: ["Parede decorativa","Parede que sustenta cargas da estrutura do edifício","Parede de drywall","Parede de divisão"], c: 1 },
-    { p: "Para instalar piso sobre contrapiso, a espessura mínima do contrapiso:", ops: ["1 cm","3 cm","5 cm","10 cm"], c: 1 },
-    { p: "O que é rejunte?", ops: ["Tipo de cola","Argamassa que preenche as juntas entre revestimentos","Impermeabilizante","Tipo de argamassa de assentamento"], c: 1 },
-    { p: "Cola para porcelanato pesado (acima de 60x60):", ops: ["Cola branca","AC3 ou AC4 (alta resistência)","AC1","Argamassa comum"], c: 1 },
-    { p: "O que é drywall?", ops: ["Tipo de tijolos","Sistema de parede com chapas de gesso sobre estrutura metálica","Revestimento externo","Tipo de concreto"], c: 1 },
-    { p: "Para impermeabilizar box de banheiro, usa-se:", ops: ["Apenas rejunte","Manta asfáltica ou impermeabilizante + rejunte flexível","Tinta comum","Silicone apenas"], c: 1 },
-    { p: "O que é gesso acartonado?", ops: ["Tipo de cimento","Chapa de gesso usada no drywall","Argamassa de reboco","Tipo de tinta"], c: 1 },
-    { p: "Para nivelar piso antes de assentar cerâmica:", ops: ["Não precisa nivelar","Usar argamassa de regularização","Usar areia grossa","Usar cimento puro"], c: 1 },
-    { p: "O que é reforma sem obra?", ops: ["Reforma impossível","Reforma que não altera estrutura (pintura, piso, louças)","Reforma virtual","Reforma sem material"], c: 1 },
-    { p: "Tempo de cura da argamassa de assentamento antes de pisar:", ops: ["1 hora","24 a 48 horas","1 semana","1 mês"], c: 1 },
-    { p: "Para instalar forro de gesso, usa-se:", ops: ["Pregos comuns","Arame galvanizado e estrutura metálica","Cola de contato","Parafusos no teto"], c: 1 },
-    { p: "O que é piso vinílico?", ops: ["Tipo de cerâmica","Revestimento sintético flexível de PVC","Piso de mármore","Piso de madeira"], c: 1 },
-    { p: "O que é mão de obra empreitada?", ops: ["Pagamento por hora","Contrato de execução completa por preço fixo","Pagamento diário","Trabalho voluntário"], c: 1 },
-    { p: "Para instalar porta de correr, o trilho deve ser:", ops: ["Apenas no piso","No teto e no piso ou só superior com guia inferior","Apenas no teto","Embutido na parede"], c: 1 },
-    { p: "O que é bota-fora em reforma?", ops: ["Entulho reaproveitado","Descarte legal de entulho e resíduos de obra","Material extra","Sobra de material"], c: 1 },
-    { p: "Para assentar azulejo em parede, a argamassa correta:", ops: ["Argamassa AC3","Argamassa AC1 para ambientes internos secos","Cimento puro","Cola PVA"], c: 1 },
-    { p: "O que é acabamento de porta (batente e guarnição)?", ops: ["A porta em si","Peças que cobrem a abertura e revestem o vão","Dobradiças","Fechadura"], c: 1 },
-    { p: "Ferramenta para cortar porcelanato:", ops: ["Serra circular com disco de madeira","Cortadora de porcelanato ou esmerilhadeira com disco diamantado","Martelo","Tupia"], c: 1 },
-    { p: "O que é infiltração em paredes?", ops: ["Umidade decorativa","Entrada indevida de água causando danos","Pintura especial","Tipo de revestimento"], c: 1 },
-    { p: "Para instalar bancada de mármore ou granito:", ops: ["Cola branca","Silicone neutro e suporte adequado","Argamassa comum","Apenas apoio"], c: 1 },
-    { p: "O que é pé-direito?", ops: ["Soleira da porta","Altura do piso ao teto","Largura do cômodo","Tipo de parede"], c: 1 },
-    { p: "Para que serve o selante (silicone)?", ops: ["Assentar cerâmica","Vedar juntas e encontros entre materiais diferentes","Colar azulejos","Nivelar piso"], c: 1 },
-    { p: "O que é pintura de fechamento em reforma?", ops: ["Primeira demão","Última etapa de pintura após todas as obras concluídas","Pintura estrutural","Primer"], c: 1 },
-    { p: "Para instalar rodapé de MDF:", ops: ["Pregar na parede apenas","Cola de contato e/ou pregos ou parafusos ocultos","Cola branca","Apertar contra parede"], c: 1 },
-    { p: "O que é teste de estanqueidade em banheiro?", ops: ["Verificar água quente","Verificar se a impermeabilização não vaza","Testar pressão","Checar vazão"], c: 1 },
-    { p: "Qual EPI é obrigatório durante demolição?", ops: ["Apenas óculos","Capacete, óculos, máscara e luvas","Apenas máscara","Sem necessidade"], c: 1 },
-    { p: "O que é rebaixo de teto?", ops: ["Teto mais alto","Estrutura que reduz altura do teto para embutir iluminação ou climatização","Tipo de forro","Pintura especial"], c: 1 },
-  ],
-  '🔩 Serralheria': [
-    { p: "O que é solda MIG?", ops: ["Solda manual com eletrodo revestido","Solda com arame contínuo e gás de proteção","Solda oxiacetilênica","Solda TIG"], c: 1 },
-    { p: "Para soldar alumínio, qual processo é mais indicado?", ops: ["Solda MIG comum","Solda TIG com argônio","Eletrodo revestido","Solda a ponto"], c: 1 },
-    { p: "O que é aço inoxidável?", ops: ["Aço comum","Liga de aço com cromo que resiste à corrosão","Alumínio especial","Ferro fundido"], c: 1 },
-    { p: "Ferramenta para dobrar chapas de metal:", ops: ["Esmerilhadeira","Dobradeira ou calandra","Furadeira","Marreta"], c: 1 },
-    { p: "O que é galvanização?", ops: ["Pintura metálica","Revestimento de zinco para proteger o metal da corrosão","Tipo de solda","Tratamento térmico"], c: 1 },
-    { p: "Para cortar aço grosso, usa-se:", ops: ["Serra tico-tico","Plasma ou esmerilhadeira com disco de corte","Lixa","Tupia"], c: 1 },
-    { p: "O que é eletrodo revestido?", ops: ["Fio de solda","Vareta metálica com revestimento usada na solda manual","Gás de proteção","Tipo de metal"], c: 1 },
-    { p: "EPI obrigatório na soldagem:", ops: ["Apenas luvas","Máscara de solda, luvas, avental e mangotes","Apenas óculos","Apenas avental"], c: 1 },
-    { p: "O que é chapa de aço xadrez?", ops: ["Chapa colorida","Chapa com relevo antiderrapante","Chapa mais resistente","Chapa mais leve"], c: 1 },
-    { p: "Para instalar gradil de ferro, o espaçamento máximo entre ferros:", ops: ["5 cm","11 cm (norma ABNT)","20 cm","Sem regra"], c: 1 },
-    { p: "O que é bitola de tubo metálico?", ops: ["Comprimento do tubo","Espessura da parede e diâmetro do tubo","Peso por metro","Tipo de aço"], c: 1 },
-    { p: "O que é escória na solda?", ops: ["Metal fundido","Resíduo sólido que se forma sobre o cordão de solda","Gás de proteção","Metal de adição"], c: 1 },
-    { p: "Para soldar peças finas (< 2mm), qual processo usar?", ops: ["Eletrodo revestido","Solda TIG ou MIG com fio fino","Oxiacetileno","Solda elétrica comum"], c: 1 },
-    { p: "O que é ângulo (cantoneira) em serralheria?", ops: ["Ferramenta de medição","Perfil metálico em forma de L","Tipo de solda","Tipo de parafuso"], c: 1 },
-    { p: "Para pintar ferro antes da pintura final, usa-se:", ops: ["Tinta diretamente","Primer zarcão (anticorrosivo)","Tinta PVA","Massa corrida"], c: 1 },
-    { p: "O que é tubo perfil quadrado?", ops: ["Tubo redondo","Tubo de seção quadrada","Chapa dobrada","Barra maciça"], c: 1 },
-    { p: "Ferramenta para abrir furos em metal:", ops: ["Tupia","Furadeira com broca de aço-rápido (HSS)","Serra tico-tico","Lixa"], c: 1 },
-    { p: "O que é rebite?", ops: ["Tipo de parafuso","Elemento de fixação permanente instalado a frio ou quente","Tipo de solda","Porca especial"], c: 1 },
-    { p: "Para que serve o esmeril de bancada?", ops: ["Soldar peças","Afiar ferramentas e desbastar metal","Dobrar chapas","Medir peças"], c: 1 },
-    { p: "O que é cordão de solda?", ops: ["Tipo de eletrodo","Depósito de metal fundido que une as peças","Gás de proteção","Defeito na solda"], c: 1 },
-    { p: "Diferença entre ferro e aço:", ops: ["São iguais","Aço é liga de ferro com carbono controlado","Ferro é mais resistente","Aço é mais mole"], c: 1 },
-    { p: "O que é disco de desbaste vs disco de corte?", ops: ["São iguais","Desbaste é mais espesso para remover material; corte é fino para cortar","Corte é mais espesso","Servem para polir"], c: 1 },
-    { p: "Para instalar portão de correr, o trilho deve ser:", ops: ["Apenas plástico","Perfil de aço nivelado e fixo no piso","Madeira tratada","Alumínio leve"], c: 1 },
-    { p: "O que é barra chata em serralheria?", ops: ["Tubo metálico","Perfil metálico retangular e liso (sem furo)","Perfil em L","Tubo quadrado"], c: 1 },
-    { p: "Para proteger solda da oxidação, usa-se:", ops: ["Apenas pintura","Limpeza, primer e pintura epóxi ou esmalte","Apenas verniz","Nada é necessário"], c: 1 },
-    { p: "O que é parafuso auto-atarraxante?", ops: ["Parafuso sem rosca","Parafuso que cria sua própria rosca no material","Parafuso de alumínio","Prego especial"], c: 1 },
-    { p: "Ferramenta para medir esquadro em peças metálicas:", ops: ["Trena apenas","Esquadro de aço e nível","Prumo","Compasso"], c: 1 },
-    { p: "O que é aço SAE 1020?", ops: ["Aço inoxidável","Aço carbono de baixo carbono para estruturas","Aço ferramenta","Alumínio especial"], c: 1 },
-    { p: "Para que serve a lixadeira de cinta?", ops: ["Cortar metal","Lixar e polir superfícies metálicas longas","Dobrar chapas","Furar metal"], c: 1 },
-    { p: "O que é ponto de solda?", ops: ["Solda completa","Solda rápida em pontos para fixar temporariamente antes da solda definitiva","Defeito","Tipo de eletrodo"], c: 1 },
-  ],
-  '🛋️ Montagem': [
-    { p: "Antes de montar móvel, qual o primeiro passo?", ops: ["Começar a montar","Ler o manual e separar todas as peças e ferramentas","Prender na parede","Ligar o elétrico"], c: 1 },
-    { p: "O que é bucha de parede?", ops: ["Tipo de parafuso","Peça plástica que expande na parede para fixar parafusos","Cola especial","Tipo de prego"], c: 1 },
-    { p: "Para fixar prateleira pesada em alvenaria:", ops: ["Bucha plástica simples","Bucha de metal e parafuso adequado ao peso","Cola de contato","Prego",""], c: 1 },
-    { p: "O que é parafuso philips?", ops: ["Parafuso sextavado","Parafuso com cabeça em cruz (+)","Parafuso fenda","Parafuso allen"], c: 1 },
-    { p: "Ferramenta para apertar parafusos de móveis (allen):", ops: ["Chave de fenda","Chave allen hexagonal","Martelo","Alicate"], c: 1 },
-    { p: "Para nivelar móvel no piso irregular:", ops: ["Não é necessário","Usar pés reguláveis ou calços","Apertar mais parafusos","Usar cola"], c: 1 },
-    { p: "O que é cavilha em montagem de móveis?", ops: ["Tipo de parafuso","Pino cilíndrico de madeira para encaixe e alinhamento","Cola especial","Dobradiça"], c: 1 },
-    { p: "Para fixar TV na parede, o suporte deve ser fixado:", ops: ["Só na cerâmica","Direto na alvenaria com buchas e parafusos adequados ao peso","Com cola","Com fita dupla face"], c: 1 },
-    { p: "O que é dobradiça caneco (europeia)?", ops: ["Dobradiça aparente","Dobradiça oculta ajustável para portas de armário","Dobradiça de portão","Dobradiça piano"], c: 1 },
-    { p: "Ferramenta para verificar se prateleira está nivelada:", ops: ["Trena","Nível de bolha","Esquadro","Prumo"], c: 1 },
-    { p: "Para montar guarda-roupa planejado, qual ferramenta elétrica é essencial?", ops: ["Esmerilhadeira","Furadeira ou parafusadeira elétrica","Serra circular","Lixadeira"], c: 1 },
-    { p: "O que é puxador embutido em móvel?", ops: ["Puxador aparente","Puxador sem saliência, integrado à peça","Puxador de metal","Fechadura"], c: 1 },
-    { p: "Para montar cama box com baú, o trilho deve ser:", ops: ["Qualquer trilho","Trilho telescópico adequado ao peso do colchão e usuários","Trilho de armário","Não precisa trilho"], c: 1 },
-    { p: "O que é corrediça telescópica?", ops: ["Tipo de dobradiça","Guia metálica que permite gaveta deslizar suavemente","Tipo de parafuso","Tipo de puxador"], c: 1 },
-    { p: "Para fixar espelho pesado na parede:", ops: ["Cola de espelho apenas","Suporte adequado com buchas e parafusos + cola de espelho","Fita dupla face","Prego simples"], c: 1 },
-    { p: "O que é parede de gesso (drywall) e como fixar prateleira?", ops: ["Igual a alvenaria","Usar buchas específicas para drywall (borboleta ou metálica)","Qualquer bucha","Não suporta prateleira"], c: 1 },
-    { p: "Para montar berço ou cama infantil, o que verificar primeiro?", ops: ["Cor do produto","Certificado INMETRO e segurança das peças","Preço","Marca"], c: 1 },
-    { p: "O que é tampo de vidro em mesa?", ops: ["Tipo de mesa","Superfície de vidro fixada sobre estrutura","Tipo de móvel","Vidro comum"], c: 1 },
-    { p: "Para instalar rack de TV na parede sem furar:", ops: ["Impossível","Usar suporte com tensão entre piso e teto ou móvel de apoio","Cola industrial","Parafuso mágico"], c: 1 },
-    { p: "O que fazer quando falta parafuso na montagem?", ops: ["Usar qualquer parafuso","Usar parafuso equivalente ou contatar fabricante","Colar com super bonder","Deixar sem fechar"], c: 1 },
-    { p: "Para montar escrivaninha com passagem de cabos, onde posicionar?", ops: ["Sem importância","Próxima à tomada com gestão de cabos pelo fundo ou tampa","Longe de tomadas","No meio do ambiente"], c: 1 },
-    { p: "O que é móvel flat pack?", ops: ["Móvel premium","Móvel vendido desmontado para montagem pelo cliente","Móvel importado","Móvel de madeira maciça"], c: 1 },
-    { p: "Para apertar parafuso excêntrico (minifix) de móvel:", ops: ["Chave de fenda philips","Chave de fenda comum girando no sentido horário","Chave allen","Martelo"], c: 1 },
-    { p: "O que é montagem de home office?", ops: ["Só montar mesa","Configurar mesa, cadeira ergonômica, organização e iluminação adequadas","Apenas instalar computador","Montar qualquer móvel"], c: 1 },
-    { p: "Para instalar persiana, o suporte fica:", ops: ["No vidro","No topo da janela ou parede acima dela","Na lateral","Qualquer lugar"], c: 1 },
-    { p: "O que verificar antes de furar parede para fixação?", ops: ["Nada especial","Verificar se há tubulações ou fios elétricos na parede com detector","Apenas bater e ouvir","Olhar externamente"], c: 1 },
-    { p: "Para montar cadeira ergonômica, o que regular primeiro?", ops: ["Encosto","Altura do assento em relação ao piso e mesa","Apoio de braço","Rodízios"], c: 1 },
-    { p: "O que é granito de cozinha e como instalar?", ops: ["Tipo de piso","Tampo de pedra natural fixado com silicone neutro sobre apoios","Tipo de azulejo","Material de parede"], c: 1 },
-    { p: "Para montar closet planejado em quarto pequeno, o que priorizar?", ops: ["Quantidade de peças","Aproveitamento vertical e portas de correr ou deslizantes","Cor branca apenas","Muitas gavetas"], c: 1 },
-    { p: "O que é tensionador de parede (ex. para berço ou grade)?", ops: ["Parafuso especial","Sistema que pressiona o produto entre paredes sem furar","Tipo de cola","Prego oculto"], c: 1 },
-  ],
-  '🏠 Pedreiro': [
-    { p: "Traço mais comum para argamassa de assentamento:", ops: ["1:1:1","1:2:6 (cimento:cal:areia)","1:3:1","2:1:4"], c: 1 },
-    { p: "O que é fck do concreto?", ops: ["Resistência à tração","Resistência característica à compressão","Fator de correção","Coeficiente de dilatação"], c: 1 },
-    { p: "Para que serve o chapisco?", ops: ["Acabamento final","Camada de aderência para reboco","Impermeabilização","Nivelamento"], c: 1 },
-    { p: "O que é prumo na alvenaria?", ops: ["Nível horizontal","Verticalidade da parede","Distância entre blocos","Tipo de tijolo"], c: 1 },
-    { p: "Espessura mínima do reboco interno:", ops: ["5mm","10mm","20mm","30mm"], c: 1 },
-    { p: "O que é laje nervurada?", ops: ["Laje sólida","Laje com vigotas e tavelas","Laje de madeira","Laje metálica"], c: 1 },
-    { p: "Para que serve a armadura de distribuição?", ops: ["Resistir à compressão","Distribuir esforços e controlar fissuras","Impermeabilizar","Decoração"], c: 1 },
-    { p: "O que é cura do concreto?", ops: ["Secagem rápida","Manter umidade para hidratação do cimento","Aquecimento","Vibração"], c: 1 },
-    { p: "Qual é a função da viga baldrame?", ops: ["Sustentação do telhado","Fundação superficial que recebe a alvenaria","Divisão de ambientes","Drenagem"], c: 1 },
-    { p: "Espessura padrão de junta de assentamento:", ops: ["3mm","10-12mm","20mm","30mm"], c: 1 },
-    { p: "O que é contrapiso?", ops: ["Acabamento final","Camada de regularização sobre a laje","Tipo de fundação","Revestimento decorativo"], c: 1 },
-    { p: "O que é forma no concreto?", ops: ["Tipo de mistura","Molde temporário para o concreto","Ferramenta de nivelamento","Aditivo"], c: 1 },
-    { p: "Qual NBR rege estruturas de concreto?", ops: ["NBR 5410","NBR 6118","NBR 9050","NBR 14136"], c: 1 },
-    { p: "O que é adensamento do concreto?", ops: ["Secagem rápida","Vibração para eliminar bolhas de ar","Mistura de aditivos","Cura úmida"], c: 1 },
-    { p: "Cimento mais usado em obras residenciais:", ops: ["CP I","CP II","CP III","CP IV"], c: 1 },
-    { p: "O que é graute?", ops: ["Tipo de tijolo","Concreto fluido para preencher vazios de blocos","Argamassa de rejunte","Impermeabilizante"], c: 1 },
-    { p: "Para que serve o espaçador de armadura?", ops: ["Juntar ferros","Garantir cobrimento mínimo","Nivelar concreto","Decoração"], c: 1 },
-    { p: "O que é alvenaria de vedação?", ops: ["Alvenaria estrutural","Parede que apenas divide espaços sem função estrutural","Fundação","Tipo de revestimento"], c: 1 },
-    { p: "Para que serve a régua de pedreiro?", ops: ["Medir comprimento","Nivelar e alisar argamassa em grandes superfícies","Cortar tijolos","Bater estacas"], c: 1 },
-    { p: "O que é piso cimentado queimado?", ops: ["Piso de cimento comum","Piso de concreto polido e selado com acabamento liso","Piso pintado","Piso de pedra"], c: 1 },
-    { p: "O que é cobrimento mínimo de armadura?", ops: ["Distância entre ferros","Espessura de concreto que cobre a armadura para protegê-la","Largura do ferro","Diâmetro do estribo"], c: 1 },
-    { p: "Para que serve o aditivo plastificante no concreto?", ops: ["Colorir","Melhorar trabalhabilidade sem aumentar água","Acelerar secagem","Impermeabilizar"], c: 1 },
-    { p: "O que é fundação por sapata?", ops: ["Fundação profunda","Fundação superficial de concreto que distribui carga no solo","Estaca","Tubulão"], c: 1 },
-    { p: "Para reparar fissura em parede, o procedimento correto:", ops: ["Pintar por cima","Abrir, limpar, aplicar selante ou argamassa e pintar","Colar com cola","Ignorar"], c: 1 },
-    { p: "O que é alinhamento de fiadas?", ops: ["Pintar as fiadas","Manter tijolos em linhas horizontais e verticais corretas","Escolher cor do tijolo","Medir o pé direito"], c: 1 },
-    { p: "Para que serve a colher de pedreiro?", ops: ["Medir","Aplicar e alisar argamassa","Cortar tijolos","Nivelar piso"], c: 1 },
-    { p: "O que é emboço?", ops: ["Camada final de reboco","Camada base de reboco grosso sobre chapisco","Tipo de tinta","Revestimento cerâmico"], c: 1 },
-    { p: "Para que serve o retardador de pega no concreto?", ops: ["Acelerar secagem","Retardar o início da prise para peças grandes","Colorir","Impermeabilizar"], c: 1 },
-    { p: "O que é bloco de concreto celular?", ops: ["Bloco normal","Bloco leve com células de ar para melhor isolamento","Bloco de argila","Bloco de gesso"], c: 1 },
-    { p: "Resistência mínima do concreto para lajes residenciais:", ops: ["10 MPa","20 MPa","30 MPa","5 MPa"], c: 1 },
-  ],
-  '🛠️ Carpinteiro': [
-    { p: "Madeira mais resistente à umidade para uso externo:", ops: ["Pinho","Eucalipto tratado ou cumaru","MDF","Compensado"], c: 1 },
-    { p: "O que é MDF?", ops: ["Madeira maciça","Medium Density Fiberboard","Tipo de compensado","Madeira de reflorestamento"], c: 1 },
-    { p: "Ferramenta para fazer cortes curvos em madeira:", ops: ["Serra circular","Serra tico-tico","Serra de fita","Plaina"], c: 1 },
-    { p: "O que é lixar a favor do fio?", ops: ["Lixa grossa sempre","Lixar na direção das fibras","Lixar em círculos","Lixar contra as fibras"], c: 1 },
-    { p: "Para instalar piso de madeira flutuante:", ops: ["Cola em toda área","Sistema de encaixe sem cola","Pregos","Parafusos"], c: 1 },
-    { p: "O que é chanfro?", ops: ["Tipo de prego","Corte em ângulo na borda da madeira","Tipo de encaixe","Ferramenta"], c: 1 },
-    { p: "Umidade ideal da madeira para carpintaria:", ops: ["5-8%","10-14%","20-25%","30%"], c: 1 },
-    { p: "Para evitar que parafuso rache a madeira:", ops: ["Usar martelo","Fazer furo-guia antes","Não usar parafuso","Molhar a madeira"], c: 1 },
-    { p: "O que é meia esquadria?", ops: ["Corte de 45° para unir peças em canto","Tipo de madeira","Medida padrão","Ferramenta"], c: 0 },
-    { p: "Ferramenta para alisar e nivelar madeira:", ops: ["Serra circular","Plaina manual ou elétrica","Furadeira","Lixadeira"], c: 1 },
-    { p: "Para que serve a tuppia (tupia)?", ops: ["Serrar madeira","Fresar perfis e rebaixos na madeira","Lixar superfícies","Pregar pregos"], c: 1 },
-    { p: "O que é encaixe macho e fêmea?", ops: ["Tipo de parafuso","Sistema onde uma parte entra na outra","Tipo de cola","Ferramenta"], c: 1 },
-    { p: "Qual cola é usada para madeira?", ops: ["Cola epóxi apenas","Cola PVA ou cola branca para madeira","Silicone","Super bonder"], c: 1 },
-    { p: "O que é sarrafo?", ops: ["Tipo de compensado","Peça de madeira serrada de seção retangular estreita","MDF","Madeira roliça"], c: 1 },
-    { p: "Para instalar assoalho de madeira maciça:", ops: ["Cola somente","Prego oblíquo e cola específica para madeira","Parafuso aparente","Apenas encaixe"], c: 1 },
-    { p: "O que é caibro no telhado?", ops: ["Tipo de telha","Peça de madeira inclinada que apoia as ripas","Cumeeira","Mão francesa"], c: 1 },
-    { p: "Para que serve a ripa no telhado?", ops: ["Sustentação","Apoio das telhas sobre os caibros","Impermeabilização","Isolamento"], c: 1 },
-    { p: "O que é cumeeira?", ops: ["Calha de telhado","Peça no ponto mais alto do telhado onde as águas se encontram","Tipo de telha","Madeiramento lateral"], c: 1 },
-    { p: "O que é vigas de madeira tratada?", ops: ["Madeira comum","Madeira imunizada contra cupins, fungos e umidade","MDF especial","Madeira pintada"], c: 1 },
-    { p: "Ferramenta para medir ângulos em carpintaria:", ops: ["Trena","Esquadro e transferidor","Nível","Prumo"], c: 1 },
-    { p: "Para que serve o caixilho de janela?", ops: ["Decoração","Estrutura que emoldura e suporta o vidro da janela","Tipo de vidro","Fechadura"], c: 1 },
-    { p: "O que é lambri de madeira?", ops: ["Tipo de prego","Revestimento de parede ou teto em tábuas de madeira","Tipo de cola","Ferramenta"], c: 1 },
-    { p: "Para instalar deck de madeira externo:", ops: ["Madeira comum sem tratamento","Madeira tratada, fixada com parafusos inox e estrutura elevada","Madeira colada","MDF externo"], c: 1 },
-    { p: "O que é verniz marítimo?", ops: ["Verniz comum","Verniz de alta resistência à água e UV para madeira externa","Tinta para madeira","Impermeabilizante"], c: 1 },
-    { p: "Para serrar madeira com corte reto e longo:", ops: ["Serra tico-tico","Serra circular com guia","Serra manual","Esmerilhadeira"], c: 1 },
-    { p: "O que é madeira de lei?", ops: ["Madeira certificada","Madeira nativa densa e durável de áreas florestais","MDF premium","Madeira sintética"], c: 1 },
-    { p: "Para que serve o cachorro de telhado (rincão)?", ops: ["Ornamentação","Peça que forma o encontro entre duas águas do telhado","Calha","Tipo de cumeeira"], c: 1 },
-    { p: "O que é madeira serrada úmida?", ops: ["Madeira de melhor qualidade","Madeira recém-serrada com alta umidade que pode empenar","Madeira tratada","MDF molhado"], c: 1 },
-    { p: "Para fixar rodapé de madeira em parede:", ops: ["Cola branca apenas","Cola de contato e pregos sem cabeça (ocultos)","Parafusos aparentes","Apenas apertar"], c: 1 },
-    { p: "O que é acabamento em V nas tábuas de revestimento?", ops: ["Pintura especial","Chanfro nas bordas que cria efeito visual de junta em V","Tipo de madeira","Ferramenta especial"], c: 1 },
-  ],
-  '🌿 Jardinagem': [
-    { p: "Para que serve a adubação nitrogenada?", ops: ["Floração","Crescimento de folhas e partes verdes","Enraizamento","Frutificação"], c: 1 },
-    { p: "O que é pH do solo?", ops: ["Quantidade de água","Medida de acidez ou basicidade do solo","Temperatura do solo","Nível de nutrientes"], c: 1 },
-    { p: "Para gramado bonito, a frequência ideal de corte:", ops: ["Anual","Quando atingir 5-8 cm de altura (quinzenal ou semanal)","Mensal","Diária"], c: 1 },
-    { p: "O que é poda de formação?", ops: ["Cortar galhos secos","Moldar a planta ainda jovem para crescer na forma desejada","Podar todas as folhas","Cortar raízes"], c: 1 },
-    { p: "Para transplantar planta, o que fazer primeiro?", ops: ["Regar muito antes","Regar 24h antes e preparar o buraco novo com terra e adubo","Não regar","Tirar todas as folhas"], c: 1 },
-    { p: "O que é substrato?", ops: ["Tipo de adubo","Mistura de materiais onde a planta cresce em vaso","Pesticida","Tipo de irrigação"], c: 1 },
-    { p: "Para que serve a drenagem no vaso?", ops: ["Decoração","Evitar encharcamento da raiz e podridão","Nutrir a planta","Fixar a planta"], c: 1 },
-    { p: "O que é composto orgânico?", ops: ["Adubo químico","Material vegetal e animal decomposto que nutre o solo","Pesticida natural","Tipo de substrato"], c: 1 },
-    { p: "Para plantar grama, qual a melhor época no Brasil?", ops: ["Inverno (seco)","Início das chuvas (primavera/verão)","Qualquer época","Outono"], c: 1 },
-    { p: "O que é poda drástica?", ops: ["Poda leve","Corte severo da planta para renovação ou controle de tamanho","Tirar folhas amarelas","Podar raízes"], c: 1 },
-    { p: "Para que serve o calcário no jardim?", ops: ["Fertilizar","Corrigir acidez do solo (elevar pH)","Matar pragas","Reter umidade"], c: 1 },
-    { p: "O que é irrigação por gotejamento?", ops: ["Irrigação por aspersão","Sistema que libera água lentamente direto na raiz","Rega manual","Irrigação por inundação"], c: 1 },
-    { p: "Para eliminar ervas daninhas sem agrotóxico:", ops: ["Deixar crescer","Capinar manualmente ou usar cobertura morta (mulch)","Usar sal","Cortar rente ao solo"], c: 1 },
-    { p: "O que é cobertura morta (mulch)?", ops: ["Plástico no jardim","Camada de material orgânico sobre o solo para reter umidade","Tipo de grama","Adubo líquido"], c: 1 },
-    { p: "Para que serve o NPK no adubo?", ops: ["Pesticida","Nitrogênio, Fósforo e Potássio — macronutrientes principais","Fungicida","Substrato"], c: 1 },
-    { p: "O que é planta suculenta?", ops: ["Planta aquática","Planta que armazena água nos tecidos (ex: cacto)","Planta ornamental","Planta frutífera"], c: 1 },
-    { p: "Para que serve a adubação fosfatada?", ops: ["Crescimento foliar","Enraizamento e floração","Cor verde","Resistência a pragas"], c: 1 },
-    { p: "O que é pulgão e como combater?", ops: ["Fungo do solo","Inseto sugador combatido com inseticida ou nim","Tipo de minhoca","Doença foliar"], c: 1 },
-    { p: "Para plantas de sol direto, quantas horas de luz são ideais?", ops: ["1-2 horas","4-6 horas mínimo","Apenas luz indireta","12 horas ou mais"], c: 1 },
-    { p: "O que é paisagismo?", ops: ["Apenas plantar flores","Arte de planejar e criar ambientes externos harmoniosos","Cortar grama","Irrigar jardim"], c: 1 },
-    { p: "Para que serve a tesoura de poda?", ops: ["Cortar raízes grossas","Cortar galhos finos e flores secas com precisão","Cortar grama","Fazer buracos"], c: 1 },
-    { p: "O que causa folhas amarelas em planta?", ops: ["Excesso de luz","Pode ser falta de nutrientes, excesso/falta de água ou pragas","Temperatura alta","Vento forte"], c: 1 },
-    { p: "Para jardim vertical, o substrato deve ser:", ops: ["Terra comum pesada","Leve (fibra de coco, perlita) para não sobrecarregar a estrutura","Areia pura","Argila"], c: 1 },
-    { p: "O que é escarificação do gramado?", ops: ["Adubação","Remoção do feltro morto entre os fios de grama","Irrigação intensa","Corte rente ao solo"], c: 1 },
-    { p: "Para que serve o fungicida no jardim?", ops: ["Matar insetos","Combater doenças fúngicas como mofo e míldio","Fertilizar","Repelir animais"], c: 1 },
-    { p: "O que é bordadura no paisagismo?", ops: ["Tipo de planta","Elemento que delimita canteiros e jardins","Tipo de adubo","Ferramenta"], c: 1 },
-    { p: "Para plantar em solo argiloso compactado:", ops: ["Irrigar muito","Adicionar areia grossa e matéria orgânica para melhorar drenagem","Adicionar mais argila","Não plantar"], c: 1 },
-    { p: "O que é enxertia?", ops: ["Tipo de poda","União de partes de duas plantas para criar uma nova planta","Tipo de adubo","Irrigação especial"], c: 1 },
-    { p: "Para que serve o aerador de gramado?", ops: ["Irrigar","Perfurar o solo para melhorar infiltração de água e ar nas raízes","Cortar grama","Fertilizar"], c: 1 },
-    { p: "O que é jardim xerófito?", ops: ["Jardim aquático","Jardim com plantas adaptadas à seca e baixo consumo de água","Jardim tropical","Jardim de sombra"], c: 1 },
-  ],
-  '🚿 Hidráulica': [
-    { p: "O que é pressão de trabalho em instalações hidráulicas?", ops: ["Pressão máxima do reservatório","Pressão operacional normal do sistema","Pressão de teste","Pressão de pico"], c: 1 },
-    { p: "NBR que rege instalações de água fria:", ops: ["NBR 5410","NBR 5626","NBR 6118","NBR 9050"], c: 1 },
-    { p: "Para que serve o vaso de expansão em sistema de água quente?", ops: ["Armazenar água fria","Absorver variação de volume da água aquecida","Aumentar pressão","Filtrar água"], c: 1 },
-    { p: "O que é retorno de água quente?", ops: ["Água fria retornando","Sistema que mantém água quente disponível imediatamente nos pontos de uso","Aquecimento solar","Bomba de recalque"], c: 1 },
-    { p: "Para bomba centrífuga, o que é NPSH?", ops: ["Norma de instalação","Altura líquida positiva de sucção que evita cavitação","Tipo de impelidor","Pressão de saída"], c: 1 },
-    { p: "O que é cavitação em bombas?", ops: ["Tipo de manutenção","Formação de bolhas de vapor que danifica a bomba","Tipo de bomba","Ruído normal"], c: 1 },
-    { p: "Para sistema de recalque, a bomba fica:", ops: ["No reservatório superior","Na saída da água","Entre o reservatório inferior e o superior","No ponto de uso"], c: 2 },
-    { p: "O que é hidrômetro?", ops: ["Medidor de pressão","Medidor de volume de água consumida","Válvula de pressão","Filtro de água"], c: 1 },
-    { p: "Para instalação de chuveiro elétrico, a bitola do fio é:", ops: ["1,5 mm²","2,5 mm²","4,0 mm²","6,0 mm²"], c: 2 },
-    { p: "O que é válvula de segurança e alívio?", ops: ["Válvula comum","Dispositivo que libera pressão excessiva protegendo o sistema","Válvula de retenção","Válvula gaveta"], c: 1 },
-    { p: "Para que serve o filtro de água no sistema?", ops: ["Regular pressão","Remover partículas e impurezas da água","Aquecimento","Medir consumo"], c: 1 },
-    { p: "O que é sistema de abastecimento direto?", ops: ["Com reservatório","Água da concessionária direto nos pontos sem reservatório","Com bomba","Com poço"], c: 1 },
-    { p: "Para instalar aquecedor solar, onde posicioná-lo?", ops: ["Norte magnético","Sul, em local sem sombra e inclinado conforme latitude local","Norte verdadeiro","Leste"], c: 1 },
-    { p: "O que é tubulação de retorno em chuveiro (evitar legionela)?", ops: ["Tubo de esgoto","Tubulação que mantém água quente circulando evitando proliferação bacteriana","Tubo de ventilação","Dreno"], c: 1 },
-    { p: "Pressão mínima recomendada nos pontos de uso residencial:", ops: ["0,5 m.c.a.","1,0 m.c.a.","5,0 m.c.a.","10 m.c.a."], c: 1 },
-    { p: "Para que serve o separador de gordura em restaurantes?", ops: ["Filtrar água","Reter gordura antes da rede pública de esgoto","Aumentar pressão","Medir consumo"], c: 1 },
-    { p: "O que é água pluvial?", ops: ["Água de poço","Água da chuva que pode ser captada e reutilizada","Água tratada","Água de rio"], c: 1 },
-    { p: "Para que serve a válvula de pé com crivo?", ops: ["Controlar pressão","Manter a escorva na bomba e impedir retorno","Regular vazão","Filtrar água"], c: 1 },
-    { p: "O que é sistema de pressurização?", ops: ["Reservatório elevado","Conjunto moto-bomba que mantém pressão constante sem reservatório elevado","Filtro de pressão","Válvula especial"], c: 1 },
-    { p: "Para instalação de torneira com sensor, a alimentação é:", ops: ["Apenas hidráulica","Hidráulica + elétrica (bateria ou 110/220V)","Apenas elétrica","Solar"], c: 1 },
-    { p: "O que é tempo de detenção em caixa de gordura?", ops: ["Tempo de limpeza","Tempo que a água fica na caixa para separação da gordura","Pressão de operação","Volume da caixa"], c: 1 },
-    { p: "Para que serve a bomba dosadora?", ops: ["Elevar água","Injetar produtos químicos em dosagem controlada no sistema","Filtrar água","Medir consumo"], c: 1 },
-    { p: "O que é abastecimento por gravidade?", ops: ["Com bomba","Sistema onde a água desce do reservatório elevado por gravidade","Sistema pressurizado","Abastecimento direto"], c: 1 },
-    { p: "Para que serve o decantador de água?", ops: ["Pressurizar","Remover partículas por sedimentação antes da filtragem","Aquecer água","Medir vazão"], c: 1 },
-    { p: "O que é tubo de queda?", ops: ["Tubo horizontal","Tubo vertical que conduz esgoto dos andares superiores","Tubo de água fria","Tubo de ventilação"], c: 1 },
-    { p: "Para dimensionar reservatório residencial, a reserva é:", ops: ["100 litros por pessoa","200 litros por pessoa por dia (consumo + reserva)","50 litros","500 litros total"], c: 1 },
-    { p: "O que é perda de carga em tubulações?", ops: ["Fuga de água","Queda de pressão devido à fricção do fluido nas paredes do tubo","Entupimento","Redução de vazão"], c: 1 },
-    { p: "Para que serve a válvula de bóia?", ops: ["Regular pressão","Controlar nível de água no reservatório cortando o fluxo quando cheio","Filtrar","Medir"], c: 1 },
-    { p: "O que é ramal predial de água?", ops: ["Rede pública","Tubulação que conecta a rede pública ao sistema interno do imóvel","Reservatório","Hidrômetro"], c: 1 },
-    { p: "Para dimensionar bomba de recalque, considera-se:", ops: ["Apenas vazão","Vazão, altura manométrica total e rendimento da bomba","Apenas pressão","Diâmetro do tubo"], c: 1 },
-  ],
-  '🔑 Chaveiro': [
-    { p: "O que é cilindro de segurança?", ops: ["Chave comum","Mecanismo interno da fechadura onde a chave opera","Tipo de cadeado","Trinco automático"], c: 1 },
-    { p: "Para abrir porta com chave perdida, qual técnica usar?", ops: ["Arrombar sempre","Pickear o cilindro ou usar chave mestra técnica se autorizado","Quebrar janela","Usar fio de arame"], c: 1 },
-    { p: "O que é chave tetra?", ops: ["Chave normal com 4 dentes","Chave de seção quadrada com 4 lados para cilindros de alta segurança","Chave para cofre","Chave magnética"], c: 1 },
-    { p: "Para duplicar chave, o que é necessário?", ops: ["Apenas a chave original","Chave original e máquina copiadora de chaves com blank adequado","Apenas o blank","Impressão da chave"], c: 1 },
-    { p: "O que é fechadura multiponto?", ops: ["Fechadura com múltiplas chaves","Fechadura que trava em vários pontos da porta simultaneamente","Fechadura digital com multi-senha","Fechadura com dois cilindros"], c: 1 },
-    { p: "Para que serve o bumping de chaves?", ops: ["Técnica para duplicar chaves","Técnica de abertura de cilindros por impacto — usada por técnicos", "Tipo de chave","Tipo de fechadura"], c: 1 },
-    { p: "O que é chave canivete (dobrável)?", ops: ["Chave com lâmina cortante","Chave que se dobra para dentro do cabo como canivete","Chave para painel elétrico","Chave multiplex"], c: 1 },
-    { p: "Para instalar fechadura em porta de madeira, as ferramentas necessárias:", ops: ["Apenas martelo","Serra copo, formão e furadeira","Esmerilhadeira","Parafusadeira apenas"], c: 1 },
-    { p: "O que é código de chave?", ops: ["Cor da chave","Sequência de números que representa os cortes da chave para reprodução","Número de série","Tipo do metal"], c: 1 },
-    { p: "Para que serve o cilindro de pinos?", ops: ["Decoração","Mecanismo com pinos de altura variável que permitem apenas a chave correta girar","Travar trinco","Acionar alarme"], c: 1 },
-    { p: "O que é fechadura elétrica?", ops: ["Fechadura digital apenas","Fechadura acionada por corrente elétrica (campainha ou controle)","Fechadura com bateria","Qualquer fechadura com energia"], c: 1 },
-    { p: "Para que serve o contra-espelho da fechadura?", ops: ["Estética apenas","Cobre e protege o furo da fechadura no lado oposto à maçaneta","Trava adicional","Parte do cilindro"], c: 1 },
-    { p: "O que é chave mestra?", ops: ["Chave de segurança","Chave que abre múltiplos cilindros de um mesmo sistema","Chave duplicada","Chave original"], c: 1 },
-    { p: "Para instalar fechadura em porta de vidro temperado:", ops: ["Furar o vidro com broca comum","Usar ferragens específicas para vidro com furo diamantado ou perfil de alumínio","Não é possível","Colar a fechadura"], c: 1 },
-    { p: "O que é picking (picagem) de cilindro?", ops: ["Cortar a fechadura","Técnica de abertura manipulando os pinos sem a chave original","Copiar chave","Arrombamento"], c: 1 },
-    { p: "Para que serve o fechamento automático de porta?", ops: ["Decoração","Mola hidráulica que fecha a porta automaticamente após abertura","Trava extra","Sensor de presença"], c: 1 },
-    { p: "O que é fechadura tipo 9 vias?", ops: ["Fechadura com 9 chaves","Fechadura de padrão com 9 combinações possíveis no cilindro","Fechadura tripla","Cadeado especial"], c: 1 },
-    { p: "Para abrir cofre com segredo esquecido:", ops: ["Arrombar","Contatar fabricante ou técnico especializado em cofres","Usar broca sempre","Aquecer com fogo"], c: 1 },
-    { p: "O que é chave Abloy (disco rotativo)?", ops: ["Chave comum","Chave de alta segurança com discos rotativos em vez de pinos","Chave eletrônica","Chave para portão"], c: 1 },
-    { p: "Para que serve o retentor de porta?", ops: ["Fechar porta automaticamente","Manter porta aberta em posição fixa","Travar a fechadura","Alarme de abertura"], c: 1 },
-    { p: "O que é fechadura biométrica?", ops: ["Fechadura digital com senha","Fechadura que identifica impressão digital para abertura","Fechadura com cartão","Fechadura eletrônica simples"], c: 1 },
-    { p: "Para duplicar chave codificada (chip), é necessário:", ops: ["Apenas copiadora simples","Equipamento específico para programação de transponders e chip","Serrador manual","Apenas o blank correto"], c: 1 },
-    { p: "O que é palheta de fechadura?", ops: ["Tipo de chave","Peça metálica interna que o pino da chave move para acionar o mecanismo","Tipo de cilindro","Chave reserva"], c: 1 },
-    { p: "Para reforçar segurança de porta, além da fechadura:", ops: ["Apenas pintura","Instalar trava de segurança adicional, reforço de batente e espião","Apenas alarme","Apenas câmera"], c: 1 },
-    { p: "O que é cadeado de alta segurança?", ops: ["Cadeado comum grande","Cadeado com haspe endurecido, cilindro de pinos de alta resistência e corpo reforçado","Cadeado eletrônico","Qualquer cadeado com segredo"], c: 1 },
-    { p: "Para instalar ferrolho de sobrepor:", ops: ["Apenas apertar na porta","Fixar com parafusos no perfil correto da porta e portal","Soldar","Colar com epóxi"], c: 1 },
-    { p: "O que é espelho de fechadura?", ops: ["Espelho decorativo","Peça que cobre e protege o furo da fechadura na face da porta","Parte interna do cilindro","Chave espelhada"], c: 1 },
-    { p: "Para que serve a escova de acionamento em porta automática?", ops: ["Decoração","Ativa o sensor/motor quando a pessoa entra na zona de detecção","Fecha a porta","Alarme de intrusão"], c: 1 },
-    { p: "O que é blank de chave?", ops: ["Chave acabada","Chave sem cortes, usada como base para duplicação","Tipo de cilindro","Chave mestra"], c: 1 },
-    { p: "Para lubrificar cilindro de fechadura, usa-se:", ops: ["Óleo de cozinha","Grafite em pó ou spray específico para cilindros","WD-40 em excesso","Vaselina sólida"], c: 1 },
-  ],
-  '🏊 Piscinas': [
-    { p: "pH ideal da água de piscina:", ops: ["5,5 a 6,0","7,2 a 7,6","8,0 a 8,5","6,0 a 6,5"], c: 1 },
-    { p: "O que é cloro livre residual ideal em piscina?", ops: ["0,1 a 0,3 ppm","1,0 a 3,0 ppm","5,0 a 7,0 ppm","Acima de 10 ppm"], c: 1 },
-    { p: "Para que serve o algicida?", ops: ["Cloro da água","Produto que elimina e previne algas","Clarificante","Floculante"], c: 1 },
-    { p: "O que é coagulante/floculante?", ops: ["Tipo de cloro","Produto que agrega partículas finas para remoção pelo filtro","Algicida","Estabilizador"], c: 1 },
-    { p: "Frequência mínima de limpeza do filtro de areia:", ops: ["Anual","Quando a pressão aumentar 0,5 bar acima do normal","Mensalmente","Semanalmente"], c: 1 },
-    { p: "O que é retrolavagem do filtro?", ops: ["Lavagem química","Inversão do fluxo de água para limpar a areia do filtro","Troca de areia","Limpeza manual"], c: 1 },
-    { p: "Para que serve o skimmer?", ops: ["Aquecimento","Coletar folhas e detritos da superfície da água","Filtrar água","Clorar água"], c: 1 },
-    { p: "O que é alcalinidade total da água?", ops: ["Sinônimo de pH","Capacidade tampão que estabiliza variações de pH","Quantidade de cloro","Dureza da água"], c: 1 },
-    { p: "Alcalinidade ideal em piscinas:", ops: ["10-30 ppm","80-120 ppm","200-300 ppm","Acima de 400 ppm"], c: 1 },
-    { p: "Para que serve o estabilizador (ácido cianúrico)?", ops: ["Aumentar pH","Proteger o cloro da degradação pelo sol","Matar algas","Clarificar a água"], c: 1 },
-    { p: "O que é cloração de choque?", ops: ["Cloração normal","Aplicação de cloro em alta dose para eliminar contaminação intensa","Troca de água","Aplicação de algicida"], c: 1 },
-    { p: "Para construir piscina em alvenaria, qual impermeabilizante usar?", ops: ["Tinta comum","Argamassa polimérica + manta ou impermeabilizante rígido bicomponente","Silicone","Tinta epóxi apenas"], c: 1 },
-    { p: "O que é dureza da água (cálcio)?", ops: ["Quantidade de cloro","Concentração de sais de cálcio e magnésio","pH da água","Temperatura"], c: 1 },
-    { p: "Dureza de cálcio ideal em piscina:", ops: ["50-100 ppm","200-400 ppm","500-600 ppm","Acima de 700 ppm"], c: 1 },
-    { p: "Para que serve a bomba de piscina?", ops: ["Clorar a água","Circular a água pelo sistema de filtragem","Aquecer a água","Drenar a piscina"], c: 1 },
-    { p: "Tempo mínimo de filtração diária recomendado:", ops: ["1-2 horas","6-8 horas","Apenas à noite","12 horas sempre"], c: 1 },
-    { p: "O que causa água verde na piscina?", ops: ["Excesso de cloro","Proliferação de algas por falta de cloro ou pH incorreto","Temperatura alta","Chuva"], c: 1 },
-    { p: "Para tratar água verde, primeiro:", ops: ["Trocar toda a água","Ajustar pH, fazer cloração de choque e escovar paredes","Apenas jogar cloro","Trocar areia do filtro"], c: 1 },
-    { p: "O que é olho de boi (retorno) da piscina?", ops: ["Tipo de lâmpada","Bocal de retorno de água filtrada para a piscina","Tipo de skimmer","Dreno de fundo"], c: 1 },
-    { p: "Para que serve o dreno de fundo?", ops: ["Apenas escoar água","Contribuir na circulação e permitir limpeza do fundo","Clorar","Aquecimento"], c: 1 },
-    { p: "O que é água turva em piscina?", ops: ["Água verde","Água com baixa visibilidade por partículas em suspensão","Água com cloro alto","Água fria"], c: 1 },
-    { p: "Para tratar água turva:", ops: ["Apenas jogar cloro","Checar pH, aplicar floculante e limpar filtro","Trocar a água","Jogar areia"], c: 1 },
-    { p: "Temperatura ideal de areia do filtro a trocar:", ops: ["Nunca trocar","A cada 3-5 anos ou quando degradada","Anualmente","A cada 6 meses"], c: 1 },
-    { p: "O que é clorador automático (dosador)?", ops: ["Bomba de circulação","Equipamento que libera cloro de forma contínua e controlada","Tipo de filtro","Aquecedor"], c: 1 },
-    { p: "Para aquecer piscina de forma econômica:", ops: ["Resistência elétrica","Aquecedor solar ou bomba de calor (heat pump)","Gás sempre","Não é possível economizar"], c: 1 },
-    { p: "O que é eflorescência em borda de piscina?", ops: ["Tipo de fungo","Manchas brancas de sais minerais que migram pela alvenaria","Tipo de alga","Dano elétrico"], c: 1 },
-    { p: "Para limpar borda e azulejos de piscina:", ops: ["Água sanitária pura","Produto específico para piscina ou ácido muriático diluído com cuidado","Cloro puro","Detergente comum"], c: 1 },
-    { p: "O que é piscina de fibra de vidro?", ops: ["Piscina de alvenaria revestida","Piscina moldada em resina de poliéster reforçada com fibra de vidro","Piscina de vinil","Piscina de polietileno"], c: 1 },
-    { p: "Para que serve o ionizador em piscinas?", ops: ["Filtrar água","Liberar íons de cobre/prata que reduzem uso de cloro","Aquecer","Circular água"], c: 1 },
-    { p: "O que é cloro combinado (cloraminas)?", ops: ["Cloro livre","Cloro reagido com amônia que causa cheiro e irrita olhos","Hipoclorito","Cloro granulado"], c: 1 },
-  ],
-  '🔥 Aquecedor / Gás': [
-    { p: "Qual norma regula instalações de gás em edificações?", ops: ["NBR 5410","NBR 13523","NBR 6118","NBR 5626"], c: 1 },
-    { p: "O que é GLP (Gás Liquefeito de Petróleo)?", ops: ["Gás natural","Mistura de propano e butano usada em botijões residenciais","Gás de cozinha industrial","Metano"], c: 1 },
-    { p: "Para detectar vazamento de gás, usa-se:", ops: ["Fogo para localizar","Água com sabão ou detector eletrônico de gás","Cheiro apenas","Pressão do manômetro"], c: 1 },
-    { p: "Pressão de trabalho do GLP na saída do regulador:", ops: ["0,28 kPa","2,80 kPa (28 mbar)","28 kPa","280 kPa"], c: 1 },
-    { p: "O que é aquecedor de passagem (a gás)?", ops: ["Boiler de acumulação","Aquecedor que esquenta água instantaneamente durante o uso","Aquecedor elétrico","Aquecedor solar"], c: 1 },
-    { p: "Para instalar aquecedor a gás, onde deve ficar o exaustor?", ops: ["Dentro do banheiro","Em local ventilado, nunca em área fechada sem ventilação adequada","No quarto","Qualquer local"], c: 1 },
-    { p: "O que é regulador de pressão de primeiro estágio?", ops: ["Regulador residencial","Regula pressão alta do cilindro para média pressão","Válvula de segurança","Medidor de gás"], c: 1 },
-    { p: "Para que serve a válvula de segurança no aquecedor?", ops: ["Regular temperatura","Aliviar pressão ou cortar gás em caso de falha","Aumentar eficiência","Economizar gás"], c: 1 },
-    { p: "O que é gás natural (GN)?", ops: ["GLP em estado gasoso","Metano distribuído por rede de dutos","Propano puro","Butano puro"], c: 1 },
-    { p: "Diferença de pressão entre GLP e GN na rede:", ops: ["São iguais","GN tem pressão e densidade diferentes do GLP — requer regulador diferente","GN é mais pressurizado","GLP tem mais pressão sempre"], c: 1 },
-    { p: "Para que serve o registro de gás junto ao equipamento?", ops: ["Controlar temperatura","Cortar o fornecimento de gás ao equipamento na manutenção","Regular pressão","Medir consumo"], c: 1 },
-    { p: "O que é boiler de acumulação?", ops: ["Aquecedor de passagem","Reservatório que mantém água aquecida em volume pré-definido","Aquecedor solar apenas","Bomba de calor"], c: 1 },
-    { p: "Para instalação de aquecedor central, o tubo deve ser:", ops: ["PVC comum","Cobre ou aço para condução de gás, aprovado por norma","PVC de gás","Qualquer tubo"], c: 1 },
-    { p: "O que é EPI essencial ao trabalhar com gás?", ops: ["Apenas luvas","Luvas, óculos, extintor próximo e ambiente ventilado","Apenas máscara","Sem necessidade"], c: 1 },
-    { p: "Para que serve o piloto do aquecedor?", ops: ["Acender automaticamente","Chama contínua pequena que acende o queimador principal quando acionado","Segurança elétrica","Medir temperatura"], c: 1 },
-    { p: "O que causa cheiro de gás sem vazamento visível?", ops: ["Normal em aquecedores","Pode ser microabertura em conexões ou tubo — testar com água e sabão","Apenas odorífico do gás","Equipamento novo"], c: 1 },
-    { p: "Para dimensionar aquecedor central residencial, considera-se:", ops: ["Apenas tamanho da casa","Número de pontos, vazão simultânea e temperatura de saída desejada","Apenas voltagem","Apenas marca"], c: 1 },
-    { p: "O que é combustão completa?", ops: ["Combustão com fumaça preta","Queima total do gás produzindo CO2 e H2O com chama azul","Combustão com CO","Combustão sem chama"], c: 1 },
-    { p: "Para que serve o termostato no aquecedor?", ops: ["Controlar pressão","Regular e manter a temperatura da água aquecida","Controlar gás","Acender piloto"], c: 1 },
-    { p: "O que é CO (monóxido de carbono) e seu risco:", ops: ["Gás inofensivo","Gás tóxico inodoro produzido em combustão incompleta que pode ser fatal","CO2 normal","Gás de cozinha"], c: 1 },
-    { p: "Ventilação mínima para ambiente com aquecedor a gás:", ops: ["Sem necessidade","Abertura permanente de no mínimo 100 cm² para entrada e saída de ar","Janela fechada","Apenas exaustor elétrico"], c: 1 },
-    { p: "Para que serve o sensor de falta de chama (termopar)?", ops: ["Medir temperatura da água","Cortar o gás se a chama se apagar por segurança","Acender o piloto","Controlar pressão"], c: 1 },
-    { p: "O que é aquecedor a gás tipo balão?", ops: ["Botijão de gás","Aquecedor de ambiente que aquece por radiação","Aquecedor de passagem","Boiler"], c: 1 },
-    { p: "Para testar estanqueidade de instalação de gás:", ops: ["Usar fogo para localizar","Pressurizar com nitrogênio ou ar e verificar com manômetro e água com sabão","Apenas cheirar","Ligar os equipamentos"], c: 1 },
-    { p: "O que é central de gás em condomínio?", ops: ["Medidor individual","Sistema coletivo com armazenamento de GLP e distribuição para unidades","Rede de GN","Aquecedor central"], c: 1 },
-    { p: "Para que serve o estabilizador de chama no queimador?", ops: ["Aumentar chama","Distribuir uniformemente o gás para combustão eficiente e estável","Apagar chama","Medir consumo"], c: 1 },
-    { p: "O que é aquecimento de piscina a gás?", ops: ["Inviável","Trocador de calor a gás que aquece a água da piscina de forma rápida","Apenas solar","Apenas elétrico"], c: 1 },
-    { p: "Para que serve o redutor de pressão domiciliar?", ops: ["Medir consumo","Reduzir pressão da rede para nível seguro de uso nos equipamentos","Cortar gás","Regular temperatura"], c: 1 },
-    { p: "O que é Kcal/h em aquecedores?", ops: ["Voltagem","Capacidade de aquecimento em quilocalorias por hora","Pressão do gás","Vazão de água"], c: 1 },
-    { p: "Para instalar fogão a gás embutido, o que verificar:", ops: ["Apenas a cor","Compatibilidade com o gás local, ventilação e distâncias de segurança","Apenas voltagem","Apenas tamanho"], c: 1 },
-  ],
-};
-
-function getPerguntasPorCategoria(cat){
-  // Find matching key
-  const chave=Object.keys(BANCO_PERGUNTAS).find(k=>k===cat)||Object.keys(BANCO_PERGUNTAS).find(k=>cat.includes(k.replace(/^[^ ]+ /,'')))||null;
-  const pool=chave?BANCO_PERGUNTAS[chave]:null;
-  if(!pool||pool.length===0){
-    // Fallback: generic questions
-    return [{p:"Qual é a principal função de um EPI?",ops:["Aumentar produtividade","Proteger o trabalhador de riscos","Reduzir custos","Facilitar trabalho"],c:1},{p:"O que significa NR em segurança do trabalho?",ops:["Norma Regulamentadora","Nova Resolução","Nota de Registro","Nível de Risco"],c:0},{p:"O que é garantia de serviço?",ops:["Prazo para pagamento","Compromisso de corrigir falhas sem custo","Desconto no próximo serviço","Certificado"],c:1},{p:"Como deve ser feito o orçamento de um serviço?",ops:["Apenas verbalmente","Por escrito com detalhamento","Por mensagem de voz","Sem necessidade"],c:1},{p:"O que é nota fiscal de serviço?",ops:["Recibo informal","Documento fiscal obrigatório que comprova prestação de serviço","Contrato verbal","Apenas um recibo"],c:1},{p:"Para que serve o contrato de prestação de serviços?",ops:["Apenas formalidade","Proteger ambas as partes definindo escopo, prazo e valor","Documento desnecessário","Apenas para grandes obras"],c:1},{p:"O que é responsabilidade civil do prestador de serviços?",ops:["Não existe","Obrigação de reparar danos causados ao cliente","Apenas moral","Apenas criminal"],c:1},{p:"Como calcular preço de serviço?",ops:["Chute","Custo dos materiais + mão de obra + margem + impostos","Apenas mão de obra","Apenas materiais"],c:1},{p:"O que fazer ao terminar um serviço?",ops:["Ir embora","Limpar o local, checar qualidade e obter aprovação do cliente","Cobrar e sair","Apenas cobrar"],c:1},{p:"O que é prazo de entrega de serviço?",ops:["Estimativa informal","Data acordada para conclusão do serviço","Apenas estimativa","Prazo do fornecedor"],c:1},{p:"Como tratar reclamação de cliente?",ops:["Ignorar","Ouvir, verificar e resolver o problema prontamente","Culpar o material","Devolver o dinheiro sempre"],c:1},{p:"O que é margem de lucro?",ops:["Custo total","Diferença entre receita e custos totais","Apenas material","Salário do profissional"],c:1},{p:"Para que serve o alvará de funcionamento?",ops:["Apenas para empresas grandes","Autorização municipal para exercer atividade comercial/serviço","Documento opcional","Apenas para obras",""],c:1},{p:"O que é MEI?",ops:["Tipo de imposto","Microempreendedor Individual — forma simplificada de formalização","Tipo de contrato","Licença especial"],c:1},{p:"O que é agendamento de serviço?",ops:["Desnecessário","Combinação prévia de data e hora com o cliente","Apenas para empresas","Contrato formal"],c:1},{p:"Como calcular tempo de um serviço?",ops:["Sem necessidade","Baseado em experiência prévia com serviços similares","Apenas chute","Sempre 1 hora"],c:1},{p:"O que é orçamento por empreitada?",ops:["Por hora trabalhada","Preço fixo pelo serviço completo","Sem contrato","Por material"],c:1},{p:"Para que serve o seguro de responsabilidade civil?",ops:["Não é necessário","Cobrir danos causados a terceiros durante o serviço","Apenas para empresas grandes","Opcional"],c:1},{p:"O que é subcontratação?",ops:["Proibido","Contratar outro profissional para parte do serviço com autorização","Tipo de fraude","Parceria informal"],c:1},{p:"Como fidelizar cliente?",ops:["Preço mais baixo sempre","Qualidade, prazo e bom atendimento que geram recomendações","Apenas brindes","Desconto sempre"],c:1}];
+    localStorage.setItem('sj_uid', uid+'_prof');
+    localStorage.setItem('sj_nome', d.nome||'Profissional');
+    localStorage.setItem('sj_tipo', 'profissional');
+    window.location.href = 'dashboard-profissional.html';
+  } catch(e) {
+    btn.disabled=false; btn.textContent='✅ Finalizar cadastro';
+    if(e.code==='auth/email-already-in-use') alert('Este email já está cadastrado! Faça login.');
+    else alert('Erro ao criar conta: '+e.message);
   }
-  // Shuffle and pick 20
-  const shuffled=[...pool].sort(()=>Math.random()-0.5);
-  return shuffled.slice(0,20);
 }
 
-let perguntas=[],atual=0,acertos=0,opcaoSel=null;
+// ── QUIZ ──────────────────────────────────────────────────────────────
+var perguntas=[],atual=0,acertos=0,opcaoSel=null,tentativas=1;
+var MAX_TENT=4;
+
+var PERGUNTAS_DEMO=[
+  {p:"Qual a tensão padrão das tomadas residenciais no Brasil segundo a NBR 14136?",ops:["110V ou 127V apenas","220V apenas","127V ou 220V dependendo da região","380V trifásico"],c:2},
+  {p:"Em instalações elétricas residenciais, qual é a bitola mínima de fio para circuitos de iluminação?",ops:["0,5 mm²","1,5 mm²","2,5 mm²","4,0 mm²"],c:1},
+  {p:"O que significa o código IP65 em equipamentos elétricos?",ops:["Resistente a poeira e jatos d'água","Apenas resistente a poeira","Submersível até 1 metro","Resistente a explosões"],c:0},
+  {p:"Qual dispositivo protege contra correntes de fuga para a terra?",ops:["Disjuntor","Fusível","DR (Diferencial-Residual)","Transformador"],c:2},
+  {p:"Para instalar um ar-condicionado split de 12.000 BTUs, qual bitola de fio é indicada?",ops:["1,5 mm²","2,5 mm²","4,0 mm²","6,0 mm²"],c:1},
+  {p:"O que é aterramento elétrico e qual sua principal função?",ops:["Aumentar a tensão","Proteger contra choques elétricos e surtos","Reduzir o consumo de energia","Melhorar a qualidade do sinal"],c:1},
+  {p:"Qual a cor do fio neutro segundo a norma NBR 5410?",ops:["Verde","Vermelho","Azul claro","Preto"],c:2},
+  {p:"Em um quadro de distribuição residencial, o que significa DPS?",ops:["Dispositivo de Proteção Secundária","Dispositivo de Proteção contra Surtos","Disjuntor Principal Simples","Derivação de Proteção do Sistema"],c:1},
+  {p:"Quantos pontos de tomada são obrigatórios por cômodo segundo a NBR 5410?",ops:["1 tomada a cada 5 metros","1 tomada a cada 4 metros ou fração","2 tomadas por cômodo mínimo","Apenas 1 tomada por cômodo"],c:1},
+  {p:"O que é um circuito dedicado em instalações elétricas?",ops:["Circuito com proteção extra","Circuito exclusivo para um único equipamento","Circuito de 3 fases","Circuito sem aterramento"],c:1},
+  {p:"Qual equipamento mede a resistência de isolamento de um cabo elétrico?",ops:["Multímetro","Alicate amperímetro","Megôhmetro","Osciloscópio"],c:2},
+  {p:"Para instalação de chuveiro elétrico de 6.800W em 220V, qual disjuntor usar?",ops:["20A","25A","32A","40A"],c:2},
+  {p:"O que é o fator de potência em uma instalação elétrica?",ops:["Relação entre potência ativa e aparente","Tensão dividida pela corrente","Resistência do circuito","Frequência da rede"],c:0},
+  {p:"Qual a profundidade mínima para instalação de eletrodutos embutidos em alvenaria?",ops:["1 cm","2 cm","3 cm","5 cm"],c:1},
+  {p:"O que significa SPDA em instalações elétricas prediais?",ops:["Sistema de Proteção Dinâmica Automática","Sistema de Proteção contra Descargas Atmosféricas","Suporte Principal de Distribuição Aérea","Sistema de Proteção Diferencial Avançada"],c:1},
+  {p:"Qual o prazo médio de vida útil de uma instalação elétrica residencial sem manutenção?",ops:["5 a 10 anos","10 a 15 anos","20 a 30 anos","50 anos ou mais"],c:2},
+  {p:"Em instalações com conduítes, qual o percentual máximo de ocupação recomendado?",ops:["30%","40%","50%","60%"],c:2},
+  {p:"O que é carga instalada em um projeto elétrico?",ops:["Potência máxima que o gerador suporta","Soma das potências de todos os equipamentos previstos","Corrente de curto-circuito","Tensão de pico do sistema"],c:1},
+  {p:"Qual norma brasileira rege as instalações elétricas de baixa tensão?",ops:["NBR 5410","NBR 14136","NBR 6118","NBR 9050"],c:0},
+  {p:"Para uma tomada de uso geral (TUG), qual a corrente nominal mínima exigida?",ops:["6A","10A","15A","20A"],c:1}
+];
 
 async function comecarQuiz(){
   document.getElementById('iaIntro').style.display='none';
   document.getElementById('loadingIA').classList.add('vis');
-  document.getElementById('loadingCat').textContent=categoriaTesteAtual;
-  await new Promise(r=>setTimeout(r,1500));
+  await new Promise(r=>setTimeout(r,2000));
   document.getElementById('loadingIA').classList.remove('vis');
-  perguntas=getPerguntasPorCategoria(categoriaTesteAtual);
+  perguntas=[...PERGUNTAS_DEMO].sort(()=>Math.random()-0.5);
   atual=0;acertos=0;opcaoSel=null;
-  document.getElementById('quizCatBadge').textContent='🤖 Teste: '+categoriaTesteAtual;
   document.getElementById('quizWrap').classList.add('ativo');
   renderPergunta();
 }
+
 function renderPergunta(){
-  const q=perguntas[atual];
+  var q=perguntas[atual];
   document.getElementById('progFill').style.width=((atual+1)/20*100)+'%';
   document.getElementById('progNum').textContent=(atual+1)+' / 20';
   document.getElementById('pergunta').textContent=q.p;
-  // Embaralhar opções mantendo rastreio da correta
-  const indices=[0,1,2,3];
-  for(let i=indices.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[indices[i],indices[j]]=[indices[j],indices[i]];}
-  const novaCorreta=indices.indexOf(q.c);
-  const letras=['A','B','C','D'];
-  document.getElementById('opcoes').innerHTML=indices.map((oi,i)=>
-    '<div class="quiz-op" onclick="selOp(this,'+i+','+novaCorreta+')" data-i="'+i+'"><div class="op-letra">'+letras[i]+'</div>'+q.ops[oi]+'</div>'
+  var letras=['A','B','C','D'];
+  document.getElementById('opcoes').innerHTML=q.ops.map((op,i)=>
+    '<div class="quiz-op" onclick="selOp(this,'+i+')" data-i="'+i+'"><div class="op-letra">'+letras[i]+'</div>'+op+'</div>'
   ).join('');
-  document.getElementById('btnProxima').classList.remove('vis');opcaoSel=null;
+  document.getElementById('btnProxima').classList.remove('vis');
+  opcaoSel=null;
 }
-function selOp(el,idx,correta){
-  if(opcaoSel!==null)return;opcaoSel=idx;
-  document.querySelectorAll('.quiz-op').forEach((op,i)=>{if(i===correta)op.classList.add('certa');else if(i===idx&&idx!==correta)op.classList.add('errada');});
-  if(idx===correta)acertos++;
+
+function selOp(el,idx){
+  if(opcaoSel!==null)return;
+  opcaoSel=idx;
+  var q=perguntas[atual];
+  document.querySelectorAll('.quiz-op').forEach(function(op,i){
+    if(i===q.c)op.classList.add('certa');
+    else if(i===idx&&idx!==q.c)op.classList.add('errada');
+  });
+  if(idx===q.c)acertos++;
   document.getElementById('btnProxima').classList.add('vis');
 }
-function proximaPergunta(){atual++;if(atual>=20){mostrarResultado();return;}renderPergunta();}
+
+function proximaPergunta(){
+  atual++;
+  if(atual>=20){mostrarResultado();return;}
+  renderPergunta();
+}
+
 function mostrarResultado(){
   document.getElementById('quizWrap').classList.remove('ativo');
-  const pct=Math.round((acertos/20)*100);const aprovado=pct>=90;
-  tentativas++;const restam=MAX_TENT-tentativas+1;
-  const res=document.getElementById('resultado');res.classList.add('vis');
+  var pct=Math.round((acertos/20)*100);
+  var aprovado=pct>=70; // 70% para aprovar
+  tentativas++;
+  var restam=MAX_TENT-tentativas+1;
+  var res=document.getElementById('resultado');
+  res.classList.add('vis');
   document.getElementById('resIcon').textContent=aprovado?'🎉':'😔';
-  document.getElementById('resTitulo').textContent=aprovado?'Aprovado em '+categoriaTesteAtual+'!':'Não foi dessa vez...';
-  document.getElementById('resSub').textContent=aprovado?'Você foi aprovado! Pode testar outras profissões ou finalizar o cadastro.':'Você precisa de 90% (18 acertos). As perguntas são sorteadas aleatoriamente — tente novamente!';
-  const sc=document.getElementById('resScore');sc.textContent=acertos+'/20 acertos — '+pct+'%';sc.className='res-score '+(aprovado?'aprovado':'reprovado');
-  if(!aprovado)document.getElementById('tentRestantes').textContent=restam>0?'🔄 Você ainda tem '+restam+' tentativa(s) hoje':'⛔ Limite diário atingido.';
-  if(aprovado&&!categoriasAprovadas.includes(categoriaTesteAtual)){
-    categoriasAprovadas.push(categoriaTesteAtual);
-    localStorage.setItem('sj_categoriasAprovadas', JSON.stringify(categoriasAprovadas));
-    const uid=localStorage.getItem('sj_uid');
-    if(uid)firebase.firestore().collection('usuarios').doc(uid).update({categoriasAprovadas:categoriasAprovadas,aprovado:true});
+  document.getElementById('resTitulo').textContent=aprovado?'Parabéns! Você foi aprovado!':'Não foi desta vez...';
+  document.getElementById('resSub').textContent=aprovado
+    ?'Finalize seu cadastro para começar a receber pedidos!'
+    :'Você precisa de 70% (14 acertos). Tente novamente!';
+  var sc=document.getElementById('resScore');
+  sc.textContent=acertos+'/20 acertos — '+pct+'%';
+  sc.className='res-score '+(aprovado?'aprovado':'reprovado');
+  if(!aprovado){
+    var tr=document.getElementById('tentRestantes');
+    tr.textContent=restam>0?'Você ainda tem '+restam+' tentativa(s) hoje':'Limite diário atingido. Volte amanhã!';
   }
-  document.getElementById('btnRepetir').style.display=(!aprovado&&restam>0)?'block':'none';
-  document.getElementById('btnOutroTeste').style.display=(categoriasAprovadas.length>0&&categoriasSelecionadas.length>1)?'block':'none';
-  document.getElementById('btnFinalizar').style.display=(categoriasAprovadas.length>0)?'block':'none';
+  document.getElementById('btnRepetir').style.display=aprovado||restam<=0?'none':'block';
+  document.getElementById('btnFinalizar').style.display=aprovado?'block':'none';
 }
-function repetirTeste(){document.getElementById('resultado').classList.remove('vis');comecarQuiz();}
-function finalizarCadastro(){window.location.href='dashboard-profissional.html';}
+
+function repetirTeste(){
+  document.getElementById('resultado').classList.remove('vis');
+  document.getElementById('quizWrap').classList.remove('ativo');
+  document.getElementById('iaIntro').style.display='block';
+  var tents=document.querySelectorAll('.tent');
+  tents.forEach(function(t,i){
+    t.className='tent';
+    if(i<tentativas-1)t.classList.add('usada');
+    else if(i===tentativas-1)t.classList.add('atual');
+  });
+}
 </script>
-<script>if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(e=>{});}</script>
+<script>if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(e=>{})}</script>
 </body>
 </html>
