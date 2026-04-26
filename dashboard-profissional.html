@@ -3,1048 +3,555 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ServiçoJá Conecta — Dashboard Profissional</title>
+<title>ServiçoJá Conecta — Publicar Pedido</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{--verde:#00C96F;--verde-escuro:#009E57;--azul:#0A1628;--azul-medio:#132240;--azul-input:#0F1C35;--branco:#F5F7F2;--cinza:#8A9BB5;--laranja:#FF6B35;--amarelo:#FFB830;--erro:#FF5C5C;--borda:rgba(255,255,255,0.09)}
-body{font-family:'DM Sans',sans-serif;background:var(--azul);color:var(--branco);min-height:100vh}
-a{color:inherit;text-decoration:none}
-nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--borda)}
-.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--branco)}
-.logo span{color:var(--verde)}
-.nav-r{display:flex;align-items:center;gap:12px}
-.av{width:36px;height:36px;border-radius:50%;background:rgba(0,201,111,0.2);border:2px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
-.nav-name{font-size:0.85rem;font-weight:600;color:var(--branco)}
-.nav-sub{font-size:0.72rem;color:var(--cinza)}
-.btn-sair{background:none;border:1px solid var(--borda);border-radius:8px;color:var(--cinza);font-size:0.78rem;padding:6px 12px;cursor:pointer;transition:all 0.2s}
-.btn-sair:hover{border-color:rgba(255,92,92,0.4);color:var(--erro)}
-.notif-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background 0.2s}
-.notif-item:hover{background:rgba(255,255,255,0.03)}
-.notif-item.nova{border-left:3px solid #00C96F;background:rgba(0,201,111,0.03)}
-.notif-item.lida{opacity:0.55}
-.ni-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.ni-txt{font-size:11px;color:#F5F7F2;line-height:1.5;margin-bottom:2px}
-.ni-tempo{font-size:10px;color:#8A9BB5}
-.ni-dot{width:7px;height:7px;border-radius:50%;background:#00C96F;margin-top:4px;flex-shrink:0}
-.layout{display:grid;grid-template-columns:220px 1fr;gap:16px;max-width:1200px;margin:0 auto;padding:24px 24px 60px}
-.sidebar{display:flex;flex-direction:column;gap:10px}
-.prof-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:16px;text-align:center}
-.prof-av{width:56px;height:56px;border-radius:50%;background:rgba(0,201,111,0.15);border:2px solid rgba(0,201,111,0.3);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem}
-.prof-name{font-weight:700;font-size:0.9rem;color:var(--branco);margin-bottom:2px}
-.prof-sub{font-size:0.72rem;color:var(--cinza);margin-bottom:8px}
-.rating{display:flex;align-items:center;justify-content:center;gap:4px;font-size:0.78rem;color:var(--amarelo)}
-.bloco{background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:14px}
-.bloco-title{font-size:0.68rem;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
-.cat-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--borda);font-size:0.78rem;color:var(--branco)}
-.cat-row:last-child{border-bottom:none}
-.cat-ok{color:var(--verde);font-size:0.68rem;font-weight:700}
-.cat-pend{color:var(--cinza);font-size:0.68rem}
-.nav-menu{background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:6px;display:flex;flex-direction:column;gap:2px}
-.nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:0.78rem;cursor:pointer;color:var(--cinza);transition:all 0.2s}
-.nav-item:hover{color:var(--branco);background:rgba(255,255,255,0.04)}
-.nav-item.ativo{background:rgba(0,201,111,0.1);color:var(--verde);font-weight:600}
-.btn-teste{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.3);border-radius:10px;padding:10px;color:var(--verde);font-size:0.78rem;font-weight:700;cursor:pointer;width:100%;text-align:center;transition:all 0.2s}
-.btn-teste:hover{background:rgba(0,201,111,0.18)}
-.taxa-box{background:var(--azul-medio);border:1px solid rgba(255,107,53,0.4);border-radius:12px;padding:11px 13px}
-.taxa-box .bloco-title{margin-bottom:6px}
-.taxa-valor{font-weight:800;font-size:1.1rem;color:var(--laranja);margin-bottom:3px}
-.taxa-venc{font-size:0.7rem;color:var(--cinza);margin-bottom:8px}
-.taxa-venc strong{color:var(--amarelo)}
-.btn-pagar{background:var(--laranja);border:none;border-radius:7px;padding:7px;color:var(--branco);font-size:0.72rem;font-weight:700;cursor:pointer;width:100%;margin-bottom:5px}
-.taxa-hist{font-size:0.68rem;color:var(--cinza);text-align:center;cursor:pointer;text-decoration:underline}
-.bloqueado-box{background:rgba(255,92,92,0.07);border:2px solid rgba(255,92,92,0.4);border-radius:12px;padding:12px;text-align:center;display:none}
-.bloqueado-box.vis{display:block}
-.bloq-icon{font-size:1.4rem;margin-bottom:4px}
-.bloq-title{font-weight:800;font-size:0.82rem;color:var(--erro);margin-bottom:4px}
-.bloq-sub{font-size:0.7rem;color:var(--cinza);line-height:1.5;margin-bottom:8px}
-.btn-regularizar{background:var(--erro);border:none;border-radius:7px;padding:7px;color:var(--branco);font-size:0.72rem;font-weight:700;cursor:pointer;width:100%}
-.main{display:flex;flex-direction:column;gap:14px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.stat{background:var(--azul-medio);border:1px solid var(--borda);border-radius:14px;padding:14px 16px}
-.stat-n{font-weight:800;font-size:1.5rem;margin-bottom:2px}
-.stat-l{font-size:0.72rem;color:var(--cinza)}
-.section-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-.section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--branco)}
-.filtros{display:flex;gap:6px;flex-wrap:wrap}
-.fpill{background:var(--azul-input);border:1.5px solid var(--borda);border-radius:100px;padding:5px 12px;font-size:0.75rem;color:var(--cinza);cursor:pointer;transition:all 0.2s;white-space:nowrap}
-.fpill:hover{border-color:rgba(0,201,111,0.3)}
-.fpill.ativo{background:rgba(0,201,111,0.12);border-color:rgba(0,201,111,0.45);color:var(--verde);font-weight:600}
-.pedido-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:16px;padding:16px 20px;transition:border-color 0.2s;animation:fadeUp 0.4s ease both}
-.pedido-card:hover{border-color:rgba(0,201,111,0.25)}
-.p-cats{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
-.pcat{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.2);color:var(--verde);font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:100px}
-.p-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;color:var(--branco);margin-bottom:5px;line-height:1.3}
-.p-desc{color:var(--cinza);font-size:0.8rem;line-height:1.6;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.p-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid var(--borda);padding-top:10px}
-.p-meta{display:flex;flex-wrap:wrap;gap:10px}
-.pm{font-size:0.75rem;color:var(--cinza)}
-.pm strong{color:var(--branco)}
-.p-actions{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
-.taxa-badge{background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.25);border-radius:7px;padding:4px 10px;font-size:0.72rem;color:var(--laranja);font-weight:700;white-space:nowrap}
-.btn-interesso{background:transparent;border:1.5px solid var(--verde);border-radius:9px;padding:7px 16px;color:var(--verde);font-weight:700;font-size:0.8rem;cursor:pointer;transition:all 0.2s}
-.btn-interesso:hover:not(:disabled){background:var(--verde);color:var(--azul)}
-.btn-interesso:disabled{opacity:0.7;cursor:default}
-.btn-enviar-proposta{background:var(--verde);border:none;border-radius:9px;padding:8px 16px;color:var(--azul);font-weight:700;font-size:0.8rem;cursor:pointer;transition:all 0.2s;animation:pulse 2s infinite}
-.btn-enviar-proposta:hover{background:var(--verde-escuro);animation:none}
-.status-pill{display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;font-weight:700;padding:5px 11px;border-radius:100px}
-.status-aguardando{background:rgba(138,155,181,0.12);border:1px solid rgba(138,155,181,0.25);color:var(--cinza)}
-.status-solicitado{background:rgba(255,184,48,0.12);border:1px solid rgba(255,184,48,0.3);color:var(--amarelo);animation:pulse 2s infinite}
-.status-enviada{background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde)}
-.urg{display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:700;padding:3px 8px;border-radius:100px}
-.urg-urgente{background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.3);color:var(--laranja)}
-.urg-semana{background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.25);color:var(--amarelo)}
-.urg-pressa{background:rgba(138,155,181,0.1);border:1px solid rgba(138,155,181,0.2);color:var(--cinza)}
-.overlay{position:fixed;inset:0;background:rgba(10,22,40,0.92);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.3s}
+:root{--verde:#00C96F;--verde-escuro:#009E57;--azul:#0A1628;--azul-medio:#132240;--azul-input:#0F1C35;--branco:#F5F7F2;--cinza:#8A9BB5;--laranja:#FF6B35;--borda:rgba(255,255,255,0.09)}
+body{font-family:'DM Sans',sans-serif;background:var(--azul);color:var(--branco);min-height:100vh;padding-bottom:80px}
+nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--borda)}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;text-decoration:none;color:var(--branco)}.logo span{color:var(--verde)}
+.nav-user{display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;border-radius:50%;background:rgba(0,201,111,0.2);border:1.5px solid rgba(0,201,111,0.3);display:flex;align-items:center;justify-content:center;font-size:0.9rem;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.page{max-width:1100px;margin:0 auto;padding:32px 24px 60px;display:grid;grid-template-columns:1fr 340px;gap:24px}
+.page-header{margin-bottom:22px}
+.page-header h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;letter-spacing:-0.5px;margin-bottom:4px}
+.page-header p{color:var(--cinza);font-size:0.85rem}
+.card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:18px;padding:24px 28px;margin-bottom:14px;animation:fadeUp 0.4s ease both}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.card-num{width:26px;height:26px;border-radius:7px;background:rgba(0,201,111,0.15);border:1px solid rgba(0,201,111,0.25);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:0.75rem;color:var(--verde);flex-shrink:0}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem}
+.card-sub{font-size:0.75rem;color:var(--cinza);margin-top:1px}
+.field{margin-bottom:13px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:0.75rem;font-weight:600;color:var(--cinza);margin-bottom:4px}
+.req{color:var(--verde)}
+.iw{position:relative;display:flex;align-items:center}
+.ii{position:absolute;left:13px;color:var(--cinza);font-size:0.9rem;pointer-events:none}
+input,select,textarea{width:100%;background:var(--azul-input);border:1.5px solid var(--borda);border-radius:11px;color:var(--branco);font-family:'DM Sans',sans-serif;font-size:0.88rem;padding:11px 11px 11px 37px;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
+textarea{padding-left:14px;resize:vertical;min-height:110px;line-height:1.6}
+input:focus,select:focus,textarea:focus{border-color:rgba(0,201,111,0.45);box-shadow:0 0 0 3px rgba(0,201,111,0.08)}
+input::placeholder,textarea::placeholder{color:rgba(138,155,181,0.45)}
+.ni{padding-left:14px!important}
+select{cursor:pointer;-webkit-appearance:none;padding-right:28px}
+select option{background:var(--azul-medio)}
+.hint{font-size:0.7rem;color:var(--cinza);margin-top:4px}
+.char-count{font-size:0.7rem;color:var(--cinza);text-align:right;margin-top:3px}
+/* CATEGORIAS */
+.cats-scroll{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:4px}
+.cat-pill{background:var(--azul-input);border:1.5px solid var(--borda);border-radius:100px;padding:7px 13px;font-size:0.8rem;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.cat-pill:hover{border-color:rgba(0,201,111,0.3)}
+.cat-pill.sel{background:rgba(0,201,111,0.12);border-color:rgba(0,201,111,0.45);color:var(--verde);font-weight:600}
+/* UPLOAD */
+.upload-area{border:2px dashed rgba(255,255,255,0.1);border-radius:14px;padding:24px;text-align:center;cursor:pointer;transition:all 0.25s;background:var(--azul-input)}
+.upload-area:hover{border-color:rgba(0,201,111,0.4);background:rgba(0,201,111,0.04)}
+.upload-area.drag{border-color:var(--verde);background:rgba(0,201,111,0.08)}
+.files-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.file-thumb{width:76px;height:76px;border-radius:10px;background:var(--azul-input);border:1px solid var(--borda);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:1.3rem;position:relative;overflow:hidden;cursor:pointer}
+.file-thumb span{font-size:0.6rem;color:var(--cinza);text-align:center;padding:0 3px}
+.file-thumb .remove{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:rgba(255,92,92,0.85);color:white;font-size:0.55rem;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;opacity:0;transition:opacity 0.2s}
+.file-thumb:hover .remove{opacity:1}
+/* VALOR */
+.valor-opts{display:flex;gap:8px;margin-bottom:12px}
+.valor-btn{flex:1;padding:11px;border-radius:10px;border:1.5px solid var(--borda);background:var(--azul-input);color:var(--cinza);font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:center}
+.valor-btn:hover{border-color:rgba(0,201,111,0.3)}
+.valor-btn.sel{background:rgba(0,201,111,0.12);border-color:rgba(0,201,111,0.45);color:var(--verde)}
+.valor-input-wrap{display:none}
+.valor-input-wrap.vis{display:block;animation:fadeUp 0.3s ease both}
+.prefix{position:absolute;left:13px;color:var(--cinza);font-size:0.88rem;font-weight:600;pointer-events:none}
+/* URGÊNCIA */
+.urg-opts{display:flex;gap:7px;flex-wrap:wrap}
+.urg-btn{flex:1;min-width:90px;padding:9px 10px;border-radius:9px;border:1.5px solid var(--borda);background:var(--azul-input);color:var(--cinza);font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:center}
+.urg-btn:hover{border-color:rgba(0,201,111,0.3)}
+.urg-btn.sel{background:rgba(0,201,111,0.12);border-color:rgba(0,201,111,0.45);color:var(--verde)}
+.urg-btn.urgente.sel{background:rgba(255,107,53,0.12);border-color:rgba(255,107,53,0.45);color:var(--laranja)}
+/* SIDE */
+.side-card{background:var(--azul-medio);border:1px solid var(--borda);border-radius:18px;padding:22px;margin-bottom:14px;position:sticky;top:20px;animation:fadeUp 0.4s 0.15s ease both}
+.side-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.prev-cat{display:inline-flex;align-items:center;gap:5px;background:rgba(0,201,111,0.12);border:1px solid rgba(0,201,111,0.25);color:var(--verde);font-size:0.7rem;font-weight:700;padding:3px 9px;border-radius:100px;margin-bottom:9px}
+.prev-titulo{font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;margin-bottom:5px;line-height:1.3}
+.prev-desc{color:var(--cinza);font-size:0.78rem;line-height:1.6;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.prev-info{border-top:1px solid var(--borda);padding-top:10px;display:flex;flex-direction:column;gap:6px}
+.prev-row{display:flex;align-items:center;justify-content:space-between;font-size:0.75rem}
+.prev-row .lbl{color:var(--cinza)}.prev-row .val{font-weight:600}
+.btn-pub{width:100%;background:var(--verde);border:none;border-radius:13px;padding:14px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-pub:hover{background:var(--verde-escuro);transform:scale(1.01)}
+.btn-pub:disabled{opacity:0.6;pointer-events:none}
+.btn-canc{width:100%;background:transparent;border:1.5px solid var(--borda);border-radius:13px;padding:12px;color:var(--cinza);font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.2s;margin-top:8px}
+.btn-canc:hover{border-color:rgba(255,255,255,0.2);color:var(--branco)}
+.dica{display:flex;align-items:flex-start;gap:7px;padding:9px 0;border-bottom:1px solid var(--borda);font-size:0.75rem;line-height:1.5}
+.dica:last-child{border-bottom:none;padding-bottom:0}
+.dica p{color:var(--cinza)}.dica strong{color:var(--branco);display:block;margin-bottom:1px}
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(10,22,40,0.92);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity 0.3s;padding:20px}
 .overlay.vis{opacity:1;pointer-events:all}
-.modal{background:var(--azul-medio);border:1px solid var(--borda);border-radius:22px;width:100%;max-width:430px;padding:28px;transform:translateY(20px);transition:transform 0.3s}
-.overlay.vis .modal{transform:translateY(0)}
-.modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--branco);margin-bottom:4px}
-.modal-sub{color:var(--cinza);font-size:0.8rem;margin-bottom:14px;line-height:1.5}
-.mfield{margin-bottom:12px}
-.mfield label{display:block;font-size:0.74rem;font-weight:600;color:var(--cinza);margin-bottom:4px}
-.mfield input,.mfield textarea{width:100%;background:var(--azul-input);border:1.5px solid var(--borda);border-radius:10px;color:var(--branco);font-family:'DM Sans',sans-serif;font-size:0.85rem;padding:10px 13px;outline:none;transition:border-color 0.2s}
-.mfield textarea{resize:vertical;min-height:80px;line-height:1.5}
-.mfield input:focus,.mfield textarea:focus{border-color:rgba(0,201,111,0.45)}
-.mfield input::placeholder,.mfield textarea::placeholder{color:rgba(138,155,181,0.4)}
-.taxa-info{background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:9px;padding:10px 13px;font-size:0.76rem;color:var(--cinza);margin-bottom:16px;line-height:1.6}
-.taxa-info strong{color:var(--laranja)}
-.modal-btns{display:flex;gap:8px}
-.btn-cancel{flex:1;background:transparent;border:1.5px solid var(--borda);border-radius:10px;padding:11px;color:var(--cinza);font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer}
-.btn-send{flex:2;background:var(--verde);border:none;border-radius:10px;padding:11px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer}
-.btn-send:hover{background:var(--verde-escuro)}
-.loading-wrap{text-align:center;padding:60px 20px;color:var(--cinza)}
-.spinner{width:38px;height:38px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px}
-.vazio{text-align:center;padding:60px 20px;display:none}
-.vazio.vis{display:block}
-.vazio-icon{font-size:2.5rem;opacity:0.3;margin-bottom:10px}
-.vazio p{color:var(--cinza);font-size:0.85rem;line-height:1.6}
-@keyframes spin{to{transform:rotate(360deg)}}
+.modal-box{background:var(--azul-medio);border:1px solid var(--borda);border-radius:22px;padding:36px;max-width:400px;width:100%;text-align:center;transform:translateY(20px);transition:transform 0.3s}
+.overlay.vis .modal-box{transform:translateY(0)}
+.modal-icon{font-size:3rem;margin-bottom:12px}
+.modal-box h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:8px}
+.modal-box p{color:var(--cinza);font-size:0.85rem;line-height:1.6;margin-bottom:22px}
+.btn-modal{width:100%;background:var(--verde);border:none;border-radius:12px;padding:13px;color:var(--azul);font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer}
+/* SPINNER */
+.spinner{width:32px;height:32px;border:3px solid var(--borda);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;margin-right:8px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
-@media(max-width:768px){.layout{grid-template-columns:1fr}.sidebar{order:2}.stats{grid-template-columns:1fr 1fr}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:768px){.page{grid-template-columns:1fr}.side-card{position:static}}
 </style>
 <meta name="theme-color" content="#00C96F">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-if(!window._fbInitialized){
-  firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",authDomain:"servicoja-e1f49.firebaseapp.com",projectId:"servicoja-e1f49",storageBucket:"servicoja-e1f49.firebasestorage.app",messagingSenderId:"874413426529",appId:"1:874413426529:web:9891d44afd9ef1750e6720"});
-  window._fbInitialized=true;
-}
+if(!window._fbInitialized){firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",authDomain:"servicoja-e1f49.firebaseapp.com",projectId:"servicoja-e1f49",storageBucket:"servicoja-e1f49.firebasestorage.app",messagingSenderId:"874413426529",appId:"1:874413426529:web:9891d44afd9ef1750e6720"});window._fbInitialized=true;}
 </script>
 </head>
 <body>
-
 <nav>
   <a href="login.html" class="logo">Serviço<span>Já</span> Conecta</a>
-  <div class="nav-r">
-    <div class="av" id="navAv" style="overflow:hidden;padding:0">👷</div>
-    <div>
-      <div class="nav-name" id="nomeNav">Profissional</div>
-      <div class="nav-sub">Conta profissional</div>
-    </div>
-    <div style="position:relative" id="notifWrap">
-      <button id="notifBtn" onclick="toggleNotif()" style="position:relative;width:36px;height:36px;border-radius:50%;background:#0F1C35;border:1px solid rgba(255,255,255,0.09);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">
-        🔔<span id="notifBadge" style="display:none;position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;border-radius:50%;background:#FF6B35;color:#fff;font-size:9px;font-weight:700;align-items:center;justify-content:center;border:2px solid #132240;padding:0 2px"></span>
-      </button>
-      <div id="notifDropdown" style="display:none;position:absolute;right:0;top:46px;width:310px;background:#132240;border:1px solid rgba(255,255,255,0.09);border-radius:14px;overflow:hidden;z-index:100;box-shadow:0 8px 32px rgba(0,0,0,0.4)">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.09)">
-          <span style="font-weight:700;font-size:13px;color:#F5F7F2">🔔 Notificações</span>
-          <span onclick="marcarTodasLidas()" style="font-size:11px;color:#8A9BB5;cursor:pointer;text-decoration:underline">Marcar lidas</span>
-        </div>
-        <div id="notifLista" style="max-height:340px;overflow-y:auto"></div>
-      </div>
-    </div>
-    <button class="btn-sair" onclick="sair()">Sair</button>
+  <div class="nav-user">
+    <div class="avatar" id="navAv">👤</div>
+    <strong id="navNome" style="font-size:0.85rem;color:var(--branco)">Carregando...</strong>
   </div>
 </nav>
 
-<div class="layout">
-  <div class="sidebar">
-    <div class="prof-card">
-      <div class="prof-av" id="sideAv" style="overflow:hidden;padding:0">👷</div>
-      <div class="prof-name" id="nomeCard">Profissional</div>
-      <div class="prof-sub" id="cidadeCard">Verificado ✓</div>
-      <div class="rating">★★★★★ <span style="color:var(--cinza)">—</span></div>
+<div class="page">
+  <div class="main-col">
+    <div class="page-header">
+      <h1 id="pageTitle">Publicar pedido de serviço</h1>
+      <p id="pageSub">Descreva o que você precisa e receba contatos de profissionais.</p>
     </div>
-    <div class="bloco">
-      <div class="bloco-title">Minhas profissões</div>
-      <div id="catsLista"><div style="color:var(--cinza);font-size:0.78rem">Carregando...</div></div>
+
+    <!-- CATEGORIA -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-num">1</div>
+        <div><div class="card-title">Categoria do serviço</div><div class="card-sub">Selecione o tipo de serviço que você precisa</div></div>
+      </div>
+      <!-- Campo de busca de categorias -->
+      <div class="iw" style="margin-bottom:12px">
+        <span class="ii">🔍</span>
+        <input type="text" id="buscaCat" placeholder="Buscar categoria..." oninput="filtrarCats(this.value)" style="padding-left:37px">
+      </div>
+      <div class="cats-scroll" id="catsScroll">
+        <div class="cat-pill" onclick="selCat(this,'⚡ Elétrica')">⚡ Elétrica</div>
+        <div class="cat-pill" onclick="selCat(this,'🔧 Encanamento')">🔧 Encanamento</div>
+        <div class="cat-pill" onclick="selCat(this,'🎨 Pintura')">🎨 Pintura</div>
+        <div class="cat-pill" onclick="selCat(this,'🪚 Carpinteiro')">🪚 Carpinteiro</div>
+        <div class="cat-pill" onclick="selCat(this,'🪚 Marcenaria')">🪚 Marcenaria</div>
+        <div class="cat-pill" onclick="selCat(this,'❄️ Ar-condicionado')">❄️ Ar-condicionado</div>
+        <div class="cat-pill" onclick="selCat(this,'🧹 Limpeza')">🧹 Limpeza</div>
+        <div class="cat-pill" onclick="selCat(this,'🏗️ Reforma')">🏗️ Reforma</div>
+        <div class="cat-pill" onclick="selCat(this,'🔩 Serralheria')">🔩 Serralheria</div>
+        <div class="cat-pill" onclick="selCat(this,'🛋️ Montagem')">🛋️ Montagem</div>
+        <div class="cat-pill" onclick="selCat(this,'🌿 Jardinagem')">🌿 Jardinagem</div>
+        <div class="cat-pill" onclick="selCat(this,'🏠 Construção civil')">🏠 Construção civil</div>
+        <div class="cat-pill" onclick="selCat(this,'🚿 Azulejista')">🚿 Azulejista</div>
+        <div class="cat-pill" onclick="selCat(this,'🪟 Vidraçaria')">🪟 Vidraçaria</div>
+        <div class="cat-pill" onclick="selCat(this,'🔐 Chaveiro')">🔐 Chaveiro</div>
+        <div class="cat-pill" onclick="selCat(this,'📡 Antena e CFTV')">📡 Antena e CFTV</div>
+        <div class="cat-pill" onclick="selCat(this,'🚗 Mecânica')">🚗 Mecânica</div>
+        <div class="cat-pill" onclick="selCat(this,'🖥️ Informática')">🖥️ Informática</div>
+        <div class="cat-pill" onclick="selCat(this,'🐾 Pet sitter')">🐾 Pet sitter</div>
+        <div class="cat-pill" onclick="selCat(this,'👶 Cuidador(a)')">👶 Cuidador(a)</div>
+        <div class="cat-pill" onclick="selCat(this,'📦 Mudança e fretes')">📦 Mudança e fretes</div>
+        <div class="cat-pill" onclick="selCat(this,'🍳 Cozinheiro(a)')">🍳 Cozinheiro(a)</div>
+        <div class="cat-pill" onclick="selCat(this,'🧑‍🏫 Aulas particulares')">🧑‍🏫 Aulas particulares</div>
+        <div class="cat-pill" onclick="selCat(this,'💇 Beleza e estética')">💇 Beleza e estética</div>
+        <div class="cat-pill" onclick="selCat(this,'📸 Fotografia')">📸 Fotografia</div>
+        <div class="cat-pill" onclick="selCat(this,'🎉 Eventos')">🎉 Eventos</div>
+        <div class="cat-pill" onclick="selCat(this,'🔧 Outros serviços')">🔧 Outros serviços</div>
+      </div>
     </div>
-    <div class="nav-menu">
-      <div class="nav-item ativo" id="nav-pedidos" onclick="selNav('pedidos',this)">📋 Pedidos disponíveis</div>
-      <div class="nav-item" id="nav-propostas" onclick="selNav('propostas',this)">📨 Meus interesses</div>
-      <div class="nav-item" id="nav-aceitos" onclick="selNav('aceitos',this)">✅ Trabalhos aceitos</div>
-      <div class="nav-item" id="nav-historico" onclick="selNav('historico',this)">📋 Histórico concluídos</div>
-      <div class="nav-item" onclick="window.location.href='perfil-profissional.html'">👤 Meu perfil</div>
-      <div class="nav-item" onclick="window.location.href='editar-perfil-profissional.html'">✏️ Editar perfil</div>
+
+    <!-- DESCRIÇÃO -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-num">2</div>
+        <div><div class="card-title">Descrição do serviço</div><div class="card-sub">Quanto mais detalhar, melhores profissionais você atrai</div></div>
+      </div>
+      <div class="field">
+        <label>Título <span class="req">*</span></label>
+        <div class="iw"><span class="ii">📝</span><input type="text" id="titulo" placeholder="Ex: Instalação de tomadas no quarto" maxlength="80" oninput="atualizarPreview()"></div>
+      </div>
+      <div class="field">
+        <label>Descrição detalhada <span class="req">*</span></label>
+        <textarea id="descricao" placeholder="Descreva o problema, o espaço, o que já foi tentado..." maxlength="1000" oninput="atualizarDesc(this)"></textarea>
+        <div class="char-count"><span id="charCount">0</span>/1000</div>
+      </div>
     </div>
-    <div class="btn-teste" onclick="window.location.href='cadastro-profissional.html?teste=1'">+ Fazer mais testes de profissão</div>
-    <div class="taxa-box" id="taxaBox">
-      <div class="bloco-title">💰 Taxas pendentes</div>
-      <div class="taxa-valor" id="taxaValor">R$ 0,00</div>
-      <div class="taxa-venc">Vencimento: <strong id="taxaVenc">—</strong></div>
-      <button class="btn-pagar" onclick="abrirPagamento()">Pagar agora</button>
-      <div class="taxa-hist">Ver histórico de taxas</div>
+
+    <!-- FOTOS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-num">3</div>
+        <div><div class="card-title">Fotos do serviço</div><div class="card-sub">Ajuda o profissional a entender melhor o que precisa</div></div>
+      </div>
+      <div class="upload-area" id="uploadArea" ondragover="dragOver(event)" ondragleave="dragLeave()" ondrop="dragDrop(event)" onclick="document.getElementById('fileInput').click()">
+        <div style="font-size:2rem;margin-bottom:8px">📁</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;margin-bottom:4px">Clique ou arraste fotos aqui</div>
+        <div style="font-size:0.75rem;color:var(--cinza)">JPG, PNG ou PDF · Até 10 arquivos</div>
+      </div>
+      <input type="file" id="fileInput" multiple accept="image/*,.pdf" style="display:none" onchange="adicionarArquivos(this.files)">
+      <div class="files-preview" id="filesPreview"></div>
     </div>
-    <div class="bloqueado-box" id="bloqueadoBox">
-      <div class="bloq-icon">🔒</div>
-      <div class="bloq-title">Conta bloqueada</div>
-      <div class="bloq-sub">Taxas em atraso. Regularize para voltar a receber pedidos.</div>
-      <button class="btn-regularizar" onclick="abrirPagamento()">Regularizar agora</button>
+
+    <!-- VALOR E URGÊNCIA -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-num">4</div>
+        <div><div class="card-title">Valor e urgência</div><div class="card-sub">Informe seu orçamento e quando precisa do serviço</div></div>
+      </div>
+      <div class="field">
+        <label>Orçamento <span class="req">*</span></label>
+        <div class="valor-opts">
+          <div class="valor-btn sel" onclick="selValor('aberto',this)">💬 Em aberto<div style="font-size:0.68rem;font-weight:400;color:var(--cinza);margin-top:2px">Recebo cotações livres</div></div>
+          <div class="valor-btn" onclick="selValor('aproximado',this)">💰 Valor aproximado<div style="font-size:0.68rem;font-weight:400;color:var(--cinza);margin-top:2px">Indico meu limite</div></div>
+        </div>
+        <div class="valor-input-wrap" id="valorWrap">
+          <label>Valor que você topa pagar (R$)</label>
+          <div class="iw"><span class="prefix">R$</span><input type="number" id="valor" placeholder="0,00" oninput="atualizarPreview()"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Urgência <span class="req">*</span></label>
+        <div class="urg-opts">
+          <div class="urg-btn urgente" onclick="selUrg(this,'🔥 Urgente')">🔥 Urgente<div style="font-size:0.68rem;opacity:0.7;margin-top:2px">Hoje ou amanhã</div></div>
+          <div class="urg-btn sel" onclick="selUrg(this,'📅 Esta semana')">📅 Esta semana<div style="font-size:0.68rem;opacity:0.7;margin-top:2px">Nos próximos 7 dias</div></div>
+          <div class="urg-btn" onclick="selUrg(this,'🗓️ Sem pressa')">🗓️ Sem pressa<div style="font-size:0.68rem;opacity:0.7;margin-top:2px">Posso aguardar</div></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Endereço do serviço (bairro e cidade) <span class="req">*</span></label>
+        <div class="iw"><span class="ii">📍</span><input type="text" id="endereco" placeholder="Ex: Centro, Campinas" oninput="atualizarPreview()"></div>
+        <p class="hint">Apenas bairro e cidade — o número da casa é combinado em particular com o profissional.</p>
+      </div>
     </div>
   </div>
 
-  <div class="main">
-    <div class="stats">
-      <div class="stat"><div class="stat-n" style="color:var(--verde)" id="statDisp">0</div><div class="stat-l">Pedidos disponíveis</div></div>
-      <div class="stat"><div class="stat-n" style="color:var(--amarelo)" id="statEnv">0</div><div class="stat-l">Interesses registrados</div></div>
-      <div class="stat"><div class="stat-n" style="color:var(--cinza)" id="statAc">0</div><div class="stat-l">Trabalhos aceitos</div></div>
-    </div>
-    <div class="section-header">
-      <div class="section-title" id="section-titulo">Pedidos disponíveis</div>
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <!-- Filtro de tempo — só aparece na aba pedidos -->
-        <div id="diasFiltroWrap" style="display:flex;gap:5px">
-          <select id="diasFiltro" onchange="renderPedidos()" style="background:var(--azul-input);border:1.5px solid var(--borda);border-radius:8px;color:var(--cinza);font-family:'DM Sans',sans-serif;font-size:0.75rem;padding:5px 10px;outline:none;cursor:pointer">
-            <option value="0">📅 Qualquer data</option>
-            <option value="1">Hoje</option>
-            <option value="2">Últimos 2 dias</option>
-            <option value="3">Últimos 3 dias</option>
-            <option value="7">Última semana</option>
-          </select>
-        </div>
-        <div class="filtros" id="filtroPills">
-          <div class="fpill ativo" data-cat="todos" onclick="selFiltro(this)">🔍 Todos</div>
+  <!-- LATERAL -->
+  <div>
+    <div class="side-card">
+      <div class="side-title">👁️ Pré-visualização</div>
+      <div id="prevEmpty" style="text-align:center;padding:16px;color:var(--cinza);font-size:0.8rem">
+        <div style="font-size:2rem;opacity:0.3;margin-bottom:8px">📋</div>
+        Preencha os campos ao lado para ver a prévia.
+      </div>
+      <div id="prevContent" style="display:none">
+        <div class="prev-cat" id="prevCat">—</div>
+        <div class="prev-titulo" id="prevTitulo">—</div>
+        <div class="prev-desc" id="prevDesc">—</div>
+        <div class="prev-info">
+          <div class="prev-row"><span class="lbl">💰 Orçamento</span><span class="val" style="color:var(--verde)" id="prevValor">Em aberto</span></div>
+          <div class="prev-row"><span class="lbl">⏱️ Urgência</span><span class="val" style="color:var(--laranja)" id="prevUrg">Esta semana</span></div>
+          <div class="prev-row"><span class="lbl">📍 Local</span><span class="val" id="prevEnd">—</span></div>
         </div>
       </div>
     </div>
-    <div class="loading-wrap" id="loading"><div class="spinner"></div><p id="loadingMsg">Conectando...</p></div>
-    <div id="listaPedidos"></div>
-    <div class="vazio" id="estadoVazio"><div class="vazio-icon">📭</div><p id="vazioMsg">Nenhum pedido disponível para suas categorias no momento.</p></div>
+
+    <div class="side-card" style="animation-delay:0.2s">
+      <div class="side-title">💡 Dicas</div>
+      <div class="dica"><span>📸</span><p><strong>Adicione fotos</strong>Pedidos com imagens atraem mais profissionais.</p></div>
+      <div class="dica"><span>📝</span><p><strong>Seja específico</strong>Descreva o espaço, materiais e o problema.</p></div>
+      <div class="dica"><span>📍</span><p><strong>Endereço completo</strong>Só revelado após você aceitar o contato do profissional.</p></div>
+    </div>
+
+    <div class="side-card" style="animation-delay:0.25s;padding:18px 22px">
+      <button class="btn-pub" id="btnPublicar" onclick="publicar()">🚀 <span id="btnTxt">Publicar pedido</span></button>
+      <button class="btn-canc" onclick="history.back()">Cancelar</button>
+    </div>
   </div>
 </div>
 
-<!-- MODAL DETALHE DO PEDIDO (item 1) — sem endereço nem contato -->
-<div class="overlay" id="overlayDetalhe">
-  <div class="modal" style="max-width:500px;max-height:88vh;overflow-y:auto">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <div class="modal-title" id="detTitulo">—</div>
-      <button onclick="document.getElementById('overlayDetalhe').classList.remove('vis')" style="background:rgba(255,255,255,0.06);border:none;border-radius:50%;width:28px;height:28px;color:var(--cinza);cursor:pointer;font-size:0.85rem;display:flex;align-items:center;justify-content:center">✕</button>
-    </div>
-    <div class="p-cats" id="detCats" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px"></div>
-    <div style="margin-bottom:14px">
-      <div style="font-size:0.68rem;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Descrição</div>
-      <div id="detDesc" style="font-size:0.85rem;color:var(--cinza);line-height:1.7;background:var(--azul-input);border:1px solid var(--borda);border-radius:10px;padding:12px 14px"></div>
-    </div>
-    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px" id="detMeta"></div>
-    <div id="detFotosSec" style="display:none;margin-bottom:14px">
-      <div style="font-size:0.68rem;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Fotos do serviço</div>
-      <div id="detFotos" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"></div>
-    </div>
-    <div class="taxa-info">💡 Ao clicar em "Me interesso" você entra na lista do cliente. A taxa só é cobrada quando o cliente aceitar receber sua proposta.</div>
-  </div>
-</div>
-
-<!-- MODAL — só abre quando o cliente solicitar a proposta -->
-<div class="overlay" id="overlayProposta">
-  <div class="modal">
-    <div class="modal-title">🚀 Enviar proposta</div>
-    <div class="modal-sub">O cliente quer receber sua proposta para: <strong id="modalTitulo" style="color:var(--branco)"></strong></div>
-    <div style="background:rgba(0,201,111,0.07);border:1px solid rgba(0,201,111,0.2);border-radius:9px;padding:10px 13px;font-size:0.78rem;color:var(--cinza);margin-bottom:14px;line-height:1.6">
-      ✅ O cliente aceitou receber sua proposta. Agora envie os detalhes!
-    </div>
-    <div class="mfield">
-      <label>Seu valor para o serviço (R$) <span style="color:var(--cinza);font-size:0.7rem">(opcional)</span></label>
-      <input type="number" id="propValor" placeholder="Ex: 350 (opcional)">
-    </div>
-    <div class="mfield">
-      <label>Mensagem para o cliente *</label>
-      <textarea id="propMsg" placeholder="Descreva como realizaria o serviço, sua experiência e prazo..."></textarea>
-    </div>
-    <div class="taxa-info">💡 Taxa ServiçoJá: <strong id="taxaModal">—</strong> — cobrada neste momento pois o cliente aceitou sua proposta.</div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
-      <button class="btn-send" onclick="enviarProposta()">🚀 Enviar proposta</button>
-    </div>
+<!-- MODAL SUCESSO -->
+<div class="overlay" id="overlayOk">
+  <div class="modal-box">
+    <div class="modal-icon" id="modalIcon">🎉</div>
+    <h2 id="modalTitle">Pedido publicado!</h2>
+    <p id="modalMsg">Seu pedido foi publicado. Profissionais da sua região já podem ver e demonstrar interesse.</p>
+    <button class="btn-modal" onclick="window.location.href='meus-pedidos-cliente.html'">Ver meus pedidos →</button>
   </div>
 </div>
 
 <script>
-let uid = localStorage.getItem('sj_uid');
-let todosHistorico = []; // cache de serviços concluídos
-const nomeLocal = localStorage.getItem('sj_nome') || 'Profissional';
-let categoriasAprovadas = [];
-let todosPedidos = [];
-let filtroAtual = 'todos';
-let pedidoAtual = null;
-let taxasCalc = {};
-let modoAtual = 'pedidos';
+// ── GLOBALS ────────────────────────────────────────────────────────
+const IMGBB_KEY = '327d0067238019843e43362c2f7096c7';
+let catSel = '';
+let urgSel = '📅 Esta semana';
+let valorTipo = 'aberto';
+let arquivos = [];
+let fotosUrls = [];
+let editandoId = null; // ID do pedido em edição (null = novo pedido)
+let userAtual = null;
 
-// ── INIT ──────────────────────────────────────────────────────────────
-async function init(user) {
-  try {
-    for (const id of [user.uid + '_prof', user.uid]) {
-      try {
-        const snap = await firebase.firestore().collection('usuarios').doc(id).get();
-        if (snap.exists && (snap.data().categoriasAprovadas || []).length > 0) {
-          categoriasAprovadas = snap.data().categoriasAprovadas;
-          uid = id;
-          localStorage.setItem('sj_categoriasAprovadas', JSON.stringify(categoriasAprovadas));
-          localStorage.setItem('sj_uid', id);
-          if (snap.data().nome) localStorage.setItem('sj_nome', snap.data().nome);
-          break;
-        }
-      } catch(e) {}
-    }
-    if (categoriasAprovadas.length === 0 && user.email) {
-      const q = await firebase.firestore().collection('usuarios')
-        .where('email', '==', user.email).where('tipo', '==', 'profissional').get();
-      if (!q.empty) {
-        const doc = q.docs[0];
-        categoriasAprovadas = doc.data().categoriasAprovadas || [];
-        uid = doc.id;
-        localStorage.setItem('sj_categoriasAprovadas', JSON.stringify(categoriasAprovadas));
-        localStorage.setItem('sj_uid', doc.id);
-        if (doc.data().nome) localStorage.setItem('sj_nome', doc.data().nome);
-      }
-    }
-    if (categoriasAprovadas.length === 0) {
-      const q2 = await firebase.firestore().collection('usuarios')
-        .where('aprovado', '==', true).where('tipo', '==', 'profissional').get();
-      const meuDoc = q2.docs.find(d => d.data().email === user.email || d.id === user.uid || d.id === user.uid + '_prof');
-      if (meuDoc) {
-        categoriasAprovadas = meuDoc.data().categoriasAprovadas || [];
-        uid = meuDoc.id;
-        localStorage.setItem('sj_categoriasAprovadas', JSON.stringify(categoriasAprovadas));
-        localStorage.setItem('sj_uid', meuDoc.id);
-      }
-    }
-  } catch(e) {
-    console.warn('Firestore fallback localStorage:', e);
-    categoriasAprovadas = JSON.parse(localStorage.getItem('sj_categoriasAprovadas') || '[]');
-  }
-
-  const nome = localStorage.getItem('sj_nome') || nomeLocal;
-  document.getElementById('nomeNav').textContent = nome;
-  document.getElementById('nomeCard').textContent = nome;
-  const todasCats = JSON.parse(localStorage.getItem('sj_categorias') || '[]');
-  const lista = document.getElementById('catsLista');
-  if (categoriasAprovadas.length > 0) {
-    lista.innerHTML = categoriasAprovadas.map(c =>
-      `<div class="cat-row"><span>${c}</span><span class="cat-ok">✓ Aprovado</span></div>`
-    ).join('') + todasCats.filter(c => !categoriasAprovadas.includes(c)).map(c =>
-      `<div class="cat-row"><span style="color:var(--cinza)">${c}</span><span class="cat-pend">Pendente</span></div>`
-    ).join('');
-  } else {
-    lista.innerHTML = '<div style="color:var(--cinza);font-size:0.78rem">Nenhuma aprovação ainda.<br>Faça o teste de IA!</div>';
-  }
-  const pills = document.getElementById('filtroPills');
-  categoriasAprovadas.forEach(cat => {
-    const p = document.createElement('div');
-    p.className = 'fpill'; p.setAttribute('data-cat', cat);
-    p.textContent = cat; p.onclick = function(){ selFiltro(this); };
-    pills.appendChild(p);
-  });
-  // ── VERIFICAÇÃO DE TAXA E BLOQUEIO ────────────────────────────────
-  try {
-    const profSnap = await firebase.firestore().collection('usuarios').doc(uid).get();
-    if (profSnap.exists) {
-      const dados = profSnap.data();
-      const taxa = parseFloat(dados.taxaAcumulada) || 0;
-      const hoje = new Date();
-      const dia = hoje.getDate();
-
-      // Atualiza bloco de taxa na sidebar
-      document.getElementById('taxaValor').textContent = 'R$ ' + taxa.toLocaleString('pt-BR',{minimumFractionDigits:2});
-      if (taxa > 0) document.getElementById('taxaBox').style.display = 'block';
-
-      // Calcula próximo vencimento
-      let venc;
-      if (dia <= 1) venc = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-      else if (dia <= 15) venc = new Date(hoje.getFullYear(), hoje.getMonth(), 15);
-      else venc = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 1);
-      const prazoFinal = new Date(venc.getTime() + 3 * 24 * 60 * 60 * 1000); // +3 dias
-      document.getElementById('taxaVenc').textContent = taxa > 0
-        ? 'Pague até ' + prazoFinal.toLocaleDateString('pt-BR') : '—';
-
-      // ── REGRA 1: Bloqueio por inadimplência (passou do prazo) ──────
-      const estaNoGrace = hoje <= prazoFinal;
-      const temTaxaVencida = taxa > 0 && !estaNoGrace;
-
-      // ── REGRA 2: Alerta R$250 ─────────────────────────────────────
-      if (taxa >= 250 && !dados.alerta250Enviado) {
-        await firebase.firestore().collection('usuarios').doc(uid).update({alerta250Enviado: true});
-        await firebase.firestore().collection('notificacoes').add({
-          para: uid, tipo: 'sistema',
-          mensagem: '⚠️ Sua taxa acumulada chegou a R$ ' + taxa.toFixed(2) + '. Ao atingir R$ 300,00 você terá apenas 3 dias para pagar antes de ser bloqueado.',
-          link: 'dashboard-profissional.html', lida: false, criadoEm: new Date().toISOString()
-        });
-      }
-
-      // ── REGRA 3: Alerta R$300 + início contagem de 3 dias ─────────
-      if (taxa >= 300) {
-        if (!dados.alerta300Em) {
-          // Primeiro vez que chega em 300 — registra a data e notifica
-          await firebase.firestore().collection('usuarios').doc(uid).update({
-            alerta300Em: new Date().toISOString(),
-            alerta250Enviado: true
-          });
-          await firebase.firestore().collection('notificacoes').add({
-            para: uid, tipo: 'sistema',
-            mensagem: '🚨 Sua taxa atingiu R$ ' + taxa.toFixed(2) + '! Você tem 3 dias para efetuar o pagamento. Após esse prazo sua conta será bloqueada automaticamente.',
-            link: 'dashboard-profissional.html', lida: false, criadoEm: new Date().toISOString()
-          });
-        } else {
-          // Verifica se passaram 3 dias desde o alerta de R$300
-          const alerta300Date = new Date(dados.alerta300Em);
-          const diasDesdeAlerta = (hoje - alerta300Date) / (1000 * 60 * 60 * 24);
-          if (diasDesdeAlerta >= 3) { /* será bloqueado abaixo */ }
-        }
-      }
-
-      // ── BLOQUEIO EFETIVO ──────────────────────────────────────────
-      const bloquear300 = taxa >= 300 && dados.alerta300Em &&
-        ((hoje - new Date(dados.alerta300Em)) / (1000 * 60 * 60 * 24)) >= 3;
-
-      if (temTaxaVencida || bloquear300 || dados.bloqueado) {
-        // Mostra tela de bloqueio e impede carregamento de pedidos
-        const motivo = bloquear300
-          ? 'Sua taxa atingiu R$ 300,00 e o prazo de 3 dias para pagamento expirou.'
-          : dados.bloqueado
-            ? 'Sua conta foi bloqueada pelo administrador.'
-            : 'Você possui taxas em atraso. O prazo de pagamento expirou.';
-
-        document.getElementById('bloqueadoBox').classList.add('vis');
-        document.getElementById('bloqueadoBox').innerHTML = `
-          <div class="bloq-icon">🔒</div>
-          <div class="bloq-title">Conta bloqueada</div>
-          <div class="bloq-sub">${motivo}<br><br>Regularize seu pagamento para voltar a receber pedidos.</div>
-          <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px;margin-bottom:10px;font-size:.75rem;color:var(--cinza)">
-            Taxa pendente: <strong style="color:var(--erro)">R$ ${taxa.toFixed(2)}</strong>
-          </div>
-          <button class="btn-regularizar" onclick="abrirPagamento()">💳 Pagar agora e regularizar</button>`;
-
-        // Esconde lista de pedidos e filtros
-        document.getElementById('listaPedidos').innerHTML = `
-          <div style="text-align:center;padding:40px 20px;color:var(--cinza)">
-            <div style="font-size:2.5rem;margin-bottom:12px">🔒</div>
-            <div style="font-weight:700;color:var(--erro);margin-bottom:8px">Conta bloqueada por inadimplência</div>
-            <div style="font-size:.82rem;line-height:1.6">Regularize o pagamento no painel à esquerda<br>para voltar a ver e dar interesse em pedidos.</div>
-          </div>`;
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('filtroPills').style.opacity = '0.3';
-        document.getElementById('filtroPills').style.pointerEvents = 'none';
-
-        // Não carrega pedidos se bloqueado
-        return;
-      }
-    }
-  } catch(e) { console.warn('Erro na verificação de taxa:', e); }
-  // carregarPedidos é chamado pelo auth handler diretamente
+// ── DETECTA MODO EDIÇÃO ─────────────────────────────────────────────
+const params = new URLSearchParams(window.location.search);
+editandoId = params.get('editar') || null;
+if (editandoId) {
+  document.getElementById('pageTitle').textContent = '✏️ Editar pedido';
+  document.getElementById('pageSub').textContent = 'Atualize as informações do seu pedido.';
+  document.getElementById('btnTxt').textContent = 'Salvar alterações';
 }
 
-// ── UTILS ─────────────────────────────────────────────────────────────
-function calcularTaxa(p) {
-  let pts = 0;
-  if ((p.urgencia||'').includes('Urgente')) pts += 30;
-  else if ((p.urgencia||'').includes('semana')) pts += 15;
-  else pts += 5;
-  const val = parseFloat(p.valor) || 0;
-  if (val >= 1000) pts += 30; else if (val >= 500) pts += 20; else pts += 10;
-  const desc = (p.descricao||'').length;
-  if (desc >= 300) pts += 20; else if (desc >= 150) pts += 10; else pts += 5;
-  const nc = Array.isArray(p.categorias) ? p.categorias.length : 1;
-  if (nc >= 3) pts += 15; else if (nc >= 2) pts += 8;
-  return Math.min(50, Math.max(10, Math.round(10 + (pts / 95) * 40)));
-}
-function formatData(iso) { return iso ? new Date(iso).toLocaleDateString('pt-BR') : '—'; }
-function meuInteresse(pedido) { return (pedido.interessados || []).find(i => i.profissionalId === uid); }
-
-// ── CARREGAR PEDIDOS ──────────────────────────────────────────────────
-// ── Normaliza categoria: remove emoji e normaliza texto ──────────────
-// ── CARREGAR PEDIDOS ──────────────────────────────────────────────────
-// ── NAV / FILTRO ──────────────────────────────────────────────────────
-function selNav(modo, el) {
-  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('ativo'));
-  el.classList.add('ativo');
-  modoAtual = modo;
-  // Esconde spinner ao trocar aba — renderPedidos cuida do estado vazio
-  document.getElementById('loading').style.display = 'none';
-  // Mostra filtros só na aba pedidos disponíveis
-  const isPedidos = modo === 'pedidos';
-  document.getElementById('filtroPills').style.display = isPedidos ? 'flex' : 'none';
-  const diasWrap = document.getElementById('diasFiltroWrap');
-  if (diasWrap) diasWrap.style.display = isPedidos ? 'flex' : 'none';
-  // Reseta filtro de tempo ao trocar aba
-  const diasSel = document.getElementById('diasFiltro');
-  if (diasSel && !isPedidos) diasSel.value = '0';
-  const titulos = {pedidos:'Pedidos disponíveis', propostas:'Meus interesses', aceitos:'Trabalhos aceitos', historico:'Histórico de serviços concluídos'};
-  document.getElementById('section-titulo').textContent = titulos[modo];
-  // Esconde filtros de categoria e tempo no histórico
-  const filtroPills = document.getElementById('filtroPills');
-  if (filtroPills) filtroPills.style.display = (modo === 'pedidos') ? 'flex' : 'none';
-  // Só renderiza se carregamento já terminou
-  const loading = document.getElementById('loading');
-  if (loading && loading.style.display !== 'none') {
-    // Ainda carregando — mostra mensagem na área de lista
-    document.getElementById('listaPedidos').innerHTML = '<div style="text-align:center;padding:40px;color:var(--cinza)">⏳ Carregando pedidos...</div>';
-    return;
-  }
-  if (modo === 'historico') carregarHistorico().then(renderPedidos);
-  else renderPedidos();
-}
-function selFiltro(el) {
-  document.querySelectorAll('.fpill').forEach(p => p.classList.remove('ativo'));
-  el.classList.add('ativo');
-  filtroAtual = el.getAttribute('data-cat');
-  renderPedidos();
-}
-
-// ── RENDER ────────────────────────────────────────────────────────────
-function renderPedidos() {
-  const lista = document.getElementById('listaPedidos');
-  const msgs = {
-    pedidos:'Nenhum pedido disponível para suas categorias.',
-    propostas:'Você ainda não demonstrou interesse em nenhum pedido.',
-    aceitos:'Nenhum trabalho aceito ou aguardando contato ainda.',
-    historico:'Nenhum serviço concluído ainda.'
-  };
-  document.getElementById('vazioMsg').textContent = msgs[modoAtual];
-
-  let filtrado = [];
-
-  if (modoAtual === 'pedidos') {
-    // Só mostra pedidos onde o prof NÃO tem interesse ainda
-    // (status null) ou tem interesse pendente (aguardando cliente)
-    let base = todosPedidos.filter(p => {
-      const int = meuInteresse(p);
-      const st = int ? int.status : null;
-      // Exclui pedidos onde cliente já aceitou (solicitado/enviado) — esses vão para Aceitos
-      return !st || st === 'interessado';
-    });
-    // Filtro de categoria
-    if (filtroAtual !== 'todos') {
-      base = base.filter(p => (Array.isArray(p.categorias)?p.categorias:[p.categorias]).includes(filtroAtual));
-    }
-    // Filtro de tempo
-    const diasFiltro = parseInt(document.getElementById('diasFiltro')?.value || '0');
-    if (diasFiltro > 0) {
-      const limite = new Date(Date.now() - diasFiltro * 24 * 60 * 60 * 1000);
-      base = base.filter(p => p.criadoEm && new Date(p.criadoEm) >= limite);
-    }
-    filtrado = base;
-
-  } else if (modoAtual === 'propostas') {
-    // Interesses pendentes (aguardando cliente aceitar)
-    filtrado = todosPedidos.filter(p => {
-      const int = meuInteresse(p);
-      return int && int.status === 'interessado';
-    });
-
-  } else if (modoAtual === 'aceitos') {
-    // Cliente aceitou (solicitado) ou proposta já enviada + aceito pelo sistema
-    filtrado = todosPedidos.filter(p => {
-      if (p.profissionalAceito === uid) return true;
-      const int = meuInteresse(p);
-      return int && (int.status === 'solicitado' || int.status === 'enviado');
-    });
-  } else if (modoAtual === 'historico') {
-    // Serviços concluídos por este profissional
-    filtrado = todosHistorico;
-  }
-
-  if (!filtrado.length) { lista.innerHTML=''; document.getElementById('estadoVazio').classList.add('vis'); return; }
-  document.getElementById('estadoVazio').classList.remove('vis');
-
-  lista.innerHTML = filtrado.map(p => {
-    const rawCats2 = p.categorias || (p.categoria ? [p.categoria] : []);
-    const cats = Array.isArray(rawCats2) && rawCats2.length ? rawCats2 : [p.categoria||'—'];
-    const taxa = calcularTaxa(p); taxasCalc[p.id] = taxa;
-    const orc = p.orcamento==='aproximado'&&p.valor ? 'R$ '+parseFloat(p.valor).toLocaleString('pt-BR') : 'Em aberto';
-    let urgClass='urg-pressa', urgLabel=p.urgencia||'🗓️ Sem pressa';
-    if ((p.urgencia||'').includes('Urgente')) urgClass='urg-urgente';
-    else if ((p.urgencia||'').includes('semana')) urgClass='urg-semana';
-
-    const interesse = meuInteresse(p);
-    const status = interesse ? interesse.status : null;
-
-    let actionHtml = '';
-    if (modoAtual === 'historico') {
-      actionHtml = `<span class="status-pill" style="background:rgba(0,201,111,0.1);border:1px solid rgba(0,201,111,0.25);color:var(--verde)">✅ Concluído</span>`;
-    } else if (modoAtual === 'pedidos') {
-      if (!status) {
-        // Ainda não demonstrou interesse
-        actionHtml = `<div class="taxa-badge">Taxa: R$ ${taxa}</div>
-          <button class="btn-interesso" onclick="registrarInteresse('${p.id}', this)">👋 Me interesso</button>`;
-      } else if (status === 'interessado') {
-        actionHtml = `<button class="btn-interesso" disabled>⏳ Aguardando cliente</button>`;
-      } else if (status === 'solicitado') {
-        // Cliente aceitou — mostra botão para falar via WhatsApp (item 4)
-        actionHtml = `<button class="btn-enviar-proposta" onclick="abrirWhatsAppCliente('${p.id}')">📲 Falar com cliente</button>`;
-      } else if (status === 'enviado') {
-        actionHtml = `<button class="btn-interesso" disabled>✅ Proposta enviada</button>`;
-      }
-    } else if (modoAtual === 'propostas') {
-      // Só aparece interessados aguardando
-      if (status === 'interessado') {
-        actionHtml = `<span class="status-pill status-aguardando">⏳ Aguardando cliente aceitar</span>`;
-      }
-    } else if (modoAtual === 'aceitos') {
-      // Cliente aceitou → falar com cliente + marcar concluído
-      if (status === 'solicitado') {
-        actionHtml = `
-          <span class="status-pill status-solicitado">⚡ Cliente aceitou!</span>
-          <button class="btn-enviar-proposta" onclick="abrirWhatsAppCliente('${p.id}')">📲 Falar com cliente</button>
-          <button class="btn-interesso" onclick="confirmarConcluir('${p.id}')" style="border-color:rgba(0,201,111,0.5);margin-top:6px;width:100%">✅ Marcar como concluído</button>`;
-      } else if (status === 'enviado' || p.profissionalAceito === uid) {
-        actionHtml = `
-          <span class="status-pill status-enviada">✅ Em contato</span>
-          <button class="btn-interesso" onclick="confirmarConcluir('${p.id}')" style="border-color:rgba(0,201,111,0.5);margin-top:6px;width:100%">✅ Marcar como concluído</button>`;
-      }
-    }
-
-    return `<div class="pedido-card">
-      <div class="p-cats">${cats.map(c=>`<span class="pcat">${c}</span>`).join('')}</div>
-      <div class="p-title" style="cursor:pointer" onclick="abrirDetalhe('${p.id}')">${p.titulo||'Sem título'} <span style="font-size:0.7rem;color:var(--cinza);font-weight:400">🔍 ver mais</span></div>
-      <div class="p-desc">${p.descricao||'Sem descrição.'}</div>
-      <div class="p-footer">
-        <div class="p-meta">
-          <span class="pm">📅 <strong>${formatData(p.criadoEm)}</strong></span>
-          <span class="pm">💰 <strong>${orc}</strong></span>
-          <span class="pm">📍 <strong>${(() => { const b = p.bairro || p.endereco?.bairro || ''; const c = p.cidade || p.endereco?.cidade || (p.endereco||'').split(',').slice(-1)[0] || '—'; return (b ? b + ', ' : '') + c; })()}</strong></span>
-          <span class="urg ${urgClass}">${urgLabel}</span>
-        </div>
-        <div class="p-actions">${actionHtml}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ── DETALHE DO PEDIDO (item 1) ────────────────────────────────────────
-function abrirDetalhe(pedidoId) {
-  const p = todosPedidos.find(x => x.id === pedidoId);
-  if (!p) return;
-  document.getElementById('detTitulo').textContent = p.titulo || 'Sem título';
-  const cats = Array.isArray(p.categorias) ? p.categorias : [p.categorias || '—'];
-  document.getElementById('detCats').innerHTML = cats.map(c => `<span class="pcat">${c}</span>`).join('');
-  document.getElementById('detDesc').textContent = p.descricao || 'Sem descrição.';
-  const orc = p.orcamento === 'aproximado' && p.valor ? 'R$ ' + parseFloat(p.valor).toLocaleString('pt-BR') : 'Em aberto';
-  const urgLabel = p.urgencia || '🗓️ Sem pressa';
-  document.getElementById('detMeta').innerHTML = `
-    <span style="font-size:0.75rem;background:var(--azul-input);border:1px solid var(--borda);border-radius:8px;padding:5px 10px;color:var(--cinza)">📅 ${formatData(p.criadoEm)}</span>
-    <span style="font-size:0.75rem;background:var(--azul-input);border:1px solid var(--borda);border-radius:8px;padding:5px 10px;color:var(--cinza)">💰 ${orc}</span>
-    <span style="font-size:0.75rem;background:var(--azul-input);border:1px solid var(--borda);border-radius:8px;padding:5px 10px;color:var(--cinza)">${urgLabel}</span>`;
-  // Fotos do pedido (sem endereço, sem contato)
-  const fotos = p.fotos || [];
-  const secFotos = document.getElementById('detFotosSec');
-  if (fotos.length > 0) {
-    secFotos.style.display = 'block';
-    document.getElementById('detFotos').innerHTML = fotos.map(f =>
-      `<div style="aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid var(--borda)"><img src="${f}" style="width:100%;height:100%;object-fit:cover"></div>`
-    ).join('');
-  } else { secFotos.style.display = 'none'; }
-  document.getElementById('overlayDetalhe').classList.add('vis');
-}
-
-// ── REGISTRAR INTERESSE (sem modal) ───────────────────────────────────
-async function registrarInteresse(pedidoId, btn) {
-  const pedido = todosPedidos.find(p => p.id === pedidoId);
-  if (!pedido) return;
-  btn.disabled = true; btn.textContent = 'Registrando...';
-  const nome = localStorage.getItem('sj_nome') || 'Profissional';
-  const taxa = taxasCalc[pedidoId] || calcularTaxa(pedido);
-  const novoInteresse = { profissionalId: uid, profissionalNome: nome, taxa, status: 'interessado', registradoEm: new Date().toISOString() };
-  const intsAtualizados = [...(pedido.interessados || []).filter(i => i.profissionalId !== uid), novoInteresse];
-  try {
-    await firebase.firestore().collection('pedidos').doc(pedidoId).update({ interessados: intsAtualizados });
-    pedido.interessados = intsAtualizados;
-    btn.textContent = '⏳ Aguardando cliente';
-    const env = parseInt(document.getElementById('statEnv').textContent) || 0;
-    document.getElementById('statEnv').textContent = env + 1;
-    criarNotificacao(pedido.clienteId, 'interesse',
-      nome + ' tem interesse no seu pedido "' + pedido.titulo + '". Veja o perfil dele!',
-      'meus-pedidos-cliente.html');
-  } catch(e) {
-    btn.disabled = false; btn.textContent = '👋 Me interesso';
-    alert('Erro: ' + e.message);
-  }
-}
-
-// ── MODAL PROPOSTA (só quando cliente solicitar) ───────────────────────
-// ── WHATSAPP DO CLIENTE (item 4) ──────────────────────────────────────
-async function abrirWhatsAppCliente(pedidoId) {
-  const pedido = todosPedidos.find(p => p.id === pedidoId);
-  if (!pedido) return;
-  const nome = localStorage.getItem('sj_nome') || 'Profissional';
-  const msg = encodeURIComponent(`Olá! Sou ${nome} cadastrado no ServiçoJá Conecta. Você aceitou meu contato para "${pedido.titulo}". Podemos conversar?`);
-  let tel = '';
-  try {
-    // Tenta direto pelo clienteId
-    if (pedido.clienteId) {
-      for (const id of [pedido.clienteId]) {
-        try {
-          const s = await firebase.firestore().collection('usuarios').doc(id).get();
-          if (s.exists) { tel = s.data().telefone || s.data().whatsapp || s.data().phone || ''; break; }
-        } catch(e) {}
-      }
-    }
-    // Fallback: telefone embutido no pedido
-    if (!tel) tel = pedido.clienteTelefone || pedido.telefone || '';
-
-    const telLimpo = tel.replace(/\D/g, '');
-    // Abre WhatsApp diretamente, com ou sem número
-    const waUrl = telLimpo.length >= 10
-      ? `https://wa.me/55${telLimpo}?text=${msg}`
-      : `https://wa.me/?text=${msg}`;
-    window.open(waUrl, '_blank');
-  } catch(e) { alert('Erro ao buscar contato: ' + e.message); }
-}
-
-function abrirModalProposta(pedidoId) {
-  pedidoAtual = todosPedidos.find(p => p.id === pedidoId);
-  if (!pedidoAtual) return;
-  document.getElementById('modalTitulo').textContent = pedidoAtual.titulo || '';
-  document.getElementById('taxaModal').textContent = 'R$ ' + (taxasCalc[pedidoId] || '—');
-  document.getElementById('propValor').value = '';
-  document.getElementById('propMsg').value = '';
-  document.getElementById('overlayProposta').classList.add('vis');
-}
-function fecharModal() { document.getElementById('overlayProposta').classList.remove('vis'); pedidoAtual = null; }
-
-async function enviarProposta() {
-  const valor = document.getElementById('propValor').value.trim();
-  const msg = document.getElementById('propMsg').value.trim();
-  if (!msg) { alert('Escreva uma mensagem para o cliente!'); return; }
-  if (!pedidoAtual) return;
-
-  const taxa = taxasCalc[pedidoAtual.id] || 10;
-  const nome = localStorage.getItem('sj_nome') || 'Profissional';
-  const pedidoId = pedidoAtual.id;
-  const pedidoTitulo = pedidoAtual.titulo;
-  const pedidoClienteId = pedidoAtual.clienteId;
-  const intsAtualizados = (pedidoAtual.interessados || []).map(i =>
-    i.profissionalId === uid
-      ? { ...i, status: 'enviado', mensagem: msg, valor: valor ? parseFloat(valor) : null, taxa, enviadoEm: new Date().toISOString() }
-      : i
-  );
-  try {
-    await firebase.firestore().collection('pedidos').doc(pedidoId).update({ interessados: intsAtualizados });
-    await firebase.firestore().collection('usuarios').doc(uid).update({ taxaAcumulada: firebase.firestore.FieldValue.increment(taxa) }).catch(()=>{});
-    const p = todosPedidos.find(x => x.id === pedidoId);
-    if (p) p.interessados = intsAtualizados;
-    fecharModal();
-    renderPedidos();
-    criarNotificacao(pedidoClienteId, 'proposta',
-      nome + ' enviou a proposta para "' + pedidoTitulo + '". Veja os detalhes!',
-      'meus-pedidos-cliente.html');
-    alert('✅ Proposta enviada com sucesso!');
-  } catch(e) { alert('Erro ao enviar: ' + e.message); }
-}
-
-// ── CONCLUIR SERVIÇO ──────────────────────────────────────────────────
-function confirmarConcluir(pedidoId) {
-  if (!confirm('Marcar este serviço como concluído?\n\nEle sairá da sua lista de aceitos e irá para o histórico.')) return;
-  concluirServico(pedidoId);
-}
-
-async function concluirServico(pedidoId) {
-  const pedido = todosPedidos.find(p => p.id === pedidoId);
-  if (!pedido) return;
-  try {
-    // Salva no histórico do profissional
-    await firebase.firestore().collection('historico').add({
-      profissionalId: uid,
-      pedidoId: pedidoId,
-      titulo: pedido.titulo || '—',
-      categorias: pedido.categorias || [pedido.categoria] || [],
-      clienteNome: pedido.clienteNome || '—',
-      endereco: pedido.endereco || '—',
-      concluidoEm: new Date().toISOString()
-    });
-    // Atualiza status do pedido para concluído
-    await firebase.firestore().collection('pedidos').doc(pedidoId).update({
-      status: 'concluido',
-      profissionalAceito: uid
-    });
-    // Remove do cache local
-    const idx = todosPedidos.findIndex(p => p.id === pedidoId);
-    if (idx !== -1) todosPedidos.splice(idx, 1);
-    // Atualiza contadores
-    document.getElementById('statAc').textContent =
-      todosPedidos.filter(p => { const i=meuInteresse(p); return i&&(i.status==='solicitado'||i.status==='enviado'); }).length;
-    renderPedidos();
-    alert('✅ Serviço marcado como concluído! Veja em "Histórico concluídos".');
-  } catch(e) { alert('Erro: ' + e.message); }
-}
-
-// ── CARREGAR HISTÓRICO ────────────────────────────────────────────────
-async function carregarHistorico() {
-  if (todosHistorico.length > 0) return; // já carregado
-  try {
-    const snap = await firebase.firestore().collection('historico')
-      .where('profissionalId', '==', uid)
-      .limit(50)
-      .get();
-    todosHistorico = snap.docs.map(d => ({id: d.id, ...d.data(),
-      titulo: d.data().titulo,
-      categorias: d.data().categorias,
-      descricao: 'Concluído em ' + (d.data().concluidoEm ? new Date(d.data().concluidoEm).toLocaleDateString("pt-BR") : "—"),
-      criadoEm: d.data().concluidoEm,
-      urgencia: '',
-      orcamento: '',
-      endereco: d.data().endereco
-    })).sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
-  } catch(e) { todosHistorico = []; }
-}
-
-function abrirPagamento() {
-  const taxa = parseFloat(document.getElementById('taxaValor').textContent.replace('R$ ','').replace(',','.')) || 0;
-  if (taxa <= 0) { alert('Você não possui taxas pendentes!'); return; }
-  document.getElementById('pagValor').textContent = 'R$ ' + taxa.toLocaleString('pt-BR',{minimumFractionDigits:2});
-  document.getElementById('pagStatus').textContent = '';
-  document.getElementById('pagStatus').style.display = 'none';
-  document.getElementById('pagComp').value = '';
-  document.getElementById('pagPreview').style.display = 'none';
-  document.getElementById('pagCompUrl').value = '';
-  document.getElementById('overlayPagamento').classList.add('vis');
-}
-
-async function uploadComprovante(input) {
-  if (!input.files[0]) return;
-  const btn = document.getElementById('btnEnviarPag');
-  btn.textContent = 'Enviando...'; btn.disabled = true;
-  try {
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-      const base64 = e.target.result.split(',')[1];
-      const fd = new FormData(); fd.append('image', base64);
-      const res = await fetch('https://api.imgbb.com/1/upload?key=327d0067238019843e43362c2f7096c7', {method:'POST',body:fd});
-      const data = await res.json();
-      if (data.success) {
-        document.getElementById('pagCompUrl').value = data.data.url;
-        document.getElementById('pagPreview').src = data.data.url;
-        document.getElementById('pagPreview').style.display = 'block';
-        btn.textContent = '✅ Enviar comprovante';
-        btn.disabled = false;
-      } else { btn.textContent = '✅ Enviar comprovante'; btn.disabled = false; alert('Erro no upload. Tente novamente.'); }
-    };
-    reader.readAsDataURL(input.files[0]);
-  } catch(e) { btn.textContent = '✅ Enviar comprovante'; btn.disabled = false; alert('Erro: ' + e.message); }
-}
-
-async function enviarComprovante() {
-  const compUrl = document.getElementById('pagCompUrl').value;
-  const taxa = parseFloat(document.getElementById('taxaValor').textContent.replace('R$ ','').replace(',','.')) || 0;
-  if (!compUrl) { alert('Por favor anexe o comprovante de pagamento!'); return; }
-  const btn = document.getElementById('btnEnviarPag');
-  btn.disabled = true; btn.textContent = 'Enviando...';
-  const nome = localStorage.getItem('sj_nome') || 'Profissional';
-  const hoje = new Date();
-  try {
-    await firebase.firestore().collection('pagamentos').add({
-      profissionalId: uid,
-      profissionalNome: nome,
-      valor: taxa,
-      comprovanteUrl: compUrl,
-      status: 'pendente',
-      criadoEm: hoje.toISOString(),
-      mes: hoje.getFullYear() + '-' + String(hoje.getMonth()+1).padStart(2,'0')
-    });
-    const st = document.getElementById('pagStatus');
-    st.textContent = '✅ Comprovante enviado! Aguardando aprovação do admin.';
-    st.style.cssText = 'display:block;background:rgba(0,201,111,.1);border:1px solid rgba(0,201,111,.25);color:var(--verde);border-radius:8px;padding:10px 12px;font-size:.8rem;margin-top:10px;text-align:center';
-    btn.textContent = '✅ Enviado!';
-    setTimeout(() => document.getElementById('overlayPagamento').classList.remove('vis'), 2500);
-  } catch(e) { btn.disabled=false; btn.textContent='✅ Enviar comprovante'; alert('Erro: ' + e.message); }
-}
-async function sair() { await firebase.auth().signOut(); localStorage.clear(); window.location.href = 'login.html'; }
-
+// ── AUTH ───────────────────────────────────────────────────────────
 firebase.auth().onAuthStateChanged(async function(user) {
   if (!user) { window.location.href = 'login.html'; return; }
+  userAtual = user;
+  const nome = localStorage.getItem('sj_nome') || user.displayName || 'Cliente';
+  document.getElementById('navNome').textContent = nome;
 
-  // Atualiza nome do cache
-  const nomeCache = localStorage.getItem('sj_nome');
-  if (nomeCache) { const el=document.getElementById('profNome'); if(el) el.textContent=nomeCache; }
-
-  // Busca doc profissional e pedidos
-  await carregarTudo(user);
-
-  // Notificações depois
-  setTimeout(() => carregarNotificacoes(uid || user.uid), 2000);
+  // Se modo edição, carrega dados do pedido
+  if (editandoId) await carregarPedido(editandoId);
 });
 
-async function carregarTudo(user) {
-  const setMsg = t => { const el=document.getElementById('loadingMsg'); if(el) el.textContent=t; };
-
+// ── CARREGAR PEDIDO PARA EDIÇÃO ────────────────────────────────────
+async function carregarPedido(id) {
   try {
-    setMsg('🔍 Buscando seu perfil...');
+    const snap = await firebase.firestore().collection('pedidos').doc(id).get();
+    // FIX: .exists é propriedade, não função
+    if (!snap.exists) { alert('Pedido não encontrado.'); history.back(); return; }
+    const d = snap.data();
 
-    // Busca doc do profissional
-    const ids = [user.uid + '_prof', user.uid];
-    for (const id of ids) {
-      try {
-        const s = await firebase.firestore().collection('usuarios').doc(id).get();
-        if (s.exists) {
-          uid = id;
-          localStorage.setItem('sj_uid', id);
-          const d = s.data();
-          categoriasAprovadas = d.categoriasAprovadas || [];
-          if (d.nome) { localStorage.setItem('sj_nome', d.nome); const el=document.getElementById('profNome'); if(el) el.textContent=d.nome; }
-          if (d.fotoPerfil) { const av=document.getElementById('navAv'); if(av) av.innerHTML='<img src="'+d.fotoPerfil+'">'; }
-          const catDiv=document.getElementById('profCats');
-          if (catDiv) catDiv.innerHTML=(d.categoriasAprovadas||[]).map(c=>'<div class="prof-cat"><span>'+c+'</span><span class="aprov-badge">✓ Aprovado</span></div>').join('');
-          break;
-        }
-      } catch(e2) { console.warn('Doc não encontrado:', id); }
-    }
+    // Título e descrição
+    document.getElementById('titulo').value = d.titulo || '';
+    document.getElementById('descricao').value = d.descricao || '';
+    document.getElementById('charCount').textContent = (d.descricao || '').length;
 
-    setMsg('📋 Buscando pedidos...');
-
-    // Busca pedidos com timeout de 10s
-    const snap = await Promise.race([
-      firebase.firestore().collection('pedidos').get(),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore timeout após 10s')), 10000))
-    ]);
-
-    const todos = snap.docs.map(d => ({id: d.id, ...d.data()}))
-      .filter(p => !p.status || p.status === 'aberto')
-      .sort((a,b) => (b.criadoEm||'').localeCompare(a.criadoEm||''));
-
-    // Filtra por categoria (ou mostra todos se sem categoria)
-    if (categoriasAprovadas.length > 0) {
-      const norm = s => (s||'').toLowerCase().replace(/[^a-záéíóúãõâêôàçüñ\s]/g,'').trim();
-      const fil = todos.filter(p => {
-        const rc = Array.isArray(p.categorias)?p.categorias:(p.categoria?[p.categoria]:[]);
-        return rc.some(c => categoriasAprovadas.some(a => {
-          const nc=norm(c), na=norm(a);
-          return nc===na || na.includes(nc) || nc.includes(na);
-        }));
+    // Categoria — busca em categorias (array) ou categoria (string)
+    const cat = (d.categorias && d.categorias[0]) || d.categoria || '';
+    if (cat) {
+      document.querySelectorAll('.cat-pill').forEach(p => {
+        if (p.textContent.trim() === cat) { p.classList.add('sel'); catSel = cat; }
       });
-      todosPedidos = fil.length > 0 ? fil : todos;
-    } else {
-      todosPedidos = todos;
     }
 
-    const pedDisp    = todosPedidos.filter(p => { const i=meuInteresse(p); return !i||!i.status; }).length;
-    const pedInt     = todosPedidos.filter(p => { const i=meuInteresse(p); return i&&i.status==='interessado'; }).length;
-    const pedAceitos = todosPedidos.filter(p => { const i=meuInteresse(p); return i&&(i.status==='solicitado'||i.status==='enviado'); }).length;
+    // Endereço
+    document.getElementById('endereco').value = d.endereco || d.bairro || '';
 
-    document.getElementById('statDisp').textContent = pedDisp;
-    document.getElementById('statEnv').textContent  = pedInt;
-    document.getElementById('statAc').textContent   = pedAceitos;
-    document.getElementById('loading').style.display = 'none';
+    // Urgência
+    urgSel = d.urgencia || '📅 Esta semana';
+    document.querySelectorAll('.urg-btn').forEach(b => {
+      b.classList.remove('sel');
+      if (b.textContent.trim().startsWith(urgSel.split(' ')[0]) ||
+          b.getAttribute('onclick').includes(urgSel)) {
+        b.classList.add('sel');
+      }
+    });
+    // Seleciona por texto exato
+    document.querySelectorAll('.urg-btn').forEach(b => {
+      if (b.childNodes[0]?.textContent?.trim() === urgSel) b.classList.add('sel');
+    });
 
-    // Verificação de taxa (non-blocking)
-    verificarTaxa().catch(e => console.warn('taxa:', e));
+    // Orçamento
+    valorTipo = d.orcamento || 'aberto';
+    document.querySelectorAll('.valor-btn').forEach(b => b.classList.remove('sel'));
+    if (valorTipo === 'aproximado') {
+      document.querySelectorAll('.valor-btn')[1].classList.add('sel');
+      document.getElementById('valorWrap').classList.add('vis');
+      if (d.valor) document.getElementById('valor').value = d.valor;
+    } else {
+      document.querySelectorAll('.valor-btn')[0].classList.add('sel');
+    }
 
-    renderPedidos();
+    // Fotos existentes
+    fotosUrls = d.fotos || [];
+    if (fotosUrls.length > 0) {
+      document.getElementById('uploadArea').style.display = 'none';
+      const prev = document.getElementById('filesPreview');
+      fotosUrls.forEach((url, i) => {
+        const thumb = document.createElement('div');
+        thumb.className = 'file-thumb';
+        thumb.innerHTML = `🖼️<span>Foto ${i+1}</span><div class="remove" onclick="removerFoto(${i},this)">✕</div>`;
+        prev.appendChild(thumb);
+      });
+    }
 
+    atualizarPreview();
   } catch(e) {
-    document.getElementById('loading').innerHTML =
-      '<div style="text-align:center;padding:30px"><div style="font-size:2rem;margin-bottom:10px">❌</div>' +
-      '<div style="color:#FF5C5C;font-weight:700;margin-bottom:8px">Erro ao carregar</div>' +
-      '<div style="color:#8A9BB5;font-size:0.8rem;margin-bottom:16px">'+e.message+'</div>' +
-      '<button onclick="location.reload()" style="background:#00C96F;border:none;border-radius:8px;padding:8px 16px;color:#0A1628;font-weight:700;cursor:pointer">🔄 Recarregar</button></div>';
-    console.error('carregarTudo:', e);
+    alert('Erro ao carregar pedido: ' + e.message);
   }
 }
 
-// ── NOTIFICAÇÕES ──────────────────────────────────────────────────────
-let notifAberto=false, notifIds=[];
-function toggleNotif() {
-  notifAberto=!notifAberto;
-  document.getElementById('notifDropdown').style.display=notifAberto?'block':'none';
-  if(notifAberto) marcarTodasLidas();
+// ── BUSCA DE CATEGORIAS ────────────────────────────────────────────
+function filtrarCats(texto) {
+  const t = texto.toLowerCase();
+  document.querySelectorAll('#catsScroll .cat-pill').forEach(p => {
+    p.style.display = p.textContent.toLowerCase().includes(t) ? '' : 'none';
+  });
 }
-document.addEventListener('click', e => {
-  const w=document.getElementById('notifWrap');
-  if(w&&!w.contains(e.target)){notifAberto=false;document.getElementById('notifDropdown').style.display='none';}
-});
-function tempoRelativo(d) {
-  const diff=Date.now()-new Date(d).getTime(),min=Math.floor(diff/60000);
-  if(min<1)return'agora';if(min<60)return min+'min atrás';
-  const h=Math.floor(min/60);if(h<24)return h+'h atrás';return Math.floor(h/24)+'d atrás';
+
+// ── SELEÇÃO CATEGORIA ──────────────────────────────────────────────
+function selCat(el, nome) {
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('sel'));
+  el.classList.add('sel');
+  catSel = nome;
+  atualizarPreview();
 }
-async function carregarNotificacoes(nuid) {
+
+// ── SELEÇÃO VALOR ──────────────────────────────────────────────────
+function selValor(tipo, el) {
+  document.querySelectorAll('.valor-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  valorTipo = tipo;
+  document.getElementById('valorWrap').classList.toggle('vis', tipo === 'aproximado');
+  atualizarPreview();
+}
+
+// ── SELEÇÃO URGÊNCIA ───────────────────────────────────────────────
+function selUrg(el, nome) {
+  document.querySelectorAll('.urg-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  urgSel = nome;
+  atualizarPreview();
+}
+
+// ── PREVIEW ────────────────────────────────────────────────────────
+function atualizarDesc(el) { document.getElementById('charCount').textContent = el.value.length; atualizarPreview(); }
+
+function atualizarPreview() {
+  const titulo = document.getElementById('titulo').value;
+  const desc = document.getElementById('descricao').value;
+  const end = document.getElementById('endereco').value;
+  const valor = document.getElementById('valor')?.value;
+  const tem = titulo || desc || catSel;
+  document.getElementById('prevEmpty').style.display = tem ? 'none' : 'block';
+  document.getElementById('prevContent').style.display = tem ? 'block' : 'none';
+  if (catSel) document.getElementById('prevCat').textContent = catSel;
+  document.getElementById('prevTitulo').textContent = titulo || 'Sem título...';
+  document.getElementById('prevDesc').textContent = desc || 'Sem descrição...';
+  document.getElementById('prevValor').textContent = valorTipo === 'aberto' ? 'Em aberto' : (valor ? 'R$ ' + parseFloat(valor).toLocaleString('pt-BR') : 'A definir');
+  document.getElementById('prevUrg').textContent = urgSel;
+  document.getElementById('prevEnd').textContent = end || '—';
+}
+
+// ── UPLOAD ARQUIVOS ────────────────────────────────────────────────
+function dragOver(e) { e.preventDefault(); document.getElementById('uploadArea').classList.add('drag'); }
+function dragLeave() { document.getElementById('uploadArea').classList.remove('drag'); }
+function dragDrop(e) { e.preventDefault(); document.getElementById('uploadArea').classList.remove('drag'); adicionarArquivos(e.dataTransfer.files); }
+
+function adicionarArquivos(files) {
+  const prev = document.getElementById('filesPreview');
+  Array.from(files).forEach(f => {
+    if (arquivos.length >= 10) return;
+    arquivos.push(f);
+    const icon = f.type.startsWith('image/') ? '🖼️' : '📄';
+    const nome = f.name.length > 10 ? f.name.substring(0,10)+'...' : f.name;
+    const thumb = document.createElement('div');
+    thumb.className = 'file-thumb';
+    thumb.innerHTML = `${icon}<span>${nome}</span><div class="remove" onclick="removerArquivo(this)">✕</div>`;
+    prev.appendChild(thumb);
+  });
+  // Mantém botão de adicionar mais visível — só esconde se atingir limite
+  if (arquivos.length >= 10) {
+    document.getElementById('uploadArea').style.display = 'none';
+  } else {
+    // Mostra área de upload compacta para adicionar mais
+    const ua = document.getElementById('uploadArea');
+    ua.style.display = '';
+    ua.style.padding = '10px';
+    ua.querySelector('div:first-child').textContent = '➕';
+    ua.querySelectorAll('div')[1].textContent = 'Adicionar mais fotos';
+    ua.querySelector('div:last-child').textContent = arquivos.length + '/10 arquivos';
+  }
+  atualizarPreview();
+}
+
+function removerArquivo(el) {
+  const thumb = el.parentElement;
+  const idx = Array.from(thumb.parentElement.children).indexOf(thumb);
+  arquivos.splice(idx, 1);
+  thumb.remove();
+  const ua = document.getElementById('uploadArea');
+  if (!arquivos.length && !fotosUrls.length) {
+    ua.style.display = ''; ua.style.padding = ''; 
+    ua.querySelector('div:first-child').textContent = '📁';
+    ua.querySelectorAll('div')[1].textContent = 'Clique ou arraste fotos aqui';
+    ua.querySelector('div:last-child').textContent = 'JPG, PNG ou PDF · Até 10 arquivos';
+  } else if (arquivos.length < 10) {
+    ua.style.display = '';
+    ua.querySelectorAll('div')[1].textContent = 'Adicionar mais fotos';
+    ua.querySelector('div:last-child').textContent = arquivos.length + '/10 arquivos';
+  }
+  atualizarPreview();
+}
+function removerFoto(idx, el) { fotosUrls.splice(idx, 1); el.parentElement.remove(); if(!arquivos.length && !fotosUrls.length) document.getElementById('uploadArea').style.display = ''; }
+
+// ── UPLOAD PARA IMGBB ──────────────────────────────────────────────
+async function uploadFotos() {
+  const urls = [...fotosUrls]; // mantém fotos já existentes
+  for (const f of arquivos) {
+    try {
+      const base64 = await new Promise(res => { const r = new FileReader(); r.onload = e => res(e.target.result.split(',')[1]); r.readAsDataURL(f); });
+      const fd = new FormData(); fd.append('image', base64);
+      const resp = await fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_KEY, { method: 'POST', body: fd });
+      const data = await resp.json();
+      if (data.success) urls.push(data.data.url);
+    } catch(e) { console.warn('Erro upload foto:', e); }
+  }
+  return urls;
+}
+
+// ── PUBLICAR / SALVAR ──────────────────────────────────────────────
+async function publicar() {
+  const titulo = document.getElementById('titulo').value.trim();
+  const descricao = document.getElementById('descricao').value.trim();
+  const endereco = document.getElementById('endereco').value.trim();
+  const valor = parseFloat(document.getElementById('valor').value) || null;
+
+  if (!titulo) { alert('Digite o título do pedido!'); return; }
+  if (!descricao) { alert('Descreva o serviço que você precisa!'); return; }
+  if (!catSel) { alert('Selecione uma categoria!'); return; }
+  if (!endereco) { alert('Informe o bairro e cidade do serviço!'); return; }
+  if (!userAtual) { alert('Você precisa estar logado!'); window.location.href = 'login.html'; return; }
+
+  const btn = document.getElementById('btnPublicar');
+  btn.disabled = true;
+  document.getElementById('btnTxt').innerHTML = '<span class="spinner"></span>Aguarde...';
+
   try {
-    const snap = await firebase.firestore().collection('notificacoes').where('para','==',nuid).limit(20).get();
-    const notifs = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.criadoEm||'').localeCompare(a.criadoEm||''));
-    notifIds = snap.docs.map(d=>d.id);
-    const novas = notifs.filter(n=>!n.lida).length;
-    const badge = document.getElementById('notifBadge');
-    if(novas>0){badge.style.display='flex';badge.textContent=novas>9?'9+':novas;}else badge.style.display='none';
-    const lista = document.getElementById('notifLista');
-    if(!notifs.length){lista.innerHTML='<div style="padding:24px;text-align:center;color:#8A9BB5;font-size:12px">Sem notificações</div>';return;}
-    const icones={interesse:'👋',solicitado:'⚡',proposta:'💬',aceite:'✅',avaliacao:'⭐',sistema:'📢'};
-    const cores={interesse:'rgba(0,201,111,0.15)',solicitado:'rgba(255,184,48,0.15)',proposta:'rgba(0,201,111,0.15)',aceite:'rgba(255,184,48,0.15)',avaliacao:'rgba(255,107,53,0.15)',sistema:'rgba(138,155,181,0.1)'};
-    lista.innerHTML=notifs.map(n=>`<div class="notif-item ${n.lida?'lida':'nova'}" onclick="abrirNotif('${n.link||''}')">
-      <div class="ni-icon" style="background:${cores[n.tipo]||cores.sistema}">${icones[n.tipo]||'📢'}</div>
-      <div style="flex:1"><div class="ni-txt">${n.mensagem}</div><div class="ni-tempo">${tempoRelativo(n.criadoEm)}</div></div>
-      ${!n.lida?'<div class="ni-dot"></div>':''}
-    </div>`).join('');
-  } catch(e){console.log('notif:',e);}
+    const fotos = await uploadFotos();
+    const dados = {
+      titulo,
+      descricao,
+      categorias: [catSel],     // array para compatibilidade com o dashboard
+      categoria: catSel,         // string de compatibilidade
+      orcamento: valorTipo,
+      valor: valorTipo === 'aproximado' ? valor : null,
+      urgencia: urgSel,
+      endereco,
+      fotos,
+      clienteId: userAtual.uid,
+      clienteNome: localStorage.getItem('sj_nome') || userAtual.displayName || '',
+      status: 'aberto',
+      atualizadoEm: new Date().toISOString()
+    };
+
+    if (editandoId) {
+      // EDIÇÃO: atualiza pedido existente
+      await firebase.firestore().collection('pedidos').doc(editandoId).update(dados);
+      document.getElementById('modalIcon').textContent = '✅';
+      document.getElementById('modalTitle').textContent = 'Pedido atualizado!';
+      document.getElementById('modalMsg').textContent = 'As informações do seu pedido foram atualizadas com sucesso.';
+    } else {
+      // NOVO: cria pedido
+      dados.criadoEm = new Date().toISOString();
+      dados.interessados = [];
+      await firebase.firestore().collection('pedidos').add(dados);
+      document.getElementById('modalIcon').textContent = '🎉';
+      document.getElementById('modalTitle').textContent = 'Pedido publicado!';
+      document.getElementById('modalMsg').textContent = 'Seu pedido foi publicado. Profissionais da sua região já podem ver e demonstrar interesse.';
+    }
+
+    document.getElementById('overlayOk').classList.add('vis');
+  } catch(e) {
+    alert('Erro ao salvar pedido: ' + e.message);
+  }
+
+  btn.disabled = false;
+  document.getElementById('btnTxt').textContent = editandoId ? 'Salvar alterações' : 'Publicar pedido';
 }
-async function marcarTodasLidas() {
-  if(!notifIds.length)return;
-  document.getElementById('notifBadge').style.display='none';
-  try{const batch=firebase.firestore().batch();notifIds.forEach(id=>batch.update(firebase.firestore().collection('notificacoes').doc(id),{lida:true}));await batch.commit();}catch(e){}
-}
-function abrirNotif(link){if(link)window.location.href=link;toggleNotif();}
-async function criarNotificacao(para,tipo,mensagem,link){
-  if(!para)return;
-  try{await firebase.firestore().collection('notificacoes').add({para,tipo,mensagem,link:link||'',lida:false,criadoEm:new Date().toISOString()});}catch(e){}
-}
-document.querySelectorAll('.overlay').forEach(ov=>ov.addEventListener('click',e=>{if(e.target===ov)ov.classList.remove('vis');}));
 </script>
-<!-- MODAL PAGAMENTO PIX -->
-<div class="overlay" id="overlayPagamento">
-  <div class="modal" style="max-width:420px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <div class="modal-title">💳 Pagar taxa ServiçoJá</div>
-      <button onclick="document.getElementById('overlayPagamento').classList.remove('vis')" style="background:rgba(255,255,255,.06);border:none;border-radius:50%;width:28px;height:28px;color:var(--cinza);cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center">✕</button>
-    </div>
-
-    <div style="background:rgba(0,201,111,.07);border:1px solid rgba(0,201,111,.2);border-radius:12px;padding:14px 16px;margin-bottom:14px;text-align:center">
-      <div style="font-size:.72rem;color:var(--cinza);margin-bottom:4px">Valor a pagar</div>
-      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;color:var(--verde)" id="pagValor">—</div>
-    </div>
-
-    <div style="background:var(--azul-input);border:1px solid var(--borda);border-radius:12px;padding:14px 16px;margin-bottom:14px">
-      <div style="font-size:.72rem;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">📱 Chave Pix para pagamento</div>
-      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:var(--branco);word-break:break-all" id="pixKey">camillouk21@gmail.com</div>
-      <div style="font-size:.72rem;color:var(--cinza);margin-top:4px">Tipo: E-mail · Titular: ServiçoJá Conecta</div>
-      <button onclick="navigator.clipboard.writeText('camillouk21@gmail.com').then(()=>this.textContent='✅ Copiado!').catch(()=>{})" style="margin-top:10px;background:rgba(0,201,111,.1);border:1px solid rgba(0,201,111,.25);border-radius:7px;padding:6px 14px;color:var(--verde);font-size:.75rem;font-weight:700;cursor:pointer;width:100%">📋 Copiar chave Pix</button>
-    </div>
-
-    <div style="font-size:.8rem;color:var(--cinza);margin-bottom:12px;line-height:1.6">
-      1. Faça o pagamento via Pix para a chave acima<br>
-      2. Salve o comprovante<br>
-      3. Anexe o comprovante abaixo e clique em enviar
-    </div>
-
-    <div class="mfield">
-      <label>Comprovante de pagamento *</label>
-      <input type="file" id="pagComp" accept="image/*,application/pdf" style="background:var(--azul-input);border:1.5px dashed rgba(0,201,111,.3);border-radius:10px;padding:10px;color:var(--cinza);width:100%;cursor:pointer" onchange="uploadComprovante(this)">
-      <input type="hidden" id="pagCompUrl">
-      <img id="pagPreview" style="display:none;width:100%;border-radius:8px;margin-top:8px;max-height:120px;object-fit:contain">
-    </div>
-
-    <div id="pagStatus" style="display:none"></div>
-
-    <div style="display:flex;gap:8px;margin-top:4px">
-      <button class="btn-cancel" onclick="document.getElementById('overlayPagamento').classList.remove('vis')">Cancelar</button>
-      <button class="btn-send" id="btnEnviarPag" onclick="enviarComprovante()">✅ Enviar comprovante</button>
-    </div>
-  </div>
-</div>
-
-<script>if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(e=>{});}</script>
 </body>
 </html>
