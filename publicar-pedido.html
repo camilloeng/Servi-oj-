@@ -443,11 +443,39 @@ function adicionarArquivos(files) {
     thumb.innerHTML = `${icon}<span>${nome}</span><div class="remove" onclick="removerArquivo(this)">✕</div>`;
     prev.appendChild(thumb);
   });
-  if (arquivos.length > 0) document.getElementById('uploadArea').style.display = 'none';
+  // Mantém botão de adicionar mais visível — só esconde se atingir limite
+  if (arquivos.length >= 10) {
+    document.getElementById('uploadArea').style.display = 'none';
+  } else {
+    // Mostra área de upload compacta para adicionar mais
+    const ua = document.getElementById('uploadArea');
+    ua.style.display = '';
+    ua.style.padding = '10px';
+    ua.querySelector('div:first-child').textContent = '➕';
+    ua.querySelectorAll('div')[1].textContent = 'Adicionar mais fotos';
+    ua.querySelector('div:last-child').textContent = arquivos.length + '/10 arquivos';
+  }
   atualizarPreview();
 }
 
-function removerArquivo(el) { el.parentElement.remove(); arquivos.pop(); if(!arquivos.length && !fotosUrls.length) document.getElementById('uploadArea').style.display = ''; atualizarPreview(); }
+function removerArquivo(el) {
+  const thumb = el.parentElement;
+  const idx = Array.from(thumb.parentElement.children).indexOf(thumb);
+  arquivos.splice(idx, 1);
+  thumb.remove();
+  const ua = document.getElementById('uploadArea');
+  if (!arquivos.length && !fotosUrls.length) {
+    ua.style.display = ''; ua.style.padding = ''; 
+    ua.querySelector('div:first-child').textContent = '📁';
+    ua.querySelectorAll('div')[1].textContent = 'Clique ou arraste fotos aqui';
+    ua.querySelector('div:last-child').textContent = 'JPG, PNG ou PDF · Até 10 arquivos';
+  } else if (arquivos.length < 10) {
+    ua.style.display = '';
+    ua.querySelectorAll('div')[1].textContent = 'Adicionar mais fotos';
+    ua.querySelector('div:last-child').textContent = arquivos.length + '/10 arquivos';
+  }
+  atualizarPreview();
+}
 function removerFoto(idx, el) { fotosUrls.splice(idx, 1); el.parentElement.remove(); if(!arquivos.length && !fotosUrls.length) document.getElementById('uploadArea').style.display = ''; }
 
 // ── UPLOAD PARA IMGBB ──────────────────────────────────────────────
