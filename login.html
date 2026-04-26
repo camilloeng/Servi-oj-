@@ -313,7 +313,7 @@ let auth, db, googleProvider;
 async function initFirebase() {
   if (auth) return;
   const {initializeApp} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-  const {getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+  const {getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, sendPasswordResetEmail} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
   const {getFirestore, doc, getDoc} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
   const app = initializeApp({
     apiKey:"AIzaSyDgmh5UctN25QCZoNoNctbuCbwMUF97HX4",
@@ -326,7 +326,21 @@ async function initFirebase() {
   auth = getAuth(app);
   db = getFirestore(app);
   googleProvider = new GoogleAuthProvider();
-  window._fbAuth = {signInWithEmailAndPassword, signInWithPopup, sendPasswordResetEmail, getDoc, doc};
+  window._fbAuth = {signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, getRedirectResult, sendPasswordResetEmail, getDoc, doc};
+  // Verifica resultado de redirect do Google (se voltou de um redirect)
+  try {
+    const result = await getRedirectResult(auth);
+    if (result && result.user) {
+      let dadosR = {}, uidR = result.user.uid;
+      try { const sR = await getDoc(doc(db, 'usuarios', uidR+'_prof')); if(sR.exists) { dadosR = sR.data(); uidR = uidR+'_prof'; } } catch(e) {}
+      const tipoR = localStorage.getItem('sj_tipo_pendente') || dadosR.tipo || 'cliente';
+      localStorage.removeItem('sj_tipo_pendente');
+      localStorage.setItem('sj_uid', uidR);
+      localStorage.setItem('sj_nome', dadosR.nome || result.user.displayName || '');
+      localStorage.setItem('sj_tipo', tipoR);
+      window.location.href = tipoR === 'profissional' ? 'dashboard-profissional.html' : 'meus-pedidos-cliente.html';
+    }
+  } catch(e) { console.warn('redirect result:', e); }
 }
 
 async function entrar() {
@@ -388,7 +402,11 @@ async function entrarGoogle() {
   try {
     await initFirebase();
     const {signInWithPopup, getDoc, doc} = window._fbAuth;
-    const cred = await signInWithPopup(auth, googleProvider);
+    // Salva o tipo selecionado para usar após o redirect
+    localStorage.setItem('sj_tipo_pendente', tipoSel || 'cliente');
+    // Usa redirect em vez de popup (mais confiável em todos os browsers)
+    await signInWithRedirect(auth, googleProvider);
+    return; // Página vai redirecionar para Google e voltar
     let dadosG = {}, uidFinalG = cred.user.uid;
     try {
       const snapG = await getDoc(doc(db, 'usuarios', cred.user.uid));
@@ -411,7 +429,16 @@ async function entrarGoogle() {
     localStorage.setItem('sj_nome', nome);
     window.location.href = tipo === 'profissional' ? (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? 'dashboard-profissional-mobile.html' : 'dashboard-profissional.html') : 'meus-pedidos-cliente.html';
   } catch(e) {
-    alert('Erro ao fazer login com Google. Tente novamente.');
+    console.error('Google login error:', e.code, e.message);
+    if (e.code === 'auth/popup-blocked') {
+      alert('Popup bloqueado pelo navegador. Permita popups para este site e tente novamente.');
+    } else if (e.code === 'auth/popup-closed-by-user') {
+      // Usuário fechou o popup - não mostra erro
+    } else if (e.code === 'auth/cancelled-popup-request') {
+      // Request cancelada - não mostra erro
+    } else {
+      alert('Erro ao fazer login com Google: ' + (e.code || e.message));
+    }
   }
 }
 
