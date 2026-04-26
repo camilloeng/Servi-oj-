@@ -197,7 +197,7 @@ input.erro-input{border-color:rgba(255,92,92,0.5)}
     </div>
     <button class="btn-continuar" id="btnContinuar" onclick="irLogin()">Continuar →</button>
     <div class="divider" style="margin-top:20px"><span>não tem conta?</span></div>
-    <div class="cadastro-link"><a href="cadastro-cliente.html">Criar conta grátis →</a></div>
+    <div class="cadastro-link"><a href="#" onclick="irCadastro();return false;">Criar conta grátis →</a></div>
     <p style="font-size:0.72rem;color:rgba(138,155,181,0.6);text-align:center;margin-top:16px;line-height:1.6">O ServiçoJá Conecta atua como plataforma de conexão entre usuários. A contratação e execução dos serviços ocorrem diretamente entre cliente e profissional.</p>
   </div>
 
@@ -206,7 +206,7 @@ input.erro-input{border-color:rgba(255,92,92,0.5)}
     <button class="back-btn" onclick="voltar('telaTipo')">← Voltar</button>
     <div class="tipo-badge" id="tipoBadge">👤 Entrando como cliente</div>
     <div class="form-title">Entre na sua conta</div>
-    <div class="form-sub">Não tem conta? <a href="cadastro-cliente.html">Cadastre-se grátis</a></div>
+    <div class="form-sub">Não tem conta? <a href="#" onclick="irCadastro();return false;">Cadastre-se grátis</a></div>
 
     <div class="erro-msg" id="erroMsg">⚠️ <span id="erroTexto">Email ou senha incorretos.</span></div>
 
@@ -239,7 +239,7 @@ input.erro-input{border-color:rgba(255,92,92,0.5)}
       Continuar com Google
     </button>
 
-    <div class="cadastro-link">Não tem conta? <a href="cadastro-cliente.html">Criar conta grátis →</a></div>
+    <div class="cadastro-link">Não tem conta? <a href="#" onclick="irCadastro();return false;">Criar conta grátis →</a></div>
   </div>
 
   <!-- TELA 3: RECUPERAR SENHA -->
@@ -439,6 +439,15 @@ async function entrarGoogle() {
     } else {
       alert('Erro ao fazer login com Google: ' + (e.code || e.message));
     }
+  }
+}
+
+function irCadastro() {
+  // Vai para o cadastro correto baseado no tipo selecionado
+  if (tipoSel === 'profissional') {
+    window.location.href = 'cadastro-profissional.html';
+  } else {
+    window.location.href = 'cadastro-cliente.html';
   }
 }
 
