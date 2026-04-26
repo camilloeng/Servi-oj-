@@ -162,7 +162,7 @@ if(!window._fbInitialized){firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZo
     </div>
     <div class="field"><div class="input-wrap"><span class="input-icon">🪪</span><input type="text" id="docInput" placeholder="000.000.000-00" maxlength="18"></div><p class="hint">Usado apenas para verificação de identidade. Não é exibido publicamente.</p></div>
     <div class="field"><label>Sobre você <span class="req">*</span></label><textarea id="cadSobre" class="no-icon" placeholder="Conte sobre sua experiência, anos de atuação e diferenciais..."></textarea></div>
-    <div class="nav-btns"><button class="btn-avancar" style="flex:1" onclick="irPara(2)">Próximo →</button></div>
+    <div class="nav-btns"><button class="btn-avancar" style="flex:1" onclick="validarEtapa1()">Próximo →</button></div>
   </div>
 
   <!-- ETAPA 2 -->
@@ -271,10 +271,19 @@ function selDoc(tipo,el){document.querySelectorAll('.doc-btn').forEach(b=>b.clas
 function toggleSenha(){var i=document.getElementById('senhaProf');i.type=i.type==='password'?'text':'password';}
 function toggleCat(el){el.classList.toggle('sel');el.querySelector('.cat-check').textContent=el.classList.contains('sel')?'✓':'';}
 
+var fotoPerfilUrl = '';
 function previewFotoCad(input){
   if(!input.files[0])return;
   var r=new FileReader();
-  r.onload=function(e){document.getElementById('fotoCircle').innerHTML='<img src="'+e.target.result+'">';};
+  r.onload=function(e){
+    document.getElementById('fotoCircle').innerHTML='<img src="'+e.target.result+'">';
+    // Upload para ImgBB em background
+    var fd=new FormData(); fd.append('image',e.target.result.split(',')[1]);
+    fetch('https://api.imgbb.com/1/upload?key=327d0067238019843e43362c2f7096c7',{method:'POST',body:fd})
+      .then(function(res){return res.json();})
+      .then(function(data){if(data.success){fotoPerfilUrl=data.data.url;}})
+      .catch(function(){console.warn('Foto upload falhou - ok, vai sem foto');});
+  };
   r.readAsDataURL(input.files[0]);
 }
 
@@ -296,6 +305,18 @@ async function buscarCEP2(val){
 
 // ── DADOS TEMPORÁRIOS — conta criada APENAS após aprovação no teste ───
 var dadosCadastroTemp = {};
+
+function validarEtapa1() {
+  var nome  = (document.getElementById('cadNome')  ||{}).value||'';
+  var email = (document.getElementById('cadEmail') ||{}).value||'';
+  var senha = (document.getElementById('senhaProf')||{}).value||'';
+  var conf  = (document.getElementById('cadConfSenha')||{}).value||'';
+  if(!nome.trim())  { alert('Preencha seu nome completo!'); return; }
+  if(!email.trim()) { alert('Preencha seu e-mail!'); return; }
+  if(!senha || senha.length<6) { alert('A senha precisa ter pelo menos 6 caracteres!'); return; }
+  if(senha !== conf) { alert('As senhas não coincidem!'); return; }
+  irPara(2);
+}
 
 function finalizarCadastroProfissional() {
   var nome  = (document.getElementById('cadNome')  ||{}).value  ||'';
@@ -348,7 +369,7 @@ async function finalizarCadastroCompleto() {
   try {
     var cred = await firebase.auth().createUserWithEmailAndPassword(d.email, d.senha);
     var uid = cred.user.uid;
-    await firebase.firestore().collection('usuarios').doc(uid+'_prof').set({
+    var dadosProf = {
       nome: d.nome||'Profissional',
       email: d.email,
       telefone: d.telefone||'',
@@ -363,7 +384,9 @@ async function finalizarCadastroCompleto() {
       totalAvaliacoes: 0,
       endereco:{rua:d.rua,bairro:d.bairro,cidade:d.cidade,estado:d.estado},
       criadoEm: new Date().toISOString()
-    });
+    };
+    if(fotoPerfilUrl) dadosProf.fotoPerfil = fotoPerfilUrl;
+    await firebase.firestore().collection('usuarios').doc(uid+'_prof').set(dadosProf);
     localStorage.setItem('sj_uid', uid+'_prof');
     localStorage.setItem('sj_nome', d.nome||'Profissional');
     localStorage.setItem('sj_tipo', 'profissional');
