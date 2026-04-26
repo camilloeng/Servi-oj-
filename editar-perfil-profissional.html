@@ -188,7 +188,7 @@ firebase.auth().onAuthStateChanged(async function(user) {
   for (const id of [user.uid + '_prof', user.uid]) {
     try {
       const s = await firebase.firestore().collection('usuarios').doc(id).get();
-      if (s.exists() && s.data().tipo === 'profissional') { profDocId = id; carregarDados(s.data()); return; }
+      if (s.exists && s.data().tipo === 'profissional') { profDocId = id; carregarDados(s.data()); return; }
     } catch(e) {}
   }
   document.getElementById('loading').style.display = 'none';
