@@ -528,12 +528,12 @@ async function aceitarProf(profId, profNome, pedidoId, taxa) {
   const pedido = todosPedidos.find(p => p.id === pedidoId);
   if (!pedido) return;
 
+  // Permite aceitar MÚLTIPLOS profissionais - só muda o status do escolhido
   const intsAtualizados = (pedido.interessados || []).map(i =>
     i.profissionalId === profId ? { ...i, status: 'solicitado' } : i
   );
 
   try {
-    // Atualiza pedido: status do interesse → 'solicitado'
     await firebase.firestore().collection('pedidos').doc(pedidoId).update({
       interessados: intsAtualizados
     });
