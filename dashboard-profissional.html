@@ -748,7 +748,7 @@ async function enviarProposta() {
   } catch(e) { alert('Erro ao enviar: ' + e.message); }
 }
 
-async // ── CONCLUIR SERVIÇO ──────────────────────────────────────────────────
+// ── CONCLUIR SERVIÇO ──────────────────────────────────────────────────
 function confirmarConcluir(pedidoId) {
   if (!confirm('Marcar este serviço como concluído?\n\nEle sairá da sua lista de aceitos e irá para o histórico.')) return;
   concluirServico(pedidoId);
