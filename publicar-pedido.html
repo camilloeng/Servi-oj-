@@ -196,6 +196,9 @@ if(!window._fbInitialized){firebase.initializeApp({apiKey:"AIzaSyDgmh5UctN25QCZo
       </div>
       <input type="file" id="fileInput" multiple accept="image/*,.pdf" style="display:none" onchange="adicionarArquivos(this.files)">
       <div class="files-preview" id="filesPreview"></div>
+      <div id="addMaisBtn" style="display:none;align-items:center;gap:6px;margin-top:8px;padding:8px 14px;background:var(--azul-input);border:1.5px dashed rgba(0,201,111,0.3);border-radius:10px;cursor:pointer;color:var(--verde);font-size:0.78rem;font-weight:600" onclick="document.getElementById('fileInput').click()">
+        <span style="font-size:1.1rem">➕</span><span>Adicionar (0/10)</span>
+      </div>
     </div>
 
     <!-- VALOR E URGÊNCIA -->
@@ -363,9 +366,15 @@ async function carregarPedido(id) {
       fotosUrls.forEach((url, i) => {
         const thumb = document.createElement('div');
         thumb.className = 'file-thumb';
-        thumb.innerHTML = `🖼️<span>Foto ${i+1}</span><div class="remove" onclick="removerFoto(${i},this)">✕</div>`;
+        thumb.innerHTML = '<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:8px"><div class="remove" onclick="removerFoto('+i+',this)">✕</div>';
         prev.appendChild(thumb);
       });
+      // Mostra botão adicionar mais
+      const addBtn = document.getElementById('addMaisBtn');
+      if (addBtn && fotosUrls.length < 10) {
+        addBtn.style.display = 'flex';
+        addBtn.querySelector('span').textContent = 'Adicionar ('+fotosUrls.length+'/10)';
+      }
     }
 
     atualizarPreview();
@@ -437,42 +446,33 @@ function adicionarArquivos(files) {
     if (arquivos.length >= 10) return;
     arquivos.push(f);
     const icon = f.type.startsWith('image/') ? '🖼️' : '📄';
-    const nome = f.name.length > 10 ? f.name.substring(0,10)+'...' : f.name;
+    const nome = f.name.length > 12 ? f.name.substring(0,12)+'...' : f.name;
     const thumb = document.createElement('div');
     thumb.className = 'file-thumb';
-    thumb.innerHTML = `${icon}<span>${nome}</span><div class="remove" onclick="removerArquivo(this)">✕</div>`;
+    thumb.innerHTML = icon+'<span>'+nome+'</span><div class="remove" onclick="removerArquivo(this)">✕</div>';
     prev.appendChild(thumb);
   });
-  // Mantém botão de adicionar mais visível — só esconde se atingir limite
-  if (arquivos.length >= 10) {
-    document.getElementById('uploadArea').style.display = 'none';
-  } else {
-    // Mostra área de upload compacta para adicionar mais
-    const ua = document.getElementById('uploadArea');
-    ua.style.display = '';
-    ua.style.padding = '10px';
-    ua.querySelector('div:first-child').textContent = '➕';
-    ua.querySelectorAll('div')[1].textContent = 'Adicionar mais fotos';
-    ua.querySelector('div:last-child').textContent = arquivos.length + '/10 arquivos';
-  }
+  // Atualiza o botão de adicionar
+  document.getElementById('addMaisBtn').style.display = arquivos.length < 10 ? 'flex' : 'none';
+  document.getElementById('addMaisBtn').querySelector('span').textContent = 'Adicionar ('+arquivos.length+'/10)';
+  document.getElementById('uploadArea').style.display = arquivos.length > 0 ? 'none' : '';
   atualizarPreview();
 }
 
 function removerArquivo(el) {
   const thumb = el.parentElement;
-  const idx = Array.from(thumb.parentElement.children).indexOf(thumb);
-  arquivos.splice(idx, 1);
+  // Encontra o índice entre os thumbs (excluindo o botão addMais)
+  const thumbs = Array.from(document.getElementById('filesPreview').querySelectorAll('.file-thumb'));
+  const idx = thumbs.indexOf(thumb);
+  if (idx >= 0) arquivos.splice(idx, 1);
   thumb.remove();
-  const ua = document.getElementById('uploadArea');
+  const addBtn = document.getElementById('addMaisBtn');
+  if (addBtn) {
+    addBtn.style.display = arquivos.length < 10 ? 'flex' : 'none';
+    addBtn.querySelector('span').textContent = 'Adicionar ('+arquivos.length+'/10)';
+  }
   if (!arquivos.length && !fotosUrls.length) {
-    ua.style.display = ''; ua.style.padding = ''; 
-    ua.querySelector('div:first-child').textContent = '📁';
-    ua.querySelectorAll('div')[1].textContent = 'Clique ou arraste fotos aqui';
-    ua.querySelector('div:last-child').textContent = 'JPG, PNG ou PDF · Até 10 arquivos';
-  } else if (arquivos.length < 10) {
-    ua.style.display = '';
-    ua.querySelectorAll('div')[1].textContent = 'Adicionar mais fotos';
-    ua.querySelector('div:last-child').textContent = arquivos.length + '/10 arquivos';
+    document.getElementById('uploadArea').style.display = '';
   }
   atualizarPreview();
 }
